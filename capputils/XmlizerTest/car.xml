@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<Car>
+    <DoorCount value="3" />
+    <HighSpeed value="240" />
+    <ModelName value="BMW 3er" />
+</Car>
