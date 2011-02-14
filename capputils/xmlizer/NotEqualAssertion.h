@@ -33,6 +33,7 @@ public:
   virtual bool valid(const reflection::IClassProperty& property,
         const reflection::ReflectableClass& object)
   {
+    // TODO: check if dynamic_cast fails
     T propertyValue = dynamic_cast<const reflection::ClassProperty<T>* >(&property)->getValue(object);
     if (propertyValue == value) {
       if (defaultMessage.size()) {
