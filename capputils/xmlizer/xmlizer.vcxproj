@@ -80,11 +80,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgumentsParser.h" />
+    <ClInclude Include="ClassProperty.h" />
     <ClInclude Include="DescriptionAttribute.h" />
     <ClInclude Include="FileExists.h" />
     <ClInclude Include="FlagAttribute.h" />
     <ClInclude Include="IAssertionAttribute.h" />
     <ClInclude Include="IAttribute.h" />
+    <ClInclude Include="IClassProperty.h" />
     <ClInclude Include="NotEqualAssertion.h" />
     <ClInclude Include="ReflectableClass.h" />
     <ClInclude Include="stdafx.h" />
@@ -105,9 +107,7 @@
     </ClCompile>
     <ClCompile Include="FileExists.cpp" />
     <ClCompile Include="FlagAttribute.cpp" />
-    <ClCompile Include="IAssertionAttribute.cpp" />
     <ClCompile Include="IAttribute.cpp" />
-    <ClCompile Include="NotEqualAssertion.cpp" />
     <ClCompile Include="ReflectableClass.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

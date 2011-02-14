@@ -10,7 +10,7 @@
 
 #include <ReflectableClass.h>
 
-class Car : public reflection::ReflectableClass {
+class Car : public capputils::reflection::ReflectableClass {
 
   InitReflectableClass(Car)
 

@@ -10,7 +10,8 @@
 #include "ReflectableClass.h"
 
 using namespace std;
-using namespace reflection;
+using namespace capputils;
+using namespace capputils::reflection;
 
 /*** Here comes the true story ***/
 
@@ -41,9 +42,9 @@ int main(int argc, char* argv[])
 
   t.setProperty("A", "12");
   t.setProperty("Height", "2.10");
-  vector<ClassProperty*>& properties = t.getProperties();
+  vector<IClassProperty*>& properties = t.getProperties();
   for (unsigned i = 0; i < properties.size(); ++i)
-    cout << properties[i]->name << " = " << t.getProperty(properties[i]->name) << endl;
+    cout << properties[i]->getName() << " = " << t.getProperty(properties[i]->getName()) << endl;
   //t.printProperties();
   cout << t.getA() << endl;
   cout << t.getHeight() << endl;

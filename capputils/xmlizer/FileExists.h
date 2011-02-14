@@ -10,7 +10,7 @@
 
 #include "IAssertionAttribute.h"
 
-namespace xmlizer {
+namespace capputils {
 
 namespace attributes {
 
@@ -22,13 +22,13 @@ public:
   FileExistsAttribute();
   virtual ~FileExistsAttribute();
 
-  virtual bool valid(const reflection::ClassProperty& property,
+  virtual bool valid(const reflection::IClassProperty& property,
       const reflection::ReflectableClass& object);
 
   virtual const std::string& getLastMessage() const;
 };
 
-reflection::AttributeWrapper FileExists();
+AttributeWrapper FileExists();
 
 }
 

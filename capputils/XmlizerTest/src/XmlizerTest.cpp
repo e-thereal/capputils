@@ -19,12 +19,29 @@
 #include <cstdarg>
 
 using namespace std;
-using namespace xmlizer;
-using namespace reflection;
-using namespace xmlizer::attributes;
+using namespace capputils;
+using namespace capputils::reflection;
+using namespace capputils::attributes;
+
+class TestBase {
+public:
+  virtual ~TestBase() { }
+};
+
+template<class T>
+class Test : public TestBase {
+private:
+    T value;
+
+public:
+  T getValue() { return value; }
+};
 
 int main(int argc, char** argv) {
 	Car car;
+
+  TestBase& testBase = Test<int>();
+  Test<int>* test = dynamic_cast<Test<int>* >(&testBase);
 
 	//Xmlizer::FromXml(car, "car.xml");
 	ArgumentsParser::Parse(car, argc, argv);

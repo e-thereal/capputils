@@ -8,7 +8,9 @@
 #ifndef IATTRIBUTE_H_
 #define IATTRIBUTE_H_
 
-namespace reflection {
+namespace capputils {
+
+namespace attributes {
 
 class IAttribute {
 public:
@@ -21,6 +23,8 @@ public:
 
   AttributeWrapper(IAttribute* attribute) : attribute (attribute) { }
 };
+
+}
 
 }
 

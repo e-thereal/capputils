@@ -13,7 +13,7 @@
 #include <ostream>
 #include <iostream>
 
-namespace xmlizer {
+namespace capputils {
 
 class Verifier {
 public:
@@ -21,7 +21,7 @@ public:
   virtual ~Verifier();
 
   static bool Valid(const reflection::ReflectableClass& object,
-      const reflection::ClassProperty& property, std::ostream& stream);
+      const reflection::IClassProperty& property, std::ostream& stream);
   static bool Valid(const reflection::ReflectableClass& object,
       std::ostream& stream = std::cout);
 };

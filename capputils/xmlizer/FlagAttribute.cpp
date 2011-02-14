@@ -7,7 +7,7 @@
 
 #include "FlagAttribute.h"
 
-namespace xmlizer {
+namespace capputils {
 
 namespace attributes {
 
@@ -17,8 +17,8 @@ FlagAttribute::FlagAttribute() {
 FlagAttribute::~FlagAttribute() {
 }
 
-reflection::AttributeWrapper Flag() {
-  return reflection::AttributeWrapper(new FlagAttribute());
+AttributeWrapper Flag() {
+  return AttributeWrapper(new FlagAttribute());
 }
 
 }

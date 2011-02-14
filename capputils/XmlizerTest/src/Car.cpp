@@ -11,8 +11,8 @@
 #include <FlagAttribute.h>
 #include <NotEqualAssertion.h>
 
-using namespace xmlizer::attributes;
-using namespace reflection;
+using namespace capputils::attributes;
+using namespace capputils::reflection;
 
 BeginPropertyDefinitions(Car)
 
@@ -23,7 +23,7 @@ BeginPropertyDefinitions(Car)
 
 EndPropertyDefinitions
 
-Car::Car() : _DoorCount(0), _HighSpeed(100), _ModelName("BMW"), _Help(0) {
+Car::Car() : _DoorCount(3), _HighSpeed(100), _ModelName("BMW"), _Help(0) {
 }
 
 Car::~Car() {

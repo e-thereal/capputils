@@ -11,8 +11,9 @@
 #include "IAssertionAttribute.h"
 #include <iostream>
 
+#include "ClassProperty.h"
 
-namespace xmlizer {
+namespace capputils {
 
 namespace attributes {
 
@@ -29,15 +30,15 @@ public:
   { }
   virtual ~NotEqualAttribute() { }
 
-  virtual bool valid(const reflection::ClassProperty& property,
+  virtual bool valid(const reflection::IClassProperty& property,
         const reflection::ReflectableClass& object)
   {
-    const std::string& propertyValue = property.getRawValue(object);
-    if (reflection::convertFromString<T>(propertyValue) == value) {
+    T propertyValue = dynamic_cast<const reflection::ClassProperty<T>* >(&property)->getValue(object);
+    if (propertyValue == value) {
       if (defaultMessage.size()) {
         message = defaultMessage;
       } else {
-        message = property.name +
+        message = property.getName() +
             " must not be " + propertyValue + "!";
       }
       return false;
@@ -51,8 +52,8 @@ public:
 };
 
 template<class T>
-reflection::AttributeWrapper NotEqual(T value, const std::string& defaultMessage = "") {
-  return reflection::AttributeWrapper(new NotEqualAttribute<T>(value, defaultMessage));
+AttributeWrapper NotEqual(T value, const std::string& defaultMessage = "") {
+  return AttributeWrapper(new NotEqualAttribute<T>(value, defaultMessage));
 }
 
 }

@@ -7,6 +7,8 @@
 
 #include "ReflectableClass.h"
 
+namespace capputils {
+
 namespace reflection {
 
 template<>
@@ -16,11 +18,11 @@ std::string convertFromString(const std::string& value) {
 
 ReflectableClass::~ReflectableClass() { }
 
-ClassProperty* ReflectableClass::findProperty(const std::string& propertyName) const {
-  std::vector<ClassProperty*>& properties = getProperties();
+IClassProperty* ReflectableClass::findProperty(const std::string& propertyName) const {
+  std::vector<IClassProperty*>& properties = getProperties();
 
   for (unsigned i = 0; i < properties.size(); ++i) {
-    if (properties[i]->name.compare(propertyName) == 0)
+    if (properties[i]->getName().compare(propertyName) == 0)
       return properties[i];
   }
 
@@ -32,17 +34,19 @@ bool ReflectableClass::hasProperty(const std::string& propertyName) const {
 }
 
 void ReflectableClass::setProperty(const std::string& propertyName, const std::string& propertyValue) {
-  ClassProperty* property = findProperty(propertyName);
+  IClassProperty* property = findProperty(propertyName);
   if (property)
-    property->setValue(*this, propertyValue);
+    property->setStringValue(*this, propertyValue);
 }
 
 const std::string ReflectableClass::getProperty(const std::string& propertyName) {
-  ClassProperty* property = findProperty(propertyName);
+  IClassProperty* property = findProperty(propertyName);
   if (property)
-    return property->getRawValue(*this);
+    return property->getStringValue(*this);
 
   return "<UNDEFINED>";
+}
+
 }
 
 }

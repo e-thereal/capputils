@@ -7,9 +7,13 @@
 
 #include "IAttribute.h"
 
-namespace reflection {
+namespace capputils {
+
+namespace attributes {
 
 IAttribute::~IAttribute() {
+}
+
 }
 
 }

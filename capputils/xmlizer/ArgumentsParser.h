@@ -10,7 +10,7 @@
 
 #include "ReflectableClass.h"
 
-namespace xmlizer {
+namespace capputils {
 
 class ArgumentsParser {
 public:

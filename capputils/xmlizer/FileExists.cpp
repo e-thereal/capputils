@@ -9,10 +9,13 @@
 
 #include <cstdio>
 
-using namespace reflection;
+#include "ReflectableClass.h"
+
 using namespace std;
 
-namespace xmlizer {
+namespace capputils {
+
+using namespace reflection;
 
 namespace attributes {
 
@@ -22,10 +25,10 @@ FileExistsAttribute::FileExistsAttribute() {
 FileExistsAttribute::~FileExistsAttribute() {
 }
 
-bool FileExistsAttribute::valid(const ClassProperty& property,
+bool FileExistsAttribute::valid(const IClassProperty& property,
     const ReflectableClass& object)
 {
-  const string& filename = property.getValue<string>(object);
+  const string& filename = property.getStringValue(object);
 
   FILE* file = fopen(filename.c_str(), "r");
   if (file) {
@@ -42,8 +45,8 @@ const string& FileExistsAttribute::getLastMessage() const {
   return lastError;
 }
 
-reflection::AttributeWrapper FileExists() {
-  return reflection::AttributeWrapper(new FileExistsAttribute());
+AttributeWrapper FileExists() {
+  return AttributeWrapper(new FileExistsAttribute());
 }
 
 }

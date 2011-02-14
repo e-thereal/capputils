@@ -11,19 +11,19 @@
 
 #include <iostream>
 
-namespace xmlizer {
+namespace capputils {
 
 using namespace attributes;
 
-TiXmlElement* Xmlizer::CreateXml(const ::reflection::ReflectableClass& object) {
+TiXmlElement* Xmlizer::CreateXml(const reflection::ReflectableClass& object) {
   TiXmlElement* xmlNode = new TiXmlElement(object.getClassName());
 
   Xmlizer::ToXml(*xmlNode, object);
   return xmlNode;
 }
 
-void Xmlizer::ToXml(TiXmlNode& xmlNode, const ::reflection::ReflectableClass& object) {
-  std::vector< ::reflection::ClassProperty*>& properties = object.getProperties();
+void Xmlizer::ToXml(TiXmlNode& xmlNode, const reflection::ReflectableClass& object) {
+  std::vector<reflection::IClassProperty*>& properties = object.getProperties();
 
   for (unsigned i = 0; i < properties.size(); ++i) {
     DescriptionAttribute* description = properties[i]->getAttribute<DescriptionAttribute>();
@@ -31,20 +31,20 @@ void Xmlizer::ToXml(TiXmlNode& xmlNode, const ::reflection::ReflectableClass& ob
       xmlNode.LinkEndChild(new TiXmlComment(description->getDescription().c_str()));
     }
 
-    TiXmlElement* propertyElement = new TiXmlElement(properties[i]->name);
-    propertyElement->SetAttribute("value", properties[i]->getRawValue(object));
+    TiXmlElement* propertyElement = new TiXmlElement(properties[i]->getName());
+    propertyElement->SetAttribute("value", properties[i]->getStringValue(object));
     xmlNode.LinkEndChild(propertyElement);
   }
 }
 
-void Xmlizer::ToXml(const ::std::string& filename, const ::reflection::ReflectableClass& object) {
+void Xmlizer::ToXml(const ::std::string& filename, const reflection::ReflectableClass& object) {
   TiXmlDocument xmlDoc;
   xmlDoc.LinkEndChild(new TiXmlDeclaration("1.0", "", ""));
   xmlDoc.LinkEndChild(Xmlizer::CreateXml(object));
   xmlDoc.SaveFile(filename);
 }
 
-void Xmlizer::FromXml(::reflection::ReflectableClass& object, const TiXmlNode& xmlNode) {
+void Xmlizer::FromXml(reflection::ReflectableClass& object, const TiXmlNode& xmlNode) {
   using namespace std;
   const TiXmlNode* xNode = &xmlNode;
 
@@ -57,15 +57,15 @@ void Xmlizer::FromXml(::reflection::ReflectableClass& object, const TiXmlNode& x
       const TiXmlElement* element = dynamic_cast<const TiXmlElement*>(node);
       const char* value = element->Attribute("value");
       if (value) {
-        reflection::ClassProperty* property = object.findProperty(element->Value());
+        reflection::IClassProperty* property = object.findProperty(element->Value());
         if (property)
-          property->setValue(object, value);
+          property->setStringValue(object, value);
       }
     }
   }
 }
 
-void Xmlizer::FromXml(::reflection::ReflectableClass& object, const ::std::string& filename) {
+void Xmlizer::FromXml(reflection::ReflectableClass& object, const ::std::string& filename) {
   TiXmlDocument doc;
   if (!doc.LoadFile(filename)) {
     // TODO: Error handling

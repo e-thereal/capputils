@@ -12,11 +12,11 @@
 
 #include "IAttribute.h"
 
-namespace xmlizer {
+namespace capputils {
 
 namespace attributes {
 
-class DescriptionAttribute: public virtual reflection::IAttribute {
+class DescriptionAttribute: public virtual IAttribute {
 private:
   std::string description;
 
@@ -27,7 +27,7 @@ public:
   const std::string& getDescription() const;
 };
 
-reflection::AttributeWrapper Description(const std::string& description);
+AttributeWrapper Description(const std::string& description);
 
 }
 

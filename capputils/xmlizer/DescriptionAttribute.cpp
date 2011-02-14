@@ -9,7 +9,7 @@
 
 using namespace std;
 
-namespace xmlizer {
+namespace capputils {
 
 namespace attributes {
 
@@ -22,8 +22,8 @@ const string& DescriptionAttribute::getDescription() const {
   return description;
 }
 
-reflection::AttributeWrapper Description(const std::string& description) {
-  return reflection::AttributeWrapper(new DescriptionAttribute(description));
+AttributeWrapper Description(const std::string& description) {
+  return AttributeWrapper(new DescriptionAttribute(description));
 }
 
 }

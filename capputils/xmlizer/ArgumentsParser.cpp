@@ -14,11 +14,12 @@
 #include "FlagAttribute.h"
 #include "DescriptionAttribute.h"
 
-using namespace reflection;
 using namespace std;
-using namespace xmlizer::attributes;
 
-namespace xmlizer {
+namespace capputils {
+
+using namespace reflection;
+using namespace attributes;
 
 ArgumentsParser::ArgumentsParser() {
   // TODO Auto-generated constructor stub
@@ -32,12 +33,12 @@ ArgumentsParser::~ArgumentsParser() {
 void ArgumentsParser::Parse(ReflectableClass& object, int argc, char** argv) {
   for (int i = 0; i < argc; ++i) {
     if (!strncmp(argv[i], "--", 2)) {
-      ClassProperty* property = object.findProperty(argv[i]+2);
+      IClassProperty* property = object.findProperty(argv[i]+2);
       if (property) {
         if (property->getAttribute<FlagAttribute>())
-          property->setValue(object, "1");
+          property->setStringValue(object, "1");
         else if (i < argc - 1)
-          property->setValue(object, argv[++i]);
+          property->setStringValue(object, argv[++i]);
       }
     }
   }
@@ -45,15 +46,15 @@ void ArgumentsParser::Parse(ReflectableClass& object, int argc, char** argv) {
 
 void ArgumentsParser::PrintUsage(const string& header, const reflection::ReflectableClass& object) {
   cout << header << endl << endl;
-  vector<ClassProperty*>& properties = object.getProperties();
+  vector<IClassProperty*>& properties = object.getProperties();
 
   size_t columnWidth = 0;
   for (unsigned i = 0; i < properties.size(); ++i)
-    columnWidth = max(columnWidth, strlen(properties[i]->name.c_str()));
+    columnWidth = max(columnWidth, strlen(properties[i]->getName().c_str()));
 
   for (unsigned i = 0; i < properties.size(); ++i) {
-    cout << "  --" << properties[i]->name;
-    for (unsigned j = 0; j < columnWidth - strlen(properties[i]->name.c_str()); ++j)
+    cout << "  --" << properties[i]->getName();
+    for (unsigned j = 0; j < columnWidth - strlen(properties[i]->getName().c_str()); ++j)
       cout << " ";
     DescriptionAttribute* description = properties[i]->getAttribute<DescriptionAttribute>();
     if (description)

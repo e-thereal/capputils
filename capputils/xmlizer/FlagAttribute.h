@@ -10,17 +10,17 @@
 
 #include "IAttribute.h"
 
-namespace xmlizer {
+namespace capputils {
 
 namespace attributes {
 
-class FlagAttribute: public virtual reflection::IAttribute {
+class FlagAttribute: public virtual IAttribute {
 public:
   FlagAttribute();
   virtual ~FlagAttribute();
 };
 
-reflection::AttributeWrapper Flag();
+AttributeWrapper Flag();
 
 }
 
