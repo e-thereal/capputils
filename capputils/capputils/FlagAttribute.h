@@ -20,7 +20,7 @@ public:
   virtual ~FlagAttribute();
 };
 
-AttributeWrapper Flag();
+AttributeWrapper* Flag();
 
 }
 

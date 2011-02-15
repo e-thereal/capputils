@@ -17,8 +17,8 @@ FlagAttribute::FlagAttribute() {
 FlagAttribute::~FlagAttribute() {
 }
 
-AttributeWrapper Flag() {
-  return AttributeWrapper(new FlagAttribute());
+AttributeWrapper* Flag() {
+  return new AttributeWrapper(new FlagAttribute());
 }
 
 }

@@ -22,8 +22,8 @@ const string& DescriptionAttribute::getDescription() const {
   return description;
 }
 
-AttributeWrapper Description(const std::string& description) {
-  return AttributeWrapper(new DescriptionAttribute(description));
+AttributeWrapper* Description(const std::string& description) {
+  return new AttributeWrapper(new DescriptionAttribute(description));
 }
 
 }

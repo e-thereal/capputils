@@ -27,7 +27,7 @@ public:
   const std::string& getDescription() const;
 };
 
-AttributeWrapper Description(const std::string& description);
+AttributeWrapper* Description(const std::string& description);
 
 }
 

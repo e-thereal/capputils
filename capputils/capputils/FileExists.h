@@ -28,7 +28,7 @@ public:
   virtual const std::string& getLastMessage() const;
 };
 
-AttributeWrapper FileExists();
+AttributeWrapper* FileExists();
 
 }
 

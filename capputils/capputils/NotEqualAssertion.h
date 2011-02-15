@@ -53,8 +53,8 @@ public:
 };
 
 template<class T>
-AttributeWrapper NotEqual(T value, const std::string& defaultMessage = "") {
-  return AttributeWrapper(new NotEqualAttribute<T>(value, defaultMessage));
+AttributeWrapper* NotEqual(T value, const std::string& defaultMessage = "") {
+  return new AttributeWrapper(new NotEqualAttribute<T>(value, defaultMessage));
 }
 
 }

@@ -25,10 +25,9 @@ public:
   template<class AT>
   AT* getAttribute() {
     AT* attribute = 0;
-    const std::vector<IAttribute*>& attributes = getAttributes();
+    const std::vector<attributes::IAttribute*>& attributes = getAttributes();
     for (unsigned i = 0; i < attributes.size(); ++i) {
-      IAttribute* att = attributes[i];
-      attribute = dynamic_cast<AT*>(att);
+      attribute = dynamic_cast<AT*>(attributes[i]);
       if (attribute != 0)
         return attribute;
     }

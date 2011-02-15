@@ -52,8 +52,10 @@ public:
     va_list args;
     va_start(args, setValue);
 
-    for (attributes::IAttribute* attr = va_arg(args, attributes::AttributeWrapper).attribute; attr; attr = va_arg(args, attributes::AttributeWrapper).attribute)
-      attributes.push_back(attr);
+    for (attributes::AttributeWrapper* attrWrap = va_arg(args, attributes::AttributeWrapper*); attrWrap; attrWrap = va_arg(args, attributes::AttributeWrapper*)) {
+      attributes.push_back(attrWrap->attribute);
+      delete attrWrap;
+    }
   }
 
   virtual const std::vector<attributes::IAttribute*>& getAttributes() const { return attributes; }

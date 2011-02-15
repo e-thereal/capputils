@@ -47,8 +47,8 @@ const string& FileExistsAttribute::getLastMessage() const {
   return lastError;
 }
 
-AttributeWrapper FileExists() {
-  return AttributeWrapper(new FileExistsAttribute());
+AttributeWrapper* FileExists() {
+  return new AttributeWrapper(new FileExistsAttribute());
 }
 
 }

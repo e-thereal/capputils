@@ -4,7 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>tinyxml</project>
-		<project>xmlizer</project>
+		<project>capputils</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
