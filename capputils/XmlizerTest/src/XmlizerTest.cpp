@@ -18,30 +18,22 @@
 #include <Verifier.h>
 #include <cstdarg>
 
+#include <boost/signals.hpp>
+#include <boost/lambda/lambda.hpp>
+
 using namespace std;
 using namespace capputils;
 using namespace capputils::reflection;
 using namespace capputils::attributes;
 
-class TestBase {
-public:
-  virtual ~TestBase() { }
-};
+void printHello() {
+  cout << "Hello" << endl;
 
-template<class T>
-class Test : public TestBase {
-private:
-    T value;
-
-public:
-  T getValue() { return value; }
-};
+  return;
+}
 
 int main(int argc, char** argv) {
 	Car car;
-
-  TestBase& testBase = Test<int>();
-  Test<int>* test = dynamic_cast<Test<int>* >(&testBase);
 
 	//Xmlizer::FromXml(car, "car.xml");
 	ArgumentsParser::Parse(car, argc, argv);

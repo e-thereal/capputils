@@ -37,9 +37,25 @@ private:
   std::vector<attributes::IAttribute*> attributes;
 
   T (*getValueFunc) (const ReflectableClass& object);
-  void (*setValueFunc) (ReflectableClass& object, T value);
+  void (*setValueFunc) (ReflectableClass& object, const T& value);
 
 public:
+  /* The last parameter is a list of IAttribute* which must be terminated
+   * by null.
+   */
+  ClassProperty(const std::string& name,
+      T (*getValue) (const ReflectableClass& object),
+      void (*setValue) (ReflectableClass& object, const T& value),
+      ...)
+      : name(name), getValueFunc(getValue), setValueFunc(setValue)
+  {
+    va_list args;
+    va_start(args, setValue);
+
+    for (attributes::IAttribute* attr = va_arg(args, attributes::AttributeWrapper).attribute; attr; attr = va_arg(args, attributes::AttributeWrapper).attribute)
+      attributes.push_back(attr);
+  }
+
   virtual const std::vector<attributes::IAttribute*>& getAttributes() const { return attributes; }
   virtual const std::string& getName() const { return name; }
 
@@ -55,24 +71,8 @@ public:
     return getValueFunc(object);
   }
 
-  void setValue(ReflectableClass& object, T value) const {
+  void setValue(ReflectableClass& object, const T& value) const {
     setValueFunc(object, value);
-  }
-
-  /* The last parameter is a list of IAttribute* which must be terminated
-   * by null.
-   */
-  ClassProperty(const std::string& name,
-      T (*getValue) (const ReflectableClass& object),
-      void (*setValue) (ReflectableClass& object, T value),
-      ...)
-      : name(name), getValueFunc(getValue), setValueFunc(setValue)
-  {
-    va_list args;
-    va_start(args, setValue);
-
-    for (attributes::IAttribute* attr = va_arg(args, attributes::AttributeWrapper).attribute; attr; attr = va_arg(args, attributes::AttributeWrapper).attribute)
-      attributes.push_back(attr);
   }
 };
 

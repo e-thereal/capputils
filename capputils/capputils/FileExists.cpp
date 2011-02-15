@@ -10,6 +10,7 @@
 #include <cstdio>
 
 #include "ReflectableClass.h"
+#include "ClassProperty.h"
 
 using namespace std;
 
@@ -28,7 +29,8 @@ FileExistsAttribute::~FileExistsAttribute() {
 bool FileExistsAttribute::valid(const IClassProperty& property,
     const ReflectableClass& object)
 {
-  const string& filename = property.getStringValue(object);
+  // TODO: handle exception if class property is not of type string
+  const string& filename = dynamic_cast<const ClassProperty<string>*>(&property)->getValue(object);
 
   FILE* file = fopen(filename.c_str(), "r");
   if (file) {

@@ -50,9 +50,9 @@ public:
 private: type _##name; \
 public: \
   type get##name() const { return _##name; } \
-  void set##name(type value) { _##name = value; } \
+  void set##name(const type& value) { _##name = value; } \
 protected: \
-  static void set##name(::capputils::reflection::ReflectableClass& object, type value) { dynamic_cast<ClassType*>(&object)->set##name(value); } \
+  static void set##name(::capputils::reflection::ReflectableClass& object, const type& value) { dynamic_cast<ClassType*>(&object)->set##name(value); } \
   static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); } \
   typedef type name##Type;
 
