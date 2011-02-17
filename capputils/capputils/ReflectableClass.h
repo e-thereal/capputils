@@ -67,6 +67,25 @@ protected: \
   public: virtual const std::string& getClassName() const { return ClassType::ClassName; } \
   private: static void initializeProperties();
 
+#define VirtualProperty(name,type) \
+public: \
+  type get##name() const; \
+protected: \
+  static void set##name(::capputils::reflection::ReflectableClass& object, const type& value) { } \
+  static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); } \
+  typedef type name##Type;
+
+#define InitReflectableClass(name)                    \
+  typedef name ClassType;                         \
+  protected: static std::vector< ::capputils::reflection::IClassProperty*> properties;                \
+  public: virtual std::vector< ::capputils::reflection::IClassProperty*>& getProperties() const {  \
+    initializeProperties();                         \
+    return properties;                              \
+  }                                               \
+  public: static const std::string ClassName;     \
+  public: virtual const std::string& getClassName() const { return ClassType::ClassName; } \
+  private: static void initializeProperties();
+
 #if defined(_MSC_VER)
 #define DefineProperty(name, ...) \
   properties.push_back(new ::capputils::reflection::ClassProperty<name##Type>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, 0));
