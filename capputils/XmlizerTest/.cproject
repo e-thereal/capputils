@@ -29,6 +29,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/capputils}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml}&quot;"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.other.other.1105490542" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.74246361" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.1472500794" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
@@ -48,6 +49,7 @@
 								</option>
 								<option id="gnu.cpp.link.option.libs.599863498" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="capputils"/>
+									<listOptionValue builtIn="false" value="boost_signals"/>
 									<listOptionValue builtIn="false" value="tinyxml"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1765874949" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">

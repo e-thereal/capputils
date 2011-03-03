@@ -21,7 +21,7 @@ public:
   virtual ~Verifier();
 
   static bool Valid(const reflection::ReflectableClass& object,
-      const reflection::IClassProperty& property, std::ostream& stream);
+      const reflection::IClassProperty& property, std::ostream& stream = std::cout);
   static bool Valid(const reflection::ReflectableClass& object,
       std::ostream& stream = std::cout);
 };

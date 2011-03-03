@@ -18,22 +18,23 @@
 #include <Verifier.h>
 #include <cstdarg>
 
-#include <boost/signals.hpp>
-#include <boost/lambda/lambda.hpp>
-
 using namespace std;
 using namespace capputils;
 using namespace capputils::reflection;
 using namespace capputils::attributes;
 
-void printHello() {
-  cout << "Hello" << endl;
-
-  return;
+void changeHandler(ObservableClass* sender, int eventId) {
+  ReflectableClass* reflectable = dynamic_cast<ReflectableClass*>(sender);
+  if (reflectable) {
+    IClassProperty* property = reflectable->getProperties()[eventId];
+    cout << reflectable->getClassName() << "::" << property->getName()
+         << " changed to " << property->getStringValue(*reflectable) << "." << endl;
+  }
 }
 
 int main(int argc, char** argv) {
 	Car car;
+	car.Changed.connect(changeHandler);
 
 	//Xmlizer::FromXml(car, "car.xml");
 	ArgumentsParser::Parse(car, argc, argv);

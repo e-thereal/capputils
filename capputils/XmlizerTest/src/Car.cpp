@@ -10,16 +10,17 @@
 #include <DescriptionAttribute.h>
 #include <FlagAttribute.h>
 #include <NotEqualAssertion.h>
+#include <ObserveAttribute.h>
 
 using namespace capputils::attributes;
 using namespace capputils::reflection;
 
 BeginPropertyDefinitions(Car)
 
-  DefineProperty(DoorCount, Description("Number of doors (default = 3)"))
-  DefineProperty(HighSpeed)
-  DefineProperty(ModelName, NotEqual<std::string>("Audi"))
-  DefineProperty(Help, Flag(), Description("Show options"))
+  DefineProperty(DoorCount, Description("Number of doors (default = 3)"), Observe(PROPERTY_ID))
+  DefineProperty(HighSpeed, Observe(PROPERTY_ID))
+  DefineProperty(ModelName, NotEqual<std::string>("Audi"), Observe(PROPERTY_ID))
+  DefineProperty(Help, Flag(), Description("Show options"), Observe(PROPERTY_ID))
 
 EndPropertyDefinitions
 

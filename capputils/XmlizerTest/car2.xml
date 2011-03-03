@@ -1,2 +1,9 @@
 <?xml version="1.0" ?>
-<Car />
+<Car>
+    <!--Number of doors (default = 3)-->
+    <DoorCount value="3" />
+    <HighSpeed value="200" />
+    <ModelName value="Mazda" />
+    <!--Show options-->
+    <Help value="0" />
+</Car>

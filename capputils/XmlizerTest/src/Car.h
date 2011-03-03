@@ -9,9 +9,11 @@
 #define CAR_H_
 
 #include <ReflectableClass.h>
+#include <ObservableClass.h>
 
-class Car : public capputils::reflection::ReflectableClass {
-
+class Car : public capputils::reflection::ReflectableClass,
+            public capputils::ObservableClass
+{
   InitReflectableClass(Car)
 
   Property(DoorCount, int)
