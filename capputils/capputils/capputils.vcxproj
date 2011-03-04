@@ -49,7 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;XMLIZER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\tinyxml</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\tinyxml;$(BOOST_INC_PATH)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgumentsParser.h" />
+    <ClInclude Include="AttributeExecuter.h" />
     <ClInclude Include="ClassProperty.h" />
     <ClInclude Include="DescriptionAttribute.h" />
     <ClInclude Include="FileExists.h" />
@@ -87,32 +88,25 @@
     <ClInclude Include="IAssertionAttribute.h" />
     <ClInclude Include="IAttribute.h" />
     <ClInclude Include="IClassProperty.h" />
+    <ClInclude Include="IExecutableAttribute.h" />
     <ClInclude Include="NotEqualAssertion.h" />
+    <ClInclude Include="ObservableClass.h" />
+    <ClInclude Include="ObserveAttribute.h" />
     <ClInclude Include="ReflectableClass.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
     <ClInclude Include="Verifier.h" />
     <ClInclude Include="xmlizer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ArgumentsParser.cpp" />
+    <ClCompile Include="AttributeExecuter.cpp" />
     <ClCompile Include="DescriptionAttribute.cpp" />
-    <ClCompile Include="dllmain.cpp">
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="FileExists.cpp" />
     <ClCompile Include="FlagAttribute.cpp" />
     <ClCompile Include="IAttribute.cpp" />
+    <ClCompile Include="IExecutableAttribute.cpp" />
+    <ClCompile Include="ObservableClass.cpp" />
+    <ClCompile Include="ObserveAttribute.cpp" />
     <ClCompile Include="ReflectableClass.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Verifier.cpp" />
     <ClCompile Include="xmlizer.cpp" />
     <ClCompile Include="xmlizertest.cpp" />

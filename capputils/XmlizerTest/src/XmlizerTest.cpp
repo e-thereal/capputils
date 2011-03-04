@@ -7,21 +7,16 @@
 //============================================================================
 
 #include <iostream>
-#include <cstdarg>
-
-#include "Car.h"
 
 #include <Xmlizer.h>
 #include <ArgumentsParser.h>
-#include <IAssertionAttribute.h>
-#include <DescriptionAttribute.h>
 #include <Verifier.h>
-#include <cstdarg>
+
+#include "Car.h"
 
 using namespace std;
 using namespace capputils;
 using namespace capputils::reflection;
-using namespace capputils::attributes;
 
 void changeHandler(ObservableClass* sender, int eventId) {
   ReflectableClass* reflectable = dynamic_cast<ReflectableClass*>(sender);
