@@ -17,6 +17,16 @@ using namespace capputils::reflection;
 
 //DefineEnum(Engine, NoEngine, Diesel, Gas)
 
+BeginPropertyDefinitions(EngineDescription)
+  DefineProperty(CylinderCount)
+  DefineProperty(PS)
+  DefineProperty(Model)
+EndPropertyDefinitions
+
+EngineDescription::EngineDescription() : _CylinderCount(12), _PS(120), _Model("Gas") { }
+
+EngineDescription::~EngineDescription() { }
+
 BeginPropertyDefinitions(Car)
 
   DefineProperty(DoorCount, Description("Number of doors (default = 3)"), Observe(PROPERTY_ID))
@@ -24,6 +34,7 @@ BeginPropertyDefinitions(Car)
   DefineProperty(ModelName, NotEqual<std::string>("Audi"), Observe(PROPERTY_ID))
   DefineProperty(Help, Flag(), Description("Show options"), Observe(PROPERTY_ID))
   //DefineProperty(Engine)
+  ReflectableProperty(Engine)
 
 EndPropertyDefinitions
 

@@ -8,12 +8,15 @@
 #include "Xmlizer.h"
 
 #include "DescriptionAttribute.h"
+#include "IReflectableAttribute.h"
+#include "ScalarAttribute.h"
 
 #include <iostream>
 
 namespace capputils {
 
 using namespace attributes;
+using namespace reflection;
 
 TiXmlElement* Xmlizer::CreateXml(const reflection::ReflectableClass& object) {
   TiXmlElement* xmlNode = new TiXmlElement(object.getClassName());
@@ -32,7 +35,15 @@ void Xmlizer::ToXml(TiXmlNode& xmlNode, const reflection::ReflectableClass& obje
     }
 
     TiXmlElement* propertyElement = new TiXmlElement(properties[i]->getName());
-    propertyElement->SetAttribute("value", properties[i]->getStringValue(object));
+    if (properties[i]->getAttribute<IReflectableAttribute>()) {
+      ReflectableClass* reflectable = (ReflectableClass*)properties[i]->getValuePtr(object);
+      if (reflectable->getAttribute<ScalarAttribute>())
+        propertyElement->SetAttribute("value", properties[i]->getStringValue(object));
+      else
+        propertyElement->LinkEndChild(Xmlizer::CreateXml(*reflectable));
+    } else {
+      propertyElement->SetAttribute("value", properties[i]->getStringValue(object));
+    }
     xmlNode.LinkEndChild(propertyElement);
   }
 }
@@ -55,11 +66,19 @@ void Xmlizer::FromXml(reflection::ReflectableClass& object, const TiXmlNode& xml
   for (const TiXmlNode* node = xNode->FirstChild(); node; node = node->NextSibling()) {
     if (node->Type() == TiXmlNode::TINYXML_ELEMENT) {
       const TiXmlElement* element = dynamic_cast<const TiXmlElement*>(node);
-      const char* value = element->Attribute("value");
-      if (value) {
-        reflection::IClassProperty* property = object.findProperty(element->Value());
-        if (property)
-          property->setStringValue(object, value);
+      reflection::IClassProperty* property = object.findProperty(element->Value());
+      if (property) {
+        const char* value = element->Attribute("value");
+        if (value) {
+            property->setStringValue(object, value);
+        } else {
+          IReflectableAttribute* reflectable = property->getAttribute<IReflectableAttribute>();
+          if (reflectable) {
+            ReflectableClass* reflectableClass = reflectable->createInstance();
+            Xmlizer::FromXml(*reflectableClass, *node);
+            property->setValuePtr(object, reflectableClass);
+          }
+        }
       }
     }
   }

@@ -83,6 +83,11 @@ public:
     value = getValue(object);
     return &value;
   }
+
+  virtual void setValuePtr(ReflectableClass& object, void* ptr) const {
+    setValue(object, *((T*)ptr));
+    delete ptr;
+  }
 };
 
 template<class T>
@@ -122,9 +127,6 @@ public:
   }
 
   virtual void setStringValue(ReflectableClass& object, const std::string& value) const {
-    T* oldValue = getValue(object);
-    if (oldValue)
-      delete oldValue;
     setValueFunc(object, new T(convertFromString<T>(value)));
   }
 
@@ -138,6 +140,10 @@ public:
 
   virtual void* getValuePtr(const ReflectableClass& object) const {
     return getValue(object);
+  }
+
+  virtual void setValuePtr(ReflectableClass& object, void* ptr) const {
+    setValue(object, (T*)ptr);
   }
 };
 

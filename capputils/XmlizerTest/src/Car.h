@@ -14,6 +14,19 @@
 
 //DeclareEnum(Engine, NoEngine, Diesel, Gas)
 
+class EngineDescription : public capputils::reflection::ReflectableClass {
+
+  InitReflectableClass(EngineDescription)
+
+  Property(CylinderCount, int)
+  Property(PS, int)
+  Property(Model, std::string)
+
+public:
+  EngineDescription();
+  virtual ~EngineDescription();
+};
+
 class Car : public capputils::reflection::ReflectableClass,
             public capputils::ObservableClass
 {
@@ -24,6 +37,7 @@ class Car : public capputils::reflection::ReflectableClass,
   Property(ModelName, std::string)
   Property(Help, bool)
   //Property(Engine, Engine)
+  Property(Engine, EngineDescription)
 
 public:
   Car();

@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
 	Car car;
 	car.Changed.connect(changeHandler);
 
-	//Xmlizer::FromXml(car, "car.xml");
+	Xmlizer::FromXml(car, "car.xml");
 	ArgumentsParser::Parse(car, argc, argv);
 
 	if (car.getHelp() || !Verifier::Valid(car)) {
