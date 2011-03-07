@@ -37,7 +37,9 @@ private:
   std::vector<attributes::IAttribute*> attributes;
 
   T (*getValueFunc) (const ReflectableClass& object);
-  void (*setValueFunc) (ReflectableClass& object, const T& value);
+  void (*setValueFunc) (ReflectableClass& object, T value);
+
+  mutable T value;
 
 public:
   /* The last parameter is a list of IAttribute* which must be terminated
@@ -45,7 +47,7 @@ public:
    */
   ClassProperty(const std::string& name,
       T (*getValue) (const ReflectableClass& object),
-      void (*setValue) (ReflectableClass& object, const T& value),
+      void (*setValue) (ReflectableClass& object, T value),
       ...)
       : name(name), getValueFunc(getValue), setValueFunc(setValue)
   {
@@ -75,6 +77,67 @@ public:
 
   void setValue(ReflectableClass& object, const T& value) const {
     setValueFunc(object, value);
+  }
+
+  virtual void* getValuePtr(const ReflectableClass& object) const {
+    value = getValue(object);
+    return &value;
+  }
+};
+
+template<class T>
+class ClassProperty<T*> : public IClassProperty
+{
+private:
+  std::string name;
+  std::vector<attributes::IAttribute*> attributes;
+
+  T* (*getValueFunc) (const ReflectableClass& object);
+  void (*setValueFunc) (ReflectableClass& object, T* value);
+
+public:
+  /* The last parameter is a list of IAttribute* which must be terminated
+   * by null.
+   */
+  ClassProperty(const std::string& name,
+      T* (*getValue) (const ReflectableClass& object),
+      void (*setValue) (ReflectableClass& object, T* value),
+      ...)
+      : name(name), getValueFunc(getValue), setValueFunc(setValue)
+  {
+    va_list args;
+    va_start(args, setValue);
+
+    for (attributes::AttributeWrapper* attrWrap = va_arg(args, attributes::AttributeWrapper*); attrWrap; attrWrap = va_arg(args, attributes::AttributeWrapper*)) {
+      attributes.push_back(attrWrap->attribute);
+      delete attrWrap;
+    }
+  }
+
+  virtual const std::vector<attributes::IAttribute*>& getAttributes() const { return attributes; }
+  virtual const std::string& getName() const { return name; }
+
+  virtual std::string getStringValue(const ReflectableClass& object) const {
+    return convertToString<T>(*getValueFunc(object));
+  }
+
+  virtual void setStringValue(ReflectableClass& object, const std::string& value) const {
+    T* oldValue = getValue(object);
+    if (oldValue)
+      delete oldValue;
+    setValueFunc(object, new T(convertFromString<T>(value)));
+  }
+
+  T* getValue(const ReflectableClass& object) const {
+    return getValueFunc(object);
+  }
+
+  void setValue(ReflectableClass& object, T* value) const {
+    setValueFunc(object, value);
+  }
+
+  virtual void* getValuePtr(const ReflectableClass& object) const {
+    return getValue(object);
   }
 };
 

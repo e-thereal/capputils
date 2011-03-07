@@ -66,6 +66,18 @@
     <ClInclude Include="AttributeExecuter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Enumerators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IReflectableAttribute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReflectableAttribute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\capputils\capputils\ScalarAttribute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="xmlizer.cpp">
@@ -95,9 +107,6 @@
     <ClCompile Include="ReflectableClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IExecutableAttribute.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ObservableClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -105,6 +114,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AttributeExecuter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReflectableAttribute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\capputils\capputils\ScalarAttribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

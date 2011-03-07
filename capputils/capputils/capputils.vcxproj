@@ -79,33 +79,38 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\capputils\capputils\ScalarAttribute.h" />
     <ClInclude Include="ArgumentsParser.h" />
     <ClInclude Include="AttributeExecuter.h" />
     <ClInclude Include="ClassProperty.h" />
     <ClInclude Include="DescriptionAttribute.h" />
+    <ClInclude Include="Enumerators.h" />
     <ClInclude Include="FileExists.h" />
     <ClInclude Include="FlagAttribute.h" />
     <ClInclude Include="IAssertionAttribute.h" />
     <ClInclude Include="IAttribute.h" />
     <ClInclude Include="IClassProperty.h" />
     <ClInclude Include="IExecutableAttribute.h" />
+    <ClInclude Include="IReflectableAttribute.h" />
     <ClInclude Include="NotEqualAssertion.h" />
     <ClInclude Include="ObservableClass.h" />
     <ClInclude Include="ObserveAttribute.h" />
+    <ClInclude Include="ReflectableAttribute.h" />
     <ClInclude Include="ReflectableClass.h" />
     <ClInclude Include="Verifier.h" />
     <ClInclude Include="xmlizer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\capputils\capputils\ScalarAttribute.cpp" />
     <ClCompile Include="ArgumentsParser.cpp" />
     <ClCompile Include="AttributeExecuter.cpp" />
     <ClCompile Include="DescriptionAttribute.cpp" />
     <ClCompile Include="FileExists.cpp" />
     <ClCompile Include="FlagAttribute.cpp" />
     <ClCompile Include="IAttribute.cpp" />
-    <ClCompile Include="IExecutableAttribute.cpp" />
     <ClCompile Include="ObservableClass.cpp" />
     <ClCompile Include="ObserveAttribute.cpp" />
+    <ClCompile Include="ReflectableAttribute.cpp" />
     <ClCompile Include="ReflectableClass.cpp" />
     <ClCompile Include="Verifier.cpp" />
     <ClCompile Include="xmlizer.cpp" />

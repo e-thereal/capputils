@@ -21,6 +21,7 @@ public:
   virtual const std::string& getName() const = 0;
   virtual std::string getStringValue(const ReflectableClass& object) const = 0;
   virtual void setStringValue(ReflectableClass& object, const std::string& value) const = 0;
+  virtual void* getValuePtr(const ReflectableClass& object) const = 0;
 
   template<class AT>
   AT* getAttribute() {

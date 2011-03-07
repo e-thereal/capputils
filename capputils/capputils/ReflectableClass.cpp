@@ -47,6 +47,33 @@ const std::string ReflectableClass::getProperty(const std::string& propertyName)
   return "<UNDEFINED>";
 }
 
+void ReflectableClass::addAttributes(std::vector< ::capputils::attributes::IAttribute*>* attributes, ...) const {
+  va_list args;
+  va_start(args, attributes);
+
+  for (attributes::AttributeWrapper* attrWrap = va_arg(args, attributes::AttributeWrapper*); attrWrap; attrWrap = va_arg(args, attributes::AttributeWrapper*)) {
+    attributes->push_back(attrWrap->attribute);
+    delete attrWrap;
+  }
 }
 
+void ReflectableClass::toStream(std::ostream& stream) const {
+  stream << "reflectable";
+}
+
+void ReflectableClass::fromStream(std::istream& str) {
+}
+
+}
+
+}
+
+std::ostream& operator<< (std::ostream& stream, const capputils::reflection::ReflectableClass& object) {
+  object.toStream(stream);
+  return stream;
+}
+
+std::istream& operator>> (std::istream& stream, capputils::reflection::ReflectableClass& object) {
+  object.fromStream(stream);
+  return stream;
 }

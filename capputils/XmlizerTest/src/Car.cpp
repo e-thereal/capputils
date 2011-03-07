@@ -15,7 +15,7 @@
 using namespace capputils::attributes;
 using namespace capputils::reflection;
 
-DefineEnum(Engine, NoEngine, Diesel, Gas)
+//DefineEnum(Engine, NoEngine, Diesel, Gas)
 
 BeginPropertyDefinitions(Car)
 
@@ -23,11 +23,11 @@ BeginPropertyDefinitions(Car)
   DefineProperty(HighSpeed, Observe(PROPERTY_ID))
   DefineProperty(ModelName, NotEqual<std::string>("Audi"), Observe(PROPERTY_ID))
   DefineProperty(Help, Flag(), Description("Show options"), Observe(PROPERTY_ID))
-  DefineProperty(Engine)
+  //DefineProperty(Engine)
 
 EndPropertyDefinitions
 
-Car::Car() : _DoorCount(3), _HighSpeed(100), _ModelName("BMW"), _Help(0), _Engine(Gas) {
+Car::Car() : _DoorCount(3), _HighSpeed(100), _ModelName("BMW"), _Help(0)/*, _Engine(Gas)*/ {
 }
 
 Car::~Car() {

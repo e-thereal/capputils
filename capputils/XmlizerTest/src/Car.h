@@ -10,9 +10,9 @@
 
 #include <ReflectableClass.h>
 #include <ObservableClass.h>
-#include <Enumerators.h>
+//#include <Enumerators.h>
 
-DeclareEnum(Engine, NoEngine, Diesel, Gas)
+//DeclareEnum(Engine, NoEngine, Diesel, Gas)
 
 class Car : public capputils::reflection::ReflectableClass,
             public capputils::ObservableClass
@@ -23,7 +23,7 @@ class Car : public capputils::reflection::ReflectableClass,
   Property(HighSpeed, float)
   Property(ModelName, std::string)
   Property(Help, bool)
-  Property(Engine, Engine)
+  //Property(Engine, Engine)
 
 public:
   Car();
