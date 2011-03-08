@@ -22,12 +22,10 @@ using namespace reflection;
 using namespace attributes;
 
 ArgumentsParser::ArgumentsParser() {
-  // TODO Auto-generated constructor stub
 
 }
 
 ArgumentsParser::~ArgumentsParser() {
-  // TODO Auto-generated destructor stub
 }
 
 void ArgumentsParser::Parse(ReflectableClass& object, int argc, char** argv) {
