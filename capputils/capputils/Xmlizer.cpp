@@ -35,12 +35,14 @@ void Xmlizer::ToXml(TiXmlNode& xmlNode, const reflection::ReflectableClass& obje
     }
 
     TiXmlElement* propertyElement = new TiXmlElement(properties[i]->getName());
-    if (properties[i]->getAttribute<IReflectableAttribute>()) {
-      ReflectableClass* reflectable = (ReflectableClass*)properties[i]->getValuePtr(object);
-      if (reflectable->getAttribute<ScalarAttribute>())
+    IReflectableAttribute* reflectableAttribute = properties[i]->getAttribute<IReflectableAttribute>();
+    if (reflectableAttribute) {
+      ReflectableClass* reflectable = reflectableAttribute->getValuePtr(object, properties[i]);
+      if (reflectable->getAttribute<ScalarAttribute>()) {
         propertyElement->SetAttribute("value", properties[i]->getStringValue(object));
-      else
+      } else {
         propertyElement->LinkEndChild(Xmlizer::CreateXml(*reflectable));
+      }
     } else {
       propertyElement->SetAttribute("value", properties[i]->getStringValue(object));
     }
@@ -74,9 +76,10 @@ void Xmlizer::FromXml(reflection::ReflectableClass& object, const TiXmlNode& xml
         } else {
           IReflectableAttribute* reflectable = property->getAttribute<IReflectableAttribute>();
           if (reflectable) {
-            ReflectableClass* reflectableClass = reflectable->createInstance();
-            Xmlizer::FromXml(*reflectableClass, *node);
-            property->setValuePtr(object, reflectableClass);
+        	// TODO: Retrieve reflectable class from XML
+            //ReflectableClass* reflectableClass = reflectable->createInstance();
+            //Xmlizer::FromXml(*reflectableClass, *node);
+            //property->setValuePtr(object, reflectableClass);
           }
         }
       }
