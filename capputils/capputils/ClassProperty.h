@@ -81,15 +81,15 @@ public:
     setValueFunc(object, value);
   }
 
-  virtual void* getValuePtr(const ReflectableClass& object) const {
+  /*virtual ReflectableClass* getValuePtr(const ReflectableClass& object) const {
     value = getValue(object);
     return &value;
-  }
+  }*/
 
-  virtual void setValuePtr(ReflectableClass& object, void* ptr) const {
+ /*virtual void setValuePtr(ReflectableClass& object, ReflectableClass* ptr) const {
     setValue(object, *((T*)ptr));
     delete ptr;
-  }
+  }*/
 };
 
 template<class T>
@@ -140,13 +140,13 @@ public:
     setValueFunc(object, value);
   }
 
-  virtual void* getValuePtr(const ReflectableClass& object) const {
+  /*virtual ReflectableClass* getValuePtr(const ReflectableClass& object) const {
     return getValue(object);
-  }
+  }*/
 
-  virtual void setValuePtr(ReflectableClass& object, void* ptr) const {
+  /*virtual void setValuePtr(ReflectableClass& object, ReflectableClass* ptr) const {
     setValue(object, (T*)ptr);
-  }
+  }*/
 };
 
 }
