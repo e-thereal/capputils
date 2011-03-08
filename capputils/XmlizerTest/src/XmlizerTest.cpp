@@ -27,25 +27,13 @@ void changeHandler(ObservableClass* sender, int eventId) {
   }
 }
 
-class AutoPrint {
-public:
-  AutoPrint() {
-    cout << "Print without invokation." << endl;
-  }
-};
-
-class Test {
-private:
-  static AutoPrint autoPrint;
-};
-
-AutoPrint Test::autoPrint;
+DeclareEnum(Farben, Rot, Gruen);
 
 int main(int argc, char** argv) {
 	Car car;
 	car.Changed.connect(changeHandler);
 
-	Xmlizer::FromXml(car, "car.xml");
+	//Xmlizer::FromXml(car, "car.xml");
 	ArgumentsParser::Parse(car, argc, argv);
 
 	if (car.getHelp() || !Verifier::Valid(car)) {
@@ -57,7 +45,7 @@ int main(int argc, char** argv) {
 	cout << "Doors: " << car.getProperty("DoorCount") << endl;
 	cout << "High Speed: " << car.getHighSpeed() << endl;
 	cout << "Model Name: " << car.getModelName() << endl;
-	cout << "Engine Type: " << car.getEngine() << endl;
+//	cout << "Engine Type: " << car.getEngine() << endl;
 	Xmlizer::ToXml("car2.xml", car);
 
 	return 0;

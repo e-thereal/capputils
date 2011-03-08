@@ -49,8 +49,8 @@
 								</option>
 								<option id="gnu.cpp.link.option.libs.599863498" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="capputils"/>
-									<listOptionValue builtIn="false" value="boost_signals"/>
 									<listOptionValue builtIn="false" value="tinyxml"/>
+									<listOptionValue builtIn="false" value="boost_signals"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1765874949" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

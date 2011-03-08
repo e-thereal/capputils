@@ -2,8 +2,15 @@
 <Car>
     <!--Number of doors (default = 3)-->
     <DoorCount value="3" />
-    <HighSpeed value="200" />
-    <ModelName value="Mazda" />
+    <HighSpeed value="100" />
+    <ModelName value="BMW" />
     <!--Show options-->
     <Help value="0" />
+    <Engine>
+        <EngineDescription>
+            <CylinderCount value="12" />
+            <PS value="120" />
+            <Model value="Gas" />
+        </EngineDescription>
+    </Engine>
 </Car>
