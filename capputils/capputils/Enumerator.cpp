@@ -7,11 +7,13 @@
 
 #include "Enumerator.h"
 
+#include "ScalarAttribute.h"
+
 namespace capputils {
 
 namespace reflection {
 
-BeginPropertyDefinitions(Enumerator)
+BeginPropertyDefinitions(Enumerator, capputils::attributes::Scalar())
 EndPropertyDefinitions
 
 Enumerator::Enumerator() {
