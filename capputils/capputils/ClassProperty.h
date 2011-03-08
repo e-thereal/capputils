@@ -5,6 +5,8 @@
 
 #include "IClassProperty.h"
 
+#include <sstream>
+
 namespace capputils {
 
 namespace reflection {

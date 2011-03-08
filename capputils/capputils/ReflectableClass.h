@@ -87,7 +87,7 @@ protected: \
 public: \
   type get##name() const; \
 protected: \
-  static void set##name(::capputils::reflection::ReflectableClass& object, const type& value) { } \
+  static void set##name(::capputils::reflection::ReflectableClass& object, type value) { } \
   static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); } \
   typedef type name##Type;
 #else
@@ -103,7 +103,7 @@ protected: \
 public: \
   type get##name() const; \
 protected: \
-  static void set##name(::capputils::reflection::ReflectableClass& object, const type& value) { } \
+  static void set##name(::capputils::reflection::ReflectableClass& object, type value) { } \
   static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); }
 #endif
 
@@ -152,6 +152,7 @@ protected: \
 
 #define PROPERTY_ID properties.size()
 
+#if defined(_MSC_VER)
 #define BeginPropertyDefinitions(name, ...)   \
   std::vector< ::capputils::reflection::IClassProperty*> name :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> name :: attributes;     \
@@ -165,7 +166,21 @@ protected: \
   void name :: initializeProperties() const {   \
     static bool initialized = false;  \
     if (initialized) return;
-    
+#else
+#define BeginPropertyDefinitions(name, args...)   \
+  std::vector< ::capputils::reflection::IClassProperty*> name :: properties;     \
+  std::vector< ::capputils::attributes::IAttribute*> name :: attributes;     \
+  const std::string name :: ClassName = #name;  \
+  void name::initializeAttributes() const { \
+    static bool initialized = false; \
+    if (initialized) return; \
+    addAttributes(&name::attributes, ##args, 0); \
+    initialized = true; \
+  } \
+  void name :: initializeProperties() const {   \
+    static bool initialized = false;  \
+    if (initialized) return;
+#endif
 #define EndPropertyDefinitions initialized = true; }
 
 #endif /* XMLIZER_H_ */

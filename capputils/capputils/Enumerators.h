@@ -8,57 +8,67 @@
 #ifndef ENUMERATORS_H_
 #define ENUMERATORS_H_
 
+#include "Enumerator.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
 
+#include <istream>
+#include <ostream>
 #include <vector>
 
-#define DeclareEnum(name, values...) \
-enum name { values }; \
-namespace capputils { \
-namespace reflection { \
-template<> \
-const std::string convertToString(const name& value); \
-template<> \
-name convertFromString(const std::string& value); \
-} \
-}
-
-#define DefineEnum(name, values...) \
-namespace capputils { \
-namespace reflection { \
-template<> \
-const std::string convertToString(const name& value) {       \
-  name valuesArr[] = {values};                   \
-  std::string valuesString = #values;                       \
-  std::vector<std::string> stringValues;                               \
-  boost::char_separator<char> sep(", ");                         \
-  boost::tokenizer<boost::char_separator<char> > tokens(valuesString, sep);     \
-  BOOST_FOREACH(std::string t, tokens) {                       \
-    stringValues.push_back(t);                               \
-  }                                                       \
-  for (unsigned i = 0; i < stringValues.size(); ++i)         \
-    if (valuesArr[i] == value)                               \
-      return stringValues[i];                                \
-  return "unknown";                                       \
-} \
-template<> \
-name convertFromString(const std::string& value) {       \
-  name valuesArr[] = {values};                   \
-  std::string valuesString = #values;                       \
-  std::vector<std::string> stringValues;                               \
-  boost::char_separator<char> sep(", ");                         \
-  boost::tokenizer<boost::char_separator<char> > tokens(valuesString, sep);     \
-  BOOST_FOREACH(std::string t, tokens) {                       \
-    stringValues.push_back(t);                               \
-  }                                                       \
-  for (unsigned i = 0; i < stringValues.size(); ++i)         \
-    if (stringValues[i].compare(value) == 0)                               \
-      return valuesArr[i];                                \
-  return valuesArr[0];                                       \
-} \
-} \
-}
+#define DeclareEnum(name, args...) \
+class name : public capputils::reflection::Enumerator { \
+public: \
+  enum enum_type {args}; \
+\
+public: \
+  name () { \
+    initialize(); \
+    value = getValues()[0]; \
+  } \
+\
+  name (const enum_type& value) { \
+    initialize(); \
+    this->value = getValues()[value]; \
+  } \
+\
+  void initialize() { \
+    static bool initialized = false; \
+    if (initialized) \
+      return; \
+\
+    std::string valuesString = #args; \
+    boost::char_separator<char> sep(", "); \
+    boost::tokenizer<boost::char_separator<char> > tokens(valuesString, sep); \
+    std::vector<std::string>& values = getValues(); \
+    BOOST_FOREACH(std::string t, tokens) { \
+      values.push_back(t); \
+    } \
+\
+    initialized = true; \
+  } \
+  \
+  virtual std::vector<std::string>& getValues() const { \
+    static std::vector<std::string> values; \
+    return values; \
+  } \
+  operator std::string() const { \
+    return value; \
+  } \
+  \
+  operator int() const { \
+    std::vector<std::string>& values = getValues(); \
+    for (unsigned i = 0; i < values.size(); ++i) { \
+      if (value.compare(values[i]) == 0) \
+        return i; \
+    } \
+    return -1; \
+  } \
+  void operator=(const std::string& value) { \
+    this->value = value; \
+  }\
+  \
+};
 
 #endif /* ENUMERATORS_H_ */

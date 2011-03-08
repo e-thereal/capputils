@@ -15,15 +15,13 @@
 using namespace capputils::attributes;
 using namespace capputils::reflection;
 
-//DefineEnum(Engine, NoEngine, Diesel, Gas)
-
 BeginPropertyDefinitions(EngineDescription)
   DefineProperty(CylinderCount)
   DefineProperty(PS)
   DefineProperty(Model)
 EndPropertyDefinitions
 
-EngineDescription::EngineDescription() : _CylinderCount(12), _PS(120), _Model("Gas") { }
+EngineDescription::EngineDescription() : _CylinderCount(12), _PS(120), _Model(Engine::Gas) { }
 
 EngineDescription::~EngineDescription() { }
 

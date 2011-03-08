@@ -8,11 +8,13 @@
 #ifndef CAR_H_
 #define CAR_H_
 
+#include <Enumerators.h>
 #include <ReflectableClass.h>
 #include <ObservableClass.h>
-//#include <Enumerators.h>
 
-//DeclareEnum(Engine, NoEngine, Diesel, Gas)
+#include <Enumerators.h>
+
+DeclareEnum(Engine, NoEngine, Diesel, Gas)
 
 class EngineDescription : public capputils::reflection::ReflectableClass {
 
@@ -20,7 +22,7 @@ class EngineDescription : public capputils::reflection::ReflectableClass {
 
   Property(CylinderCount, int)
   Property(PS, int)
-  Property(Model, std::string)
+  Property(Model, Engine)
 
 public:
   EngineDescription();
