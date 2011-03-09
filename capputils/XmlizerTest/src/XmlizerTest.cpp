@@ -11,6 +11,7 @@
 #include <Xmlizer.h>
 #include <ArgumentsParser.h>
 #include <Verifier.h>
+#include <ReflectableClassFactory.h>
 
 #include "Car.h"
 
@@ -27,13 +28,22 @@ void changeHandler(ObservableClass* sender, int eventId) {
   }
 }
 
-DeclareEnum(Farben, Rot, Gruen);
-
 int main(int argc, char** argv) {
 	Car car;
 	car.Changed.connect(changeHandler);
 
-	//Xmlizer::FromXml(car, "car.xml");
+	ReflectableClassFactory& factory = ReflectableClassFactory::getInstance();
+	vector<string>& classNames = factory.getClassNames();
+	for (unsigned i = 0; i < classNames.size(); ++i) {
+	  cout << classNames[i] << endl;
+	  ReflectableClass* object = ReflectableClassFactory::getInstance().newInstance(classNames[i]);
+    vector<IClassProperty*>& properties = object->getProperties();
+    for (unsigned j = 0; j < properties.size(); ++j)
+      cout << "  - " << properties[j]->getName() << endl;
+    delete object;
+	}
+
+	Xmlizer::FromXml(car, "car.xml");
 	ArgumentsParser::Parse(car, argc, argv);
 
 	if (car.getHelp() || !Verifier::Valid(car)) {

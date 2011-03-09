@@ -38,7 +38,6 @@ class Car : public capputils::reflection::ReflectableClass,
   Property(HighSpeed, float)
   Property(ModelName, std::string)
   Property(Help, bool)
-  //Property(Engine, Engine)
   Property(Engine, EngineDescription)
 
 public:
