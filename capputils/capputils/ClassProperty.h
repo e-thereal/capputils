@@ -6,6 +6,7 @@
 #include "IClassProperty.h"
 
 #include <sstream>
+#include <iostream>
 
 namespace capputils {
 
@@ -117,14 +118,18 @@ public:
   virtual const std::string& getName() const { return name; }
 
   virtual std::string getStringValue(const ReflectableClass& object) const {
-    return convertToString<T>(*getValueFunc(object));
+    T* value = getValueFunc(object);
+    if (value)
+      return convertToString<T>(*value);
+    else
+      return "<null>";
   }
 
-  virtual void setStringValue(ReflectableClass& object, const std::string& value) const {
+  virtual void setStringValue(ReflectableClass& object, const std::string&/* value*/) const {
     //setValueFunc(object, new T(convertFromString<T>(value)));
     // TODO: static assert that getting pointer values from a string is not supported
+    throw "setting pointer values from a string is not supported";
     setValueFunc(object, 0);
-    throw "getting pointer values from a string is not supported";
   }
 
   T* getValue(const ReflectableClass& object) const {

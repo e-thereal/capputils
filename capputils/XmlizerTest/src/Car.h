@@ -14,7 +14,7 @@
 
 #include <Enumerators.h>
 
-ReflectableEnum(Engine, NoEngine, Diesel, Gas)
+ReflectableEnum(Engine, NoEngine, Diesel, Gas);
 
 class EngineDescription : public capputils::reflection::ReflectableClass {
 

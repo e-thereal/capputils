@@ -33,7 +33,6 @@ public:
     ClassProperty<T>* typedProperty = dynamic_cast<ClassProperty<T>* >(property);
     if (typedProperty) {
       typedProperty->setValue(object, *((T*)valuePtr));
-      delete valuePtr;
     }
   }
 };

@@ -68,8 +68,7 @@ public: \
   void operator=(const std::string& value) { \
     this->value = value; \
   }\
-  \
-};
+}
 #else
 #define ReflectableEnum(name, args...) \
 class name : public capputils::reflection::Enumerator { \
@@ -122,8 +121,7 @@ public: \
   void operator=(const std::string& value) { \
     this->value = value; \
   }\
-  \
-};
+}
 #endif
 
 #endif /* ENUMERATORS_H_ */
