@@ -49,7 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;XMLIZER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\tinyxml;$(BOOST_INC_PATH)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\tinyxml;$(BOOST_INC_PATH)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
@@ -84,6 +84,7 @@
     <ClInclude Include="AttributeExecuter.h" />
     <ClInclude Include="ClassProperty.h" />
     <ClInclude Include="DescriptionAttribute.h" />
+    <ClInclude Include="Enumerator.h" />
     <ClInclude Include="Enumerators.h" />
     <ClInclude Include="FileExists.h" />
     <ClInclude Include="FlagAttribute.h" />
@@ -97,6 +98,7 @@
     <ClInclude Include="ObserveAttribute.h" />
     <ClInclude Include="ReflectableAttribute.h" />
     <ClInclude Include="ReflectableClass.h" />
+    <ClInclude Include="ReflectableClassFactory.h" />
     <ClInclude Include="Verifier.h" />
     <ClInclude Include="xmlizer.h" />
   </ItemGroup>
@@ -104,7 +106,9 @@
     <ClCompile Include="..\..\capputils\capputils\ScalarAttribute.cpp" />
     <ClCompile Include="ArgumentsParser.cpp" />
     <ClCompile Include="AttributeExecuter.cpp" />
+    <ClCompile Include="ClassProperty.cpp" />
     <ClCompile Include="DescriptionAttribute.cpp" />
+    <ClCompile Include="Enumerator.cpp" />
     <ClCompile Include="FileExists.cpp" />
     <ClCompile Include="FlagAttribute.cpp" />
     <ClCompile Include="IAttribute.cpp" />
@@ -112,6 +116,7 @@
     <ClCompile Include="ObserveAttribute.cpp" />
     <ClCompile Include="ReflectableAttribute.cpp" />
     <ClCompile Include="ReflectableClass.cpp" />
+    <ClCompile Include="ReflectableClassFactory.cpp" />
     <ClCompile Include="Verifier.cpp" />
     <ClCompile Include="xmlizer.cpp" />
     <ClCompile Include="xmlizertest.cpp" />

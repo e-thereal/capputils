@@ -78,6 +78,12 @@
     <ClInclude Include="..\..\capputils\capputils\ScalarAttribute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ReflectableClassFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Enumerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="xmlizer.cpp">
@@ -120,6 +126,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\capputils\capputils\ScalarAttribute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReflectableClassFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Enumerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClassProperty.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

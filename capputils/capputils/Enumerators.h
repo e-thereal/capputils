@@ -16,8 +16,62 @@
 #include <istream>
 #include <ostream>
 #include <vector>
-
-#define DeclareEnum(name, args...) \
+#if defined(_MSC_VER)
+#define ReflectableEnum(name, ...) \
+class name : public capputils::reflection::Enumerator { \
+public: \
+  enum enum_type {__VA_ARGS__}; \
+\
+public: \
+  name () { \
+    initialize(); \
+    value = getValues()[0]; \
+  } \
+\
+  name (const enum_type& value) { \
+    initialize(); \
+    this->value = getValues()[value]; \
+  } \
+\
+  void initialize() { \
+    static bool initialized = false; \
+    if (initialized) \
+      return; \
+\
+    std::string valuesString = #__VA_ARGS__; \
+    boost::char_separator<char> sep(", "); \
+    boost::tokenizer<boost::char_separator<char> > tokens(valuesString, sep); \
+    std::vector<std::string>& values = getValues(); \
+    BOOST_FOREACH(std::string t, tokens) { \
+      values.push_back(t); \
+    } \
+\
+    initialized = true; \
+  } \
+  \
+  virtual std::vector<std::string>& getValues() const { \
+    static std::vector<std::string> values; \
+    return values; \
+  } \
+  operator std::string() const { \
+    return value; \
+  } \
+  \
+  operator int() const { \
+    std::vector<std::string>& values = getValues(); \
+    for (unsigned i = 0; i < values.size(); ++i) { \
+      if (value.compare(values[i]) == 0) \
+        return i; \
+    } \
+    return -1; \
+  } \
+  void operator=(const std::string& value) { \
+    this->value = value; \
+  }\
+  \
+};
+#else
+#define ReflectableEnum(name, args...) \
 class name : public capputils::reflection::Enumerator { \
 public: \
   enum enum_type {args}; \
@@ -70,5 +124,6 @@ public: \
   }\
   \
 };
+#endif
 
 #endif /* ENUMERATORS_H_ */

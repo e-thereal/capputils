@@ -177,6 +177,20 @@ protected: \
   std::vector< ::capputils::reflection::IClassProperty*> name :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> name :: attributes;     \
   const std::string name :: ClassName = #name;  \
+  capputils::reflection::RegisterConstructor name::_constructor(#name, name::newInstance); \
+  void name::initializeAttributes() const { \
+    static bool initialized = false; \
+    if (initialized) return; \
+    addAttributes(&name::attributes, __VA_ARGS__, 0); \
+    initialized = true; \
+  } \
+  void name :: initializeProperties() const {   \
+    static bool initialized = false;  \
+    if (initialized) return;
+#define BeginAbstractPropertyDefinitions(name, ...)   \
+  std::vector< ::capputils::reflection::IClassProperty*> name :: properties;     \
+  std::vector< ::capputils::attributes::IAttribute*> name :: attributes;     \
+  const std::string name :: ClassName = #name;  \
   void name::initializeAttributes() const { \
     static bool initialized = false; \
     if (initialized) return; \
