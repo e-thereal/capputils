@@ -22,10 +22,10 @@ using namespace reflection;
 using namespace attributes;
 
 ArgumentsParser::ArgumentsParser() {
-
 }
 
 ArgumentsParser::~ArgumentsParser() {
+
 }
 
 void ArgumentsParser::Parse(ReflectableClass& object, int argc, char** argv) {

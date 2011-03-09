@@ -10,6 +10,7 @@
 #include "DescriptionAttribute.h"
 #include "IReflectableAttribute.h"
 #include "ScalarAttribute.h"
+#include "ReflectableClassFactory.h"
 
 #include <iostream>
 
@@ -57,6 +58,15 @@ void Xmlizer::ToXml(const ::std::string& filename, const reflection::Reflectable
   xmlDoc.SaveFile(filename);
 }
 
+ReflectableClass* Xmlizer::CreateReflectableClass(const TiXmlNode& xmlNode) {
+  ReflectableClass* object = ReflectableClassFactory::getInstance().newInstance(xmlNode.Value());
+  if (object) {
+    Xmlizer::FromXml(*object, xmlNode);
+    return object;
+  }
+  return 0;
+}
+
 void Xmlizer::FromXml(reflection::ReflectableClass& object, const TiXmlNode& xmlNode) {
   using namespace std;
   const TiXmlNode* xNode = &xmlNode;
@@ -76,10 +86,7 @@ void Xmlizer::FromXml(reflection::ReflectableClass& object, const TiXmlNode& xml
         } else {
           IReflectableAttribute* reflectable = property->getAttribute<IReflectableAttribute>();
           if (reflectable) {
-        	// TODO: Retrieve reflectable class from XML
-            //ReflectableClass* reflectableClass = reflectable->createInstance();
-            //Xmlizer::FromXml(*reflectableClass, *node);
-            //property->setValuePtr(object, reflectableClass);
+            reflectable->setValuePtr(object, property, Xmlizer::CreateReflectableClass(*node->FirstChild()));
           }
         }
       }

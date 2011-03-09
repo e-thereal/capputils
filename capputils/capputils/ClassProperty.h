@@ -11,6 +11,8 @@ namespace capputils {
 
 namespace reflection {
 
+class ReflectableClass;
+
 template<class T>
 T convertFromString(const std::string& value) {
   T result;
@@ -80,16 +82,6 @@ public:
   void setValue(ReflectableClass& object, const T& value) const {
     setValueFunc(object, value);
   }
-
-  /*virtual ReflectableClass* getValuePtr(const ReflectableClass& object) const {
-    value = getValue(object);
-    return &value;
-  }*/
-
- /*virtual void setValuePtr(ReflectableClass& object, ReflectableClass* ptr) const {
-    setValue(object, *((T*)ptr));
-    delete ptr;
-  }*/
 };
 
 template<class T>
@@ -129,7 +121,10 @@ public:
   }
 
   virtual void setStringValue(ReflectableClass& object, const std::string& value) const {
-    setValueFunc(object, new T(convertFromString<T>(value)));
+    //setValueFunc(object, new T(convertFromString<T>(value)));
+    // TODO: static assert that getting pointer values from a string is not supported
+    setValueFunc(object, 0);
+    throw "getting pointer values from a string is not supported";
   }
 
   T* getValue(const ReflectableClass& object) const {
@@ -139,14 +134,6 @@ public:
   void setValue(ReflectableClass& object, T* value) const {
     setValueFunc(object, value);
   }
-
-  /*virtual ReflectableClass* getValuePtr(const ReflectableClass& object) const {
-    return getValue(object);
-  }*/
-
-  /*virtual void setValuePtr(ReflectableClass& object, ReflectableClass* ptr) const {
-    setValue(object, (T*)ptr);
-  }*/
 };
 
 }

@@ -11,11 +11,6 @@ namespace capputils {
 
 namespace reflection {
 
-template<>
-std::string convertFromString(const std::string& value) {
-  return std::string(value);
-}
-
 ReflectableClass::~ReflectableClass() { }
 
 IClassProperty* ReflectableClass::findProperty(const std::string& propertyName) const {

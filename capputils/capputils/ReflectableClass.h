@@ -21,6 +21,7 @@
 #include "ClassProperty.h"
 #include "AttributeExecuter.h"
 #include "ReflectableAttribute.h"
+#include "ReflectableClassFactory.h"
 
 namespace capputils {
 
@@ -122,6 +123,25 @@ protected: \
   public: static const std::string ClassName;     \
   public: virtual const std::string& getClassName() const { return ClassType::ClassName; } \
   private: void initializeProperties() const; \
+  private: void initializeAttributes() const; \
+  private: static capputils::reflection::RegisterConstructor _constructor; \
+  public: static ReflectableClass* newInstance() { return new name(); }
+
+#define InitAbstractReflectableClass(name)                    \
+  typedef name ClassType;                         \
+  protected: static std::vector< ::capputils::reflection::IClassProperty*> properties;                \
+  protected: static std::vector< ::capputils::attributes::IAttribute*> attributes;                \
+  public: virtual std::vector< ::capputils::reflection::IClassProperty*>& getProperties() const {  \
+    initializeProperties();                         \
+    return properties;                              \
+  }                                               \
+  public: virtual std::vector< ::capputils::attributes::IAttribute*>& getAttributes() const {  \
+    initializeAttributes();                        \
+    return attributes;                             \
+  }                                               \
+  public: static const std::string ClassName;     \
+  public: virtual const std::string& getClassName() const { return ClassType::ClassName; } \
+  private: void initializeProperties() const; \
   private: void initializeAttributes() const;
 
 #if !defined(CAPPUTILS_USE_CPP0x)
@@ -168,6 +188,20 @@ protected: \
     if (initialized) return;
 #else
 #define BeginPropertyDefinitions(name, args...)   \
+  std::vector< ::capputils::reflection::IClassProperty*> name :: properties;     \
+  std::vector< ::capputils::attributes::IAttribute*> name :: attributes;     \
+  const std::string name :: ClassName = #name;  \
+  capputils::reflection::RegisterConstructor name::_constructor(#name, name::newInstance); \
+  void name::initializeAttributes() const { \
+    static bool initialized = false; \
+    if (initialized) return; \
+    addAttributes(&name::attributes, ##args, 0); \
+    initialized = true; \
+  } \
+  void name :: initializeProperties() const {   \
+    static bool initialized = false;  \
+    if (initialized) return;
+#define BeginAbstractPropertyDefinitions(name, args...)   \
   std::vector< ::capputils::reflection::IClassProperty*> name :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> name :: attributes;     \
   const std::string name :: ClassName = #name;  \

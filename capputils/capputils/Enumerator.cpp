@@ -13,7 +13,7 @@ namespace capputils {
 
 namespace reflection {
 
-BeginPropertyDefinitions(Enumerator, capputils::attributes::Scalar())
+BeginAbstractPropertyDefinitions(Enumerator, capputils::attributes::Scalar())
 EndPropertyDefinitions
 
 Enumerator::Enumerator() {

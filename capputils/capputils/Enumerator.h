@@ -19,7 +19,7 @@ namespace reflection {
 
 class Enumerator: public ReflectableClass {
 
-InitReflectableClass(Enumerator)
+InitAbstractReflectableClass(Enumerator)
 
 protected:
   std::string value;
