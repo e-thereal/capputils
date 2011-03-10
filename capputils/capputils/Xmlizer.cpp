@@ -86,7 +86,10 @@ void Xmlizer::FromXml(reflection::ReflectableClass& object, const TiXmlNode& xml
         } else {
           IReflectableAttribute* reflectable = property->getAttribute<IReflectableAttribute>();
           if (reflectable) {
-            reflectable->setValuePtr(object, property, Xmlizer::CreateReflectableClass(*node->FirstChild()));
+            ReflectableClass* newObject = Xmlizer::CreateReflectableClass(*node->FirstChild());
+            reflectable->setValuePtr(object, property, newObject);
+            if (!reflectable->isPointer())
+              delete newObject;
           }
         }
       }

@@ -23,6 +23,8 @@ public:
 
   virtual void setValuePtr(reflection::ReflectableClass& object,
       reflection::IClassProperty* property, reflection::ReflectableClass* valuePtr) const = 0;
+
+  virtual bool isPointer() const = 0;
 };
 
 }

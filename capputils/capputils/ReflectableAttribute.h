@@ -35,6 +35,10 @@ public:
       typedProperty->setValue(object, *((T*)valuePtr));
     }
   }
+
+  virtual bool isPointer() const {
+    return false;
+  }
 };
 
 template<class T>
@@ -59,6 +63,10 @@ public:
     if (typedProperty) {
       typedProperty->setValue(object, (T*)valuePtr);
     }
+  }
+
+  virtual bool isPointer() const {
+    return true;
   }
 };
 
