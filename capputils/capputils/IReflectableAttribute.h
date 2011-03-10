@@ -19,7 +19,7 @@ class IReflectableAttribute : public virtual IAttribute {
 public:
   virtual reflection::ReflectableClass* getValuePtr(
       const reflection::ReflectableClass& object,
-      reflection::IClassProperty* property) const = 0;
+      const reflection::IClassProperty* property) const = 0;
 
   virtual void setValuePtr(reflection::ReflectableClass& object,
       reflection::IClassProperty* property, reflection::ReflectableClass* valuePtr) const = 0;

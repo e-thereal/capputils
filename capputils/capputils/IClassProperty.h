@@ -25,7 +25,7 @@ public:
   //virtual void setValuePtr(ReflectableClass& object, ReflectableClass* ptr) const = 0;
 
   template<class AT>
-  AT* getAttribute() {
+  AT* getAttribute() const {
     AT* attribute = 0;
     const std::vector<attributes::IAttribute*>& attributes = getAttributes();
     for (unsigned i = 0; i < attributes.size(); ++i) {

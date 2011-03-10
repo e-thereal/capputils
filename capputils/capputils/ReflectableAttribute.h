@@ -15,10 +15,10 @@ private:
 
 public:
   virtual reflection::ReflectableClass* getValuePtr(const reflection::ReflectableClass& object,
-      reflection::IClassProperty* property) const
+      const reflection::IClassProperty* property) const
   {
     using namespace capputils::reflection;
-    ClassProperty<T>* typedProperty = dynamic_cast<ClassProperty<T>* >(property);
+    const ClassProperty<T>* typedProperty = dynamic_cast<const ClassProperty<T>* >(property);
     if (typedProperty) {
       value = typedProperty->getValue(object);
       return &value;
@@ -45,10 +45,10 @@ template<class T>
 class ReflectableAttribute<T*> : public virtual IReflectableAttribute {
 public:
   virtual reflection::ReflectableClass* getValuePtr(const reflection::ReflectableClass& object,
-        reflection::IClassProperty* property) const
+        const reflection::IClassProperty* property) const
     {
       using namespace capputils::reflection;
-      ClassProperty<T*>* typedProperty = dynamic_cast<ClassProperty<T*>* >(property);
+      const ClassProperty<T*>* typedProperty = dynamic_cast<const ClassProperty<T*>* >(property);
       if (typedProperty) {
         return typedProperty->getValue(object);
       }

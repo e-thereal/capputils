@@ -22,12 +22,22 @@ AttributeExecuter::AttributeExecuter() {
 AttributeExecuter::~AttributeExecuter() {
 }
 
-void AttributeExecuter::Execute(ReflectableClass& object, const IClassProperty& property) {
+void AttributeExecuter::ExecuteBefore(ReflectableClass& object, const IClassProperty& property) {
   vector<IAttribute*> attributes = property.getAttributes();
   for (unsigned j = 0; j < attributes.size(); ++j) {
     IExecutableAttribute* executable = dynamic_cast<IExecutableAttribute*>(attributes[j]);
     if (executable) {
-      executable->execute(object);
+      executable->executeBefore(object, property);
+    }
+  }
+}
+
+void AttributeExecuter::ExecuteAfter(ReflectableClass& object, const IClassProperty& property) {
+  vector<IAttribute*> attributes = property.getAttributes();
+  for (unsigned j = 0; j < attributes.size(); ++j) {
+    IExecutableAttribute* executable = dynamic_cast<IExecutableAttribute*>(attributes[j]);
+    if (executable) {
+      executable->executeAfter(object, property);
     }
   }
 }

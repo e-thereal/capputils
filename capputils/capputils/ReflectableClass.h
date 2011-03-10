@@ -96,7 +96,7 @@ protected: \
 private: type _##name; \
 public: \
   type get##name() const { return _##name; } \
-  void set##name(type value) { static ::capputils::reflection::IClassProperty* property = findProperty(#name); _##name = value; ::capputils::attributes::AttributeExecuter::Execute(*this, *property); } \
+  void set##name(type value) { static ::capputils::reflection::IClassProperty* property = findProperty(#name); ::capputils::attributes::AttributeExecuter::ExecuteBefore(*this, *property); _##name = value; ::capputils::attributes::AttributeExecuter::ExecuteAfter(*this, *property); } \
 protected: \
   static void set##name(::capputils::reflection::ReflectableClass& object, type value) { dynamic_cast<ClassType*>(&object)->set##name(value); } \
   static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); }

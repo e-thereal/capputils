@@ -19,8 +19,10 @@ public:
   AttributeExecuter();
   virtual ~AttributeExecuter();
 
-  static void Execute(reflection::ReflectableClass& object,
+  static void ExecuteBefore(reflection::ReflectableClass& object,
       const reflection::IClassProperty& property);
+  static void ExecuteAfter(reflection::ReflectableClass& object,
+        const reflection::IClassProperty& property);
 };
 
 }
