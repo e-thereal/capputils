@@ -24,10 +24,10 @@ ObservableClass::~ObservableClass() {
     (*i)->removeParent(this);
 }
 
-void ObservableClass::fireEvent(int eventId) {
+void ObservableClass::fireChangeEvent(int eventId) {
   Changed(this, eventId);
   for (map<ObservableClass*, int>::iterator i = parents.begin(); i != parents.end(); ++i)
-    i->first->fireEvent(i->second);
+    i->first->fireChangeEvent(i->second);
 }
 
 void ObservableClass::addChild(ObservableClass* child, int eventId) {

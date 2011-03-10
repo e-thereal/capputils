@@ -43,7 +43,7 @@ void ObserveAttribute::executeAfter(ReflectableClass& object, const IClassProper
       if (observableChild)
         observable->addChild(observableChild, eventId);
     }
-    observable->fireEvent(eventId);
+    observable->fireChangeEvent(eventId);
   }
 }
 

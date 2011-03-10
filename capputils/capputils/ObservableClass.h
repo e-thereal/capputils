@@ -27,7 +27,7 @@ public:
   ObservableClass();
   virtual ~ObservableClass();
 
-  void fireEvent(int eventId);
+  void fireChangeEvent(int eventId);
   void addChild(ObservableClass* child, int eventId);
   void removeChild(ObservableClass* child);
 
