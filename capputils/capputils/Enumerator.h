@@ -32,6 +32,7 @@ public:
 
   virtual void toStream(std::ostream& stream) const;
   virtual void fromStream(std::istream& stream);
+  virtual int toInt() const = 0;
 };
 
 }

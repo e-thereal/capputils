@@ -57,13 +57,16 @@ public: \
     return value; \
   } \
   \
-  operator int() const { \
+  virtual int toInt() const { \
     std::vector<std::string>& values = getValues(); \
     for (unsigned i = 0; i < values.size(); ++i) { \
       if (value.compare(values[i]) == 0) \
         return i; \
     } \
     return -1; \
+  } \
+  operator int() const { \
+    return toInt(); \
   } \
   void operator=(const std::string& value) { \
     this->value = value; \
