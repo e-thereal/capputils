@@ -87,6 +87,12 @@ public:
   void setValue(ReflectableClass& object, const T& value) const {
     setValueFunc(object, value);
   }
+
+  virtual void setValue(ReflectableClass& object, const ReflectableClass& fromObject, const IClassProperty* fromProperty) {
+    const ClassProperty<T>* typedProperty = dynamic_cast<const ClassProperty<T>*>(fromProperty);
+    if (typedProperty)
+      setValue(object, typedProperty->getValue(fromObject));
+  }
 };
 
 template<class T>
@@ -146,6 +152,12 @@ public:
 
   void setValue(ReflectableClass& object, T* value) const {
     setValueFunc(object, value);
+  }
+
+  virtual void setValue(ReflectableClass& object, const ReflectableClass& fromObject, const IClassProperty* fromProperty) {
+    const ClassProperty<T*>* typedProperty = dynamic_cast<const ClassProperty<T*>*>(fromProperty);
+    if (typedProperty)
+      setValue(object, typedProperty->getValue(fromObject));
   }
 };
 
