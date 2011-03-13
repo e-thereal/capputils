@@ -9,6 +9,8 @@
 
 #include "IAttribute.h"
 
+#include <typeinfo>
+
 namespace capputils {
 
 namespace reflection {
@@ -21,8 +23,8 @@ public:
   virtual const std::string& getName() const = 0;
   virtual std::string getStringValue(const ReflectableClass& object) const = 0;
   virtual void setStringValue(ReflectableClass& object, const std::string& value) const = 0;
-  //virtual ReflectableClass* getValuePtr(const ReflectableClass& object) const = 0;
-  //virtual void setValuePtr(ReflectableClass& object, ReflectableClass* ptr) const = 0;
+  virtual const char* getTypeName() const = 0;
+  virtual size_t getTypeHash() const = 0;
 
   template<class AT>
   AT* getAttribute() const {

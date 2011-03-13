@@ -76,6 +76,14 @@ public:
     setValueFunc(object, convertFromString<T>(value));
   }
 
+  virtual const char* getTypeName() const {
+    return typeid(T).name();
+  }
+
+  virtual size_t getTypeHash() const {
+    return typeid(T).hash_code();
+  }
+
   T getValue(const ReflectableClass& object) const {
     return getValueFunc(object);
   }
@@ -130,6 +138,14 @@ public:
     // TODO: static assert that getting pointer values from a string is not supported
     throw "setting pointer values from a string is not supported";
     setValueFunc(object, 0);
+  }
+
+  virtual const char* getTypeName() const {
+    return typeid(T*).name();
+  }
+
+  virtual size_t getTypeHash() const {
+    return typeid(T*).hash_code();
   }
 
   T* getValue(const ReflectableClass& object) const {

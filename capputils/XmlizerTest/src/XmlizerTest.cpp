@@ -31,6 +31,7 @@ void changeHandler(ObservableClass* sender, int eventId) {
 int main(int argc, char** argv) {
 	Car car;
 	car.Changed.connect(changeHandler);
+  cout << typeid(int).name() << endl;
 
 	ReflectableClassFactory& factory = ReflectableClassFactory::getInstance();
 	vector<string>& classNames = factory.getClassNames();
@@ -39,7 +40,7 @@ int main(int argc, char** argv) {
 	  ReflectableClass* object = ReflectableClassFactory::getInstance().newInstance(classNames[i]);
     vector<IClassProperty*>& properties = object->getProperties();
     for (unsigned j = 0; j < properties.size(); ++j)
-      cout << "  - " << properties[j]->getName() << endl;
+      cout << "  - " << properties[j]->getTypeName() << " " << properties[j]->getName() << endl;
     delete object;
 	}
 

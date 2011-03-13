@@ -24,7 +24,7 @@ class Test : public reflection::ReflectableClass {
   InitReflectableClass(Test)
 
   Property(A, int)
-  Property(Height, float)
+  Property(Height, double)
 };
 
 BeginPropertyDefinitions(Test)
