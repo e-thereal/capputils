@@ -22,6 +22,8 @@ public:
   ObserveAttribute(int eventId);
   virtual ~ObserveAttribute();
 
+  int getEventId() const;
+
   virtual void executeBefore(reflection::ReflectableClass& object, const reflection::IClassProperty& property) const;
   virtual void executeAfter(reflection::ReflectableClass& object, const reflection::IClassProperty& property) const;
 };

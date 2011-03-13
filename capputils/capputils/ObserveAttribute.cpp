@@ -22,6 +22,10 @@ ObserveAttribute::ObserveAttribute(int eventId) : eventId(eventId) {
 ObserveAttribute::~ObserveAttribute() {
 }
 
+int ObserveAttribute::getEventId() const {
+  return eventId;
+}
+
 void ObserveAttribute::executeBefore(ReflectableClass& object, const IClassProperty& property) const {
   IReflectableAttribute* reflectable = property.getAttribute<IReflectableAttribute>();
   ObservableClass* observable = dynamic_cast<ObservableClass*>(&object);
