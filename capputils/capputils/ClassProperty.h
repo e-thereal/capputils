@@ -76,12 +76,8 @@ public:
     setValueFunc(object, convertFromString<T>(value));
   }
 
-  virtual const char* getTypeName() const {
-    return typeid(T).name();
-  }
-
-  virtual size_t getTypeHash() const {
-    return typeid(T).hash_code();
+  virtual const type_info& getType() const {
+    return typeid(T);
   }
 
   T getValue(const ReflectableClass& object) const {
@@ -140,12 +136,8 @@ public:
     setValueFunc(object, 0);
   }
 
-  virtual const char* getTypeName() const {
-    return typeid(T*).name();
-  }
-
-  virtual size_t getTypeHash() const {
-    return typeid(T*).hash_code();
+  virtual const type_info& getType() const {
+    return typeid(T*);
   }
 
   T* getValue(const ReflectableClass& object) const {

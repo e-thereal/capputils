@@ -23,8 +23,7 @@ public:
   virtual const std::string& getName() const = 0;
   virtual std::string getStringValue(const ReflectableClass& object) const = 0;
   virtual void setStringValue(ReflectableClass& object, const std::string& value) const = 0;
-  virtual const char* getTypeName() const = 0;
-  virtual size_t getTypeHash() const = 0;
+  virtual const type_info& getType() const = 0;
 
   template<class AT>
   AT* getAttribute() const {

@@ -40,8 +40,9 @@ int main(int argc, char** argv) {
 	  ReflectableClass* object = ReflectableClassFactory::getInstance().newInstance(classNames[i]);
     vector<IClassProperty*>& properties = object->getProperties();
     for (unsigned j = 0; j < properties.size(); ++j)
-      cout << "  - " << properties[j]->getTypeName() << " " << properties[j]->getName() << endl;
+      cout << "  - " << properties[j]->getType().name() << " " << properties[j]->getName() << endl;
     delete object;
+    cout << endl;
 	}
 
 	Xmlizer::FromXml(car, "car.xml");
