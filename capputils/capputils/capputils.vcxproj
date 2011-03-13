@@ -87,6 +87,7 @@
     <ClInclude Include="Enumerator.h" />
     <ClInclude Include="Enumerators.h" />
     <ClInclude Include="FileExists.h" />
+    <ClInclude Include="FilenameAttribute.h" />
     <ClInclude Include="FlagAttribute.h" />
     <ClInclude Include="IAssertionAttribute.h" />
     <ClInclude Include="IAttribute.h" />
@@ -110,6 +111,7 @@
     <ClCompile Include="DescriptionAttribute.cpp" />
     <ClCompile Include="Enumerator.cpp" />
     <ClCompile Include="FileExists.cpp" />
+    <ClCompile Include="FilenameAttribute.cpp" />
     <ClCompile Include="FlagAttribute.cpp" />
     <ClCompile Include="IAttribute.cpp" />
     <ClCompile Include="ObservableClass.cpp" />
