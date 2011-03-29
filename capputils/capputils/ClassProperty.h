@@ -76,7 +76,7 @@ public:
     setValueFunc(object, convertFromString<T>(value));
   }
 
-  virtual const type_info& getType() const {
+  virtual const std::type_info& getType() const {
     return typeid(T);
   }
 
@@ -142,7 +142,7 @@ public:
     setValueFunc(object, 0);
   }
 
-  virtual const type_info& getType() const {
+  virtual const std::type_info& getType() const {
     return typeid(T*);
   }
 
