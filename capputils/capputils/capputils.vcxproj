@@ -84,6 +84,7 @@
     <ClInclude Include="AttributeExecuter.h" />
     <ClInclude Include="ClassProperty.h" />
     <ClInclude Include="DescriptionAttribute.h" />
+    <ClInclude Include="EnumerableAttribute.h" />
     <ClInclude Include="Enumerator.h" />
     <ClInclude Include="Enumerators.h" />
     <ClInclude Include="FileExists.h" />
@@ -92,6 +93,7 @@
     <ClInclude Include="IAssertionAttribute.h" />
     <ClInclude Include="IAttribute.h" />
     <ClInclude Include="IClassProperty.h" />
+    <ClInclude Include="IEnumerableAttribute.h" />
     <ClInclude Include="IExecutableAttribute.h" />
     <ClInclude Include="IReflectableAttribute.h" />
     <ClInclude Include="NotEqualAssertion.h" />

@@ -21,6 +21,7 @@
 #include "ClassProperty.h"
 #include "AttributeExecuter.h"
 #include "ReflectableAttribute.h"
+#include "EnumerableAttribute.h"
 #include "ReflectableClassFactory.h"
 
 namespace capputils {
@@ -162,6 +163,8 @@ protected: \
   properties.push_back(new ::capputils::reflection::ClassProperty<decltype(((ClassType*)0)->get##name())>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, 0));
 #define ReflectableProperty(name, ...) \
   properties.push_back(new ::capputils::reflection::ClassProperty<decltype(((ClassType*)0)->get##name())>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Reflectable<decltype(((ClassType*)0)->get##name())>(), 0));
+#define EnumerableProperty(name, ...) \
+  properties.push_back(new ::capputils::reflection::ClassProperty<decltype(((ClassType*)0)->get##name())>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Enumerable<decltype(((ClassType*)0)->get##name())>(), 0));
 #else
 #define DefineProperty(name, arguments...) \
   properties.push_back(new ::capputils::reflection::ClassProperty<decltype(((ClassType*)0)->get##name())>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0));

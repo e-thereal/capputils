@@ -11,6 +11,8 @@
 #include <Enumerators.h>
 #include <ReflectableClass.h>
 #include <ObservableClass.h>
+#include <vector>
+#include <string>
 
 #include <Enumerators.h>
 
@@ -39,6 +41,7 @@ class Car : public capputils::reflection::ReflectableClass,
   Property(ModelName, std::string)
   Property(Help, bool)
   Property(Engine, EngineDescription)
+  Property(Owners, std::vector<std::string>)
 
 public:
   Car();

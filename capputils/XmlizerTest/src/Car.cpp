@@ -32,6 +32,7 @@ BeginPropertyDefinitions(Car)
   DefineProperty(ModelName, NotEqual<std::string>("Audi"), Observe(PROPERTY_ID))
   DefineProperty(Help, Flag(), Description("Show options"), Observe(PROPERTY_ID))
   ReflectableProperty(Engine)
+  EnumerableProperty(Owners)
 
 EndPropertyDefinitions
 

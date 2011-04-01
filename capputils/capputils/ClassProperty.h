@@ -15,24 +15,59 @@ namespace reflection {
 class ReflectableClass;
 
 template<class T>
-T convertFromString(const std::string& value) {
-  T result;
-  std::stringstream s(value);
-  s >> result;
-  return result;
-}
+class Converter {
+public:
+  static T fromString(const std::string& value) {
+    T result;
+    std::stringstream s(value);
+    s >> result;
+    return result;
+  }
+
+  static std::string toString(const T& value) {
+    std::stringstream s;
+    s << value;
+    return s.str();
+  }
+};
+
+/*** Template specializations for strings (from string variants) ***/
 
 template<class T>
-const std::string convertToString(const T& value) {
-  std::stringstream s;
-  s << value;
-  return s.str();
-}
+class Converter<std::vector<T> > {
+public:
+  static std::vector<T> fromString(const std::string& value) {
+    std::string result;
+    std::stringstream s(value);
+    std::vector<T> vec;
+    while (!s.eof()) {
+      s >> result;
+      vec.push_back(Converter<T>::fromString(result));
+    }
+    return vec;
+  }
 
-/*** Template specializations for strings ***/
+  static std::string toString(const std::vector<T>& value) {
+    std::stringstream s;
+    if (value.size())
+      s << value[0];
+    for (unsigned i = 1; i < value.size(); ++i)
+      s << " " << value[i];
+    return s.str();
+  }
+};
 
 template<>
-std::string convertFromString(const std::string& value);
+class Converter<std::string> {
+public:
+  static std::string fromString(const std::string& value) {
+    return std::string(value);
+  }
+
+  static std::string toString(const std::string& value) {
+    return std::string(value);
+  }
+};
 
 template<class T>
 class ClassProperty : public IClassProperty
@@ -69,11 +104,11 @@ public:
   virtual const std::string& getName() const { return name; }
 
   virtual std::string getStringValue(const ReflectableClass& object) const {
-    return convertToString<T>(getValueFunc(object));
+    return Converter<T>::toString(getValueFunc(object));
   }
 
   virtual void setStringValue(ReflectableClass& object, const std::string& value) const {
-    setValueFunc(object, convertFromString<T>(value));
+    setValueFunc(object, Converter<T>::fromString(value));
   }
 
   virtual const std::type_info& getType() const {
@@ -130,7 +165,7 @@ public:
   virtual std::string getStringValue(const ReflectableClass& object) const {
     T* value = getValueFunc(object);
     if (value)
-      return convertToString<T>(*value);
+      Converter<T>::toString(*value);
     else
       return "<null>";
   }

@@ -12,6 +12,7 @@
 #include <ArgumentsParser.h>
 #include <Verifier.h>
 #include <ReflectableClassFactory.h>
+#include <ClassProperty.h>
 
 #include "Car.h"
 
@@ -28,10 +29,25 @@ void changeHandler(ObservableClass* sender, int eventId) {
   }
 }
 
+template<class T, bool print = true>
+class Printer {
+public:
+  static void print(T value) {
+    cout << value << endl;
+  }
+};
+
+template<class T>
+class Printer<T, false> {
+public:
+  static void print(T value) {
+    cout << "no print" << endl;
+  }
+};
+
 int main(int argc, char** argv) {
 	Car car;
 	car.Changed.connect(changeHandler);
-  cout << typeid(int).name() << endl;
 
 	ReflectableClassFactory& factory = ReflectableClassFactory::getInstance();
 	vector<string>& classNames = factory.getClassNames();
@@ -52,6 +68,11 @@ int main(int argc, char** argv) {
 	  ArgumentsParser::PrintUsage(string("\nUsage: ") + argv[0] + " [switches], where switches are:", car);
 	  return 0;
   }
+
+  vector<string>& owners = car.getOwners();
+  owners.push_back("Tom");
+  owners.push_back("Anne");
+  car.setOwners(owners);
 
 	cout << "Xmlizer Test" << endl;
 	cout << "Doors: " << car.getProperty("DoorCount") << endl;

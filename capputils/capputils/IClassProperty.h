@@ -26,7 +26,6 @@ public:
   virtual void setValue(ReflectableClass& object, const ReflectableClass& fromObject, const IClassProperty* fromProperty) = 0;
   virtual const std::type_info& getType() const = 0;
   
-
   template<class AT>
   AT* getAttribute() const {
     AT* attribute = 0;

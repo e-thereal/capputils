@@ -13,11 +13,6 @@ namespace capputils {
 
 namespace reflection {
 
-template<>
-std::string convertFromString(const std::string& value) {
-  return std::string(value);
-}
-
 }
 
 }
