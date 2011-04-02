@@ -21,6 +21,8 @@ class IExecutableAttribute : public virtual IAttribute {
 public:
   virtual void executeBefore(reflection::ReflectableClass& object, const reflection::IClassProperty& property) const = 0;
   virtual void executeAfter(reflection::ReflectableClass& object, const reflection::IClassProperty& property) const = 0;
+
+
 };
 
 }

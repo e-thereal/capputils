@@ -79,10 +79,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Car.cpp" />
+    <ClCompile Include="src\Person.cpp" />
     <ClCompile Include="src\XmlizerTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Car.h" />
+    <ClInclude Include="src\Person.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -70,7 +70,7 @@ public:
 };
 
 template<class T>
-class ClassProperty : public IClassProperty
+class ClassProperty : public virtual IClassProperty
 {
 private:
   std::string name;
@@ -104,22 +104,22 @@ public:
   virtual const std::string& getName() const { return name; }
 
   virtual std::string getStringValue(const ReflectableClass& object) const {
-    return Converter<T>::toString(getValueFunc(object));
+    return Converter<T>::toString(getValue(object));
   }
 
   virtual void setStringValue(ReflectableClass& object, const std::string& value) const {
-    setValueFunc(object, Converter<T>::fromString(value));
+    setValue(object, Converter<T>::fromString(value));
   }
 
   virtual const std::type_info& getType() const {
     return typeid(T);
   }
 
-  T getValue(const ReflectableClass& object) const {
+  virtual T getValue(const ReflectableClass& object) const {
     return getValueFunc(object);
   }
 
-  void setValue(ReflectableClass& object, const T& value) const {
+  virtual void setValue(ReflectableClass& object, const T& value) const {
     setValueFunc(object, value);
   }
 
@@ -131,7 +131,7 @@ public:
 };
 
 template<class T>
-class ClassProperty<T*> : public IClassProperty
+class ClassProperty<T*> : public virtual IClassProperty
 {
 private:
   std::string name;
@@ -163,9 +163,9 @@ public:
   virtual const std::string& getName() const { return name; }
 
   virtual std::string getStringValue(const ReflectableClass& object) const {
-    T* value = getValueFunc(object);
+    T* value = getValue(object);
     if (value)
-      Converter<T>::toString(*value);
+      return Converter<T>::toString(*value);
     else
       return "<null>";
   }
@@ -174,18 +174,18 @@ public:
     //setValueFunc(object, new T(convertFromString<T>(value)));
     // TODO: static assert that getting pointer values from a string is not supported
     throw "setting pointer values from a string is not supported";
-    setValueFunc(object, 0);
+    setValue(object, 0);
   }
 
   virtual const std::type_info& getType() const {
     return typeid(T*);
   }
 
-  T* getValue(const ReflectableClass& object) const {
+  virtual T* getValue(const ReflectableClass& object) const {
     return getValueFunc(object);
   }
 
-  void setValue(ReflectableClass& object, T* value) const {
+  virtual void setValue(ReflectableClass& object, T* value) const {
     setValueFunc(object, value);
   }
 

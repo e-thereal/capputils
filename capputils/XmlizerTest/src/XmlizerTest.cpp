@@ -29,25 +29,25 @@ void changeHandler(ObservableClass* sender, int eventId) {
   }
 }
 
-template<class T, bool print = true>
-class Printer {
-public:
-  static void print(T value) {
-    cout << value << endl;
-  }
-};
-
 template<class T>
-class Printer<T, false> {
+class VirtualClassProperty : public ClassProperty<T> {
 public:
-  static void print(T value) {
-    cout << "no print" << endl;
+  VirtualClassProperty() : ClassProperty<T>("Test", 0, 0, 0) { }
+
+  virtual T getValue(const ReflectableClass& object) const {
+    return 1;
   }
 };
 
 int main(int argc, char** argv) {
 	Car car;
 	car.Changed.connect(changeHandler);
+
+  VirtualClassProperty<int> prop;
+  ClassProperty<int>* intProp = dynamic_cast<ClassProperty<int>*>(&prop);
+  
+  if (intProp)
+    cout << intProp->getValue(car) << endl;
 
 	ReflectableClassFactory& factory = ReflectableClassFactory::getInstance();
 	vector<string>& classNames = factory.getClassNames();

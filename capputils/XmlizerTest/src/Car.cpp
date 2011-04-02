@@ -11,7 +11,9 @@
 #include <FlagAttribute.h>
 #include <NotEqualAssertion.h>
 #include <ObserveAttribute.h>
+#include <EnumerableAttribute.h>
 
+using namespace std;
 using namespace capputils::attributes;
 using namespace capputils::reflection;
 
@@ -32,7 +34,7 @@ BeginPropertyDefinitions(Car)
   DefineProperty(ModelName, NotEqual<std::string>("Audi"), Observe(PROPERTY_ID))
   DefineProperty(Help, Flag(), Description("Show options"), Observe(PROPERTY_ID))
   ReflectableProperty(Engine)
-  EnumerableProperty(Owners)
+  DefineProperty(Owners, Enumerable<vector<string> >())
 
 EndPropertyDefinitions
 

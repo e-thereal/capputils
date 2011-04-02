@@ -95,6 +95,7 @@
     <ClInclude Include="IClassProperty.h" />
     <ClInclude Include="IEnumerableAttribute.h" />
     <ClInclude Include="IExecutableAttribute.h" />
+    <ClInclude Include="IPropertyIterator.h" />
     <ClInclude Include="IReflectableAttribute.h" />
     <ClInclude Include="NotEqualAssertion.h" />
     <ClInclude Include="ObservableClass.h" />
