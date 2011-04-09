@@ -65,9 +65,11 @@ public:
   typedef typename T::value_type ValueType;
 
   virtual reflection::IPropertyIterator* getPropertyIterator(const reflection::IClassProperty* property) {
+    using namespace reflection;
+
     const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
     if (!typedProperty)
-      throw "test";
+      throw "unexpected error.";
     {
       reflection::PropertyIterator<CollectionType, ValueType> iter(typedProperty);
       iter.reset();

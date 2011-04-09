@@ -62,4 +62,8 @@ void ArgumentsParser::PrintUsage(const string& header, const reflection::Reflect
   cout << endl;
 }
 
+void ArgumentsParser::PrintDefaultUsage(const std::string& programName, const reflection::ReflectableClass& object) {
+  ArgumentsParser::PrintUsage(string("\nUsage: ") + programName + " [switches], where switches are:", object);
+}
+
 }

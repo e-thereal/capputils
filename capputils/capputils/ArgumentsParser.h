@@ -19,6 +19,7 @@ public:
 
   static void Parse(reflection::ReflectableClass& object, int argc, char** argv);
   static void PrintUsage(const std::string& header, const reflection::ReflectableClass& object);
+  static void PrintDefaultUsage(const std::string& programName, const reflection::ReflectableClass& object);
 };
 
 }
