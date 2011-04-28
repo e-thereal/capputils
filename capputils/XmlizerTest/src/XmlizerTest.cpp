@@ -29,25 +29,9 @@ void changeHandler(ObservableClass* sender, int eventId) {
   }
 }
 
-template<class T>
-class VirtualClassProperty : public ClassProperty<T> {
-public:
-  VirtualClassProperty() : ClassProperty<T>("Test", 0, 0, 0) { }
-
-  virtual T getValue(const ReflectableClass& object) const {
-    return 1;
-  }
-};
-
 int main(int argc, char** argv) {
 	Car car;
 	car.Changed.connect(changeHandler);
-
-  VirtualClassProperty<int> prop;
-  ClassProperty<int>* intProp = dynamic_cast<ClassProperty<int>*>(&prop);
-  
-  if (intProp)
-    cout << intProp->getValue(car) << endl;
 
 	ReflectableClassFactory& factory = ReflectableClassFactory::getInstance();
 	vector<string>& classNames = factory.getClassNames();
@@ -69,9 +53,9 @@ int main(int argc, char** argv) {
 	  return 0;
   }
 
-  vector<string>& owners = car.getOwners();
-  owners.push_back("Tom");
-  owners.push_back("Anne");
+  vector<string>* owners = car.getOwners();
+  owners->push_back("Tomble");
+  owners->push_back("Anne");
   car.setOwners(owners);
 
 	cout << "Xmlizer Test" << endl;

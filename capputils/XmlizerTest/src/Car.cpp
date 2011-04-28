@@ -34,12 +34,14 @@ BeginPropertyDefinitions(Car)
   DefineProperty(ModelName, NotEqual<std::string>("Audi"), Observe(PROPERTY_ID))
   DefineProperty(Help, Flag(), Description("Show options"), Observe(PROPERTY_ID))
   ReflectableProperty(Engine)
-  DefineProperty(Owners, Enumerable<vector<string> >())
+  DefineProperty(Owners, Enumerable<vector<string>* >())
 
 EndPropertyDefinitions
 
 Car::Car() : _DoorCount(3), _HighSpeed(100), _ModelName("BMW"), _Help(0) {
+  _Owners = new vector<string>();
 }
 
 Car::~Car() {
+  delete _Owners;
 }

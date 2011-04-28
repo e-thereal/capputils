@@ -41,7 +41,7 @@ class Car : public capputils::reflection::ReflectableClass,
   Property(ModelName, std::string)
   Property(Help, bool)
   Property(Engine, EngineDescription)
-  Property(Owners, std::vector<std::string>)
+  Property(Owners, std::vector<std::string>*)
 
 public:
   Car();
