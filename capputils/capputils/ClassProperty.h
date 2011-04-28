@@ -14,7 +14,7 @@ namespace reflection {
 
 class ReflectableClass;
 
-template<class T>
+template<class T, bool fromMethod = true>
 class Converter {
 public:
   static T fromString(const std::string& value) {
@@ -31,10 +31,32 @@ public:
   }
 };
 
+template<class T>
+class Converter<T, false> {
+public:
+  static std::string toString(const T& value) {
+    std::stringstream s;
+    s << value;
+    return s.str();
+  }
+};
+
 /*** Template specializations for strings (from string variants) ***/
 
 template<class T>
-class Converter<std::vector<T> > {
+class Converter<T*> {
+public:
+  static std::string toString(const T* value) {
+    if (value) {
+      return Converter<T, false>::toString(*value);
+    } else {
+      return "<null>";
+    }
+  }
+};
+
+template<class T>
+class Converter<std::vector<T>, true> {
 public:
   static std::vector<T> fromString(const std::string& value) {
     std::string result;
@@ -47,6 +69,19 @@ public:
     return vec;
   }
 
+  static std::string toString(const std::vector<T>& value) {
+    std::stringstream s;
+    if (value.size())
+      s << value[0];
+    for (unsigned i = 1; i < value.size(); ++i)
+      s << " " << value[i];
+    return s.str();
+  }
+};
+
+template<class T>
+class Converter<std::vector<T>, false> {
+public:
   static std::string toString(const std::vector<T>& value) {
     std::stringstream s;
     if (value.size())
@@ -174,11 +209,7 @@ public:
   }
 
   virtual std::string getStringValue(const ReflectableClass& object) const {
-    T* value = getValue(object);
-    if (value)
-      return Converter<T>::toString(*value);
-    else
-      return "<null>";
+    return Converter<T*>::toString(getValue(object));
   }
 
   virtual void setStringValue(ReflectableClass& object, const std::string&/* value*/) const {
