@@ -79,7 +79,8 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\capputils\capputils\ScalarAttribute.h" />
+    <ClInclude Include="EventHandler.h" />
+    <ClInclude Include="ScalarAttribute.h" />
     <ClInclude Include="ArgumentsParser.h" />
     <ClInclude Include="AttributeExecuter.h" />
     <ClInclude Include="ClassProperty.h" />
@@ -107,7 +108,7 @@
     <ClInclude Include="xmlizer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\capputils\capputils\ScalarAttribute.cpp" />
+    <ClCompile Include="ScalarAttribute.cpp" />
     <ClCompile Include="ArgumentsParser.cpp" />
     <ClCompile Include="AttributeExecuter.cpp" />
     <ClCompile Include="ClassProperty.cpp" />

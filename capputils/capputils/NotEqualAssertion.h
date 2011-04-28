@@ -40,7 +40,7 @@ public:
         message = defaultMessage;
       } else {
         message = property.getName() +
-            " must not be " + propertyValue + "!";
+          " must not be " + property.getStringValue(object) + "!";
       }
       return false;
     }

@@ -48,8 +48,10 @@ public:
     CollectionType& collection = collectionProperty->getValue(object);
     if (i < collection.size())
       collection[i] = value;
-    else
+    else if (i == collection.size())
       collection.push_back(value);
+    else
+      throw "invalid iterator position!";
     collectionProperty->setValue(object, collection);
   }
 };
