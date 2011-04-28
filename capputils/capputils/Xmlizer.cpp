@@ -12,6 +12,7 @@
 #include "IEnumerableAttribute.h"
 #include "ScalarAttribute.h"
 #include "ReflectableClassFactory.h"
+#include "ReuseAttribute.h"
 
 #include <iostream>
 
@@ -92,10 +93,16 @@ void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClass
     IReflectableAttribute* reflectable = property->getAttribute<IReflectableAttribute>();
     IEnumerableAttribute* enumerableAttribute = property->getAttribute<IEnumerableAttribute>();
     if (reflectable) {
-      ReflectableClass* newObject = Xmlizer::CreateReflectableClass(*element->FirstChild());
-      reflectable->setValuePtr(object, property, newObject);
-      if (!reflectable->isPointer())
-        delete newObject;
+      if (property->getAttribute<ReuseAttribute>() && reflectable->isPointer()) {
+        ReflectableClass* oldObject = reflectable->getValuePtr(object, property);
+        Xmlizer::FromXml(*oldObject, *element->FirstChild());
+        reflectable->setValuePtr(object, property, oldObject);
+      } else { 
+        ReflectableClass* newObject = Xmlizer::CreateReflectableClass(*element->FirstChild());
+        reflectable->setValuePtr(object, property, newObject);
+        if (!reflectable->isPointer())
+          delete newObject;
+      }
     } else if (enumerableAttribute) {
       const TiXmlNode* collectionElement = element->FirstChild("Collection");
       IPropertyIterator* iter = enumerableAttribute->getPropertyIterator(property);

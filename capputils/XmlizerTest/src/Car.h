@@ -42,7 +42,7 @@ class Car : public capputils::reflection::ReflectableClass,
   Property(HighSpeed, float)
   Property(ModelName, std::string)
   Property(Help, bool)
-  Property(Engine, EngineDescription)
+  Property(Engine, EngineDescription*)
   Property(Owners, std::vector<Person*>*)
 
 public:

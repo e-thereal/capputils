@@ -33,7 +33,10 @@ int main(int argc, char** argv) {
 	Car car;
 	car.Changed.connect(changeHandler);
 
-	ReflectableClassFactory& factory = ReflectableClassFactory::getInstance();
+  ReflectableClass* object = &car;
+  cout << object->getClassName() << endl;
+
+	/*ReflectableClassFactory& factory = ReflectableClassFactory::getInstance();
 	vector<string>& classNames = factory.getClassNames();
 	for (unsigned i = 0; i < classNames.size(); ++i) {
 	  cout << classNames[i] << endl;
@@ -43,9 +46,9 @@ int main(int argc, char** argv) {
       cout << "  - " << properties[j]->getType().name() << " " << properties[j]->getName() << endl;
     delete object;
     cout << endl;
-	}
+	}*/
 
-	//Xmlizer::FromXml(car, "car.xml");
+	Xmlizer::FromXml(car, "car.xml");
 	ArgumentsParser::Parse(car, argc, argv);
 
 	if (car.getHelp() || !Verifier::Valid(car)) {

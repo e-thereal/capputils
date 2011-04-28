@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EventHandler.h" />
+    <ClInclude Include="ReuseAttribute.h" />
     <ClInclude Include="ScalarAttribute.h" />
     <ClInclude Include="ArgumentsParser.h" />
     <ClInclude Include="AttributeExecuter.h" />
@@ -108,6 +109,7 @@
     <ClInclude Include="xmlizer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ReuseAttribute.cpp" />
     <ClCompile Include="ScalarAttribute.cpp" />
     <ClCompile Include="ArgumentsParser.cpp" />
     <ClCompile Include="AttributeExecuter.cpp" />
