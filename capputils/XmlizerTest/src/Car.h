@@ -16,6 +16,8 @@
 
 #include <Enumerators.h>
 
+#include "Person.h"
+
 ReflectableEnum(Engine, NoEngine, Diesel, Gas);
 
 class EngineDescription : public capputils::reflection::ReflectableClass {
@@ -41,7 +43,7 @@ class Car : public capputils::reflection::ReflectableClass,
   Property(ModelName, std::string)
   Property(Help, bool)
   Property(Engine, EngineDescription)
-  Property(Owners, std::vector<std::string>*)
+  Property(Owners, std::vector<Person*>*)
 
 public:
   Car();

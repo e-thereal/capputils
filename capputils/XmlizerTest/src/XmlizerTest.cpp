@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
     cout << endl;
 	}
 
-	Xmlizer::FromXml(car, "car.xml");
+	//Xmlizer::FromXml(car, "car.xml");
 	ArgumentsParser::Parse(car, argc, argv);
 
 	if (car.getHelp() || !Verifier::Valid(car)) {
@@ -53,11 +53,15 @@ int main(int argc, char** argv) {
 	  return 0;
   }
 
-  vector<string>* owners = car.getOwners();
-  owners->push_back("Tomble");
-  owners->push_back("Anne");
-  car.setOwners(owners);
-
+  //vector<string>* owners = car.getOwners();
+  //owners->push_back("Tomble");
+  //owners->push_back("Anni");
+  //car.setOwners(owners);
+  vector<Person*>* owners = car.getOwners();
+  owners->push_back(new Person());
+  owners->push_back(new Person());
+  owners->push_back(new Person()); 
+  
 	cout << "Xmlizer Test" << endl;
 	cout << "Doors: " << car.getProperty("DoorCount") << endl;
 	cout << "High Speed: " << car.getHighSpeed() << endl;

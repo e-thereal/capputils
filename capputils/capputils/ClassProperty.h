@@ -102,6 +102,9 @@ public:
 
   virtual const std::vector<attributes::IAttribute*>& getAttributes() const { return attributes; }
   virtual const std::string& getName() const { return name; }
+  virtual void addAttribute(attributes::IAttribute* attribute) {
+    attributes.push_back(attribute);
+  }
 
   virtual std::string getStringValue(const ReflectableClass& object) const {
     return Converter<T>::toString(getValue(object));
@@ -159,8 +162,16 @@ public:
     }
   }
 
+  virtual ~ClassProperty() {
+    for (unsigned i = 0; i < attributes.size(); ++i)
+      delete attributes[i];
+  }
+
   virtual const std::vector<attributes::IAttribute*>& getAttributes() const { return attributes; }
   virtual const std::string& getName() const { return name; }
+  virtual void addAttribute(attributes::IAttribute* attribute) {
+    attributes.push_back(attribute);
+  }
 
   virtual std::string getStringValue(const ReflectableClass& object) const {
     T* value = getValue(object);
