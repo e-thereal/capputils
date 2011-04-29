@@ -157,7 +157,7 @@ public:
     return getValueFunc(object);
   }
 
-  virtual void setValue(ReflectableClass& object, const T& value) const {
+  virtual void setValue(ReflectableClass& object, T value) const {
     setValueFunc(object, value);
   }
 

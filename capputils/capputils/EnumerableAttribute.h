@@ -41,7 +41,7 @@ public:
     return collectionProperty->getValue(object)[i];
   }
 
-  virtual void setValue(ReflectableClass& object, const ValueType& value) const {
+  virtual void setValue(ReflectableClass& object, ValueType value) const {
     CollectionType& collection = collectionProperty->getValue(object);
     if (i < collection.size())
       collection[i] = value;
@@ -83,7 +83,7 @@ public:
     return collectionProperty->getValue(object)->at(i);
   }
 
-  virtual void setValue(ReflectableClass& object, const ValueType& value) const {
+  virtual void setValue(ReflectableClass& object, ValueType value) const {
     CollectionType* collection = collectionProperty->getValue(object);
     if (i < collection->size())
       (*collection)[i] = value;
