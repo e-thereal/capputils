@@ -57,7 +57,7 @@ template<class CollectionType, class ValueType>
 class PropertyIterator<CollectionType*, ValueType> : public virtual IPropertyIterator, public ClassProperty<ValueType> {
 
 private:
-  int i;
+  unsigned i;
   const ClassProperty<CollectionType*>* collectionProperty;
 
 public:

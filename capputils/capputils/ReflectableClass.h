@@ -171,6 +171,12 @@ protected: \
 #endif
 
 #define PROPERTY_ID properties.size()
+#define ReflectableBase(BaseClass) \
+  { \
+  std::vector<capputils::reflection::IClassProperty*>& baseProperties = BaseClass::getProperties(); \
+    for (unsigned i = 0; i < baseProperties.size(); ++i) \
+      properties.push_back(baseProperties[i]); \
+  }
 
 #if defined(_MSC_VER)
 #define BeginPropertyDefinitions(name, ...)   \
