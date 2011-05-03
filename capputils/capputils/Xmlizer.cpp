@@ -13,6 +13,7 @@
 #include "ScalarAttribute.h"
 #include "ReflectableClassFactory.h"
 #include "ReuseAttribute.h"
+#include "VolatileAttribute.h"
 
 #include <iostream>
 
@@ -58,6 +59,9 @@ void Xmlizer::ToXml(TiXmlNode& xmlNode, const ReflectableClass& object) {
   std::vector<reflection::IClassProperty*>& properties = object.getProperties();
 
   for (unsigned i = 0; i < properties.size(); ++i) {
+    if (properties[i]->getAttribute<VolatileAttribute>())
+      continue;
+
     DescriptionAttribute* description = properties[i]->getAttribute<DescriptionAttribute>();
     if (description) {
       xmlNode.LinkEndChild(new TiXmlComment(description->getDescription().c_str()));

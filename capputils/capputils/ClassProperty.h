@@ -43,7 +43,7 @@ public:
 
 /*** Template specializations for strings (from string variants) ***/
 
-template<class T>
+/*template<class T>
 class Converter<T*> {
 public:
   static std::string toString(const T* value) {
@@ -53,7 +53,7 @@ public:
       return "<null>";
     }
   }
-};
+};*/
 
 template<class T>
 class Converter<std::vector<T>, true> {

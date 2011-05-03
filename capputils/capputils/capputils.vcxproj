@@ -106,6 +106,7 @@
     <ClInclude Include="ReflectableClass.h" />
     <ClInclude Include="ReflectableClassFactory.h" />
     <ClInclude Include="Verifier.h" />
+    <ClInclude Include="VolatileAttribute.h" />
     <ClInclude Include="xmlizer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -126,6 +127,7 @@
     <ClCompile Include="ReflectableClass.cpp" />
     <ClCompile Include="ReflectableClassFactory.cpp" />
     <ClCompile Include="Verifier.cpp" />
+    <ClCompile Include="VolatileAttribute.cpp" />
     <ClCompile Include="xmlizer.cpp" />
     <ClCompile Include="xmlizertest.cpp" />
   </ItemGroup>
