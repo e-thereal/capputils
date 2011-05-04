@@ -15,6 +15,7 @@
 #include <ClassProperty.h>
 
 #include "Car.h"
+#include "Student.h"
 
 using namespace std;
 using namespace capputils;
@@ -48,7 +49,7 @@ int main(int argc, char** argv) {
     cout << endl;
 	}*/
 
-	Xmlizer::FromXml(car, "car.xml");
+	Xmlizer::FromXml(car, "car2.xml");
 	ArgumentsParser::Parse(car, argc, argv);
 
 	if (car.getHelp() || !Verifier::Valid(car)) {
@@ -62,8 +63,7 @@ int main(int argc, char** argv) {
   //car.setOwners(owners);
   vector<Person*>* owners = car.getOwners();
   owners->push_back(new Person());
-  owners->push_back(new Person());
-  owners->push_back(new Person()); 
+  owners->push_back(new Student());
   
 	cout << "Xmlizer Test" << endl;
 	cout << "Doors: " << car.getProperty("DoorCount") << endl;

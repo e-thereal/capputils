@@ -6,7 +6,7 @@
 
 using namespace capputils::attributes;
 
-BeginPropertyDefinitions(Address, Scalar())
+BeginPropertyDefinitions(Address)
 
 DefineProperty(Street, Observe(PROPERTY_ID))
 DefineProperty(City, Observe(PROPERTY_ID))
