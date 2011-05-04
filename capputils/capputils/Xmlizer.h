@@ -18,9 +18,12 @@ namespace capputils {
 
 class Xmlizer {
 public:
+  static void AddPropertyToXml(TiXmlNode& xmlNode, const reflection::ReflectableClass& object,
+      const reflection::IClassProperty* property);
   static TiXmlElement* CreateXml(const reflection::ReflectableClass& object);
   static void ToXml(TiXmlNode& xmlNode, const reflection::ReflectableClass& object);
   static void ToXml(const ::std::string& filename, const reflection::ReflectableClass& object);
+  static void ToFile(const ::std::string& filename, TiXmlNode* node);
 
   static reflection::ReflectableClass* CreateReflectableClass(const TiXmlNode& xmlNode);
   static reflection::ReflectableClass* CreateReflectableClass(const ::std::string& filename);

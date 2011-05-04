@@ -6,6 +6,7 @@
  */
 
 #include "ReflectableClassFactory.h"
+#include <iostream>
 
 using namespace std;
 
@@ -28,6 +29,7 @@ ReflectableClass* ReflectableClassFactory::newInstance(const string& classname) 
 void ReflectableClassFactory::registerConstructor(
     const string& classname, ConstructorType constructor)
 {
+  cout << "Register: " << classname << "(" << this << ")" << endl;
   constructors[classname] = constructor;
   classNames.push_back(classname);
 }

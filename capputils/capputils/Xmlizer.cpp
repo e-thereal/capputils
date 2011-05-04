@@ -55,6 +55,19 @@ void populatePropertyElement(TiXmlElement* propertyElement, const ReflectableCla
   }
 }
 
+void Xmlizer::AddPropertyToXml(TiXmlNode& xmlNode, const ReflectableClass& object,
+      const IClassProperty* property)
+{
+  DescriptionAttribute* description = property->getAttribute<DescriptionAttribute>();
+  if (description) {
+    xmlNode.LinkEndChild(new TiXmlComment(description->getDescription().c_str()));
+  }
+
+  TiXmlElement* propertyElement = new TiXmlElement(property->getName());
+  populatePropertyElement(propertyElement, object, property);
+  xmlNode.LinkEndChild(propertyElement);
+}
+
 void Xmlizer::ToXml(TiXmlNode& xmlNode, const ReflectableClass& object) {
   std::vector<reflection::IClassProperty*>& properties = object.getProperties();
 
@@ -62,21 +75,18 @@ void Xmlizer::ToXml(TiXmlNode& xmlNode, const ReflectableClass& object) {
     if (properties[i]->getAttribute<VolatileAttribute>())
       continue;
 
-    DescriptionAttribute* description = properties[i]->getAttribute<DescriptionAttribute>();
-    if (description) {
-      xmlNode.LinkEndChild(new TiXmlComment(description->getDescription().c_str()));
-    }
-
-    TiXmlElement* propertyElement = new TiXmlElement(properties[i]->getName());
-    populatePropertyElement(propertyElement, object, properties[i]);
-    xmlNode.LinkEndChild(propertyElement);
+    AddPropertyToXml(xmlNode, object, properties[i]);
   }
 }
 
 void Xmlizer::ToXml(const ::std::string& filename, const reflection::ReflectableClass& object) {
+  ToFile(filename, Xmlizer::CreateXml(object));
+}
+
+void Xmlizer::ToFile(const ::std::string& filename, TiXmlNode* node) {
   TiXmlDocument xmlDoc;
   xmlDoc.LinkEndChild(new TiXmlDeclaration("1.0", "", ""));
-  xmlDoc.LinkEndChild(Xmlizer::CreateXml(object));
+  xmlDoc.LinkEndChild(node);
   xmlDoc.SaveFile(filename);
 }
 
