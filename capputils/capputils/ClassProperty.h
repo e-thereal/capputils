@@ -7,6 +7,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <typeinfo>
 
 namespace capputils {
 

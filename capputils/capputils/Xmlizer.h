@@ -23,6 +23,7 @@ public:
   static void ToXml(const ::std::string& filename, const reflection::ReflectableClass& object);
 
   static reflection::ReflectableClass* CreateReflectableClass(const TiXmlNode& xmlNode);
+  static reflection::ReflectableClass* CreateReflectableClass(const ::std::string& filename);
   static void FromXml(reflection::ReflectableClass& object, const TiXmlNode& xmlNode);
   static void FromXml(reflection::ReflectableClass& object, const ::std::string& filename);
 };

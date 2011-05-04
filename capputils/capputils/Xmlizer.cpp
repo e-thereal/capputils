@@ -89,6 +89,15 @@ ReflectableClass* Xmlizer::CreateReflectableClass(const TiXmlNode& xmlNode) {
   return 0;
 }
 
+reflection::ReflectableClass* Xmlizer::CreateReflectableClass(const ::std::string& filename) {
+  TiXmlDocument doc;
+  if (!doc.LoadFile(filename)) {
+    // TODO: Error handling
+    return 0;
+  }
+  return CreateReflectableClass(*doc.FirstChildElement());
+}
+
 void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClassProperty* property, const TiXmlElement* element) {
   const char* value = element->Attribute("value");
   if (value) {
