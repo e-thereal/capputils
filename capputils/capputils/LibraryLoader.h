@@ -11,10 +11,14 @@
 #include <string>
 #include <map>
 
+#include <boost/signals.hpp>
+#include "EventHandler.h"
+
 namespace capputils {
 
 struct LibraryData {
   std::string filename;
+  time_t lastModified;
   int loadCount;
   void* handle;
 };
@@ -34,6 +38,7 @@ public:
 
   void loadLibrary(const std::string& filename);
   void freeLibrary(const std::string& filename);
+  bool librariesUpdated();
 };
 
 }

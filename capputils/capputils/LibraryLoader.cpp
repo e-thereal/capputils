@@ -9,8 +9,10 @@
 
 #include <dlfcn.h>
 #include <iostream>
+#include <boost/filesystem.hpp>
 
 using namespace std;
+using namespace boost::filesystem;
 
 namespace capputils {
 
@@ -44,6 +46,7 @@ void LibraryLoader::loadLibrary(const string& filename) {
     data->filename = filename;
     data->loadCount = 1;
     data->handle = dlopen(filename.c_str(), RTLD_LAZY);
+    data->lastModified = last_write_time(filename.c_str());
     libraryTable[filename] = data;
   } else {
     iter->second->loadCount = iter->second->loadCount + 1;
@@ -65,6 +68,26 @@ void LibraryLoader::freeLibrary(const string& filename) {
       cout << "Library freed." << endl;
     }
   }
+}
+
+bool LibraryLoader::librariesUpdated() {
+  bool updated = false;
+  time_t lastModified = 0;
+  for (map<string, LibraryData*>::iterator iter = libraryTable.begin();
+      iter != libraryTable.end(); ++iter)
+  {
+    LibraryData* data = iter->second;
+    try {
+      lastModified = last_write_time(data->filename);
+    } catch(...) {
+      continue;
+    }
+    if (lastModified != data->lastModified) {
+      data->lastModified = lastModified;
+      updated = true;
+    }
+  }
+  return updated;
 }
 
 }
