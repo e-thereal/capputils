@@ -36,13 +36,18 @@ public:
 
   ReflectableClass* newInstance(const std::string& classname);
   void registerConstructor(const std::string& classname, ConstructorType constructor);
+  void freeConstructor(const std::string& classname);
   std::vector<std::string>& getClassNames();
 };
 
 class RegisterConstructor {
+private:
+  std::string classname;
+
 public:
   RegisterConstructor(const std::string& classname,
       ReflectableClassFactory::ConstructorType constructor);
+  virtual ~RegisterConstructor();
 };
 
 }

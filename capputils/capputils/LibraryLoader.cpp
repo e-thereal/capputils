@@ -8,6 +8,7 @@
 #include "LibraryLoader.h"
 
 #include <dlfcn.h>
+#include <iostream>
 
 using namespace std;
 
@@ -43,20 +44,25 @@ void LibraryLoader::loadLibrary(const string& filename) {
     data->filename = filename;
     data->loadCount = 1;
     data->handle = dlopen(filename.c_str(), RTLD_LAZY);
+    libraryTable[filename] = data;
   } else {
     iter->second->loadCount = iter->second->loadCount + 1;
+    cout << filename << " library counter incremented (" << iter->second->loadCount << ")." << endl;
   }
 }
 
 void LibraryLoader::freeLibrary(const string& filename) {
+  cout << "Try to unload " << filename << endl;
   map<string, LibraryData*>::iterator iter = libraryTable.find(filename);
   if (iter != libraryTable.end()) {
     LibraryData* data = iter->second;
     data->loadCount = data->loadCount - 1;
+    cout << filename << " library counter decremented (" << data->loadCount << ")." << endl;
     if (!data->loadCount) {
       dlclose(data->handle);
       libraryTable.erase(filename);
       delete data;
+      cout << "Library freed." << endl;
     }
   }
 }
