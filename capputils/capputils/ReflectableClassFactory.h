@@ -20,10 +20,12 @@ class ReflectableClass;
 
 class ReflectableClassFactory {
 public:
-  typedef ReflectableClass* (*ConstructorType)() ;
+  typedef ReflectableClass* (*ConstructorType)();
+  typedef void (*DestructorType)(ReflectableClass*);
 
 private:
   std::map<std::string, ConstructorType> constructors;
+  std::map<std::string, DestructorType> destructors;
   std::vector<std::string> classNames;
 
 protected:
@@ -35,19 +37,21 @@ public:
   static ReflectableClassFactory& getInstance();
 
   ReflectableClass* newInstance(const std::string& classname);
-  void registerConstructor(const std::string& classname, ConstructorType constructor);
-  void freeConstructor(const std::string& classname);
+  void deleteInstance(ReflectableClass* instance);
+  void registerClass(const std::string& classname, ConstructorType constructor, DestructorType destructor);
+  void freeClass(const std::string& classname);
   std::vector<std::string>& getClassNames();
 };
 
-class RegisterConstructor {
+class RegisterClass {
 private:
   std::string classname;
 
 public:
-  RegisterConstructor(const std::string& classname,
-      ReflectableClassFactory::ConstructorType constructor);
-  virtual ~RegisterConstructor();
+  RegisterClass(const std::string& classname,
+      ReflectableClassFactory::ConstructorType constructor,
+      ReflectableClassFactory::DestructorType destructor);
+  virtual ~RegisterClass();
 };
 
 }

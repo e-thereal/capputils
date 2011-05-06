@@ -6,6 +6,7 @@
  */
 
 #include "ReflectableClassFactory.h"
+#include "ReflectableClass.h"
 #include <iostream>
 
 using namespace std;
@@ -26,17 +27,25 @@ ReflectableClass* ReflectableClassFactory::newInstance(const string& classname) 
   return 0;
 }
 
-void ReflectableClassFactory::registerConstructor(
-    const string& classname, ConstructorType constructor)
+void ReflectableClassFactory::deleteInstance(ReflectableClass* instance) {
+  const std::string& classname = instance->getClassName();
+  if (destructors.find(classname) != destructors.end())
+    destructors[classname](instance);
+}
+
+void ReflectableClassFactory::registerClass(const string& classname,
+    ConstructorType constructor, DestructorType destructor)
 {
   cout << "Register: " << classname << "(" << this << ")" << endl;
   constructors[classname] = constructor;
+  destructors[classname] = destructor;
   classNames.push_back(classname);
 }
 
-void ReflectableClassFactory::freeConstructor(const std::string& classname) {
+void ReflectableClassFactory::freeClass(const std::string& classname) {
   cout << "Free constructor: " << classname << "(" << this << ")" << endl;
   constructors.erase(classname);
+  destructors.erase(classname);
   for (unsigned i = 0; i < classNames.size(); ++i)
     if (classNames[i].compare(classname) == 0) {
       classNames.erase(classNames.begin() + i);
@@ -55,14 +64,15 @@ std::vector<std::string>& ReflectableClassFactory::getClassNames() {
   return classNames;
 }
 
-RegisterConstructor::RegisterConstructor(const std::string& classname,
-      ReflectableClassFactory::ConstructorType constructor) : classname(classname)
+RegisterClass::RegisterClass(const std::string& classname,
+      ReflectableClassFactory::ConstructorType constructor,
+      ReflectableClassFactory::DestructorType destructor) : classname(classname)
 {
-  ReflectableClassFactory::getInstance().registerConstructor(classname, constructor);
+  ReflectableClassFactory::getInstance().registerClass(classname, constructor, destructor);
 }
 
-RegisterConstructor::~RegisterConstructor() {
-  ReflectableClassFactory::getInstance().freeConstructor(classname);
+RegisterClass::~RegisterClass() {
+  ReflectableClassFactory::getInstance().freeClass(classname);
 }
 
 }

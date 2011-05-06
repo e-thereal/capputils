@@ -124,8 +124,9 @@ protected: \
   public: virtual const std::string& getClassName() const { return ClassType::ClassName; } \
   private: void initializeProperties() const; \
   private: void initializeAttributes() const; \
-  private: static capputils::reflection::RegisterConstructor _constructor; \
-  public: static ReflectableClass* newInstance() { return new name(); }
+  private: static capputils::reflection::RegisterClass _registration; \
+  public: static ReflectableClass* newInstance() { return new name(); } \
+  public: static void deleteInstance(ReflectableClass* instance) { delete instance; }
 
 #define InitAbstractReflectableClass(name)                    \
   typedef name ClassType;                         \
@@ -211,7 +212,7 @@ protected: \
   std::vector< ::capputils::reflection::IClassProperty*> name :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> name :: attributes;     \
   const std::string name :: ClassName = #name;  \
-  capputils::reflection::RegisterConstructor name::_constructor(#name, name::newInstance); \
+  capputils::reflection::RegisterClass name::_registration(#name, name::newInstance, name::deleteInstance); \
   void name::initializeAttributes() const { \
     static bool initialized = false; \
     if (initialized) return; \

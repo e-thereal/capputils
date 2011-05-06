@@ -42,7 +42,7 @@ public:
   }
 
   virtual void setValue(ReflectableClass& object, ValueType value) const {
-    CollectionType& collection = collectionProperty->getValue(object);
+    CollectionType collection = collectionProperty->getValue(object);
     if (i < collection.size())
       collection[i] = value;
     else if (i == collection.size())
