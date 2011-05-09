@@ -48,7 +48,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;XMLIZER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;CAPPUTILS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\tinyxml;$(BOOST_INC_PATH)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
@@ -79,7 +79,9 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="capputils.h" />
     <ClInclude Include="EventHandler.h" />
+    <ClInclude Include="LibraryLoader.h" />
     <ClInclude Include="ReuseAttribute.h" />
     <ClInclude Include="ScalarAttribute.h" />
     <ClInclude Include="ArgumentsParser.h" />
@@ -110,6 +112,7 @@
     <ClInclude Include="xmlizer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="LibraryLoader.cpp" />
     <ClCompile Include="ReuseAttribute.cpp" />
     <ClCompile Include="ScalarAttribute.cpp" />
     <ClCompile Include="ArgumentsParser.cpp" />
@@ -129,7 +132,6 @@
     <ClCompile Include="Verifier.cpp" />
     <ClCompile Include="VolatileAttribute.cpp" />
     <ClCompile Include="xmlizer.cpp" />
-    <ClCompile Include="xmlizertest.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

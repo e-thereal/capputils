@@ -10,13 +10,14 @@
 
 #include <string>
 
+#include "capputils.h"
 #include "IAttribute.h"
 
 namespace capputils {
 
 namespace attributes {
 
-class DescriptionAttribute: public virtual IAttribute {
+class CAPPUTILS_API DescriptionAttribute: public virtual IAttribute {
 private:
   std::string description;
 
@@ -27,7 +28,7 @@ public:
   const std::string& getDescription() const;
 };
 
-AttributeWrapper* Description(const std::string& description);
+CAPPUTILS_API AttributeWrapper* Description(const std::string& description);
 
 }
 

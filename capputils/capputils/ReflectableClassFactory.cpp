@@ -11,9 +11,18 @@
 
 using namespace std;
 
+#ifdef _WIN32
+using namespace boost::interprocess;
+#endif
+
 namespace capputils {
 
 namespace reflection {
+
+#ifdef _WIN32
+const char* SharedMemoryName = "CapputilsSharedMemory";
+managed_windows_shared_memory* ReflectableClassFactory::segment = 0;
+#endif
 
 ReflectableClassFactory::ReflectableClassFactory() {
 }
@@ -55,8 +64,37 @@ void ReflectableClassFactory::freeClass(const std::string& classname) {
 
 ReflectableClassFactory& ReflectableClassFactory::getInstance() {
   static ReflectableClassFactory* instance = 0;
-  if (!instance)
+
+#ifdef _WIN32
+  if (!instance) {
+    try {
+      cout << "Try to open shared memory segment ..." << ends;
+      managed_windows_shared_memory segment(open_only, SharedMemoryName);
+      cout << " done." << endl;
+      cout << "Try to get pointer..." << ends;
+      instance = *segment.find<ReflectableClassFactory*>(unique_instance).first;
+      cout << " done." << endl;
+    } catch (...) {
+      cout << " failed." << endl;
+    }
+  }
+#endif
+  if (!instance) {
     instance = new ReflectableClassFactory();
+    cout << "New factory created." << endl;
+#ifdef _WIN32
+    try {
+      cout << "Try to create shared memory segment ..." << ends;
+      managed_windows_shared_memory* segment = new managed_windows_shared_memory(create_only, SharedMemoryName, 256);
+      cout << " done." << endl;
+      cout << "Try to create pointer..." << ends;
+      segment->construct<ReflectableClassFactory*>(unique_instance)(&getInstance());
+      cout << " done." << endl;
+    } catch (...) {
+      cout << " failed." << endl;
+    }
+#endif
+  }
   return *instance;
 }
 

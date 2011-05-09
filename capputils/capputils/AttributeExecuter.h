@@ -8,13 +8,14 @@
 #ifndef ATTRIBUTEEXECUTER_H_
 #define ATTRIBUTEEXECUTER_H_
 
+#include "capputils.h"
 #include "ReflectableClass.h"
 
 namespace capputils {
 
 namespace attributes {
 
-class AttributeExecuter {
+class CAPPUTILS_API AttributeExecuter {
 public:
   AttributeExecuter();
   virtual ~AttributeExecuter();

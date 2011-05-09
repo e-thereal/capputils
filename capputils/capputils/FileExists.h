@@ -8,13 +8,14 @@
 #ifndef FILEEXISTS_H_
 #define FILEEXISTS_H_
 
+#include "capputils.h"
 #include "IAssertionAttribute.h"
 
 namespace capputils {
 
 namespace attributes {
 
-class FileExistsAttribute: public virtual IAssertionAttribute {
+class CAPPUTILS_API FileExistsAttribute: public virtual IAssertionAttribute {
 private:
   std::string lastError;
 

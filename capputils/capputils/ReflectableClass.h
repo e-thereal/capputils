@@ -184,7 +184,7 @@ protected: \
   std::vector< ::capputils::reflection::IClassProperty*> name :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> name :: attributes;     \
   const std::string name :: ClassName = #name;  \
-  capputils::reflection::RegisterConstructor name::_constructor(#name, name::newInstance); \
+  capputils::reflection::RegisterClass name::_registration(#name, name::newInstance, name::deleteInstance); \
   void name::initializeAttributes() const { \
     static bool initialized = false; \
     if (initialized) return; \

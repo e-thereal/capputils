@@ -8,6 +8,7 @@
 #ifndef ENUMERATOR_H_
 #define ENUMERATOR_H_
 
+#include "capputils.h"
 #include "ReflectableClass.h"
 
 #include <vector>
@@ -17,7 +18,7 @@ namespace capputils {
 
 namespace reflection {
 
-class Enumerator: public ReflectableClass {
+class CAPPUTILS_API Enumerator: public ReflectableClass {
 
 InitAbstractReflectableClass(Enumerator)
 

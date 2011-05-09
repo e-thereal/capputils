@@ -16,11 +16,21 @@
 
 namespace capputils {
 
+#ifdef _WIN32
+struct HandleWrapper;
+#endif
+
 struct LibraryData {
   std::string filename;
   time_t lastModified;
   int loadCount;
+#ifdef _WIN32
+  HandleWrapper* handleWrapper;
+#else
   void* handle;
+#endif
+  LibraryData(const char* filename);
+  virtual ~LibraryData();
 };
 
 class LibraryLoader {

@@ -8,11 +8,12 @@
 #ifndef ARGUMENTSPARSER_H_
 #define ARGUMENTSPARSER_H_
 
+#include "capputils.h"
 #include "ReflectableClass.h"
 
 namespace capputils {
 
-class ArgumentsParser {
+class CAPPUTILS_API ArgumentsParser {
 public:
   ArgumentsParser();
   virtual ~ArgumentsParser();

@@ -12,6 +12,10 @@
 #include <string>
 #include <vector>
 
+#ifdef _WIN32
+#include <boost/interprocess/managed_windows_shared_memory.hpp>
+#endif
+
 namespace capputils {
 
 namespace reflection {
@@ -19,6 +23,8 @@ namespace reflection {
 class ReflectableClass;
 
 class ReflectableClassFactory {
+friend class InitFactory;
+
 public:
   typedef ReflectableClass* (*ConstructorType)();
   typedef void (*DestructorType)(ReflectableClass*);
@@ -27,11 +33,12 @@ private:
   std::map<std::string, ConstructorType> constructors;
   std::map<std::string, DestructorType> destructors;
   std::vector<std::string> classNames;
-
-protected:
-  ReflectableClassFactory();
+#ifdef _WIN32
+  static boost::interprocess::managed_windows_shared_memory* segment;
+#endif
 
 public:
+  ReflectableClassFactory();
   virtual ~ReflectableClassFactory();
 
   static ReflectableClassFactory& getInstance();
