@@ -29,7 +29,7 @@ struct HandleWrapper {
 LibraryData::LibraryData(const char* filename) {
   handleWrapper = new HandleWrapper();
   this->filename = filename;
-  string tmpName = this->filename + ".tmp.dll";
+  string tmpName = this->filename + ".host_copy.dll";
   copy_file(filename, tmpName.c_str(), copy_option::overwrite_if_exists);
   loadCount = 1;
   handleWrapper->handle = LoadLibraryA(tmpName.c_str());
@@ -39,6 +39,9 @@ LibraryData::LibraryData(const char* filename) {
 LibraryData::~LibraryData() {
   FreeLibrary(handleWrapper->handle);
   delete handleWrapper;
+
+  string tmpName = this->filename + ".host_copy.dll";
+  remove(tmpName.c_str());
 }
 
 #else
