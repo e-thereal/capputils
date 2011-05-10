@@ -17,6 +17,7 @@
 #include <ostream>
 #include <istream>
 
+#include "capputils.h"
 #include "IAttribute.h"
 #include "ClassProperty.h"
 #include "AttributeExecuter.h"
@@ -67,12 +68,16 @@ protected:
   void addAttributes(std::vector< ::capputils::attributes::IAttribute*>* attributes, ...) const;
 };
 
+std::string trimTypeName(const char* typeName); 
+
 }
 
 }
 
 std::ostream& operator<< (std::ostream& stream, const capputils::reflection::ReflectableClass& object);
 std::istream& operator>> (std::istream& stream, capputils::reflection::ReflectableClass& object);
+
+
 
 #if !defined(CAPPUTILS_USE_CPP0x)
 #define Property(name,type) \
@@ -180,31 +185,31 @@ protected: \
   }
 
 #if defined(_MSC_VER)
-#define BeginPropertyDefinitions(name, ...)   \
-  std::vector< ::capputils::reflection::IClassProperty*> name :: properties;     \
-  std::vector< ::capputils::attributes::IAttribute*> name :: attributes;     \
-  const std::string name :: ClassName = #name;  \
-  capputils::reflection::RegisterClass name::_registration(#name, name::newInstance, name::deleteInstance); \
-  void name::initializeAttributes() const { \
+#define BeginPropertyDefinitions(cname, ...)   \
+  std::vector< ::capputils::reflection::IClassProperty*> cname :: properties;     \
+  std::vector< ::capputils::attributes::IAttribute*> cname :: attributes;     \
+  const std::string cname :: ClassName = capputils::reflection::trimTypeName(typeid(cname).name());  \
+  capputils::reflection::RegisterClass cname::_registration(capputils::reflection::trimTypeName(typeid(cname).name()), cname::newInstance, cname::deleteInstance); \
+  void cname::initializeAttributes() const { \
     static bool initialized = false; \
     if (initialized) return; \
-    addAttributes(&name::attributes, __VA_ARGS__, 0); \
+    addAttributes(&cname::attributes, __VA_ARGS__, 0); \
     initialized = true; \
   } \
-  void name :: initializeProperties() const {   \
+  void cname :: initializeProperties() const {   \
     static bool initialized = false;  \
     if (initialized) return;
-#define BeginAbstractPropertyDefinitions(name, ...)   \
-  std::vector< ::capputils::reflection::IClassProperty*> name :: properties;     \
-  std::vector< ::capputils::attributes::IAttribute*> name :: attributes;     \
-  const std::string name :: ClassName = #name;  \
-  void name::initializeAttributes() const { \
+#define BeginAbstractPropertyDefinitions(cname, ...)   \
+  std::vector< ::capputils::reflection::IClassProperty*> cname :: properties;     \
+  std::vector< ::capputils::attributes::IAttribute*> cname :: attributes;     \
+  const std::string cname :: ClassName = capputils::reflection::trimTypeName(typeid(cname).name());  \
+  void cname::initializeAttributes() const { \
     static bool initialized = false; \
     if (initialized) return; \
-    addAttributes(&name::attributes, __VA_ARGS__, 0); \
+    addAttributes(&cname::attributes, __VA_ARGS__, 0); \
     initialized = true; \
   } \
-  void name :: initializeProperties() const {   \
+  void cname :: initializeProperties() const {   \
     static bool initialized = false;  \
     if (initialized) return;
 #else

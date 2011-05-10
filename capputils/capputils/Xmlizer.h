@@ -16,6 +16,9 @@
 
 namespace capputils {
 
+std::string makeXmlName(const std::string& className);
+std::string makeClassName(const std::string& xmlName);
+
 class Xmlizer {
 public:
   static void AddPropertyToXml(TiXmlNode& xmlNode, const reflection::ReflectableClass& object,

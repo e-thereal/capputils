@@ -7,6 +7,8 @@
 
 #include "ReflectableClass.h"
 
+using namespace std;
+
 namespace capputils {
 
 namespace reflection {
@@ -59,6 +61,15 @@ void ReflectableClass::toStream(std::ostream& stream) const {
 void ReflectableClass::fromStream(std::istream& str) {
 }
 
+std::string trimTypeName(const char* typeName) {
+  string name(typeName);
+  if (name.find("class") == 0)
+    return name.substr(6);
+  if (name.find("struct") == 0)
+    return name.substr(7);
+  return name;
+}
+
 }
 
 }
@@ -72,3 +83,4 @@ std::istream& operator>> (std::istream& stream, capputils::reflection::Reflectab
   object.fromStream(stream);
   return stream;
 }
+

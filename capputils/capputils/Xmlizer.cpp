@@ -17,13 +17,35 @@
 
 #include <iostream>
 
+using namespace std;
+
 namespace capputils {
 
 using namespace attributes;
 using namespace reflection;
 
+string& replaceAll(string& context, const string& from, const string& to)
+{
+    size_t lookHere = 0;
+    size_t foundHere;
+    while((foundHere = context.find(from, lookHere)) != string::npos)
+    {
+          context.replace(foundHere, from.size(), to);
+          lookHere = foundHere + to.size();
+    }
+    return context;
+}
+
+string makeXmlName(const string& className) {
+  return replaceAll(className.substr(), "::", "-");
+}
+
+string makeClassName(const string& xmlName) {
+  return replaceAll(xmlName.substr(), "-", "::");
+}
+
 TiXmlElement* Xmlizer::CreateXml(const reflection::ReflectableClass& object) {
-  TiXmlElement* xmlNode = new TiXmlElement(object.getClassName());
+  TiXmlElement* xmlNode = new TiXmlElement(makeXmlName(object.getClassName()));
 
   Xmlizer::ToXml(*xmlNode, object);
   return xmlNode;
@@ -91,7 +113,7 @@ void Xmlizer::ToFile(const ::std::string& filename, TiXmlNode* node) {
 }
 
 ReflectableClass* Xmlizer::CreateReflectableClass(const TiXmlNode& xmlNode) {
-  ReflectableClass* object = ReflectableClassFactory::getInstance().newInstance(xmlNode.Value());
+  ReflectableClass* object = ReflectableClassFactory::getInstance().newInstance(makeClassName(xmlNode.Value()));
   if (object) {
     Xmlizer::FromXml(*object, xmlNode);
     return object;
@@ -145,8 +167,8 @@ void Xmlizer::FromXml(reflection::ReflectableClass& object, const TiXmlNode& xml
   using namespace std;
   const TiXmlNode* xNode = &xmlNode;
 
-  if (object.getClassName().compare(xNode->Value()) != 0) {
-    xNode = xNode->FirstChild(object.getClassName());
+  if (makeXmlName(object.getClassName()).compare(xNode->Value()) != 0) {
+    xNode = xNode->FirstChild(makeXmlName(object.getClassName()));
   }
 
   for (const TiXmlNode* node = xNode->FirstChild(); node; node = node->NextSibling()) {
