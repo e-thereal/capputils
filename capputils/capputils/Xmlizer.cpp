@@ -24,16 +24,17 @@ namespace capputils {
 using namespace attributes;
 using namespace reflection;
 
-string& replaceAll(string& context, const string& from, const string& to)
+string replaceAll(const string& context, const string& from, const string& to)
 {
-    size_t lookHere = 0;
-    size_t foundHere;
-    while((foundHere = context.find(from, lookHere)) != string::npos)
-    {
-          context.replace(foundHere, from.size(), to);
-          lookHere = foundHere + to.size();
-    }
-    return context;
+  string str = context;
+  size_t lookHere = 0;
+  size_t foundHere;
+  while((foundHere = str.find(from, lookHere)) != string::npos)
+  {
+    str.replace(foundHere, from.size(), to);
+        lookHere = foundHere + to.size();
+  }
+  return str;
 }
 
 string makeXmlName(const string& className) {

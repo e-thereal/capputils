@@ -8,6 +8,7 @@
 #include "ReflectableClassFactory.h"
 #include "ReflectableClass.h"
 #include <iostream>
+#include <cassert>
 
 using namespace std;
 
@@ -33,6 +34,7 @@ ReflectableClassFactory::~ReflectableClassFactory() {
 ReflectableClass* ReflectableClassFactory::newInstance(const string& classname) {
   if (constructors.find(classname) != constructors.end())
     return constructors[classname]();
+  assert(0);
   return 0;
 }
 

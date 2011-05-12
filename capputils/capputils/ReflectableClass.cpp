@@ -7,6 +7,12 @@
 
 #include "ReflectableClass.h"
 
+#ifndef _Win32
+#include <sstream>
+#include <cassert>
+#include <iostream>
+#endif
+
 using namespace std;
 
 namespace capputils {
@@ -61,6 +67,7 @@ void ReflectableClass::toStream(std::ostream& stream) const {
 void ReflectableClass::fromStream(std::istream& str) {
 }
 
+#ifdef _WIN32
 std::string trimTypeName(const char* typeName) {
   string name(typeName);
   if (name.find("class") == 0)
@@ -69,6 +76,40 @@ std::string trimTypeName(const char* typeName) {
     return name.substr(7);
   return name;
 }
+#else
+std::string trimTypeName(const char* typeName) {
+  string name;
+  stringstream stream(typeName);
+  int num;
+  char buffer[256];
+  char ch;
+
+  if (typeName[0] == 'N') {
+    //cout << "namespace mode: " << typeName << endl;
+    stream.get(); // read the first N
+    for(int i = 0; !stream.eof() && i < 10; ++i) {
+      stream >> num; // read number of characters of the namespace name
+      //cout << "Length: " << num << endl;
+      assert(num < 256);
+      stream.get(buffer, num + 1);
+      //cout << "Read: " << buffer << endl;
+      name += buffer;
+      //cout << "Current: " << name << endl;
+      ch = stream.peek();
+      //cout << "Peak: " << ch << endl;
+      if (ch == 'E')
+        break;
+      else
+        name += "::";
+    }
+  } else {
+    stream >> num;
+    name = string(typeName + 1, typeName + 1 + num);
+  }
+
+  return name;
+}
+#endif
 
 }
 
