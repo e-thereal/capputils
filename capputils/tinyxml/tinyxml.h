@@ -34,6 +34,12 @@ distribution.
 #pragma warning( disable : 4786 )
 #endif
 
+#ifdef _WIN32
+#ifndef TINYXML_EXPORTS
+#pragma comment (lib, "tinyxml")
+#endif
+#endif
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
