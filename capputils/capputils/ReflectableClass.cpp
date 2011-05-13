@@ -85,18 +85,13 @@ std::string trimTypeName(const char* typeName) {
   char ch;
 
   if (typeName[0] == 'N') {
-    //cout << "namespace mode: " << typeName << endl;
     stream.get(); // read the first N
     for(int i = 0; !stream.eof() && i < 10; ++i) {
       stream >> num; // read number of characters of the namespace name
-      //cout << "Length: " << num << endl;
       assert(num < 256);
       stream.get(buffer, num + 1);
-      //cout << "Read: " << buffer << endl;
       name += buffer;
-      //cout << "Current: " << name << endl;
       ch = stream.peek();
-      //cout << "Peak: " << ch << endl;
       if (ch == 'E')
         break;
       else

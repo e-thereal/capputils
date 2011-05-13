@@ -47,14 +47,14 @@ void ReflectableClassFactory::deleteInstance(ReflectableClass* instance) {
 void ReflectableClassFactory::registerClass(const string& classname,
     ConstructorType constructor, DestructorType destructor)
 {
-  cout << "Register: " << classname << "(" << this << ")" << endl;
+  //cout << "Register: " << classname << "(" << this << ")" << endl;
   constructors[classname] = constructor;
   destructors[classname] = destructor;
   classNames.push_back(classname);
 }
 
 void ReflectableClassFactory::freeClass(const std::string& classname) {
-  cout << "Free constructor: " << classname << "(" << this << ")" << endl;
+  //cout << "Free constructor: " << classname << "(" << this << ")" << endl;
   constructors.erase(classname);
   destructors.erase(classname);
   for (unsigned i = 0; i < classNames.size(); ++i)
@@ -70,30 +70,30 @@ ReflectableClassFactory& ReflectableClassFactory::getInstance() {
 #ifdef _WIN32
   if (!instance) {
     try {
-      cout << "Try to open shared memory segment ..." << ends;
+      //cout << "Try to open shared memory segment ..." << ends;
       managed_windows_shared_memory segment(open_only, SharedMemoryName);
-      cout << " done." << endl;
-      cout << "Try to get pointer..." << ends;
+      //cout << " done." << endl;
+      //cout << "Try to get pointer..." << ends;
       instance = *segment.find<ReflectableClassFactory*>(unique_instance).first;
-      cout << " done." << endl;
+      //cout << " done." << endl;
     } catch (...) {
-      cout << " failed." << endl;
+      //cout << " failed." << endl;
     }
   }
 #endif
   if (!instance) {
     instance = new ReflectableClassFactory();
-    cout << "New factory created." << endl;
+    //cout << "New factory created." << endl;
 #ifdef _WIN32
     try {
-      cout << "Try to create shared memory segment ..." << ends;
+      //cout << "Try to create shared memory segment ..." << ends;
       managed_windows_shared_memory* segment = new managed_windows_shared_memory(create_only, SharedMemoryName, 256);
-      cout << " done." << endl;
-      cout << "Try to create pointer..." << ends;
+      //cout << " done." << endl;
+      //cout << "Try to create pointer..." << ends;
       segment->construct<ReflectableClassFactory*>(unique_instance)(&getInstance());
-      cout << " done." << endl;
+      //cout << " done." << endl;
     } catch (...) {
-      cout << " failed." << endl;
+      //cout << " failed." << endl;
     }
 #endif
   }

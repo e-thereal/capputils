@@ -88,7 +88,7 @@ void LibraryLoader::loadLibrary(const string& filename) {
     libraryTable[filename] = data;
   } else {
     iter->second->loadCount = iter->second->loadCount + 1;
-    cout << filename << " library counter incremented (" << iter->second->loadCount << ")." << endl;
+    //cout << filename << " library counter incremented (" << iter->second->loadCount << ")." << endl;
   }
 }
 
@@ -98,11 +98,11 @@ void LibraryLoader::freeLibrary(const string& filename) {
   if (iter != libraryTable.end()) {
     LibraryData* data = iter->second;
     data->loadCount = data->loadCount - 1;
-    cout << filename << " library counter decremented (" << data->loadCount << ")." << endl;
+    //cout << filename << " library counter decremented (" << data->loadCount << ")." << endl;
     if (!data->loadCount) {
       libraryTable.erase(filename);
       delete data;
-      cout << "Library freed." << endl;
+      //cout << "Library freed." << endl;
     }
   }
 }
