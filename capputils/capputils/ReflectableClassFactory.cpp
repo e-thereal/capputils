@@ -10,6 +10,8 @@
 #include <iostream>
 #include <cassert>
 
+#include "FactoryException.h"
+
 using namespace std;
 
 #ifdef _WIN32
@@ -32,16 +34,18 @@ ReflectableClassFactory::~ReflectableClassFactory() {
 }
 
 ReflectableClass* ReflectableClassFactory::newInstance(const string& classname) {
+  // TODO: Tell which class could not be loaded
   if (constructors.find(classname) != constructors.end())
     return constructors[classname]();
-  assert(0);
-  return 0;
+  throw exceptions::FactoryException();
 }
 
 void ReflectableClassFactory::deleteInstance(ReflectableClass* instance) {
   const std::string& classname = instance->getClassName();
   if (destructors.find(classname) != destructors.end())
     destructors[classname](instance);
+  else
+    throw exceptions::FactoryException();
 }
 
 void ReflectableClassFactory::registerClass(const string& classname,

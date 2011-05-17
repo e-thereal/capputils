@@ -15,6 +15,7 @@
 #endif
 #include <iostream>
 #include <boost/filesystem.hpp>
+#include "LibraryException.h"
 
 using namespace std;
 using namespace boost::filesystem;
@@ -27,12 +28,15 @@ struct HandleWrapper {
 };
 
 LibraryData::LibraryData(const char* filename) {
+  // TODO: Error handling, can't copy or can't load + why can't load
   handleWrapper = new HandleWrapper();
   this->filename = filename;
   string tmpName = this->filename + ".host_copy.dll";
   copy_file(filename, tmpName.c_str(), copy_option::overwrite_if_exists);
   loadCount = 1;
   handleWrapper->handle = LoadLibraryA(tmpName.c_str());
+  if (!handleWrapper->handle)
+    throw exceptions::LibraryException();
   lastModified = last_write_time(filename);
 }
 
@@ -50,6 +54,8 @@ LibraryData::LibraryData(const char* filename) {
   this->filename = filename;
   loadCount = 1;
   handle = dlopen(filename, RTLD_LAZY);
+  if (!handle)
+    throw exceptions::LibraryException();
   lastModified = last_write_time(filename);
 }
 

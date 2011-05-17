@@ -111,6 +111,12 @@
     <ClInclude Include="capputils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LibraryException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FactoryException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="xmlizer.cpp">
@@ -171,6 +177,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LibraryLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LibraryException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FactoryException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

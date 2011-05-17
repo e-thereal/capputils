@@ -81,6 +81,8 @@
   <ItemGroup>
     <ClInclude Include="capputils.h" />
     <ClInclude Include="EventHandler.h" />
+    <ClInclude Include="FactoryException.h" />
+    <ClInclude Include="LibraryException.h" />
     <ClInclude Include="LibraryLoader.h" />
     <ClInclude Include="ReuseAttribute.h" />
     <ClInclude Include="ScalarAttribute.h" />
@@ -112,6 +114,8 @@
     <ClInclude Include="xmlizer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FactoryException.cpp" />
+    <ClCompile Include="LibraryException.cpp" />
     <ClCompile Include="LibraryLoader.cpp" />
     <ClCompile Include="ReuseAttribute.cpp" />
     <ClCompile Include="ScalarAttribute.cpp" />
