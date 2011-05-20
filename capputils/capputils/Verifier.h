@@ -24,6 +24,7 @@ public:
       const reflection::IClassProperty& property, std::ostream& stream = std::cout);
   static bool Valid(const reflection::ReflectableClass& object,
       std::ostream& stream = std::cout);
+  static bool UpToDate(const reflection::ReflectableClass& object);
 };
 
 }

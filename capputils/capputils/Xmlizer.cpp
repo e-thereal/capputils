@@ -14,6 +14,7 @@
 #include "ReflectableClassFactory.h"
 #include "ReuseAttribute.h"
 #include "VolatileAttribute.h"
+#include "IXmlableAttribute.h"
 
 #include <iostream>
 
@@ -75,6 +76,13 @@ void populatePropertyElement(TiXmlElement* propertyElement, const ReflectableCla
     delete iter;
   } else {
     propertyElement->SetAttribute("value", property->getStringValue(object));
+  }
+  const vector<IAttribute*>& attributes = property->getAttributes();
+  for (unsigned i = 0; i < attributes.size(); ++i) {
+    IXmlableAttribute* xmlable = dynamic_cast<IXmlableAttribute*>(attributes[i]);
+    if (xmlable) {
+      xmlable->addToPropertyNode(*propertyElement, object, property);
+    }
   }
 }
 
@@ -161,6 +169,12 @@ void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClass
       }
       delete iter;
     }
+  }
+  const vector<IAttribute*>& attributes = property->getAttributes();
+  for (unsigned i = 0; i < attributes.size(); ++i) {
+    IXmlableAttribute* xmlable = dynamic_cast<IXmlableAttribute*>(attributes[i]);
+    if (xmlable)
+      xmlable->getFromPropertyNode(*element, object, property);
   }
 }
 

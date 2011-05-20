@@ -99,7 +99,8 @@ std::string trimTypeName(const char* typeName) {
     }
   } else {
     stream >> num;
-    name = string(typeName + 1, typeName + 1 + num);
+    int cur = stream.tellg();
+    name = string(typeName + cur, typeName + cur + num);
   }
 
   return name;
