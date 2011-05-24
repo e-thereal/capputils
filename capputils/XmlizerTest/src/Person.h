@@ -3,12 +3,13 @@
 #ifndef _PERSON_H_
 #define _PERSON_H_
 
-#include <ReflectableClass.h>
+#include <capputils/ReflectableClass.h>
 #include <string>
 #include <istream>
 #include <ostream>
-#include <Enumerators.h>
-#include <ObservableClass.h>
+#include <capputils/Enumerators.h>
+#include <capputils/ObservableClass.h>
+#include <capputils/TimedClass.h>
 
 class Address : public capputils::reflection::ReflectableClass,
                 public capputils::ObservableClass
@@ -49,7 +50,9 @@ public:
 ReflectableEnum(Gender, Male, Female, Neutrum);
 
 class Person : public capputils::reflection::ReflectableClass,
-               public capputils::ObservableClass {
+               public capputils::ObservableClass,
+               public capputils::TimedClass
+{
 InitReflectableClass(Person)
 
 Property(FirstName, std::string)

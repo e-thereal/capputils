@@ -10,7 +10,7 @@
 
 #include "IAttribute.h"
 
-#include <tinyxml.h>
+#include <tinyxml/tinyxml.h>
 
 namespace capputils {
 

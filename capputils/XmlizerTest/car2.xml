@@ -2,7 +2,7 @@
 <Car>
     <!--Number of doors (default = 3)-->
     <DoorCount value="3" />
-    <HighSpeed value="100" />
+    <HighSpeed value="200" timestamp="May 19 2011 16:24:08" />
     <ModelName value="BMW" />
     <!--Show options-->
     <Help value="0" />
@@ -10,7 +10,10 @@
         <EngineDescription>
             <CylinderCount value="12" />
             <PS value="120" />
-            <Model value="Gas" />
+            <Model value="Diesel" />
         </EngineDescription>
     </Engine>
+    <Owners>
+        <Collection />
+    </Owners>
 </Car>

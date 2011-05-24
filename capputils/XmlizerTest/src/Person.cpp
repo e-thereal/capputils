@@ -1,8 +1,9 @@
 #include "Person.h"
 
-#include <DescriptionAttribute.h>
-#include <ScalarAttribute.h>
-#include <ObserveAttribute.h>
+#include <capputils/DescriptionAttribute.h>
+#include <capputils/ScalarAttribute.h>
+#include <capputils/ObserveAttribute.h>
+#include <capputils/TimeStampAttribute.h>
 
 using namespace capputils::attributes;
 
@@ -26,7 +27,7 @@ DefineProperty(Name,
   Description("Name of our parents."), Observe(PROPERTY_ID))
 
 DefineProperty(Age,
-  Description("Age in years."), Observe(PROPERTY_ID))
+  Description("Age in years."), Observe(PROPERTY_ID), TimeStamp(PROPERTY_ID))
 
 ReflectableProperty(Address,
   Description("Address with everything."), Observe(PROPERTY_ID))

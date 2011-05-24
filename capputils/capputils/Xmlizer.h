@@ -8,7 +8,7 @@
 #ifndef XMLIZER_H_
 #define XMLIZER_H_
 
-#include <tinyxml.h>
+#include <tinyxml/tinyxml.h>
 #include <iostream>
 #include <string>
 

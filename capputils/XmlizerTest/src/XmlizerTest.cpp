@@ -8,11 +8,11 @@
 
 #include <iostream>
 
-#include <Xmlizer.h>
-#include <ArgumentsParser.h>
-#include <Verifier.h>
-#include <ReflectableClassFactory.h>
-#include <ClassProperty.h>
+#include <capputils/Xmlizer.h>
+#include <capputils/ArgumentsParser.h>
+#include <capputils/Verifier.h>
+#include <capputils/ReflectableClassFactory.h>
+#include <capputils/ClassProperty.h>
 
 #include "Car.h"
 #include "Student.h"
@@ -32,10 +32,8 @@ void changeHandler(ObservableClass* sender, int eventId) {
 
 int main(int argc, char** argv) {
 	Car car;
-	car.Changed.connect(changeHandler);
-
-  ReflectableClass* object = &car;
-  cout << object->getClassName() << endl;
+	cout << __DATE__" "__TIME__ << endl;
+	//car.Changed.connect(changeHandler);
 
 	/*ReflectableClassFactory& factory = ReflectableClassFactory::getInstance();
 	vector<string>& classNames = factory.getClassNames();
@@ -61,9 +59,9 @@ int main(int argc, char** argv) {
   //owners->push_back("Tomble");
   //owners->push_back("Anni");
   //car.setOwners(owners);
-  vector<Person*>* owners = car.getOwners();
-  owners->push_back(new Person());
-  owners->push_back(new Student());
+  //vector<Person*>* owners = car.getOwners();
+  //owners->push_back(new Person());
+  //owners->push_back(new Student());
   
 	cout << "Xmlizer Test" << endl;
 	cout << "Doors: " << car.getProperty("DoorCount") << endl;
