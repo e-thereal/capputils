@@ -178,6 +178,40 @@ void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClass
   }
 }
 
+void Xmlizer::GetPropertyFromXml(reflection::ReflectableClass& object,
+      reflection::IClassProperty* property, const TiXmlNode& xmlNode)
+{
+  using namespace std;
+  const TiXmlNode* xNode = &xmlNode;
+
+  // TODO: error handling
+  if (!property)
+    return;
+
+  if (makeXmlName(object.getClassName()).compare(xNode->Value()) != 0) {
+    xNode = xNode->FirstChild(makeXmlName(object.getClassName()));
+  }
+
+  const TiXmlNode* node = xNode->FirstChild(property->getName());
+  if (node) {
+    if (node->Type() == TiXmlNode::TINYXML_ELEMENT) {
+      const TiXmlElement* element = dynamic_cast<const TiXmlElement*>(node);
+      setValueOfProperty(object, property, element);
+    }
+  }
+}
+
+void Xmlizer::GetPropertyFromXml(reflection::ReflectableClass& object,
+      reflection::IClassProperty* property, const std::string& filename)
+{
+  TiXmlDocument doc;
+  if (!doc.LoadFile(filename)) {
+    // TODO: Error handling
+    return;
+  }
+  Xmlizer::GetPropertyFromXml(object, property, doc);
+}
+
 void Xmlizer::FromXml(reflection::ReflectableClass& object, const TiXmlNode& xmlNode) {
   using namespace std;
   const TiXmlNode* xNode = &xmlNode;
