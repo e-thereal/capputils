@@ -118,17 +118,16 @@ protected: \
   protected: static std::vector< ::capputils::reflection::IClassProperty*> properties;                \
   protected: static std::vector< ::capputils::attributes::IAttribute*> attributes;                \
   public: virtual std::vector< ::capputils::reflection::IClassProperty*>& getProperties() const {  \
-    initializeProperties();                         \
-    return properties;                              \
+    initializeClass();                            \
+    return properties;                            \
   }                                               \
   public: virtual std::vector< ::capputils::attributes::IAttribute*>& getAttributes() const {  \
-    initializeAttributes();                        \
-    return attributes;                             \
+    initializeClass();                            \
+    return attributes;                            \
   }                                               \
   public: static const std::string ClassName;     \
   public: virtual const std::string& getClassName() const { return ClassType::ClassName; } \
-  private: void initializeProperties() const; \
-  private: void initializeAttributes() const; \
+  private: void initializeClass() const; \
   private: static capputils::reflection::RegisterClass _registration; \
   public: static ReflectableClass* newInstance() { return new name(); } \
   public: static void deleteInstance(ReflectableClass* instance) { delete instance; }
@@ -138,17 +137,16 @@ protected: \
   protected: static std::vector< ::capputils::reflection::IClassProperty*> properties;                \
   protected: static std::vector< ::capputils::attributes::IAttribute*> attributes;                \
   public: virtual std::vector< ::capputils::reflection::IClassProperty*>& getProperties() const {  \
-    initializeProperties();                         \
+    initializeClass();                         \
     return properties;                              \
   }                                               \
   public: virtual std::vector< ::capputils::attributes::IAttribute*>& getAttributes() const {  \
-    initializeAttributes();                        \
+    initializeClass();                        \
     return attributes;                             \
   }                                               \
   public: static const std::string ClassName;     \
   public: virtual const std::string& getClassName() const { return ClassType::ClassName; } \
-  private: void initializeProperties() const; \
-  private: void initializeAttributes() const;
+  private: void initializeClass() const;
 
 #if !defined(CAPPUTILS_USE_CPP0x)
 #if defined(_MSC_VER)
@@ -179,9 +177,12 @@ protected: \
 #define PROPERTY_ID properties.size()
 #define ReflectableBase(BaseClass) \
   { \
-  std::vector<capputils::reflection::IClassProperty*>& baseProperties = BaseClass::getProperties(); \
+    std::vector<capputils::reflection::IClassProperty*>& baseProperties = BaseClass::getProperties(); \
     for (unsigned i = 0; i < baseProperties.size(); ++i) \
       properties.push_back(baseProperties[i]); \
+    std::vector<capputils::attributes::IAttribute*>& baseAttributes = BaseClass::getAttributes(); \
+    for (unsigned i = 0; i < baseAttributes.size(); ++i) \
+      attributes.push_back(baseAttributes[i]); \
   }
 
 #if defined(_MSC_VER)
@@ -190,56 +191,38 @@ protected: \
   std::vector< ::capputils::attributes::IAttribute*> cname :: attributes;     \
   const std::string cname :: ClassName = capputils::reflection::trimTypeName(typeid(cname).name());  \
   capputils::reflection::RegisterClass cname::_registration(capputils::reflection::trimTypeName(typeid(cname).name()), cname::newInstance, cname::deleteInstance); \
-  void cname::initializeAttributes() const { \
+  void cname::initializeClass() const { \
     static bool initialized = false; \
     if (initialized) return; \
-    addAttributes(&cname::attributes, __VA_ARGS__, 0); \
-    initialized = true; \
-  } \
-  void cname :: initializeProperties() const {   \
-    static bool initialized = false;  \
-    if (initialized) return;
+    addAttributes(&cname::attributes, __VA_ARGS__, 0);
+
 #define BeginAbstractPropertyDefinitions(cname, ...)   \
   std::vector< ::capputils::reflection::IClassProperty*> cname :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> cname :: attributes;     \
   const std::string cname :: ClassName = capputils::reflection::trimTypeName(typeid(cname).name());  \
-  void cname::initializeAttributes() const { \
+  void cname::initializeClass() const { \
     static bool initialized = false; \
     if (initialized) return; \
-    addAttributes(&cname::attributes, __VA_ARGS__, 0); \
-    initialized = true; \
-  } \
-  void cname :: initializeProperties() const {   \
-    static bool initialized = false;  \
-    if (initialized) return;
+    addAttributes(&cname::attributes, __VA_ARGS__, 0);
 #else
 #define BeginPropertyDefinitions(cname, args...)   \
   std::vector< ::capputils::reflection::IClassProperty*> cname :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> cname :: attributes;     \
   const std::string cname :: ClassName = capputils::reflection::trimTypeName(typeid(cname).name());  \
   capputils::reflection::RegisterClass cname::_registration(capputils::reflection::trimTypeName(typeid(cname).name()), cname::newInstance, cname::deleteInstance); \
-  void cname::initializeAttributes() const { \
+  void cname::initializeClass() const { \
     static bool initialized = false; \
     if (initialized) return; \
-    addAttributes(&cname::attributes, ##args, 0); \
-    initialized = true; \
-  } \
-  void cname :: initializeProperties() const {   \
-    static bool initialized = false;  \
-    if (initialized) return;
+    addAttributes(&cname::attributes, ##args, 0);
+
 #define BeginAbstractPropertyDefinitions(cname, args...)   \
   std::vector< ::capputils::reflection::IClassProperty*> cname :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> cname :: attributes;     \
   const std::string cname :: ClassName = capputils::reflection::trimTypeName(typeid(cname).name());  \
-  void cname::initializeAttributes() const { \
+  void cname::initializeClass() const { \
     static bool initialized = false; \
     if (initialized) return; \
-    addAttributes(&cname::attributes, ##args, 0); \
-    initialized = true; \
-  } \
-  void cname :: initializeProperties() const {   \
-    static bool initialized = false;  \
-    if (initialized) return;
+    addAttributes(&cname::attributes, ##args, 0);
 #endif
 #define EndPropertyDefinitions initialized = true; }
 

@@ -24,6 +24,7 @@ struct LibraryData {
   std::string filename;
   time_t lastModified;
   int loadCount;
+  std::vector<std::string> classnames; ///< contains all classes that come with the library
 #ifdef _WIN32
   HandleWrapper* handleWrapper;
 #else
@@ -49,6 +50,9 @@ public:
   void loadLibrary(const std::string& filename);
   void freeLibrary(const std::string& filename);
   bool librariesUpdated();
+
+  // Returns the library name that defines the given class
+  std::string classDefinedIn(const std::string& classname);
 };
 
 }

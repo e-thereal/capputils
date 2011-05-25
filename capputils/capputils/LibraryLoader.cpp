@@ -7,6 +7,8 @@
 
 #include "LibraryLoader.h"
 
+#include <set>
+
 #ifndef _WIN32
 #include <dlfcn.h>
 #else
@@ -16,6 +18,7 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include "LibraryException.h"
+#include "ReflectableClassFactory.h"
 
 using namespace std;
 using namespace boost::filesystem;
@@ -29,6 +32,13 @@ struct HandleWrapper {
 
 LibraryData::LibraryData(const char* filename) {
   // TODO: Error handling, can't copy or can't load + why can't load
+
+  reflection::ReflectableClassFactory& factory = reflection::ReflectableClassFactory::getInstance();
+  set<string> loadedClasses;
+  vector<string>& loadedClassNames = factory.getClassNames();
+  for (unsigned i = 0; i < loadedClassNames.size(); ++i)
+    loadedClasses.insert(loadedClassNames[i]);
+
   handleWrapper = new HandleWrapper();
   this->filename = filename;
   string tmpName = this->filename + ".host_copy.dll";
@@ -38,6 +48,12 @@ LibraryData::LibraryData(const char* filename) {
   if (!handleWrapper->handle)
     throw exceptions::LibraryException();
   lastModified = last_write_time(filename);
+
+  loadedClassNames = factory.getClassNames();
+  for (unsigned i = 0; i < loadedClassNames.size(); ++i) {
+    if (loadedClasses.find(loadedClassNames[i]) == loadedClasses.end())
+      classnames.push_back(loadedClassNames[i]);
+  }
 }
 
 LibraryData::~LibraryData() {
@@ -51,12 +67,26 @@ LibraryData::~LibraryData() {
 #else
 
 LibraryData::LibraryData(const char* filename) {
+  // Get classnames before and after loading the library
+  // Diff are all classes that come with the library
+  reflection::ReflectableClassFactory& factory = reflection::ReflectableClassFactory::getInstance();
+  set<string> loadedClasses;
+  vector<string>& loadedClassNames = factory.getClassNames();
+  for (unsigned i = 0; i < loadedClassNames.size(); ++i)
+    loadedClasses.insert(loadedClassNames[i]);
+
   this->filename = filename;
   loadCount = 1;
   handle = dlopen(filename, RTLD_LAZY);
   if (!handle)
     throw exceptions::LibraryException();
   lastModified = last_write_time(filename);
+
+  loadedClassNames = factory.getClassNames();
+  for (unsigned i = 0; i < loadedClassNames.size(); ++i) {
+    if (loadedClasses.find(loadedClassNames[i]) == loadedClasses.end())
+      classnames.push_back(loadedClassNames[i]);
+  }
 }
 
 LibraryData::~LibraryData() {
@@ -99,7 +129,7 @@ void LibraryLoader::loadLibrary(const string& filename) {
 }
 
 void LibraryLoader::freeLibrary(const string& filename) {
-  cout << "Try to unload " << filename << endl;
+  //cout << "Try to unload " << filename << endl;
   map<string, LibraryData*>::iterator iter = libraryTable.find(filename);
   if (iter != libraryTable.end()) {
     LibraryData* data = iter->second;
@@ -131,6 +161,20 @@ bool LibraryLoader::librariesUpdated() {
     }
   }
   return updated;
+}
+
+string LibraryLoader::classDefinedIn(const string& classname) {
+  for (map<string, LibraryData*>::iterator iter = libraryTable.begin();
+        iter != libraryTable.end(); ++iter)
+  {
+    LibraryData* data = iter->second;
+    for (unsigned i = 0; i < data->classnames.size(); ++i) {
+      if (data->classnames[i].compare(classname) == 0)
+        return iter->first;
+    }
+  }
+
+  return "";
 }
 
 }
