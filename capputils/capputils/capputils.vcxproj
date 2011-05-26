@@ -49,7 +49,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;CAPPUTILS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\tinyxml;$(BOOST_INC_PATH)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(BOOST_INC_PATH)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
@@ -82,8 +82,11 @@
     <ClInclude Include="capputils.h" />
     <ClInclude Include="EventHandler.h" />
     <ClInclude Include="FactoryException.h" />
+    <ClInclude Include="InputAttribute.h" />
+    <ClInclude Include="IXmlableAttribute.h" />
     <ClInclude Include="LibraryException.h" />
     <ClInclude Include="LibraryLoader.h" />
+    <ClInclude Include="OutputAttribute.h" />
     <ClInclude Include="ReuseAttribute.h" />
     <ClInclude Include="ScalarAttribute.h" />
     <ClInclude Include="ArgumentsParser.h" />
@@ -109,14 +112,19 @@
     <ClInclude Include="ReflectableAttribute.h" />
     <ClInclude Include="ReflectableClass.h" />
     <ClInclude Include="ReflectableClassFactory.h" />
+    <ClInclude Include="ShortNameAttribute.h" />
+    <ClInclude Include="TimedClass.h" />
+    <ClInclude Include="TimeStampAttribute.h" />
     <ClInclude Include="Verifier.h" />
     <ClInclude Include="VolatileAttribute.h" />
     <ClInclude Include="xmlizer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FactoryException.cpp" />
+    <ClCompile Include="InputAttribute.cpp" />
     <ClCompile Include="LibraryException.cpp" />
     <ClCompile Include="LibraryLoader.cpp" />
+    <ClCompile Include="OutputAttribute.cpp" />
     <ClCompile Include="ReuseAttribute.cpp" />
     <ClCompile Include="ScalarAttribute.cpp" />
     <ClCompile Include="ArgumentsParser.cpp" />
@@ -133,6 +141,9 @@
     <ClCompile Include="ReflectableAttribute.cpp" />
     <ClCompile Include="ReflectableClass.cpp" />
     <ClCompile Include="ReflectableClassFactory.cpp" />
+    <ClCompile Include="ShortNameAttribute.cpp" />
+    <ClCompile Include="TimedClass.cpp" />
+    <ClCompile Include="TimeStampAttribute.cpp" />
     <ClCompile Include="Verifier.cpp" />
     <ClCompile Include="VolatileAttribute.cpp" />
     <ClCompile Include="xmlizer.cpp" />
