@@ -3,17 +3,22 @@
 #define _CAPPUTILS_FACTORYEXCEPTION_H_
 
 #include <exception>
+#include <string>
 
 namespace capputils  {
 
 namespace exceptions {
 
 class FactoryException : public std::exception {
+private:
+  std::string classname;
+  mutable std::string lastMessage;
 
 public:
-  virtual const char* what() const throw() {
-    return "Can't create instance of ReflectableClass";
-  }
+  FactoryException(const std::string& classname);
+  virtual ~FactoryException() throw ();
+
+  virtual const char* what() const throw();
 };
 
 }

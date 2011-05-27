@@ -77,7 +77,7 @@ LibraryData::LibraryData(const char* filename) {
 
   this->filename = filename;
   loadCount = 1;
-  handle = dlopen(filename, RTLD_LAZY);
+  handle = dlopen(filename, RTLD_NOW);
   if (!handle)
     throw exceptions::LibraryException();
   lastModified = last_write_time(filename);
@@ -90,6 +90,7 @@ LibraryData::LibraryData(const char* filename) {
 }
 
 LibraryData::~LibraryData() {
+  //cout << "Unloading library: " << filename << endl;
   dlclose(handle);
 }
 
@@ -122,6 +123,7 @@ void LibraryLoader::loadLibrary(const string& filename) {
   if (iter == libraryTable.end()) {
     LibraryData* data = new LibraryData(filename.c_str());
     libraryTable[filename] = data;
+    //cout << filename << " library loaded." << endl;
   } else {
     iter->second->loadCount = iter->second->loadCount + 1;
     //cout << filename << " library counter incremented (" << iter->second->loadCount << ")." << endl;
@@ -129,7 +131,7 @@ void LibraryLoader::loadLibrary(const string& filename) {
 }
 
 void LibraryLoader::freeLibrary(const string& filename) {
-  //cout << "Try to unload " << filename << endl;
+  //cout << "Try to free library " << filename << endl;
   map<string, LibraryData*>::iterator iter = libraryTable.find(filename);
   if (iter != libraryTable.end()) {
     LibraryData* data = iter->second;

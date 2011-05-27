@@ -75,6 +75,7 @@ public: \
 #else
 #define ReflectableEnum(name, args...) \
 class name : public capputils::reflection::Enumerator { \
+  InitReflectableClass(name) \
 public: \
   enum enum_type {args}; \
 \
@@ -129,5 +130,10 @@ public: \
   }\
 }
 #endif
+
+#define DefineEnum(ename) \
+  BeginPropertyDefinitions(ename) \
+  ReflectableBase(capputils::reflection::Enumerator) \
+  EndPropertyDefinitions
 
 #endif /* ENUMERATORS_H_ */

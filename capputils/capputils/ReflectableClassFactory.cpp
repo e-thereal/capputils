@@ -40,7 +40,7 @@ ReflectableClass* ReflectableClassFactory::newInstance(const string& classname) 
     if (object)
       return object;
   }
-  throw exceptions::FactoryException();
+  throw exceptions::FactoryException(classname);
 }
 
 void ReflectableClassFactory::deleteInstance(ReflectableClass* instance) {
@@ -48,7 +48,7 @@ void ReflectableClassFactory::deleteInstance(ReflectableClass* instance) {
   if (destructors.find(classname) != destructors.end())
     destructors[classname](instance);
   else
-    throw exceptions::FactoryException();
+    throw exceptions::FactoryException(classname);
 }
 
 void ReflectableClassFactory::registerClass(const string& classname,
