@@ -19,6 +19,7 @@
 #if defined(_MSC_VER)
 #define ReflectableEnum(name, ...) \
 class name : public capputils::reflection::Enumerator { \
+  InitReflectableClass(name) \
 public: \
   enum enum_type {__VA_ARGS__}; \
 \
