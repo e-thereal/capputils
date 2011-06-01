@@ -20,7 +20,7 @@ using namespace reflection;
 
 namespace attributes {
 
-FilenameAttribute::FilenameAttribute() {
+FilenameAttribute::FilenameAttribute(bool multipleSelection) : multipleSelection(multipleSelection) {
 }
 
 FilenameAttribute::~FilenameAttribute() {
@@ -36,8 +36,12 @@ const string& FilenameAttribute::getLastMessage() const {
   return lastError;
 }
 
-AttributeWrapper* Filename() {
-  return new AttributeWrapper(new FilenameAttribute());
+bool FilenameAttribute::getMultipleSelection() const {
+  return multipleSelection;
+}
+
+AttributeWrapper* Filename(bool multipleSelection) {
+  return new AttributeWrapper(new FilenameAttribute(multipleSelection));
 }
 
 }

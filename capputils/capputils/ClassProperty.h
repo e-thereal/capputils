@@ -105,6 +105,54 @@ public:
   }
 };
 
+template<>
+class Converter<std::vector<std::string>, true> {
+public:
+  static std::vector<std::string> fromString(const std::string& value) {
+    std::vector<std::string> vec;
+    std::string str;
+    bool withinString = false;
+    for (unsigned i = 0; i < value.size(); ++i) {
+      if (withinString) {
+        if (value[i] == '\"') {
+          withinString = false;
+          vec.push_back(str);
+          str = "";
+        } else {
+          str += value[i];
+        }
+      } else {
+        if (value[i] == '\"')
+          withinString = true;
+      }
+    }
+
+    return vec;
+  }
+
+  static std::string toString(const std::vector<std::string>& value) {
+    std::stringstream s;
+    if (value.size())
+      s << "\"" << value[0] << "\"";
+    for (unsigned i = 1; i < value.size(); ++i)
+      s << " \"" << value[i] << "\"";
+    return s.str();
+  }
+};
+
+template<>
+class Converter<std::vector<std::string>, false> {
+public:
+  static std::string toString(const std::vector<std::string>& value) {
+    std::stringstream s;
+    if (value.size())
+      s << "\"" << value[0] << "\"";
+    for (unsigned i = 1; i < value.size(); ++i)
+      s << " \"" << value[i] << "\"";
+    return s.str();
+  }
+};
+
 template<class T>
 class ClassProperty : public virtual IClassProperty
 {

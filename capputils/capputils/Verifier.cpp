@@ -60,6 +60,7 @@ bool Verifier::Valid(const ReflectableClass& object, ostream& stream) {
 
 bool Verifier::UpToDate(const ReflectableClass& object) {
   vector<IClassProperty*>& properties = object.getProperties();
+  FilenameAttribute* fa;
   time_t newestInput = 0, oldestOutput = 0;
   bool hasOutputDate = false;
   int newestInputId = -1;
@@ -73,7 +74,7 @@ bool Verifier::UpToDate(const ReflectableClass& object) {
       if (prop->getAttribute<OutputAttribute>()) {
         time_t newOutputDate;
 
-        if (prop->getAttribute<FilenameAttribute>()) {
+        if ((fa = prop->getAttribute<FilenameAttribute>()) && !fa->getMultipleSelection()) {
           newOutputDate = last_write_time(prop->getStringValue(object));
         } else if (timeStamp) {
           newOutputDate = timeStamp->getTime(object);
@@ -91,7 +92,7 @@ bool Verifier::UpToDate(const ReflectableClass& object) {
           oldestOutputId = -1;
         oldestOutput = min(oldestOutput, newOutputDate);
       } else {
-        if (prop->getAttribute<FilenameAttribute>() && prop->getAttribute<InputAttribute>()) {
+        if ((fa = prop->getAttribute<FilenameAttribute>()) && !fa->getMultipleSelection() && prop->getAttribute<InputAttribute>()) {
           if (last_write_time(prop->getStringValue(object)) > newestInput)
             newestInputId = i;
           newestInput = max(newestInput, last_write_time(prop->getStringValue(object)));

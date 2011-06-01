@@ -17,18 +17,21 @@ namespace attributes {
 class FilenameAttribute: public virtual IAssertionAttribute {
 private:
   std::string lastError;
+  bool multipleSelection;
 
 public:
-  FilenameAttribute();
+  FilenameAttribute(bool multipleSelection = false);
   virtual ~FilenameAttribute();
 
   virtual bool valid(const reflection::IClassProperty& property,
       const reflection::ReflectableClass& object);
 
   virtual const std::string& getLastMessage() const;
+
+  bool getMultipleSelection() const;
 };
 
-AttributeWrapper* Filename();
+AttributeWrapper* Filename(bool multipleSelection = false);
 
 }
 
