@@ -82,6 +82,7 @@
     <ClInclude Include="capputils.h" />
     <ClInclude Include="EventHandler.h" />
     <ClInclude Include="FactoryException.h" />
+    <ClInclude Include="FromEnumerableAttribute.h" />
     <ClInclude Include="InputAttribute.h" />
     <ClInclude Include="IXmlableAttribute.h" />
     <ClInclude Include="LibraryException.h" />
@@ -115,12 +116,14 @@
     <ClInclude Include="ShortNameAttribute.h" />
     <ClInclude Include="TimedClass.h" />
     <ClInclude Include="TimeStampAttribute.h" />
+    <ClInclude Include="ToEnumerableAttribute.h" />
     <ClInclude Include="Verifier.h" />
     <ClInclude Include="VolatileAttribute.h" />
     <ClInclude Include="xmlizer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FactoryException.cpp" />
+    <ClCompile Include="FromEnumerableAttribute.cpp" />
     <ClCompile Include="InputAttribute.cpp" />
     <ClCompile Include="LibraryException.cpp" />
     <ClCompile Include="LibraryLoader.cpp" />
@@ -144,6 +147,7 @@
     <ClCompile Include="ShortNameAttribute.cpp" />
     <ClCompile Include="TimedClass.cpp" />
     <ClCompile Include="TimeStampAttribute.cpp" />
+    <ClCompile Include="ToEnumerableAttribute.cpp" />
     <ClCompile Include="Verifier.cpp" />
     <ClCompile Include="VolatileAttribute.cpp" />
     <ClCompile Include="xmlizer.cpp" />
