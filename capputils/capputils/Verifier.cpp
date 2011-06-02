@@ -107,13 +107,13 @@ bool Verifier::UpToDate(const ReflectableClass& object) {
     return false;
   }
   if (newestInput <= oldestOutput) {
-    cout << object.getClassName() << " already up to date!" << endl;
+    //cout << object.getClassName() << " already up to date!" << endl;
   } else {
-    cout << object.getClassName() << " is not up to date!" << endl;
-    if (newestInputId > -1)
-      cout << "Newest Input: " << properties[newestInputId]->getName() << endl;
-    if (oldestOutputId > -1)
-          cout << "Oldest Output: " << properties[oldestOutputId]->getName() << endl;
+    //cout << object.getClassName() << " is not up to date!" << endl;
+    //if (newestInputId > -1)
+    //  cout << "Newest Input: " << properties[newestInputId]->getName() << endl;
+    //if (oldestOutputId > -1)
+    //  cout << "Oldest Output: " << properties[oldestOutputId]->getName() << endl;
   }
   return newestInput <= oldestOutput;
 }

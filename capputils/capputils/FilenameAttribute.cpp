@@ -20,7 +20,9 @@ using namespace reflection;
 
 namespace attributes {
 
-FilenameAttribute::FilenameAttribute(bool multipleSelection) : multipleSelection(multipleSelection) {
+FilenameAttribute::FilenameAttribute(const string& pattern, bool multipleSelection)
+ : pattern(pattern), multipleSelection(multipleSelection)
+{
 }
 
 FilenameAttribute::~FilenameAttribute() {
@@ -40,8 +42,12 @@ bool FilenameAttribute::getMultipleSelection() const {
   return multipleSelection;
 }
 
-AttributeWrapper* Filename(bool multipleSelection) {
-  return new AttributeWrapper(new FilenameAttribute(multipleSelection));
+const std::string& FilenameAttribute::getPattern() const {
+  return pattern;
+}
+
+AttributeWrapper* Filename(const string& pattern, bool multipleSelection) {
+  return new AttributeWrapper(new FilenameAttribute(pattern, multipleSelection));
 }
 
 }

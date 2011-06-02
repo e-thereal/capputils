@@ -18,9 +18,10 @@ class FilenameAttribute: public virtual IAssertionAttribute {
 private:
   std::string lastError;
   bool multipleSelection;
+  std::string pattern; ///< Qt file dialog style (e.g. "Text (*.txt)")
 
 public:
-  FilenameAttribute(bool multipleSelection = false);
+  FilenameAttribute(const std::string& pattern = "All (*)", bool multipleSelection = false);
   virtual ~FilenameAttribute();
 
   virtual bool valid(const reflection::IClassProperty& property,
@@ -29,9 +30,11 @@ public:
   virtual const std::string& getLastMessage() const;
 
   bool getMultipleSelection() const;
+  const std::string& getPattern() const;
 };
 
-AttributeWrapper* Filename(bool multipleSelection = false);
+AttributeWrapper* Filename(const std::string& pattern = "All (*)",
+    bool multipleSelection = false);
 
 }
 
