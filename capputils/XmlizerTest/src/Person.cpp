@@ -7,6 +7,8 @@
 
 using namespace capputils::attributes;
 
+DefineEnum(Gender)
+
 BeginPropertyDefinitions(Address)
 
 DefineProperty(Street, Observe(PROPERTY_ID))

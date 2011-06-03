@@ -78,8 +78,9 @@ LibraryData::LibraryData(const char* filename) {
   this->filename = filename;
   loadCount = 1;
   handle = dlopen(filename, RTLD_NOW);
-  if (!handle)
-    throw exceptions::LibraryException();
+  if (!handle) {
+    throw exceptions::LibraryException(filename, dlerror());
+  }
   lastModified = last_write_time(filename);
 
   loadedClassNames = factory.getClassNames();

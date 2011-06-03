@@ -8,17 +8,20 @@
 
 #include <iostream>
 
+#include <capputils/Enumerators.h>
 #include <capputils/Xmlizer.h>
 #include <capputils/ArgumentsParser.h>
 #include <capputils/Verifier.h>
 #include <capputils/ReflectableClassFactory.h>
 #include <capputils/ClassProperty.h>
+#include <capputils/IAttribute.h>
 
 #include "Car.h"
 #include "Student.h"
 
 using namespace std;
 using namespace capputils;
+using namespace capputils::attributes;
 using namespace capputils::reflection;
 
 void changeHandler(ObservableClass* sender, int eventId) {
@@ -29,6 +32,10 @@ void changeHandler(ObservableClass* sender, int eventId) {
          << " changed to " << property->getStringValue(*reflectable) << "." << endl;
   }
 }
+
+ReflectableEnum(Test, Klappt, KlapptNicht);
+
+DefineEnum(Test);
 
 int main(int argc, char** argv) {
 	Car car;
@@ -49,6 +56,10 @@ int main(int argc, char** argv) {
 
 	Xmlizer::FromXml(car, "car2.xml");
 	ArgumentsParser::Parse(car, argc, argv);
+
+	Test test = Test::Klappt;
+	vector<IAttribute*>& attributes = test.getAttributes();
+	cout << "# attributes = " << attributes.size() << endl;
 
 	if (car.getHelp() || !Verifier::Valid(car)) {
 	  ArgumentsParser::PrintUsage(string("\nUsage: ") + argv[0] + " [switches], where switches are:", car);

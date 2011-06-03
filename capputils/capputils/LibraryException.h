@@ -3,16 +3,22 @@
 #define _CAPPUTILS_LIBRARYEXCEPTION_H_
 
 #include <exception>
+#include <string>
 
 namespace capputils {
 
 namespace exceptions {
 
 class LibraryException : public std::exception {
+private:
+  std::string library;
+  std::string cause;
+  mutable std::string lastMessage;
+
 public:
-  virtual const char* what() const throw() {
-    return "Can't load library.";
-  }
+  LibraryException(const std::string& library, const std::string& cause);
+  virtual ~LibraryException() throw();
+  virtual const char* what() const throw();
 };
 
 }

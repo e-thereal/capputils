@@ -22,6 +22,8 @@ using namespace std;
 using namespace capputils::attributes;
 using namespace capputils::reflection;
 
+DefineEnum(Engine)
+
 BeginPropertyDefinitions(EngineDescription)
   DefineProperty(CylinderCount)
   DefineProperty(PS)
