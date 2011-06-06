@@ -45,8 +45,9 @@ LibraryData::LibraryData(const char* filename) {
   copy_file(filename, tmpName.c_str(), copy_option::overwrite_if_exists);
   loadCount = 1;
   handleWrapper->handle = LoadLibraryA(tmpName.c_str());
-  if (!handleWrapper->handle)
-    throw exceptions::LibraryException();
+  if (!handleWrapper->handle) {
+    throw exceptions::LibraryException(filename, "Unknown error.");
+  }
   lastModified = last_write_time(filename);
 
   loadedClassNames = factory.getClassNames();

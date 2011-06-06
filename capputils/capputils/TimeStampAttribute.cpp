@@ -91,6 +91,9 @@ void TimeStampAttribute::addToPropertyNode(TiXmlElement& node, const Reflectable
   char buffer[256];
   time_t time = getTime(object);
 
+  if (time < 0)
+    time = 0;
+
   timeinfo = localtime(&time);
   strftime(buffer, 256, "%b %d %Y %H:%M:%S", timeinfo);
   node.SetAttribute("timestamp", buffer);
