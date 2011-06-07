@@ -78,7 +78,9 @@ LibraryData::LibraryData(const char* filename) {
 
   this->filename = filename;
   loadCount = 1;
-  handle = dlopen(filename, RTLD_NOW);
+  // need to get dynamic_casts right (http://stackoverflow.com/questions/2351786/dynamic-cast-fails-when-used-with-dlopen-dlsym)
+  // http://gcc.gnu.org/ml/gcc-help/2008-11/msg00174.html
+  handle = dlopen(filename, RTLD_NOW | RTLD_GLOBAL);
   if (!handle) {
     throw exceptions::LibraryException(filename, dlerror());
   }

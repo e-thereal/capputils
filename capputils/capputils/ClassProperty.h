@@ -282,8 +282,9 @@ public:
 
   virtual void setValue(ReflectableClass& object, const ReflectableClass& fromObject, const IClassProperty* fromProperty) {
     const ClassProperty<T*>* typedProperty = dynamic_cast<const ClassProperty<T*>*>(fromProperty);
-    if (typedProperty)
+    if (typedProperty) {
       setValue(object, typedProperty->getValue(fromObject));
+    }
   }
 };
 
