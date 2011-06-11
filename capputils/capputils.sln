@@ -14,6 +14,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "capputils", "capputils\capp
 		{A571956C-9097-4B72-B3CA-9627786AAECD} = {A571956C-9097-4B72-B3CA-9627786AAECD}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Demo1", "examples\Demo1\Demo1.vcxproj", "{6827D781-FA94-476C-AD63-0921EF3A83CD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A571956C-9097-4B72-B3CA-9627786AAECD} = {A571956C-9097-4B72-B3CA-9627786AAECD}
+		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C} = {B47B19A5-8F5D-467D-B0D5-B5D7115D013C}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -46,6 +52,12 @@ Global
 		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C}.Release|Win32.ActiveCfg = Release|Win32
 		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C}.Release|Win32.Build.0 = Release|Win32
 		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C}.Release|x64.ActiveCfg = Release|Win32
+		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Debug|Win32.Build.0 = Debug|Win32
+		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Debug|x64.ActiveCfg = Debug|Win32
+		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Release|Win32.ActiveCfg = Release|Win32
+		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Release|Win32.Build.0 = Release|Win32
+		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
