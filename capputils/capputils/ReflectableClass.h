@@ -1,8 +1,12 @@
-/*
- * ReflectableClass.h
+/**
+ * \brief Contains the class declaration of ReflecableClass and some useful makros
+ * \file ReflectableClass.h
  *
  *  Created on: Jan 7, 2011
- *      Author: tombr
+ *  \author Tom Brosch
+ *  
+ *  You must call InitReflectableClass and BeginProperyDefintions and EndPropertyDefinitions.
+ *  See example for help. (minimal class)
  */
 
 #ifndef REFLECTABLECLASS_H_
@@ -24,34 +28,119 @@
 #include "ReflectableAttribute.h"
 #include "ReflectableClassFactory.h"
 
+/** \brief main namespace */
 namespace capputils {
 
+/** \brief Everything that has to do with reflection comes in here */
 namespace reflection {
 
+/**
+ * \brief Base class of all reflectable classes
+ * 
+ * \remarks
+ * Properties are defined in a static vector. Therefore, the vector has to be part
+ * of the specific class and can not be a field of the base class.
+ */
 class ReflectableClass {
 public:
   virtual ~ReflectableClass();
 
 public:
   /**
-   * Remarks:
-   * Properties are defined in a static vector. Therefore, the vector has to be part
-   * of the specific class and can not be a field of the base class.
+   * \brief Returns all properties of the class including properties of all of its base classes
+   * 
+   * \return Vector containing pointers to all defined class properties.
+   * 
+   * \remark
+   * - This method is automatically defined by the BeginPropertyDefinitions macro.
    */
   virtual std::vector<IClassProperty*>& getProperties() const = 0;
+
+  /**
+   * \brief Returns all attributes of a class.
+   * 
+   * \return Vector containg pointers to all attributes of the class.
+   * 
+   * \remark
+   * - This method is automatically defined by the BeginPropertyDefinitions macro.
+   */
   virtual std::vector< ::capputils::attributes::IAttribute*>& getAttributes() const = 0;
+
+  /**
+   * \brief Returns the full class name including its namespaces
+   * 
+   * The returned class name is of the form namespace::classname
+   * 
+   * \return Class name including its namespaces
+   * 
+   * \remark
+   * - This method is automatically defined by the BeginPropertyDefinitions macro.
+   */
   virtual const std::string& getClassName() const = 0;
+
+  /**
+   * \brief Overload this method to provide a customized way of writing a class to a stream
+   * 
+   * \param[in, out] stream  Stream where the class will be written to
+   */
   virtual void toStream(std::ostream& stream) const;
+
+  /**
+   * \brief Overload this method to provide a customized way of reading a class from a stream
+   * 
+   * \param[in, out] stream Stream from which the class properties will be read from
+   */
   virtual void fromStream(std::istream& stream);
 
+  /** 
+   * \brief Returns the pointer to a class property given its name
+   * 
+   * \param[in] propertyName Name of the property according property.
+   * 
+   * \return Pointer to the class property or 0 if there is no property with the given name.
+   */
   IClassProperty* findProperty(const std::string& propertyName) const;
 
+  /**
+   * \brief Returns true of the current class has a property of the given name
+   * 
+   * \param[in] propertyName Name of the according property.
+   * 
+   * \return True, iff the class has a property with the given name
+   */
   bool hasProperty(const std::string& propertyName) const;
 
+  /**
+   * \brief Sets the value of a given property by the properties name using a string representing the value
+   * 
+   * \param[in] propertyName Name of the according property
+   * \param[in] propertyValue New value of the property as a string
+   * 
+   * \remark
+   * - This method is not type-safe. Use findProperty() and use one of the type-safe setters of IClassProperty
+   *   to set the value safely.
+   */
   void setProperty(const std::string& propertyName, const std::string& propertyValue);
 
+  /**
+   * \brief Returns the value of a property as a string
+   * 
+   * \param[in] propertyName Name of the according property
+   * 
+   * \return Value of the property as a string
+   */
   const std::string getProperty(const std::string& propertyName);
 
+  /**
+   * Returns a pointer to an attribute given its type
+   * 
+   * \return A pointer to an attribute if the class contains an attribute of the given type, 0 otherwise.
+   * 
+   * The attribute type is given as the type parameter of the template method.
+   * 
+   * \remark
+   * - This method can be used to check if a class is flagged with a particular attribute.
+   */
   template<class AT>
   AT* getAttribute() {
     AT* attribute = 0;
@@ -77,7 +166,22 @@ std::string trimTypeName(const char* typeName);
 std::ostream& operator<< (std::ostream& stream, const capputils::reflection::ReflectableClass& object);
 std::istream& operator>> (std::istream& stream, capputils::reflection::ReflectableClass& object);
 
-
+/** \def Property(name, type)
+ * \brief Declares a property
+ * 
+ * The first parameter is the name of the property. Capitalization is recommended. The second parameter is the type of the property.
+ * The macro will define according getter and setter methods.
+ * 
+ * For example:
+ * \code
+ *  Property(Name, std::string)
+ * \endcode
+ * will generate
+ * \code
+ *   std::string getName() const { ... }
+ *   void setName(std::string value) { ... }
+ * \endcode
+ */
 
 #if !defined(CAPPUTILS_USE_CPP0x)
 #define Property(name,type) \

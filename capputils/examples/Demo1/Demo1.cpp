@@ -1,3 +1,11 @@
+/**
+ * \brief Shows how to read parameters from the command line.
+ * 
+ * \example Demo1/Demo1.cpp
+ * 
+ * This is a first example.
+ */
+
 
 /*** Begin: DataModel.h ***/
 
