@@ -86,12 +86,13 @@ bool Verifier::UpToDate(const ReflectableClass& object) {
           oldestOutput = newOutputDate;
           hasOutputDate = true;
           oldestOutputId = i;
-          continue;
         }
         if (newOutputDate < oldestOutput)
-          oldestOutputId = -1;
+          oldestOutputId = i;
         oldestOutput = min(oldestOutput, newOutputDate);
-      } else {
+      }
+      // Inputs are attributes that are not pure outputs.
+      if (prop->getAttribute<OutputAttribute>() == 0 || prop->getAttribute<InputAttribute>() != 0){
         if ((fa = prop->getAttribute<FilenameAttribute>()) && !fa->getMultipleSelection() && prop->getAttribute<InputAttribute>()) {
           if (last_write_time(prop->getStringValue(object)) > newestInput)
             newestInputId = i;
@@ -106,15 +107,19 @@ bool Verifier::UpToDate(const ReflectableClass& object) {
   } catch (filesystem_error error) {
     return false;
   }
-  if (newestInput <= oldestOutput) {
-    //cout << object.getClassName() << " already up to date!" << endl;
-  } else {
-    //cout << object.getClassName() << " is not up to date!" << endl;
-    //if (newestInputId > -1)
-    //  cout << "Newest Input: " << properties[newestInputId]->getName() << endl;
-    //if (oldestOutputId > -1)
-    //  cout << "Oldest Output: " << properties[oldestOutputId]->getName() << endl;
-  }
+//  if (newestInput <= oldestOutput) {
+//    cout << object.getClassName() << " already up to date!" << endl;
+//    if (newestInputId > -1)
+//      cout << "  Newest Input: " << properties[newestInputId]->getName() << endl;
+//    if (oldestOutputId > -1)
+//      cout << "  Oldest Output: " << properties[oldestOutputId]->getName() << endl;
+//  } else {
+//    cout << object.getClassName() << " is not up to date!" << endl;
+//    if (newestInputId > -1)
+//      cout << "  Newest Input: " << properties[newestInputId]->getName() << endl;
+//    if (oldestOutputId > -1)
+//      cout << "  Oldest Output: " << properties[oldestOutputId]->getName() << endl;
+//  }
   return newestInput <= oldestOutput;
 }
 
