@@ -5,8 +5,8 @@
  *      Author: tombr
  */
 
-#ifndef ENUMERATORS_H_
-#define ENUMERATORS_H_
+#ifndef CAPPUTILS_ENUMERATORS_H_
+#define CAPPUTILS_ENUMERATORS_H_
 
 #include "Enumerator.h"
 
@@ -137,4 +137,4 @@ public: \
   ReflectableBase(capputils::reflection::Enumerator) \
   EndPropertyDefinitions
 
-#endif /* ENUMERATORS_H_ */
+#endif /* CAPPUTILS_ENUMERATORS_H_ */

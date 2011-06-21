@@ -5,8 +5,8 @@
  *      Author: tombr
  */
 
-#ifndef ENUMERATOR_H_
-#define ENUMERATOR_H_
+#ifndef CAPPUTILS_ENUMERATOR_H_
+#define CAPPUTILS_ENUMERATOR_H_
 
 #include "capputils.h"
 #include "ReflectableClass.h"
@@ -40,4 +40,4 @@ public:
 
 }
 
-#endif /* ENUMERATOR_H_ */
+#endif /* CAPPUTILS_ENUMERATOR_H_ */

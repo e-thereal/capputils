@@ -46,7 +46,7 @@ LibraryData::LibraryData(const char* filename) {
   loadCount = 1;
   handleWrapper->handle = LoadLibraryA(tmpName.c_str());
   if (!handleWrapper->handle) {
-    throw exceptions::LibraryException(filename, "Unknown error.");
+    throw exceptions::LibraryException(filename, "Unknown load error.");
   }
   lastModified = last_write_time(filename);
 
@@ -58,7 +58,11 @@ LibraryData::LibraryData(const char* filename) {
 }
 
 LibraryData::~LibraryData() {
-  FreeLibrary(handleWrapper->handle);
+  // TODO: Error handling: why can't free.
+  if (!FreeLibrary(handleWrapper->handle)) {
+    delete handleWrapper;
+    throw exceptions::LibraryException(filename, "Unknown free error.");
+  }
   delete handleWrapper;
 
   string tmpName = this->filename + ".host_copy.dll";
@@ -78,7 +82,7 @@ LibraryData::LibraryData(const char* filename) {
 
   this->filename = filename;
   loadCount = 1;
-  // need to get dynamic_casts right (http://stackoverflow.com/questions/2351786/dynamic-cast-fails-when-used-with-dlopen-dlsym)
+  // needed to get dynamic_casts right (http://stackoverflow.com/questions/2351786/dynamic-cast-fails-when-used-with-dlopen-dlsym)
   // http://gcc.gnu.org/ml/gcc-help/2008-11/msg00174.html
   handle = dlopen(filename, RTLD_NOW | RTLD_GLOBAL);
   if (!handle) {
@@ -95,7 +99,8 @@ LibraryData::LibraryData(const char* filename) {
 
 LibraryData::~LibraryData() {
   //cout << "Unloading library: " << filename << endl;
-  dlclose(handle);
+  if (dlclose(handle))
+    throw exceptions::LibraryException(filename, dlerror());
 }
 
 #endif
@@ -135,16 +140,16 @@ void LibraryLoader::loadLibrary(const string& filename) {
 }
 
 void LibraryLoader::freeLibrary(const string& filename) {
-  //cout << "Try to free library " << filename << endl;
+//  cout << "Try to free library " << filename << endl;
   map<string, LibraryData*>::iterator iter = libraryTable.find(filename);
   if (iter != libraryTable.end()) {
     LibraryData* data = iter->second;
     data->loadCount = data->loadCount - 1;
-    //cout << filename << " library counter decremented (" << data->loadCount << ")." << endl;
+//    cout << filename << " library counter decremented (" << data->loadCount << ")." << endl;
     if (!data->loadCount) {
       libraryTable.erase(filename);
       delete data;
-      //cout << "Library freed." << endl;
+//      cout << "Library freed." << endl;
     }
   }
 }

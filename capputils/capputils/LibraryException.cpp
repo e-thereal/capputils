@@ -22,4 +22,3 @@ const char* LibraryException::what() const throw() {
 }
 
 }
-
