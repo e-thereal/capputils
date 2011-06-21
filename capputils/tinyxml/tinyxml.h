@@ -1798,7 +1798,6 @@ private:
 	TIXML_STRING lineBreak;
 };
 
-
 #ifdef _MSC_VER
 #pragma warning( pop )
 #endif
