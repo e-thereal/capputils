@@ -102,6 +102,16 @@ public:
   IClassProperty* findProperty(const std::string& propertyName) const;
 
   /**
+   * \brief Returns the index of a property given its name
+   *
+   * \param[out]  index         Will be set to the index of the property if a property with the given name exists.
+   * \param[in]   propertyName  Name of the property
+   *
+   * \return true iff a property with the given name could be found.
+   */
+  bool getPropertyIndex(unsigned& index, const std::string& propertyName) const;
+
+  /**
    * \brief Returns true of the current class has a property of the given name
    * 
    * \param[in] propertyName Name of the according property.

@@ -22,14 +22,21 @@ namespace reflection {
 ReflectableClass::~ReflectableClass() { }
 
 IClassProperty* ReflectableClass::findProperty(const std::string& propertyName) const {
+  unsigned index = 0;
+  if (getPropertyIndex(index, propertyName))
+    return getProperties()[index];
+  return 0;
+}
+
+bool ReflectableClass::getPropertyIndex(unsigned& index, const std::string& propertyName) const {
   std::vector<IClassProperty*>& properties = getProperties();
 
-  for (unsigned i = 0; i < properties.size(); ++i) {
-    if (properties[i]->getName().compare(propertyName) == 0)
-      return properties[i];
+  for (index = 0; index < properties.size(); ++index) {
+    if (properties[index]->getName().compare(propertyName) == 0)
+      return true;
   }
 
-  return 0;
+  return false;
 }
 
 bool ReflectableClass::hasProperty(const std::string& propertyName) const {
