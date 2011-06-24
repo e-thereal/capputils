@@ -122,6 +122,7 @@
     <ClInclude Include="xmlizer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="FactoryException.cpp" />
     <ClCompile Include="FromEnumerableAttribute.cpp" />
     <ClCompile Include="InputAttribute.cpp" />
