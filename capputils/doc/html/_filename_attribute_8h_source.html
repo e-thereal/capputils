@@ -6,13 +6,6 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/search.js"></script>
-<link href="navtree.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="navtree.js"></script>
-<script type="text/javascript" src="resize.js"></script>
-<script type="text/javascript">
-$(document).ready(initResizable);
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
 <body onload='searchBox.OnSelectItem(0);'>
@@ -38,6 +31,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li id="searchli">
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -62,26 +56,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
-</div>
-<div id="side-nav" class="ui-resizable side-nav-resizable">
-  <div id="nav-tree">
-    <div id="nav-tree-contents">
-    </div>
-  </div>
-  <div id="splitbar" style="-moz-user-select:none;" 
-       class="ui-resizable-handle">
-  </div>
-</div>
-<script type="text/javascript">
-  initNavTree('_filename_attribute_8h.html','');
-</script>
-<div id="doc-content">
 <div class="header">
   <div class="headertitle">
 <div class="title">capputils/FilenameAttribute.h</div>  </div>
 </div>
 <div class="contents">
-<a href="_filename_attribute_8h.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">/*</span>
+<div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">/*</span>
 <a name="l00002"></a>00002 <span class="comment"> * FilenameAttribute.h</span>
 <a name="l00003"></a>00003 <span class="comment"> *</span>
 <a name="l00004"></a>00004 <span class="comment"> *  Created on: Mar 11, 2011</span>
@@ -91,49 +71,47 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00008"></a>00008 <span class="preprocessor">#ifndef FILENAMEATTRIBUTE_H_</span>
 <a name="l00009"></a>00009 <span class="preprocessor"></span><span class="preprocessor">#define FILENAMEATTRIBUTE_H_</span>
 <a name="l00010"></a>00010 <span class="preprocessor"></span>
-<a name="l00011"></a>00011 <span class="preprocessor">#include &quot;<a class="code" href="_i_assertion_attribute_8h.html">IAssertionAttribute.h</a>&quot;</span>
+<a name="l00011"></a>00011 <span class="preprocessor">#include &quot;IAssertionAttribute.h&quot;</span>
 <a name="l00012"></a>00012 
 <a name="l00013"></a>00013 <span class="keyword">namespace </span>capputils {
 <a name="l00014"></a>00014 
 <a name="l00015"></a>00015 <span class="keyword">namespace </span>attributes {
 <a name="l00016"></a>00016 
-<a name="l00017"></a><a class="code" href="classcapputils_1_1attributes_1_1_filename_attribute.html">00017</a> <span class="keyword">class </span><a class="code" href="classcapputils_1_1attributes_1_1_filename_attribute.html">FilenameAttribute</a>: <span class="keyword">public</span> <span class="keyword">virtual</span> <a class="code" href="classcapputils_1_1attributes_1_1_i_assertion_attribute.html">IAssertionAttribute</a> {
+<a name="l00017"></a>00017 <span class="keyword">class </span>FilenameAttribute: <span class="keyword">public</span> <span class="keyword">virtual</span> IAssertionAttribute {
 <a name="l00018"></a>00018 <span class="keyword">private</span>:
 <a name="l00019"></a>00019   std::string lastError;
-<a name="l00020"></a>00020 
-<a name="l00021"></a>00021 <span class="keyword">public</span>:
-<a name="l00022"></a>00022   <a class="code" href="classcapputils_1_1attributes_1_1_filename_attribute.html#abf04754c48cf742ed5f3f846f6ce8ab9">FilenameAttribute</a>();
-<a name="l00023"></a>00023   <span class="keyword">virtual</span> <a class="code" href="classcapputils_1_1attributes_1_1_filename_attribute.html#a879df9154d7669ef43c4cd0653c27721">~FilenameAttribute</a>();
-<a name="l00024"></a>00024 
-<a name="l00025"></a>00025   <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classcapputils_1_1attributes_1_1_filename_attribute.html#a391452dd4fc2c7a6eaf9e12cd6eb0c9a">valid</a>(<span class="keyword">const</span> <a class="code" href="classcapputils_1_1reflection_1_1_i_class_property.html">reflection::IClassProperty</a>&amp; property,
-<a name="l00026"></a>00026       <span class="keyword">const</span> <a class="code" href="classcapputils_1_1reflection_1_1_reflectable_class.html">reflection::ReflectableClass</a>&amp; <span class="keywordtype">object</span>);
-<a name="l00027"></a>00027 
-<a name="l00028"></a>00028   <span class="keyword">virtual</span> <span class="keyword">const</span> std::string&amp; <a class="code" href="classcapputils_1_1attributes_1_1_filename_attribute.html#a46b27e248d74ed6faf9fe891a287e310">getLastMessage</a>() <span class="keyword">const</span>;
-<a name="l00029"></a>00029 };
-<a name="l00030"></a>00030 
-<a name="l00031"></a>00031 <a class="code" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a>* <a class="code" href="namespacecapputils_1_1attributes.html#a3fb811ba5388562b2e670dc43e84f305">Filename</a>();
-<a name="l00032"></a>00032 
-<a name="l00033"></a>00033 }
-<a name="l00034"></a>00034 
-<a name="l00035"></a>00035 }
-<a name="l00036"></a>00036 
-<a name="l00037"></a>00037 <span class="preprocessor">#endif </span><span class="comment">/* FILENAMEATTRIBUTE_H_ */</span>
+<a name="l00020"></a>00020   <span class="keywordtype">bool</span> multipleSelection;
+<a name="l00021"></a>00021   std::string pattern; 
+<a name="l00022"></a>00022 
+<a name="l00023"></a>00023 <span class="keyword">public</span>:
+<a name="l00024"></a>00024   FilenameAttribute(<span class="keyword">const</span> std::string&amp; pattern = <span class="stringliteral">&quot;All (*)&quot;</span>, <span class="keywordtype">bool</span> multipleSelection = <span class="keyword">false</span>);
+<a name="l00025"></a>00025   <span class="keyword">virtual</span> ~FilenameAttribute();
+<a name="l00026"></a>00026 
+<a name="l00027"></a>00027   <span class="keyword">virtual</span> <span class="keywordtype">bool</span> valid(<span class="keyword">const</span> reflection::IClassProperty&amp; property,
+<a name="l00028"></a>00028       <span class="keyword">const</span> reflection::ReflectableClass&amp; <span class="keywordtype">object</span>);
+<a name="l00029"></a>00029 
+<a name="l00030"></a>00030   <span class="keyword">virtual</span> <span class="keyword">const</span> std::string&amp; getLastMessage() <span class="keyword">const</span>;
+<a name="l00031"></a>00031 
+<a name="l00032"></a>00032   <span class="keywordtype">bool</span> getMultipleSelection() <span class="keyword">const</span>;
+<a name="l00033"></a>00033   <span class="keyword">const</span> std::string&amp; getPattern() <span class="keyword">const</span>;
+<a name="l00034"></a>00034 };
+<a name="l00035"></a>00035 
+<a name="l00036"></a>00036 AttributeWrapper* Filename(<span class="keyword">const</span> std::string&amp; pattern = <span class="stringliteral">&quot;All (*)&quot;</span>,
+<a name="l00037"></a>00037     <span class="keywordtype">bool</span> multipleSelection = <span class="keyword">false</span>);
+<a name="l00038"></a>00038 
+<a name="l00039"></a>00039 }
+<a name="l00040"></a>00040 
+<a name="l00041"></a>00041 }
+<a name="l00042"></a>00042 
+<a name="l00043"></a>00043 <span class="preprocessor">#endif </span><span class="comment">/* FILENAMEATTRIBUTE_H_ */</span>
 </pre></div></div>
 </div>
-  <div id="nav-path" class="navpath">
-    <ul>
-      <li class="navelem"><a class="el" href="_filename_attribute_8h.html">FilenameAttribute.h</a>      </li>
-      <li class="footer">Generated on Sat May 21 2011 16:12:23 for Capputils by&#160;
-<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </li>
-    </ul>
-  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -142,6 +120,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-
+<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 15:36:19 for Capputils by&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
 </html>

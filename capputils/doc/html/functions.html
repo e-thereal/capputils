@@ -6,13 +6,6 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/search.js"></script>
-<link href="navtree.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="navtree.js"></script>
-<script type="text/javascript" src="resize.js"></script>
-<script type="text/javascript">
-$(document).ready(initResizable);
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
 <body onload='searchBox.OnSelectItem(0);'>
@@ -38,6 +31,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li id="searchli">
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -68,102 +62,49 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li class="current"><a href="functions.html"><span>All</span></a></li>
       <li><a href="functions_func.html"><span>Functions</span></a></li>
-      <li><a href="functions_vars.html"><span>Variables</span></a></li>
-      <li><a href="functions_type.html"><span>Typedefs</span></a></li>
-      <li><a href="functions_rela.html"><span>Related&#160;Functions</span></a></li>
-    </ul>
-  </div>
-  <div id="navrow4" class="tabs3">
-    <ul class="tablist">
-      <li class="current"><a href="functions.html#index_a"><span>a</span></a></li>
-      <li><a href="functions_0x63.html#index_c"><span>c</span></a></li>
-      <li><a href="functions_0x64.html#index_d"><span>d</span></a></li>
-      <li><a href="functions_0x65.html#index_e"><span>e</span></a></li>
-      <li><a href="functions_0x66.html#index_f"><span>f</span></a></li>
-      <li><a href="functions_0x67.html#index_g"><span>g</span></a></li>
-      <li><a href="functions_0x68.html#index_h"><span>h</span></a></li>
-      <li><a href="functions_0x69.html#index_i"><span>i</span></a></li>
-      <li><a href="functions_0x6c.html#index_l"><span>l</span></a></li>
-      <li><a href="functions_0x6d.html#index_m"><span>m</span></a></li>
-      <li><a href="functions_0x6e.html#index_n"><span>n</span></a></li>
-      <li><a href="functions_0x6f.html#index_o"><span>o</span></a></li>
-      <li><a href="functions_0x70.html#index_p"><span>p</span></a></li>
-      <li><a href="functions_0x72.html#index_r"><span>r</span></a></li>
-      <li><a href="functions_0x73.html#index_s"><span>s</span></a></li>
-      <li><a href="functions_0x74.html#index_t"><span>t</span></a></li>
-      <li><a href="functions_0x75.html#index_u"><span>u</span></a></li>
-      <li><a href="functions_0x76.html#index_v"><span>v</span></a></li>
-      <li><a href="functions_0x77.html#index_w"><span>w</span></a></li>
-      <li><a href="functions_0x7e.html#index_0x7e"><span>~</span></a></li>
     </ul>
   </div>
 </div>
-<div id="side-nav" class="ui-resizable side-nav-resizable">
-  <div id="nav-tree">
-    <div id="nav-tree-contents">
-    </div>
-  </div>
-  <div id="splitbar" style="-moz-user-select:none;" 
-       class="ui-resizable-handle">
-  </div>
-</div>
-<script type="text/javascript">
-  initNavTree('functions.html','');
-</script>
-<div id="doc-content">
 <div class="contents">
-<div class="textblock">Here is a list of all class members with links to the classes they belong to:</div>
-
-<h3><a class="anchor" id="index_a"></a>- a -</h3><ul>
-<li>addAttribute()
-: <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">capputils::reflection::ClassProperty&lt; T &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#a565fdaede3ce5b33d4636af80816dd2f">capputils::reflection::ClassProperty&lt; T * &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a08a09a19a47f25a90f95f4669c0fc1b6">capputils::reflection::IClassProperty</a>
+<div class="textblock">Here is a list of all documented class members with links to the class documentation for each member:</div><ul>
+<li>findProperty()
+: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7d811637be82d8b3396b8d256d6dc1e2">capputils::reflection::ReflectableClass</a>
 </li>
-<li>addAttributes()
-: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a5e1045fbc8b8eafcf04d1a38141e889e">capputils::reflection::ReflectableClass</a>
+<li>fromStream()
+: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7b93c19d1b847fcf5f83fa9e28ad4b38">capputils::reflection::ReflectableClass</a>
 </li>
-<li>addChild()
-: <a class="el" href="classcapputils_1_1_observable_class.html#a59ab02b48107823c5769d54b1bc9c12f">capputils::ObservableClass</a>
+<li>getAttribute()
+: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a242f6be8529113d869d78fea06514159">capputils::reflection::ReflectableClass</a>
 </li>
-<li>addParent()
-: <a class="el" href="classcapputils_1_1_observable_class.html#aec7bbcaf6ac6ef5f51f6f5c884455062">capputils::ObservableClass</a>
+<li>getAttributes()
+: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a42e170cc2eee78959a37539374490590">capputils::reflection::ReflectableClass</a>
 </li>
-<li>AddPropertyToXml()
-: <a class="el" href="classcapputils_1_1_xmlizer.html#a65b7d6ea39b7c3b58c331b09451ef42e">capputils::Xmlizer</a>
+<li>getClassName()
+: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#aedf1bd195c69b5e7d73e464a1a150e30">capputils::reflection::ReflectableClass</a>
 </li>
-<li>addToPropertyNode()
-: <a class="el" href="classcapputils_1_1attributes_1_1_i_xmlable_attribute.html#a23ff19ac73e95bd6386274b695da72e9">capputils::attributes::IXmlableAttribute</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_time_stamp_attribute.html#a30982537c05d15da6e72dc7e654041a9">capputils::attributes::TimeStampAttribute</a>
+<li>getProperties()
+: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a59fc62b722d79d5b0e0827a295406d41">capputils::reflection::ReflectableClass</a>
 </li>
-<li>ArgumentsParser()
-: <a class="el" href="classcapputils_1_1_arguments_parser.html#ae123838f3f712087ff9c59bbc046d6ab">capputils::ArgumentsParser</a>
+<li>getProperty()
+: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a8c5aa58bd065cfc21b03121f3aca53bc">capputils::reflection::ReflectableClass</a>
 </li>
-<li>attribute
-: <a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html#a67eef5c0f303b49025f88f319c021ad1">capputils::attributes::AttributeWrapper</a>
+<li>hasProperty()
+: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a5216875d2e539f6040958f7dc751ab34">capputils::reflection::ReflectableClass</a>
 </li>
-<li>AttributeExecuter()
-: <a class="el" href="classcapputils_1_1attributes_1_1_attribute_executer.html#af5f47bfe6b226b74c550a6c7664b35fb">capputils::attributes::AttributeExecuter</a>
+<li>setProperty()
+: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#afa00c2f29cfed1ba4c85169be685b05b">capputils::reflection::ReflectableClass</a>
 </li>
-<li>AttributeWrapper()
-: <a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html#a4c53702967d6fdf70a35789c5cf61b78">capputils::attributes::AttributeWrapper</a>
+<li>toStream()
+: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#ae9e5a6212b882b29b80d2fb319525a2a">capputils::reflection::ReflectableClass</a>
 </li>
 </ul>
 </div>
-</div>
-  <div id="nav-path" class="navpath">
-    <ul>
-      <li class="footer">Generated on Sat May 21 2011 16:12:23 for Capputils by&#160;
-<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </li>
-    </ul>
-  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -172,6 +113,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-
+<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 15:36:19 for Capputils by&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
 </html>

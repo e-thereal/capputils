@@ -6,13 +6,6 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/search.js"></script>
-<link href="navtree.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="navtree.js"></script>
-<script type="text/javascript" src="resize.js"></script>
-<script type="text/javascript">
-$(document).ready(initResizable);
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
 <body onload='searchBox.OnSelectItem(0);'>
@@ -38,6 +31,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li id="searchli">
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -65,133 +59,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     </ul>
   </div>
 </div>
-<div id="side-nav" class="ui-resizable side-nav-resizable">
-  <div id="nav-tree">
-    <div id="nav-tree-contents">
-    </div>
-  </div>
-  <div id="splitbar" style="-moz-user-select:none;" 
-       class="ui-resizable-handle">
-  </div>
-</div>
-<script type="text/javascript">
-  initNavTree('hierarchy.html','');
-</script>
-<div id="doc-content">
 <div class="header">
   <div class="headertitle">
 <div class="title">Class Hierarchy</div>  </div>
 </div>
 <div class="contents">
 <div class="textblock">This inheritance list is sorted roughly, but not completely, alphabetically:</div><ul>
-<li><a class="el" href="classcapputils_1_1_arguments_parser.html">capputils::ArgumentsParser</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_attribute_executer.html">capputils::attributes::AttributeExecuter</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">capputils::attributes::AttributeWrapper</a></li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_converter.html">capputils::reflection::Converter&lt; T, fromMethod &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1string_01_4.html">capputils::reflection::Converter&lt; std::string &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1vector_3_01_t_01_4_00_01false_01_4.html">capputils::reflection::Converter&lt; std::vector&lt; T &gt;, false &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1vector_3_01_t_01_4_00_01true_01_4.html">capputils::reflection::Converter&lt; std::vector&lt; T &gt;, true &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01_t_00_01false_01_4.html">capputils::reflection::Converter&lt; T, false &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1_event_handler0.html">capputils::EventHandler0&lt; T &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1_event_handler1.html">capputils::EventHandler1&lt; T, P1 &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1_event_handler2.html">capputils::EventHandler2&lt; T, P1, P2 &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1_event_handler2.html">capputils::EventHandler2&lt; T, ObservableClass *, int &gt;</a><ul>
-<li><a class="el" href="classcapputils_1_1_event_handler.html">capputils::EventHandler&lt; T &gt;</a></li>
-</ul>
-</li>
-<li><a class="el" href="classcapputils_1_1exceptions_1_1_factory_exception.html">capputils::exceptions::FactoryException</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">capputils::attributes::IAttribute</a><ul>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_description_attribute.html">capputils::attributes::DescriptionAttribute</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_flag_attribute.html">capputils::attributes::FlagAttribute</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_i_assertion_attribute.html">capputils::attributes::IAssertionAttribute</a><ul>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_file_exists_attribute.html">capputils::attributes::FileExistsAttribute</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_filename_attribute.html">capputils::attributes::FilenameAttribute</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html">capputils::attributes::NotEqualAttribute&lt; T &gt;</a></li>
-</ul>
-</li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_i_enumerable_attribute.html">capputils::attributes::IEnumerableAttribute</a><ul>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_enumerable_attribute.html">capputils::attributes::EnumerableAttribute&lt; T, reflectable &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_enumerable_attribute_3_01_t_01_5_00_01false_01_4.html">capputils::attributes::EnumerableAttribute&lt; T *, false &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_enumerable_attribute_3_01_t_01_5_00_01true_01_4.html">capputils::attributes::EnumerableAttribute&lt; T *, true &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_enumerable_attribute_3_01_t_00_01true_01_4.html">capputils::attributes::EnumerableAttribute&lt; T, true &gt;</a></li>
-</ul>
-</li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_i_executable_attribute.html">capputils::attributes::IExecutableAttribute</a><ul>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_observe_attribute.html">capputils::attributes::ObserveAttribute</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_time_stamp_attribute.html">capputils::attributes::TimeStampAttribute</a></li>
-</ul>
-</li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_input_attribute.html">capputils::attributes::InputAttribute</a><ul>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_named_input_attribute.html">capputils::attributes::NamedInputAttribute</a></li>
-</ul>
-</li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_i_reflectable_attribute.html">capputils::attributes::IReflectableAttribute</a><ul>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_reflectable_attribute.html">capputils::attributes::ReflectableAttribute&lt; T &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_reflectable_attribute_3_01_t_01_5_01_4.html">capputils::attributes::ReflectableAttribute&lt; T * &gt;</a></li>
-</ul>
-</li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_i_xmlable_attribute.html">capputils::attributes::IXmlableAttribute</a><ul>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_time_stamp_attribute.html">capputils::attributes::TimeStampAttribute</a></li>
-</ul>
-</li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_output_attribute.html">capputils::attributes::OutputAttribute</a><ul>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_named_output_attribute.html">capputils::attributes::NamedOutputAttribute</a></li>
-</ul>
-</li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_reuse_attribute.html">capputils::attributes::ReuseAttribute</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_scalar_attribute.html">capputils::attributes::ScalarAttribute</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_short_name_attribute.html">capputils::attributes::ShortNameAttribute</a><ul>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_named_input_attribute.html">capputils::attributes::NamedInputAttribute</a></li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_named_output_attribute.html">capputils::attributes::NamedOutputAttribute</a></li>
-</ul>
-</li>
-<li><a class="el" href="classcapputils_1_1attributes_1_1_volatile_attribute.html">capputils::attributes::VolatileAttribute</a></li>
-</ul>
-</li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">capputils::reflection::IClassProperty</a><ul>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_class_property.html">capputils::reflection::ClassProperty&lt; T &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html">capputils::reflection::ClassProperty&lt; T * &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_i_property_iterator.html">capputils::reflection::IPropertyIterator</a><ul>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_property_iterator.html">capputils::reflection::PropertyIterator&lt; CollectionType, ValueType &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_property_iterator_3_01_collection_type_01_5_00_01_value_type_01_4.html">capputils::reflection::PropertyIterator&lt; CollectionType *, ValueType &gt;</a></li>
-</ul>
-</li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_class_property.html">capputils::reflection::ClassProperty&lt; ValueType &gt;</a><ul>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_property_iterator.html">capputils::reflection::PropertyIterator&lt; CollectionType, ValueType &gt;</a></li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_property_iterator_3_01_collection_type_01_5_00_01_value_type_01_4.html">capputils::reflection::PropertyIterator&lt; CollectionType *, ValueType &gt;</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="el" href="structcapputils_1_1_library_data.html">capputils::LibraryData</a></li>
-<li><a class="el" href="classcapputils_1_1exceptions_1_1_library_exception.html">capputils::exceptions::LibraryException</a></li>
-<li><a class="el" href="classcapputils_1_1_library_loader.html">capputils::LibraryLoader</a></li>
-<li><a class="el" href="classcapputils_1_1_observable_class.html">capputils::ObservableClass</a></li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">capputils::reflection::ReflectableClass</a><ul>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_enumerator.html">capputils::reflection::Enumerator</a></li>
-</ul>
-</li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class_factory.html">capputils::reflection::ReflectableClassFactory</a></li>
-<li><a class="el" href="classcapputils_1_1reflection_1_1_register_class.html">capputils::reflection::RegisterClass</a></li>
-<li><a class="el" href="classcapputils_1_1_timed_class.html">capputils::TimedClass</a></li>
-<li><a class="el" href="classcapputils_1_1_verifier.html">capputils::Verifier</a></li>
-<li><a class="el" href="classcapputils_1_1_xmlizer.html">capputils::Xmlizer</a></li>
+<li><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">capputils::reflection::ReflectableClass</a></li>
 </ul>
 </div>
-</div>
-  <div id="nav-path" class="navpath">
-    <ul>
-      <li class="footer">Generated on Sat May 21 2011 16:12:23 for Capputils by&#160;
-<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </li>
-    </ul>
-  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -200,6 +82,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-
+<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 15:36:19 for Capputils by&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
 </html>

@@ -6,13 +6,6 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/search.js"></script>
-<link href="navtree.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="navtree.js"></script>
-<script type="text/javascript" src="resize.js"></script>
-<script type="text/javascript">
-$(document).ready(initResizable);
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
 <body onload='searchBox.OnSelectItem(0);'>
@@ -35,9 +28,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li id="searchli">
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -69,7 +63,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li class="current"><a href="functions.html"><span>All</span></a></li>
       <li><a href="functions_func.html"><span>Functions</span></a></li>
       <li><a href="functions_vars.html"><span>Variables</span></a></li>
-      <li><a href="functions_type.html"><span>Typedefs</span></a></li>
+      <li><a href="functions_enum.html"><span>Enumerations</span></a></li>
       <li><a href="functions_rela.html"><span>Related&#160;Functions</span></a></li>
     </ul>
   </div>
@@ -81,139 +75,41 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions_0x65.html#index_e"><span>e</span></a></li>
       <li><a href="functions_0x66.html#index_f"><span>f</span></a></li>
       <li class="current"><a href="functions_0x67.html#index_g"><span>g</span></a></li>
-      <li><a href="functions_0x68.html#index_h"><span>h</span></a></li>
       <li><a href="functions_0x69.html#index_i"><span>i</span></a></li>
       <li><a href="functions_0x6c.html#index_l"><span>l</span></a></li>
-      <li><a href="functions_0x6d.html#index_m"><span>m</span></a></li>
       <li><a href="functions_0x6e.html#index_n"><span>n</span></a></li>
       <li><a href="functions_0x6f.html#index_o"><span>o</span></a></li>
       <li><a href="functions_0x70.html#index_p"><span>p</span></a></li>
+      <li><a href="functions_0x71.html#index_q"><span>q</span></a></li>
       <li><a href="functions_0x72.html#index_r"><span>r</span></a></li>
       <li><a href="functions_0x73.html#index_s"><span>s</span></a></li>
       <li><a href="functions_0x74.html#index_t"><span>t</span></a></li>
       <li><a href="functions_0x75.html#index_u"><span>u</span></a></li>
       <li><a href="functions_0x76.html#index_v"><span>v</span></a></li>
-      <li><a href="functions_0x77.html#index_w"><span>w</span></a></li>
-      <li><a href="functions_0x7e.html#index_0x7e"><span>~</span></a></li>
     </ul>
   </div>
 </div>
-<div id="side-nav" class="ui-resizable side-nav-resizable">
-  <div id="nav-tree">
-    <div id="nav-tree-contents">
-    </div>
-  </div>
-  <div id="splitbar" style="-moz-user-select:none;" 
-       class="ui-resizable-handle">
-  </div>
-</div>
-<script type="text/javascript">
-  initNavTree('functions.html','');
-</script>
-<div id="doc-content">
 <div class="contents">
-<div class="textblock">Here is a list of all class members with links to the classes they belong to:</div>
+<div class="textblock">Here is a list of all documented class members with links to the class documentation for each member:</div>
 
 <h3><a class="anchor" id="index_g"></a>- g -</h3><ul>
-<li>getAttribute()
-: <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a05fd9892ddd0654fe38cf088b424c383">capputils::reflection::IClassProperty</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a242f6be8529113d869d78fea06514159">capputils::reflection::ReflectableClass</a>
+<li>GetDocument()
+: <a class="el" href="class_ti_xml_node.html#aa66f4ebcd175204a168ed7c2d7b43071">TiXmlNode</a>
 </li>
-<li>getAttributes()
-: <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#aa5a1d2980c76d67c4e035f44999174c3">capputils::reflection::ClassProperty&lt; T * &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#aed2def89cfb7276951831298b9eb04d6">capputils::reflection::IClassProperty</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a52ca298a2fc2861e1d2ddfa54cfe0c1e">capputils::reflection::ClassProperty&lt; T &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a42e170cc2eee78959a37539374490590">capputils::reflection::ReflectableClass</a>
+<li>GetText()
+: <a class="el" href="class_ti_xml_element.html#aa6dedd8a146acf3b1bc0903deb2d411a">TiXmlElement</a>
 </li>
-<li>getClassName()
-: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#aedf1bd195c69b5e7d73e464a1a150e30">capputils::reflection::ReflectableClass</a>
-</li>
-<li>getClassNames()
-: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class_factory.html#aa9f08a3b89df52580f588d25544da765">capputils::reflection::ReflectableClassFactory</a>
-</li>
-<li>getDescription()
-: <a class="el" href="classcapputils_1_1attributes_1_1_description_attribute.html#a2fbde6d4d3125ca18e35940c61fae00e">capputils::attributes::DescriptionAttribute</a>
-</li>
-<li>getEventId()
-: <a class="el" href="classcapputils_1_1attributes_1_1_observe_attribute.html#a48ac59e0ac635f2b1c71efaa2bdccd0a">capputils::attributes::ObserveAttribute</a>
-</li>
-<li>getFromPropertyNode()
-: <a class="el" href="classcapputils_1_1attributes_1_1_i_xmlable_attribute.html#aa35b9bf1597c2daef47a3285d076e78e">capputils::attributes::IXmlableAttribute</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_time_stamp_attribute.html#a737b5d08ad6664d9820901d7cffdb151">capputils::attributes::TimeStampAttribute</a>
-</li>
-<li>getInstance()
-: <a class="el" href="classcapputils_1_1_library_loader.html#a2e1ef05bcc7c58f7821e0288ac6639d2">capputils::LibraryLoader</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class_factory.html#a29e55dc450ce8d6d67fd95b04ac0dead">capputils::reflection::ReflectableClassFactory</a>
-</li>
-<li>getLastMessage()
-: <a class="el" href="classcapputils_1_1attributes_1_1_filename_attribute.html#a46b27e248d74ed6faf9fe891a287e310">capputils::attributes::FilenameAttribute</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_i_assertion_attribute.html#ac0a57dba425f6b9d07d13dbb9e3e73e9">capputils::attributes::IAssertionAttribute</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html#acc79045c5dae525176f5c5b0e98a3957">capputils::attributes::NotEqualAttribute&lt; T &gt;</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_file_exists_attribute.html#a3906b6c4415526f9b4c8abba58552929">capputils::attributes::FileExistsAttribute</a>
-</li>
-<li>getName()
-: <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac28111803eb2a939384bcf9eb752100d">capputils::reflection::ClassProperty&lt; T &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#aef4672b2aae1f303aefd1fe92f9938ef">capputils::reflection::ClassProperty&lt; T * &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#ab6777e47440611e8d5e0e84e5c7ead2f">capputils::reflection::IClassProperty</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_short_name_attribute.html#a23ff3da74da4de2760729aeab20226d2">capputils::attributes::ShortNameAttribute</a>
-</li>
-<li>getProperties()
-: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a59fc62b722d79d5b0e0827a295406d41">capputils::reflection::ReflectableClass</a>
-</li>
-<li>getProperty()
-: <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a8c5aa58bd065cfc21b03121f3aca53bc">capputils::reflection::ReflectableClass</a>
-</li>
-<li>getPropertyIterator()
-: <a class="el" href="classcapputils_1_1attributes_1_1_enumerable_attribute_3_01_t_01_5_00_01false_01_4.html#a1608c37996b9ab7bd7c0c4b0ad8cafb6">capputils::attributes::EnumerableAttribute&lt; T *, false &gt;</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_enumerable_attribute.html#a3a07080a69e10f0d98e59edb3b3d6cb5">capputils::attributes::EnumerableAttribute&lt; T, reflectable &gt;</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_enumerable_attribute_3_01_t_00_01true_01_4.html#aba19a5449240bebe5051cb0b30ab8c04">capputils::attributes::EnumerableAttribute&lt; T, true &gt;</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_enumerable_attribute_3_01_t_01_5_00_01true_01_4.html#ad3e9247360e19445f89ff641bf0ae67b">capputils::attributes::EnumerableAttribute&lt; T *, true &gt;</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_i_enumerable_attribute.html#a4672858993975d2eb5ba62ac8a84174b">capputils::attributes::IEnumerableAttribute</a>
-</li>
-<li>getStringValue()
-: <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a28a1e3e1ec83adb105b6d78e8ae60470">capputils::reflection::IClassProperty</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#ab551cd2957c1a6f4589b9eb4254c56f6">capputils::reflection::ClassProperty&lt; T * &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a2c3be6b20dafd428a5fc5b79856f1d0b">capputils::reflection::ClassProperty&lt; T &gt;</a>
-</li>
-<li>getTime()
-: <a class="el" href="classcapputils_1_1attributes_1_1_time_stamp_attribute.html#a7d585f6ba5f9b3f92a33b5a9bc407796">capputils::attributes::TimeStampAttribute</a>
-, <a class="el" href="classcapputils_1_1_timed_class.html#a584f89982c319339eebc9880269ba069">capputils::TimedClass</a>
-</li>
-<li>getType()
-: <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#a5b485f343ae0909afaa1ac5ab9374e39">capputils::reflection::ClassProperty&lt; T * &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a623957322e5302f9b102ed07e876c4a5">capputils::reflection::IClassProperty</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a6bcafdf050e006ba440f1a1b6905da6c">capputils::reflection::ClassProperty&lt; T &gt;</a>
-</li>
-<li>getValue()
-: <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ae2a345a83a5d99d2eec2e1792c3b2871">capputils::reflection::ClassProperty&lt; T &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#a43ff46bacc4416ba31ee03f1c3af952b">capputils::reflection::ClassProperty&lt; T * &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_property_iterator.html#a43df47c63699a1db001fab1c21e34251">capputils::reflection::PropertyIterator&lt; CollectionType, ValueType &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_property_iterator_3_01_collection_type_01_5_00_01_value_type_01_4.html#aa107cd0a04b99b29791b84e4972d13de">capputils::reflection::PropertyIterator&lt; CollectionType *, ValueType &gt;</a>
-</li>
-<li>getValuePtr()
-: <a class="el" href="classcapputils_1_1attributes_1_1_reflectable_attribute_3_01_t_01_5_01_4.html#aa00dccf051f8954a5e3f7001f01b41ed">capputils::attributes::ReflectableAttribute&lt; T * &gt;</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_i_reflectable_attribute.html#ac37e11fef722381ffe8d0e01a9e0981e">capputils::attributes::IReflectableAttribute</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_reflectable_attribute.html#a5cb9d104ba3286378ee7f19c89741e38">capputils::attributes::ReflectableAttribute&lt; T &gt;</a>
-</li>
-<li>getValues()
-: <a class="el" href="classcapputils_1_1reflection_1_1_enumerator.html#a1e6295dd07c1cc26967e851f1dfdbfe6">capputils::reflection::Enumerator</a>
+<li>GetUserData()
+: <a class="el" href="class_ti_xml_base.html#a6559a530ca6763fc301a14d77ed28c17">TiXmlBase</a>
 </li>
 </ul>
 </div>
-</div>
-  <div id="nav-path" class="navpath">
-    <ul>
-      <li class="footer">Generated on Sat May 21 2011 16:12:23 for Capputils by&#160;
-<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </li>
-    </ul>
-  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Friends</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -222,6 +118,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-
+<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 14:43:52 for Capputils by&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
 </html>

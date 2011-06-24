@@ -6,13 +6,6 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/search.js"></script>
-<link href="navtree.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="navtree.js"></script>
-<script type="text/javascript" src="resize.js"></script>
-<script type="text/javascript">
-$(document).ready(initResizable);
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
 <body onload='searchBox.OnSelectItem(0);'>
@@ -35,9 +28,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li id="searchli">
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -62,20 +57,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="namespacemembers.html"><span>Namespace&#160;Members</span></a></li>
     </ul>
   </div>
-</div>
-<div id="side-nav" class="ui-resizable side-nav-resizable">
-  <div id="nav-tree">
-    <div id="nav-tree-contents">
-    </div>
-  </div>
-  <div id="splitbar" style="-moz-user-select:none;" 
-       class="ui-resizable-handle">
+  <div id="nav-path" class="navpath">
+    <ul>
+      <li class="navelem"><a class="el" href="namespacecapputils.html">capputils</a>      </li>
+      <li class="navelem"><a class="el" href="namespacecapputils_1_1attributes.html">attributes</a>      </li>
+    </ul>
   </div>
 </div>
-<script type="text/javascript">
-  initNavTree('namespacecapputils_1_1attributes.html','');
-</script>
-<div id="doc-content">
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
@@ -97,6 +85,7 @@ Classes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_file_exists_attribute.html">FileExistsAttribute</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_filename_attribute.html">FilenameAttribute</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_flag_attribute.html">FlagAttribute</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_from_enumerable_attribute.html">FromEnumerableAttribute</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_i_assertion_attribute.html">IAssertionAttribute</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">IAttribute</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a></td></tr>
@@ -116,6 +105,7 @@ Classes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_scalar_attribute.html">ScalarAttribute</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_short_name_attribute.html">ShortNameAttribute</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_time_stamp_attribute.html">TimeStampAttribute</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_to_enumerable_attribute.html">ToEnumerableAttribute</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_volatile_attribute.html">VolatileAttribute</a></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -123,8 +113,10 @@ Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;class T , bool reflectable&gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#a7c50eb886f0cb3196064b15f7b6fb8ed">Enumerable</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#a22a01dca89fd5cc1cc14136c28a8e062">FileExists</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#a3fb811ba5388562b2e670dc43e84f305">Filename</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#ad4c8c8326c410c3376e2c255deaa455a">Filename</a> (const string &amp;pattern, bool multipleSelection)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#a8b61c624a7aeab845252af1769cdbbb3">Filename</a> (const std::string &amp;pattern=&quot;All (*)&quot;, bool multipleSelection=false)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#a61754c0ca755b65396e1e775284c9696">Flag</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#a44a8c17621767ca8f7f50e5e9aecd153">FromEnumerable</a> (int enumerablePropertyId)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#a19407cc3449bb858970b61eee1f83cf7">Input</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#a62a98ef1858bd07922a9dabafca12b37">Input</a> (const std::string &amp;name)</td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;class T &gt; </td></tr>
@@ -140,6 +132,7 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#aca375068fed644cfd0bc8da58b29ae12">ShortName</a> (const std::string &amp;name)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">time_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#a336da2c058e557d4f0cedd875a970aea">fromString</a> (const std::string &amp;str)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#aa8720bcbe80b7cf5bee84485fb2d0c05">TimeStamp</a> (int propertyId)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#a646c30f029220a0abbb8a64d64216368">ToEnumerable</a> (int enumerablePropertyId)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1attributes.html#aec777807d0340e2ff730d98108748e4e">Volatile</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -160,7 +153,8 @@ Variables</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
-
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="_demo1_2_demo1_8cpp-example.html#a4">Demo1/Demo1.cpp</a>.</dd>
+</dl>
 </div>
 </div>
 <a class="anchor" id="a7c50eb886f0cb3196064b15f7b6fb8ed"></a><!-- doxytag: member="capputils::attributes::Enumerable" ref="a7c50eb886f0cb3196064b15f7b6fb8ed" args="()" -->
@@ -197,15 +191,53 @@ template&lt;class T , bool reflectable&gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a3fb811ba5388562b2e670dc43e84f305"></a><!-- doxytag: member="capputils::attributes::Filename" ref="a3fb811ba5388562b2e670dc43e84f305" args="()" -->
+<a class="anchor" id="ad4c8c8326c410c3376e2c255deaa455a"></a><!-- doxytag: member="capputils::attributes::Filename" ref="ad4c8c8326c410c3376e2c255deaa455a" args="(const string &amp;pattern, bool multipleSelection)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> * capputils::attributes::Filename </td>
+          <td class="memname"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a>* capputils::attributes::Filename </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const string &amp;&#160;</td>
+          <td class="paramname"><em>pattern</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>multipleSelection</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a8b61c624a7aeab845252af1769cdbbb3"></a><!-- doxytag: member="capputils::attributes::Filename" ref="a8b61c624a7aeab845252af1769cdbbb3" args="(const std::string &amp;pattern=&quot;All (*)&quot;, bool multipleSelection=false)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a>* capputils::attributes::Filename </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>pattern</em> = <code>&quot;All&#160;(*)&quot;</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>multipleSelection</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div>
@@ -221,6 +253,24 @@ template&lt;class T , bool reflectable&gt; </div>
           <td class="memname"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> * capputils::attributes::Flag </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="_demo1_2_demo1_8cpp-example.html#a5">Demo1/Demo1.cpp</a>.</dd>
+</dl>
+</div>
+</div>
+<a class="anchor" id="a44a8c17621767ca8f7f50e5e9aecd153"></a><!-- doxytag: member="capputils::attributes::FromEnumerable" ref="a44a8c17621767ca8f7f50e5e9aecd153" args="(int enumerablePropertyId)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> * capputils::attributes::FromEnumerable </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>enumerablePropertyId</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -325,6 +375,22 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="ab67d7f68fd7df1f11d76f79a87291ab9"></a><!-- doxytag: member="capputils::attributes::Output" ref="ab67d7f68fd7df1f11d76f79a87291ab9" args="()" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> * capputils::attributes::Output </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="a2e0fb467bbee9996049af4ecf78973f8"></a><!-- doxytag: member="capputils::attributes::Output" ref="a2e0fb467bbee9996049af4ecf78973f8" args="(const std::string &amp;name)" -->
 <div class="memitem">
 <div class="memproto">
@@ -334,22 +400,6 @@ template&lt;class T &gt; </div>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>name</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab67d7f68fd7df1f11d76f79a87291ab9"></a><!-- doxytag: member="capputils::attributes::Output" ref="ab67d7f68fd7df1f11d76f79a87291ab9" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> * capputils::attributes::Output </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -459,6 +509,23 @@ template&lt;class T &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="a646c30f029220a0abbb8a64d64216368"></a><!-- doxytag: member="capputils::attributes::ToEnumerable" ref="a646c30f029220a0abbb8a64d64216368" args="(int enumerablePropertyId)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a> * capputils::attributes::ToEnumerable </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>enumerablePropertyId</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="aec777807d0340e2ff730d98108748e4e"></a><!-- doxytag: member="capputils::attributes::Volatile" ref="aec777807d0340e2ff730d98108748e4e" args="()" -->
 <div class="memitem">
 <div class="memproto">
@@ -493,22 +560,12 @@ template&lt;class T &gt; </div>
 </div>
 </div>
 </div>
-</div>
-  <div id="nav-path" class="navpath">
-    <ul>
-      <li class="navelem"><a class="el" href="namespacecapputils.html">capputils</a>      </li>
-      <li class="navelem"><a class="el" href="namespacecapputils_1_1attributes.html">attributes</a>      </li>
-      <li class="footer">Generated on Sat May 21 2011 16:12:23 for Capputils by&#160;
-<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </li>
-    </ul>
-  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -517,6 +574,8 @@ template&lt;class T &gt; </div>
 </iframe>
 </div>
 
-
+<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 14:30:02 for Capputils by&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
 </html>

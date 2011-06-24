@@ -6,13 +6,6 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/search.js"></script>
-<link href="navtree.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="navtree.js"></script>
-<script type="text/javascript" src="resize.js"></script>
-<script type="text/javascript">
-$(document).ready(initResizable);
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
 <body onload='searchBox.OnSelectItem(0);'>
@@ -38,6 +31,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li id="searchli">
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -63,271 +57,60 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     </ul>
   </div>
 </div>
-<div id="side-nav" class="ui-resizable side-nav-resizable">
-  <div id="nav-tree">
-    <div id="nav-tree-contents">
-    </div>
-  </div>
-  <div id="splitbar" style="-moz-user-select:none;" 
-       class="ui-resizable-handle">
-  </div>
-</div>
-<script type="text/javascript">
-  initNavTree('_reflectable_class_8h.html','');
-</script>
-<div id="doc-content">
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#define-members">Defines</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#define-members">Defines</a>  </div>
   <div class="headertitle">
 <div class="title">capputils/ReflectableClass.h File Reference</div>  </div>
 </div>
 <div class="contents">
+
+<p>Contains the class declaration of ReflecableClass and some useful makros.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;sstream&gt;</code><br/>
 <code>#include &lt;string&gt;</code><br/>
 <code>#include &lt;vector&gt;</code><br/>
 <code>#include &lt;cstdarg&gt;</code><br/>
 <code>#include &lt;ostream&gt;</code><br/>
 <code>#include &lt;istream&gt;</code><br/>
-<code>#include &quot;<a class="el" href="capputils_8h_source.html">capputils.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_i_attribute_8h_source.html">IAttribute.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_class_property_8h_source.html">ClassProperty.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_attribute_executer_8h_source.html">AttributeExecuter.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_reflectable_attribute_8h_source.html">ReflectableAttribute.h</a>&quot;</code><br/>
-<code>#include &quot;<a class="el" href="_reflectable_class_factory_8h_source.html">ReflectableClassFactory.h</a>&quot;</code><br/>
+<code>#include &quot;capputils.h&quot;</code><br/>
+<code>#include &quot;IAttribute.h&quot;</code><br/>
+<code>#include &quot;ClassProperty.h&quot;</code><br/>
+<code>#include &quot;AttributeExecuter.h&quot;</code><br/>
+<code>#include &quot;ReflectableAttribute.h&quot;</code><br/>
+<code>#include &quot;ReflectableClassFactory.h&quot;</code><br/>
 </div>
 <p><a href="_reflectable_class_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">capputils::reflection::ReflectableClass</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class of all reflectable classes.  <a href="classcapputils_1_1reflection_1_1_reflectable_class.html#details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="namespaces"></a>
 Namespaces</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils.html">capputils</a></td></tr>
+
+<p><tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>main namespace </p>
+<br/></td></tr>
+</p>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1reflection.html">capputils::reflection</a></td></tr>
+
+<p><tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Everything that has to do with reflection comes in here. </p>
+<br/></td></tr>
+</p>
 <tr><td colspan="2"><h2><a name="define-members"></a>
 Defines</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a04fbfb33f1e0f829a39c044b353c9a02">CAPPUTILS_USE_CPP0x</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da">Property</a>(name, type)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#af9491873d67fcf66ae32a4e30c540a32">VirtualProperty</a>(name, type)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#af407f433b556d813802a968d545ee1e9">InitReflectableClass</a>(name)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a8e76b281bc9df4b5e5b087ea5660f5c9">InitAbstractReflectableClass</a>(name)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a4e588a7b9d7a950363f16a642e9d65bf">DefineProperty</a>(name, arguments...)&#160;&#160;&#160;properties.push_back(new ::<a class="el" href="classcapputils_1_1reflection_1_1_class_property.html">capputils::reflection::ClassProperty</a>&lt;decltype(((ClassType*)0)-&gt;get##name())&gt;(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0));</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a6b67ca309c7a512862384ba16c3b84e5">ReflectableProperty</a>(name, arguments...)&#160;&#160;&#160;properties.push_back(new ::<a class="el" href="classcapputils_1_1reflection_1_1_class_property.html">capputils::reflection::ClassProperty</a>&lt;decltype(((ClassType*)0)-&gt;get##name())&gt;(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable&lt;decltype(((ClassType*)0)-&gt;get##name())&gt;(), 0));</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a311ecd42cf087cd9d530ae5f9fb2abb8">PROPERTY_ID</a>&#160;&#160;&#160;properties.size()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a9de2e6877c4b5edc93f02a9137b28a88">ReflectableBase</a>(BaseClass)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a0846dc07b3afef4a0dfa8cb260ada5a2">BeginPropertyDefinitions</a>(cname, args...)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a14724823416afe175238f38e18976ecb">BeginAbstractPropertyDefinitions</a>(cname, args...)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a87cac6d918200dd05f7597409c1a31c9">EndPropertyDefinitions</a>&#160;&#160;&#160;initialized = true; }</td></tr>
-<tr><td colspan="2"><h2><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1reflection.html#a675dfbdf05bc4e1829b7f6f7dc34db34">capputils::reflection::trimTypeName</a> (const char *typeName)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#aedae80751cdf3eb87a09ad212b570d7b">operator&lt;&lt;</a> (std::ostream &amp;stream, const <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">capputils::reflection::ReflectableClass</a> &amp;object)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">std::istream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#ac43c16eb3af0965ea979ffe43c2c7661">operator&gt;&gt;</a> (std::istream &amp;stream, <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">capputils::reflection::ReflectableClass</a> &amp;object)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares a property.  <a href="#a141cc4c043a592450c332d3512d211da"></a><br/></td></tr>
 </table>
-<hr/><h2>Define Documentation</h2>
-<a class="anchor" id="a14724823416afe175238f38e18976ecb"></a><!-- doxytag: member="ReflectableClass.h::BeginAbstractPropertyDefinitions" ref="a14724823416afe175238f38e18976ecb" args="(cname, args...)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BeginAbstractPropertyDefinitions</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">cname, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">args...&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<b>Value:</b><div class="fragment"><pre class="fragment">std::vector&lt; ::capputils::reflection::IClassProperty*&gt; cname :: properties;     \
-  std::vector&lt; ::capputils::attributes::IAttribute*&gt; cname :: attributes;     \
-  <span class="keyword">const</span> std::string cname :: ClassName = <a class="code" href="namespacecapputils_1_1reflection.html#a675dfbdf05bc4e1829b7f6f7dc34db34">capputils::reflection::trimTypeName</a>(<span class="keyword">typeid</span>(cname).name());  \
-  <span class="keywordtype">void</span> cname::initializeAttributes()<span class="keyword"> const </span>{ \
-    <span class="keyword">static</span> <span class="keywordtype">bool</span> initialized = <span class="keyword">false</span>; \
-    <span class="keywordflow">if</span> (initialized) <span class="keywordflow">return</span>; \
-    addAttributes(&amp;cname::attributes, ##args, 0); \
-    initialized = <span class="keyword">true</span>; \
-  } \
-  <span class="keywordtype">void</span> cname :: initializeProperties()<span class="keyword"> const </span>{   \
-    <span class="keyword">static</span> <span class="keywordtype">bool</span> initialized = <span class="keyword">false</span>;  \
-    <span class="keywordflow">if</span> (initialized) <span class="keywordflow">return</span>;
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a0846dc07b3afef4a0dfa8cb260ada5a2"></a><!-- doxytag: member="ReflectableClass.h::BeginPropertyDefinitions" ref="a0846dc07b3afef4a0dfa8cb260ada5a2" args="(cname, args...)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BeginPropertyDefinitions</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">cname, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">args...&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<b>Value:</b><div class="fragment"><pre class="fragment">std::vector&lt; ::capputils::reflection::IClassProperty*&gt; cname :: properties;     \
-  std::vector&lt; ::capputils::attributes::IAttribute*&gt; cname :: attributes;     \
-  <span class="keyword">const</span> std::string cname :: ClassName = <a class="code" href="namespacecapputils_1_1reflection.html#a675dfbdf05bc4e1829b7f6f7dc34db34">capputils::reflection::trimTypeName</a>(<span class="keyword">typeid</span>(cname).name());  \
-  <a class="code" href="classcapputils_1_1reflection_1_1_register_class.html">capputils::reflection::RegisterClass</a> cname::_registration(<a class="code" href="namespacecapputils_1_1reflection.html#a675dfbdf05bc4e1829b7f6f7dc34db34">capputils::reflection::trimTypeName</a>(<span class="keyword">typeid</span>(cname).name()), cname::newInstance, cname::deleteInstance); \
-  <span class="keywordtype">void</span> cname::initializeAttributes()<span class="keyword"> const </span>{ \
-    <span class="keyword">static</span> <span class="keywordtype">bool</span> initialized = <span class="keyword">false</span>; \
-    <span class="keywordflow">if</span> (initialized) <span class="keywordflow">return</span>; \
-    addAttributes(&amp;cname::attributes, ##args, 0); \
-    initialized = <span class="keyword">true</span>; \
-  } \
-  <span class="keywordtype">void</span> cname :: initializeProperties()<span class="keyword"> const </span>{   \
-    <span class="keyword">static</span> <span class="keywordtype">bool</span> initialized = <span class="keyword">false</span>;  \
-    <span class="keywordflow">if</span> (initialized) <span class="keywordflow">return</span>;
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a04fbfb33f1e0f829a39c044b353c9a02"></a><!-- doxytag: member="ReflectableClass.h::CAPPUTILS_USE_CPP0x" ref="a04fbfb33f1e0f829a39c044b353c9a02" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define CAPPUTILS_USE_CPP0x</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4e588a7b9d7a950363f16a642e9d65bf"></a><!-- doxytag: member="ReflectableClass.h::DefineProperty" ref="a4e588a7b9d7a950363f16a642e9d65bf" args="(name, arguments...)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define DefineProperty</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">name, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">arguments...&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;properties.push_back(new ::<a class="el" href="classcapputils_1_1reflection_1_1_class_property.html">capputils::reflection::ClassProperty</a>&lt;decltype(((ClassType*)0)-&gt;get##name())&gt;(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0));</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a87cac6d918200dd05f7597409c1a31c9"></a><!-- doxytag: member="ReflectableClass.h::EndPropertyDefinitions" ref="a87cac6d918200dd05f7597409c1a31c9" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EndPropertyDefinitions&#160;&#160;&#160;initialized = true; }</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a8e76b281bc9df4b5e5b087ea5660f5c9"></a><!-- doxytag: member="ReflectableClass.h::InitAbstractReflectableClass" ref="a8e76b281bc9df4b5e5b087ea5660f5c9" args="(name)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define InitAbstractReflectableClass</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">name</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<b>Value:</b><div class="fragment"><pre class="fragment"><span class="keyword">typedef</span> name ClassType;                         \
-  <span class="keyword">protected</span>: <span class="keyword">static</span> std::vector&lt; ::capputils::reflection::IClassProperty*&gt; properties;                \
-  <span class="keyword">protected</span>: <span class="keyword">static</span> std::vector&lt; ::capputils::attributes::IAttribute*&gt; attributes;                \
-  <span class="keyword">public</span>: <span class="keyword">virtual</span> std::vector&lt; ::capputils::reflection::IClassProperty*&gt;&amp; getProperties()<span class="keyword"> const </span>{  \
-    initializeProperties();                         \
-    <span class="keywordflow">return</span> properties;                              \
-  }                                               \
-  <span class="keyword">public</span>: <span class="keyword">virtual</span> std::vector&lt; ::capputils::attributes::IAttribute*&gt;&amp; getAttributes()<span class="keyword"> const </span>{  \
-    initializeAttributes();                        \
-    <span class="keywordflow">return</span> attributes;                             \
-  }                                               \
-  <span class="keyword">public</span>: <span class="keyword">static</span> <span class="keyword">const</span> std::string ClassName;     \
-  <span class="keyword">public</span>: <span class="keyword">virtual</span> <span class="keyword">const</span> std::string&amp; getClassName()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> ClassType::ClassName; } \
-  <span class="keyword">private</span>: <span class="keywordtype">void</span> initializeProperties() <span class="keyword">const</span>; \
-  <span class="keyword">private</span>: <span class="keywordtype">void</span> initializeAttributes() <span class="keyword">const</span>;
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="af407f433b556d813802a968d545ee1e9"></a><!-- doxytag: member="ReflectableClass.h::InitReflectableClass" ref="af407f433b556d813802a968d545ee1e9" args="(name)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define InitReflectableClass</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">name</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<b>Value:</b><div class="fragment"><pre class="fragment"><span class="keyword">typedef</span> name ClassType;                         \
-  <span class="keyword">protected</span>: <span class="keyword">static</span> std::vector&lt; ::capputils::reflection::IClassProperty*&gt; properties;                \
-  <span class="keyword">protected</span>: <span class="keyword">static</span> std::vector&lt; ::capputils::attributes::IAttribute*&gt; attributes;                \
-  <span class="keyword">public</span>: <span class="keyword">virtual</span> std::vector&lt; ::capputils::reflection::IClassProperty*&gt;&amp; getProperties()<span class="keyword"> const </span>{  \
-    initializeProperties();                         \
-    <span class="keywordflow">return</span> properties;                              \
-  }                                               \
-  <span class="keyword">public</span>: <span class="keyword">virtual</span> std::vector&lt; ::capputils::attributes::IAttribute*&gt;&amp; getAttributes()<span class="keyword"> const </span>{  \
-    initializeAttributes();                        \
-    <span class="keywordflow">return</span> attributes;                             \
-  }                                               \
-  <span class="keyword">public</span>: <span class="keyword">static</span> <span class="keyword">const</span> std::string ClassName;     \
-  <span class="keyword">public</span>: <span class="keyword">virtual</span> <span class="keyword">const</span> std::string&amp; getClassName()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> ClassType::ClassName; } \
-  <span class="keyword">private</span>: <span class="keywordtype">void</span> initializeProperties() <span class="keyword">const</span>; \
-  <span class="keyword">private</span>: <span class="keywordtype">void</span> initializeAttributes() <span class="keyword">const</span>; \
-  <span class="keyword">private</span>: <span class="keyword">static</span> <a class="code" href="classcapputils_1_1reflection_1_1_register_class.html">capputils::reflection::RegisterClass</a> _registration; \
-  <span class="keyword">public</span>: <span class="keyword">static</span> ReflectableClass* newInstance() { <span class="keywordflow">return</span> <span class="keyword">new</span> name(); } \
-  <span class="keyword">public</span>: <span class="keyword">static</span> <span class="keywordtype">void</span> deleteInstance(ReflectableClass* instance) { <span class="keyword">delete</span> instance; }
-</pre></div>
-</div>
-</div>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>Contains the class declaration of ReflecableClass and some useful makros. </p>
+<p>Created on: Jan 7, 2011 </p>
+<dl class="author"><dt><b>Author:</b></dt><dd>Tom Brosch</dd></dl>
+<p>You must call InitReflectableClass and BeginProperyDefintions and EndPropertyDefinitions. See example for help. (minimal class) </p>
+</div><hr/><h2>Define Documentation</h2>
 <a class="anchor" id="a141cc4c043a592450c332d3512d211da"></a><!-- doxytag: member="ReflectableClass.h::Property" ref="a141cc4c043a592450c332d3512d211da" args="(name, type)" -->
 <div class="memitem">
 <div class="memproto">
@@ -355,178 +138,29 @@ Functions</h2></td></tr>
 <b>Value:</b><div class="fragment"><pre class="fragment"><span class="keyword">private</span>: type _##name; \
 <span class="keyword">public</span>: \
   type <span class="keyword">get</span>##name()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _##name; } \
-  <span class="keywordtype">void</span> <span class="keyword">set</span>##name(type value) { static ::capputils::reflection::IClassProperty* <span class="keyword">property</span> = findProperty(#name);<a class="code" href="classcapputils_1_1attributes_1_1_attribute_executer.html#ae060b1b56421a4fd0519c036f7665a1f"> ::capputils::attributes::AttributeExecuter::ExecuteBefore</a>(*<span class="keyword">this</span>, *property); _##name = value;<a class="code" href="classcapputils_1_1attributes_1_1_attribute_executer.html#af0af49420c164adc15986446ae36248e"> ::capputils::attributes::AttributeExecuter::ExecuteAfter</a>(*<span class="keyword">this</span>, *property); } \
+  <span class="keywordtype">void</span> <span class="keyword">set</span>##name(type value) { static ::capputils::reflection::IClassProperty* <span class="keyword">property</span> = findProperty(#name); ::capputils::attributes::AttributeExecuter::ExecuteBefore(*<span class="keyword">this</span>, *property); _##name = value; ::capputils::attributes::AttributeExecuter::ExecuteAfter(*<span class="keyword">this</span>, *property); } \
 <span class="keyword">protected</span>: \
-  <span class="keyword">static</span> <span class="keywordtype">void</span> <span class="keyword">set</span>##name(::<a class="code" href="classcapputils_1_1reflection_1_1_reflectable_class.html">capputils::reflection::ReflectableClass</a>&amp; <span class="keywordtype">object</span>, type value) { <span class="keyword">dynamic_cast&lt;</span>ClassType*<span class="keyword">&gt;</span>(&amp;object)-&gt;<span class="keyword">set</span>##name(value); } \
+  <span class="keyword">static</span> <span class="keywordtype">void</span> <span class="keyword">set</span>##name(::<a class="code" href="classcapputils_1_1reflection_1_1_reflectable_class.html" title="Base class of all reflectable classes.">capputils::reflection::ReflectableClass</a>&amp; <span class="keywordtype">object</span>, type value) { <span class="keyword">dynamic_cast&lt;</span>ClassType*<span class="keyword">&gt;</span>(&amp;object)-&gt;<span class="keyword">set</span>##name(value); } \
   <span class="keyword">static</span> type <span class="keyword">get</span>##name(const ::capputils::reflection::ReflectableClass&amp; <span class="keywordtype">object</span>) { <span class="keywordflow">return</span> <span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span>ClassType*<span class="keyword">&gt;</span>(&amp;object)-&gt;<span class="keyword">get</span>##name(); }
 </pre></div>
-</div>
-</div>
-<a class="anchor" id="a311ecd42cf087cd9d530ae5f9fb2abb8"></a><!-- doxytag: member="ReflectableClass.h::PROPERTY_ID" ref="a311ecd42cf087cd9d530ae5f9fb2abb8" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define PROPERTY_ID&#160;&#160;&#160;properties.size()</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9de2e6877c4b5edc93f02a9137b28a88"></a><!-- doxytag: member="ReflectableClass.h::ReflectableBase" ref="a9de2e6877c4b5edc93f02a9137b28a88" args="(BaseClass)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ReflectableBase</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">BaseClass</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<b>Value:</b><div class="fragment"><pre class="fragment">{ \
-  std::vector&lt;capputils::reflection::IClassProperty*&gt;&amp; baseProperties = BaseClass::getProperties(); \
-    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; baseProperties.size(); ++i) \
-      properties.push_back(baseProperties[i]); \
-  }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a6b67ca309c7a512862384ba16c3b84e5"></a><!-- doxytag: member="ReflectableClass.h::ReflectableProperty" ref="a6b67ca309c7a512862384ba16c3b84e5" args="(name, arguments...)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ReflectableProperty</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">name, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">arguments...&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;properties.push_back(new ::<a class="el" href="classcapputils_1_1reflection_1_1_class_property.html">capputils::reflection::ClassProperty</a>&lt;decltype(((ClassType*)0)-&gt;get##name())&gt;(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable&lt;decltype(((ClassType*)0)-&gt;get##name())&gt;(), 0));</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af9491873d67fcf66ae32a4e30c540a32"></a><!-- doxytag: member="ReflectableClass.h::VirtualProperty" ref="af9491873d67fcf66ae32a4e30c540a32" args="(name, type)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define VirtualProperty</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">name, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">type&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<b>Value:</b><div class="fragment"><pre class="fragment"><span class="keyword">public</span>: \
-  type <span class="keyword">get</span>##name() <span class="keyword">const</span>; \
-<span class="keyword">protected</span>: \
-  <span class="keyword">static</span> <span class="keywordtype">void</span> <span class="keyword">set</span>##name(::<a class="code" href="classcapputils_1_1reflection_1_1_reflectable_class.html">capputils::reflection::ReflectableClass</a>&amp; <span class="keywordtype">object</span>, type value) { } \
-  <span class="keyword">static</span> type <span class="keyword">get</span>##name(const ::capputils::reflection::ReflectableClass&amp; <span class="keywordtype">object</span>) { <span class="keywordflow">return</span> <span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span>ClassType*<span class="keyword">&gt;</span>(&amp;object)-&gt;<span class="keyword">get</span>##name(); }
-</pre></div>
-</div>
-</div>
-<hr/><h2>Function Documentation</h2>
-<a class="anchor" id="aedae80751cdf3eb87a09ad212b570d7b"></a><!-- doxytag: member="ReflectableClass.h::operator&lt;&lt;" ref="aedae80751cdf3eb87a09ad212b570d7b" args="(std::ostream &amp;stream, const capputils::reflection::ReflectableClass &amp;object)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::ostream&amp; operator&lt;&lt; </td>
-          <td>(</td>
-          <td class="paramtype">std::ostream &amp;&#160;</td>
-          <td class="paramname"><em>stream</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">capputils::reflection::ReflectableClass</a> &amp;&#160;</td>
-          <td class="paramname"><em>object</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac43c16eb3af0965ea979ffe43c2c7661"></a><!-- doxytag: member="ReflectableClass.h::operator&gt;&gt;" ref="ac43c16eb3af0965ea979ffe43c2c7661" args="(std::istream &amp;stream, capputils::reflection::ReflectableClass &amp;object)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::istream&amp; operator&gt;&gt; </td>
-          <td>(</td>
-          <td class="paramtype">std::istream &amp;&#160;</td>
-          <td class="paramname"><em>stream</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">capputils::reflection::ReflectableClass</a> &amp;&#160;</td>
-          <td class="paramname"><em>object</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
+<p>Declares a property. </p>
+<p>The first parameter is the name of the property. Capitalization is recommended. The second parameter is the type of the property. The macro will define according getter and setter methods.</p>
+<p>For example: </p>
+<div class="fragment"><pre class="fragment">  <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(Name, std::string)
+</pre></div><p> will generate </p>
+<div class="fragment"><pre class="fragment">   std::string getName()<span class="keyword"> const </span>{ ... }
+   <span class="keywordtype">void</span> setName(std::string value) { ... }
+</pre></div> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="_demo1_2_demo1_8cpp-example.html#a0">Demo1/Demo1.cpp</a>.</dd>
+</dl>
 </div>
 </div>
 </div>
-</div>
-  <div id="nav-path" class="navpath">
-    <ul>
-      <li class="navelem"><a class="el" href="_reflectable_class_8h.html">ReflectableClass.h</a>      </li>
-      <li class="footer">Generated on Sat May 21 2011 16:12:23 for Capputils by&#160;
-<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </li>
-    </ul>
-  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -535,6 +169,8 @@ Functions</h2></td></tr>
 </iframe>
 </div>
 
-
+<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 15:36:19 for Capputils by&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
 </html>

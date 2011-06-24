@@ -6,13 +6,6 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/search.js"></script>
-<link href="navtree.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="navtree.js"></script>
-<script type="text/javascript" src="resize.js"></script>
-<script type="text/javascript">
-$(document).ready(initResizable);
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
 <body onload='searchBox.OnSelectItem(0);'>
@@ -35,9 +28,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
+      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li id="searchli">
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -69,7 +63,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li class="current"><a href="functions.html"><span>All</span></a></li>
       <li><a href="functions_func.html"><span>Functions</span></a></li>
       <li><a href="functions_vars.html"><span>Variables</span></a></li>
-      <li><a href="functions_type.html"><span>Typedefs</span></a></li>
+      <li><a href="functions_enum.html"><span>Enumerations</span></a></li>
       <li><a href="functions_rela.html"><span>Related&#160;Functions</span></a></li>
     </ul>
   </div>
@@ -81,92 +75,56 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li class="current"><a href="functions_0x65.html#index_e"><span>e</span></a></li>
       <li><a href="functions_0x66.html#index_f"><span>f</span></a></li>
       <li><a href="functions_0x67.html#index_g"><span>g</span></a></li>
-      <li><a href="functions_0x68.html#index_h"><span>h</span></a></li>
       <li><a href="functions_0x69.html#index_i"><span>i</span></a></li>
       <li><a href="functions_0x6c.html#index_l"><span>l</span></a></li>
-      <li><a href="functions_0x6d.html#index_m"><span>m</span></a></li>
       <li><a href="functions_0x6e.html#index_n"><span>n</span></a></li>
       <li><a href="functions_0x6f.html#index_o"><span>o</span></a></li>
       <li><a href="functions_0x70.html#index_p"><span>p</span></a></li>
+      <li><a href="functions_0x71.html#index_q"><span>q</span></a></li>
       <li><a href="functions_0x72.html#index_r"><span>r</span></a></li>
       <li><a href="functions_0x73.html#index_s"><span>s</span></a></li>
       <li><a href="functions_0x74.html#index_t"><span>t</span></a></li>
       <li><a href="functions_0x75.html#index_u"><span>u</span></a></li>
       <li><a href="functions_0x76.html#index_v"><span>v</span></a></li>
-      <li><a href="functions_0x77.html#index_w"><span>w</span></a></li>
-      <li><a href="functions_0x7e.html#index_0x7e"><span>~</span></a></li>
     </ul>
   </div>
 </div>
-<div id="side-nav" class="ui-resizable side-nav-resizable">
-  <div id="nav-tree">
-    <div id="nav-tree-contents">
-    </div>
-  </div>
-  <div id="splitbar" style="-moz-user-select:none;" 
-       class="ui-resizable-handle">
-  </div>
-</div>
-<script type="text/javascript">
-  initNavTree('functions.html','');
-</script>
-<div id="doc-content">
 <div class="contents">
-<div class="textblock">Here is a list of all class members with links to the classes they belong to:</div>
+<div class="textblock">Here is a list of all documented class members with links to the class documentation for each member:</div>
 
 <h3><a class="anchor" id="index_e"></a>- e -</h3><ul>
-<li>Enumerator()
-: <a class="el" href="classcapputils_1_1reflection_1_1_enumerator.html#afdaf1701583961dfd38497b199e46ca3">capputils::reflection::Enumerator</a>
+<li>Element()
+: <a class="el" href="class_ti_xml_handle.html#acb5fe8388a526289ea65e817a51e05e7">TiXmlHandle</a>
 </li>
-<li>eof()
-: <a class="el" href="classcapputils_1_1reflection_1_1_property_iterator.html#a377b7402ef3a0fdb3e21888cf84b8857">capputils::reflection::PropertyIterator&lt; CollectionType, ValueType &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_i_property_iterator.html#a35fb817b9007bb956ca78286f9040d93">capputils::reflection::IPropertyIterator</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_property_iterator_3_01_collection_type_01_5_00_01_value_type_01_4.html#a28f6d0afeb2e641344f0102dedb867dc">capputils::reflection::PropertyIterator&lt; CollectionType *, ValueType &gt;</a>
+<li>EncodeString()
+: <a class="el" href="class_ti_xml_base.html#a32ed202562b58de64c7d799ca3c9db98">TiXmlBase</a>
 </li>
-<li>EventHandler()
-: <a class="el" href="classcapputils_1_1_event_handler.html#a29fccd1090031c1d89ad70e3c5925436">capputils::EventHandler&lt; T &gt;</a>
+<li>Encoding()
+: <a class="el" href="class_ti_xml_declaration.html#a5d974231f9e9a2f0542f15f3a46cdb76">TiXmlDeclaration</a>
 </li>
-<li>EventHandler0()
-: <a class="el" href="classcapputils_1_1_event_handler0.html#a6ff6738c3492114025870928f13f6e41">capputils::EventHandler0&lt; T &gt;</a>
+<li>Error()
+: <a class="el" href="class_ti_xml_document.html#a6dfc01a6e5d58e56acd537dfd3bdeb29">TiXmlDocument</a>
 </li>
-<li>EventHandler1()
-: <a class="el" href="classcapputils_1_1_event_handler1.html#a21010106d643357d232891d82f2a3b58">capputils::EventHandler1&lt; T, P1 &gt;</a>
+<li>ErrorCol()
+: <a class="el" href="class_ti_xml_document.html#aa90bc630ee5203c6109ca5fad3323649">TiXmlDocument</a>
 </li>
-<li>EventHandler2()
-: <a class="el" href="classcapputils_1_1_event_handler2.html#adcfc1fc218c892aff9d79b25b8f76730">capputils::EventHandler2&lt; T, P1, P2 &gt;</a>
+<li>ErrorDesc()
+: <a class="el" href="class_ti_xml_document.html#a9d0f689f6e09ea494ea547be8d79c25e">TiXmlDocument</a>
 </li>
-<li>ExecuteAfter()
-: <a class="el" href="classcapputils_1_1attributes_1_1_attribute_executer.html#af0af49420c164adc15986446ae36248e">capputils::attributes::AttributeExecuter</a>
+<li>ErrorId()
+: <a class="el" href="class_ti_xml_document.html#af96fc2f3f9ec6422782bfe916c9e778f">TiXmlDocument</a>
 </li>
-<li>executeAfter()
-: <a class="el" href="classcapputils_1_1attributes_1_1_i_executable_attribute.html#a5f5e3633e0165ea44db3052345740c6b">capputils::attributes::IExecutableAttribute</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_observe_attribute.html#ad9de9768de2da280f2dc0cea3d070adb">capputils::attributes::ObserveAttribute</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_time_stamp_attribute.html#a7bd78c4e9ea03120f1099fff402158d1">capputils::attributes::TimeStampAttribute</a>
-</li>
-<li>executeBefore()
-: <a class="el" href="classcapputils_1_1attributes_1_1_i_executable_attribute.html#ab5368a7aa7d3d806be042fe474702cd9">capputils::attributes::IExecutableAttribute</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_time_stamp_attribute.html#acbc5bea12c2e1ebb82163341650cf4f9">capputils::attributes::TimeStampAttribute</a>
-, <a class="el" href="classcapputils_1_1attributes_1_1_observe_attribute.html#ad3ed9b3672a92a01d852f228cc52c5fa">capputils::attributes::ObserveAttribute</a>
-</li>
-<li>ExecuteBefore()
-: <a class="el" href="classcapputils_1_1attributes_1_1_attribute_executer.html#ae060b1b56421a4fd0519c036f7665a1f">capputils::attributes::AttributeExecuter</a>
+<li>ErrorRow()
+: <a class="el" href="class_ti_xml_document.html#af30efc75e804aa2e92fb8be3a8cb676e">TiXmlDocument</a>
 </li>
 </ul>
 </div>
-</div>
-  <div id="nav-path" class="navpath">
-    <ul>
-      <li class="footer">Generated on Sat May 21 2011 16:12:23 for Capputils by&#160;
-<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </li>
-    </ul>
-  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Friends</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -175,6 +133,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-
+<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 14:43:52 for Capputils by&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
 </html>

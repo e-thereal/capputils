@@ -6,13 +6,6 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/search.js"></script>
-<link href="navtree.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="navtree.js"></script>
-<script type="text/javascript" src="resize.js"></script>
-<script type="text/javascript">
-$(document).ready(initResizable);
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
 <body onload='searchBox.OnSelectItem(0);'>
@@ -38,6 +31,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li id="searchli">
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -64,113 +58,66 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
-</div>
-<div id="side-nav" class="ui-resizable side-nav-resizable">
-  <div id="nav-tree">
-    <div id="nav-tree-contents">
-    </div>
-  </div>
-  <div id="splitbar" style="-moz-user-select:none;" 
-       class="ui-resizable-handle">
+  <div id="nav-path" class="navpath">
+    <ul>
+      <li class="navelem"><a class="el" href="namespacecapputils.html">capputils</a>      </li>
+      <li class="navelem"><a class="el" href="namespacecapputils_1_1reflection.html">reflection</a>      </li>
+      <li class="navelem"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">ReflectableClass</a>      </li>
+    </ul>
   </div>
 </div>
-<script type="text/javascript">
-  initNavTree('classcapputils_1_1reflection_1_1_reflectable_class.html','');
-</script>
-<div id="doc-content">
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">capputils::reflection::ReflectableClass Class Reference</div>  </div>
 </div>
 <div class="contents">
 <!-- doxytag: class="capputils::reflection::ReflectableClass" -->
+<p>Base class of all reflectable classes.  
+ <a href="classcapputils_1_1reflection_1_1_reflectable_class.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_reflectable_class_8h_source.html">ReflectableClass.h</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for capputils::reflection::ReflectableClass:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classcapputils_1_1reflection_1_1_reflectable_class.png" usemap="#capputils::reflection::ReflectableClass_map" alt=""/>
-  <map id="capputils::reflection::ReflectableClass_map" name="capputils::reflection::ReflectableClass_map">
-<area href="classcapputils_1_1reflection_1_1_enumerator.html" alt="capputils::reflection::Enumerator" shape="rect" coords="0,56,221,80"/>
-</map>
- </div></div>
+
+<p>Inherited by Address, capputils::reflection::Enumerator, Car, DataModel, EngineDescription, and Person.</p>
 
 <p><a href="classcapputils_1_1reflection_1_1_reflectable_class-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#aa0eeddc680f1142584104a9d892429b5">~ReflectableClass</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::vector<br class="typebreak"/>
-&lt; <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">IClassProperty</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a59fc62b722d79d5b0e0827a295406d41">getProperties</a> () const =0</td></tr>
+&lt; IClassProperty * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a59fc62b722d79d5b0e0827a295406d41">getProperties</a> () const =0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns all properties of the class including properties of all of its base classes.  <a href="#a59fc62b722d79d5b0e0827a295406d41"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::vector<br class="typebreak"/>
-&lt; ::<a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">capputils::attributes::IAttribute</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a42e170cc2eee78959a37539374490590">getAttributes</a> () const =0</td></tr>
+&lt; ::capputils::attributes::IAttribute * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a42e170cc2eee78959a37539374490590">getAttributes</a> () const =0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns all attributes of a class.  <a href="#a42e170cc2eee78959a37539374490590"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#aedf1bd195c69b5e7d73e464a1a150e30">getClassName</a> () const =0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the full class name including its namespaces.  <a href="#aedf1bd195c69b5e7d73e464a1a150e30"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#ae9e5a6212b882b29b80d2fb319525a2a">toStream</a> (std::ostream &amp;stream) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Overload this method to provide a customized way of writing a class to a stream.  <a href="#ae9e5a6212b882b29b80d2fb319525a2a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7b93c19d1b847fcf5f83fa9e28ad4b38">fromStream</a> (std::istream &amp;stream)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">IClassProperty</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7d811637be82d8b3396b8d256d6dc1e2">findProperty</a> (const std::string &amp;propertyName) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Overload this method to provide a customized way of reading a class from a stream.  <a href="#a7b93c19d1b847fcf5f83fa9e28ad4b38"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">IClassProperty *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7d811637be82d8b3396b8d256d6dc1e2">findProperty</a> (const std::string &amp;propertyName) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the pointer to a class property given its name.  <a href="#a7d811637be82d8b3396b8d256d6dc1e2"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a5216875d2e539f6040958f7dc751ab34">hasProperty</a> (const std::string &amp;propertyName) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true of the current class has a property of the given name.  <a href="#a5216875d2e539f6040958f7dc751ab34"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#afa00c2f29cfed1ba4c85169be685b05b">setProperty</a> (const std::string &amp;propertyName, const std::string &amp;propertyValue)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the value of a given property by the properties name using a string representing the value.  <a href="#afa00c2f29cfed1ba4c85169be685b05b"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a8c5aa58bd065cfc21b03121f3aca53bc">getProperty</a> (const std::string &amp;propertyName)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of a property as a string.  <a href="#a8c5aa58bd065cfc21b03121f3aca53bc"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;class AT &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">AT *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a242f6be8529113d869d78fea06514159">getAttribute</a> ()</td></tr>
-<tr><td colspan="2"><h2><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a5e1045fbc8b8eafcf04d1a38141e889e">addAttributes</a> (std::vector&lt; ::<a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">capputils::attributes::IAttribute</a> * &gt; *attributes,...) const </td></tr>
 </table>
-<hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="aa0eeddc680f1142584104a9d892429b5"></a><!-- doxytag: member="capputils::reflection::ReflectableClass::~ReflectableClass" ref="aa0eeddc680f1142584104a9d892429b5" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">capputils::reflection::ReflectableClass::~ReflectableClass </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a5e1045fbc8b8eafcf04d1a38141e889e"></a><!-- doxytag: member="capputils::reflection::ReflectableClass::addAttributes" ref="a5e1045fbc8b8eafcf04d1a38141e889e" args="(std::vector&lt; ::capputils::attributes::IAttribute * &gt; *attributes,...) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void capputils::reflection::ReflectableClass::addAttributes </td>
-          <td>(</td>
-          <td class="paramtype">std::vector&lt; ::<a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">capputils::attributes::IAttribute</a> * &gt; *&#160;</td>
-          <td class="paramname"><em>attributes</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>...</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const<code> [protected]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>Base class of all reflectable classes. </p>
+<dl class="remark"><dt><b>Remarks:</b></dt><dd>Properties are defined in a static vector. Therefore, the vector has to be part of the specific class and can not be a field of the base class. </dd></dl>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a7d811637be82d8b3396b8d256d6dc1e2"></a><!-- doxytag: member="capputils::reflection::ReflectableClass::findProperty" ref="a7d811637be82d8b3396b8d256d6dc1e2" args="(const std::string &amp;propertyName) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">IClassProperty</a> * capputils::reflection::ReflectableClass::findProperty </td>
+          <td class="memname">IClassProperty * capputils::reflection::ReflectableClass::findProperty </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>propertyName</em></td><td>)</td>
@@ -179,6 +126,15 @@ Protected Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Returns the pointer to a class property given its name. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">propertyName</td><td>Name of the property according property.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>Pointer to the class property or 0 if there is no property with the given name. </dd></dl>
 
 </div>
 </div>
@@ -197,7 +153,13 @@ Protected Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classcapputils_1_1reflection_1_1_enumerator.html#a83f377e62d717538cf6dc3e60e627a8e">capputils::reflection::Enumerator</a>.</p>
+<p>Overload this method to provide a customized way of reading a class from a stream. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">stream</td><td>Stream from which the class properties will be read from </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -216,6 +178,13 @@ template&lt;class AT &gt; </div>
       </table>
 </div>
 <div class="memdoc">
+<p>Returns a pointer to an attribute given its type</p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>A pointer to an attribute if the class contains an attribute of the given type, 0 otherwise.</dd></dl>
+<p>The attribute type is given as the type parameter of the template method.</p>
+<dl class="remark"><dt><b>Remarks:</b></dt><dd><ul>
+<li>This method can be used to check if a class is flagged with a particular attribute. </li>
+</ul>
+</dd></dl>
 
 </div>
 </div>
@@ -224,7 +193,7 @@ template&lt;class AT &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual std::vector&lt; ::<a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">capputils::attributes::IAttribute</a>*&gt;&amp; capputils::reflection::ReflectableClass::getAttributes </td>
+          <td class="memname">virtual std::vector&lt; ::capputils::attributes::IAttribute*&gt;&amp; capputils::reflection::ReflectableClass::getAttributes </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [pure virtual]</code></td>
@@ -232,6 +201,13 @@ template&lt;class AT &gt; </div>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Returns all attributes of a class. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>Vector containg pointers to all attributes of the class.</dd></dl>
+<dl class="remark"><dt><b>Remarks:</b></dt><dd><ul>
+<li>This method is automatically defined by the BeginPropertyDefinitions macro. </li>
+</ul>
+</dd></dl>
 
 </div>
 </div>
@@ -249,6 +225,14 @@ template&lt;class AT &gt; </div>
 </div>
 <div class="memdoc">
 
+<p>Returns the full class name including its namespaces. </p>
+<p>The returned class name is of the form namespace::classname</p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>Class name including its namespaces</dd></dl>
+<dl class="remark"><dt><b>Remarks:</b></dt><dd><ul>
+<li>This method is automatically defined by the BeginPropertyDefinitions macro. </li>
+</ul>
+</dd></dl>
+
 </div>
 </div>
 <a class="anchor" id="a59fc62b722d79d5b0e0827a295406d41"></a><!-- doxytag: member="capputils::reflection::ReflectableClass::getProperties" ref="a59fc62b722d79d5b0e0827a295406d41" args="() const =0" -->
@@ -256,7 +240,7 @@ template&lt;class AT &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual std::vector&lt;<a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">IClassProperty</a>*&gt;&amp; capputils::reflection::ReflectableClass::getProperties </td>
+          <td class="memname">virtual std::vector&lt;IClassProperty*&gt;&amp; capputils::reflection::ReflectableClass::getProperties </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [pure virtual]</code></td>
@@ -264,7 +248,13 @@ template&lt;class AT &gt; </div>
       </table>
 </div>
 <div class="memdoc">
-<p>Remarks: Properties are defined in a static vector. Therefore, the vector has to be part of the specific class and can not be a field of the base class. </p>
+
+<p>Returns all properties of the class including properties of all of its base classes. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>Vector containing pointers to all defined class properties.</dd></dl>
+<dl class="remark"><dt><b>Remarks:</b></dt><dd><ul>
+<li>This method is automatically defined by the BeginPropertyDefinitions macro. </li>
+</ul>
+</dd></dl>
 
 </div>
 </div>
@@ -283,6 +273,15 @@ template&lt;class AT &gt; </div>
 </div>
 <div class="memdoc">
 
+<p>Returns the value of a property as a string. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">propertyName</td><td>Name of the according property</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>Value of the property as a string </dd></dl>
+
 </div>
 </div>
 <a class="anchor" id="a5216875d2e539f6040958f7dc751ab34"></a><!-- doxytag: member="capputils::reflection::ReflectableClass::hasProperty" ref="a5216875d2e539f6040958f7dc751ab34" args="(const std::string &amp;propertyName) const " -->
@@ -299,6 +298,15 @@ template&lt;class AT &gt; </div>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Returns true of the current class has a property of the given name. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">propertyName</td><td>Name of the according property.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>True, iff the class has a property with the given name </dd></dl>
 
 </div>
 </div>
@@ -327,6 +335,19 @@ template&lt;class AT &gt; </div>
 </div>
 <div class="memdoc">
 
+<p>Sets the value of a given property by the properties name using a string representing the value. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">propertyName</td><td>Name of the according property </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">propertyValue</td><td>New value of the property as a string</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="remark"><dt><b>Remarks:</b></dt><dd><ul>
+<li>This method is not type-safe. Use <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7d811637be82d8b3396b8d256d6dc1e2" title="Returns the pointer to a class property given its name.">findProperty()</a> and use one of the type-safe setters of IClassProperty to set the value safely. </li>
+</ul>
+</dd></dl>
+
 </div>
 </div>
 <a class="anchor" id="ae9e5a6212b882b29b80d2fb319525a2a"></a><!-- doxytag: member="capputils::reflection::ReflectableClass::toStream" ref="ae9e5a6212b882b29b80d2fb319525a2a" args="(std::ostream &amp;stream) const " -->
@@ -344,32 +365,27 @@ template&lt;class AT &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classcapputils_1_1reflection_1_1_enumerator.html#a462599c36f21af91038097f58ff3e3ca">capputils::reflection::Enumerator</a>.</p>
+<p>Overload this method to provide a customized way of writing a class to a stream. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">stream</td><td>Stream where the class will be written to </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>capputils/<a class="el" href="_reflectable_class_8h_source.html">ReflectableClass.h</a></li>
-<li>capputils/<a class="el" href="_reflectable_class_8cpp.html">ReflectableClass.cpp</a></li>
+<li>capputils/ReflectableClass.cpp</li>
 </ul>
 </div>
-</div>
-  <div id="nav-path" class="navpath">
-    <ul>
-      <li class="navelem"><a class="el" href="namespacecapputils.html">capputils</a>      </li>
-      <li class="navelem"><a class="el" href="namespacecapputils_1_1reflection.html">reflection</a>      </li>
-      <li class="navelem"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">ReflectableClass</a>      </li>
-      <li class="footer">Generated on Sat May 21 2011 16:12:24 for Capputils by&#160;
-<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </li>
-    </ul>
-  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -378,6 +394,8 @@ template&lt;class AT &gt; </div>
 </iframe>
 </div>
 
-
+<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 15:36:19 for Capputils by&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
 </html>

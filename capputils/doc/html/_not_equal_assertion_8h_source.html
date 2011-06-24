@@ -6,13 +6,6 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/search.js"></script>
-<link href="navtree.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="navtree.js"></script>
-<script type="text/javascript" src="resize.js"></script>
-<script type="text/javascript">
-$(document).ready(initResizable);
-</script>
 <link href="doxygen.css" rel="stylesheet" type="text/css"/>
 </head>
 <body onload='searchBox.OnSelectItem(0);'>
@@ -38,6 +31,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li id="searchli">
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -62,26 +56,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
-</div>
-<div id="side-nav" class="ui-resizable side-nav-resizable">
-  <div id="nav-tree">
-    <div id="nav-tree-contents">
-    </div>
-  </div>
-  <div id="splitbar" style="-moz-user-select:none;" 
-       class="ui-resizable-handle">
-  </div>
-</div>
-<script type="text/javascript">
-  initNavTree('_not_equal_assertion_8h.html','');
-</script>
-<div id="doc-content">
 <div class="header">
   <div class="headertitle">
 <div class="title">capputils/NotEqualAssertion.h</div>  </div>
 </div>
 <div class="contents">
-<a href="_not_equal_assertion_8h.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">/*</span>
+<div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">/*</span>
 <a name="l00002"></a>00002 <span class="comment"> * NotEqualAssertion.h</span>
 <a name="l00003"></a>00003 <span class="comment"> *</span>
 <a name="l00004"></a>00004 <span class="comment"> *  Created on: Feb 10, 2011</span>
@@ -91,33 +71,33 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00008"></a>00008 <span class="preprocessor">#ifndef NOTEQUALASSERTION_H_</span>
 <a name="l00009"></a>00009 <span class="preprocessor"></span><span class="preprocessor">#define NOTEQUALASSERTION_H_</span>
 <a name="l00010"></a>00010 <span class="preprocessor"></span>
-<a name="l00011"></a>00011 <span class="preprocessor">#include &quot;<a class="code" href="_i_assertion_attribute_8h.html">IAssertionAttribute.h</a>&quot;</span>
+<a name="l00011"></a>00011 <span class="preprocessor">#include &quot;IAssertionAttribute.h&quot;</span>
 <a name="l00012"></a>00012 <span class="preprocessor">#include &lt;iostream&gt;</span>
 <a name="l00013"></a>00013 
-<a name="l00014"></a>00014 <span class="preprocessor">#include &quot;<a class="code" href="_class_property_8h.html">ClassProperty.h</a>&quot;</span>
+<a name="l00014"></a>00014 <span class="preprocessor">#include &quot;ClassProperty.h&quot;</span>
 <a name="l00015"></a>00015 
 <a name="l00016"></a>00016 <span class="keyword">namespace </span>capputils {
 <a name="l00017"></a>00017 
 <a name="l00018"></a>00018 <span class="keyword">namespace </span>attributes {
 <a name="l00019"></a>00019 
 <a name="l00020"></a>00020 <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;
-<a name="l00021"></a><a class="code" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html">00021</a> <span class="keyword">class </span><a class="code" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html">NotEqualAttribute</a>: <span class="keyword">public</span> <span class="keyword">virtual</span> <a class="code" href="classcapputils_1_1attributes_1_1_i_assertion_attribute.html">IAssertionAttribute</a> {
+<a name="l00021"></a>00021 <span class="keyword">class </span>NotEqualAttribute: <span class="keyword">public</span> <span class="keyword">virtual</span> IAssertionAttribute {
 <a name="l00022"></a>00022 <span class="keyword">private</span>:
 <a name="l00023"></a>00023   T value;
 <a name="l00024"></a>00024   std::string defaultMessage;
 <a name="l00025"></a>00025   std::string message;
 <a name="l00026"></a>00026 
 <a name="l00027"></a>00027 <span class="keyword">public</span>:
-<a name="l00028"></a><a class="code" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html#a7c1bbb4f54ddbaf6c7385ac91b17568d">00028</a>   <a class="code" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html#a7c1bbb4f54ddbaf6c7385ac91b17568d">NotEqualAttribute</a>(T value, <span class="keyword">const</span> std::string&amp; defaultMessage = <span class="stringliteral">&quot;&quot;</span>)
+<a name="l00028"></a>00028   NotEqualAttribute(T value, <span class="keyword">const</span> std::string&amp; defaultMessage = <span class="stringliteral">&quot;&quot;</span>)
 <a name="l00029"></a>00029    : value(value), defaultMessage(defaultMessage)
 <a name="l00030"></a>00030   { }
-<a name="l00031"></a><a class="code" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html#af69160e41eba9283a8635a07431023e9">00031</a>   <span class="keyword">virtual</span> <a class="code" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html#af69160e41eba9283a8635a07431023e9">~NotEqualAttribute</a>() { }
+<a name="l00031"></a>00031   <span class="keyword">virtual</span> ~NotEqualAttribute() { }
 <a name="l00032"></a>00032 
-<a name="l00033"></a><a class="code" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html#acd5630242ea5edb2a93f38f1b5a65894">00033</a>   <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html#acd5630242ea5edb2a93f38f1b5a65894">valid</a>(<span class="keyword">const</span> <a class="code" href="classcapputils_1_1reflection_1_1_i_class_property.html">reflection::IClassProperty</a>&amp; property,
-<a name="l00034"></a>00034         <span class="keyword">const</span> <a class="code" href="classcapputils_1_1reflection_1_1_reflectable_class.html">reflection::ReflectableClass</a>&amp; <span class="keywordtype">object</span>)
+<a name="l00033"></a>00033   <span class="keyword">virtual</span> <span class="keywordtype">bool</span> valid(<span class="keyword">const</span> reflection::IClassProperty&amp; property,
+<a name="l00034"></a>00034         <span class="keyword">const</span> reflection::ReflectableClass&amp; <span class="keywordtype">object</span>)
 <a name="l00035"></a>00035   {
 <a name="l00036"></a>00036     <span class="comment">// TODO: check if dynamic_cast fails</span>
-<a name="l00037"></a>00037     T propertyValue = <span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span><a class="code" href="classcapputils_1_1reflection_1_1_class_property.html">reflection::ClassProperty&lt;T&gt;</a>* <span class="keyword">&gt;</span>(&amp;property)-&gt;getValue(<span class="keywordtype">object</span>);
+<a name="l00037"></a>00037     T propertyValue = <span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span>reflection::ClassProperty&lt;T&gt;* <span class="keyword">&gt;</span>(&amp;property)-&gt;getValue(<span class="keywordtype">object</span>);
 <a name="l00038"></a>00038     <span class="keywordflow">if</span> (propertyValue == value) {
 <a name="l00039"></a>00039       <span class="keywordflow">if</span> (defaultMessage.size()) {
 <a name="l00040"></a>00040         message = defaultMessage;
@@ -130,14 +110,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00047"></a>00047     <span class="keywordflow">return</span> <span class="keyword">true</span>;
 <a name="l00048"></a>00048   }
 <a name="l00049"></a>00049 
-<a name="l00050"></a><a class="code" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html#acc79045c5dae525176f5c5b0e98a3957">00050</a>   <span class="keyword">virtual</span> <span class="keyword">const</span> std::string&amp; <a class="code" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html#acc79045c5dae525176f5c5b0e98a3957">getLastMessage</a>()<span class="keyword"> const </span>{
+<a name="l00050"></a>00050   <span class="keyword">virtual</span> <span class="keyword">const</span> std::string&amp; getLastMessage()<span class="keyword"> const </span>{
 <a name="l00051"></a>00051     <span class="keywordflow">return</span> message;
 <a name="l00052"></a>00052   }
 <a name="l00053"></a>00053 };
 <a name="l00054"></a>00054 
 <a name="l00055"></a>00055 <span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;
-<a name="l00056"></a><a class="code" href="namespacecapputils_1_1attributes.html#a719fb1f11184b2b6188b140b88a60383">00056</a> <a class="code" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a>* <a class="code" href="namespacecapputils_1_1attributes.html#a719fb1f11184b2b6188b140b88a60383">NotEqual</a>(T value, <span class="keyword">const</span> std::string&amp; defaultMessage = <span class="stringliteral">&quot;&quot;</span>) {
-<a name="l00057"></a>00057   <span class="keywordflow">return</span> <span class="keyword">new</span> <a class="code" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">AttributeWrapper</a>(<span class="keyword">new</span> <a class="code" href="classcapputils_1_1attributes_1_1_not_equal_attribute.html">NotEqualAttribute&lt;T&gt;</a>(value, defaultMessage));
+<a name="l00056"></a>00056 AttributeWrapper* NotEqual(T value, <span class="keyword">const</span> std::string&amp; defaultMessage = <span class="stringliteral">&quot;&quot;</span>) {
+<a name="l00057"></a>00057   <span class="keywordflow">return</span> <span class="keyword">new</span> AttributeWrapper(<span class="keyword">new</span> NotEqualAttribute&lt;T&gt;(value, defaultMessage));
 <a name="l00058"></a>00058 }
 <a name="l00059"></a>00059 
 <a name="l00060"></a>00060 }
@@ -147,20 +127,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00064"></a>00064 <span class="preprocessor">#endif </span><span class="comment">/* NOTEQUALASSERTION_H_ */</span>
 </pre></div></div>
 </div>
-  <div id="nav-path" class="navpath">
-    <ul>
-      <li class="navelem"><a class="el" href="_not_equal_assertion_8h.html">NotEqualAssertion.h</a>      </li>
-      <li class="footer">Generated on Sat May 21 2011 16:12:23 for Capputils by&#160;
-<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </li>
-    </ul>
-  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -169,6 +141,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-
+<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 15:36:19 for Capputils by&#160;
+<a href="http://www.doxygen.org/index.html">
+<img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
 </html>
