@@ -25,6 +25,7 @@ public:
       reflection::IClassProperty* property, reflection::ReflectableClass* valuePtr) const = 0;
 
   virtual bool isPointer() const = 0;
+  virtual bool isSmartPointer() const = 0;
 };
 
 }

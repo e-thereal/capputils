@@ -4,6 +4,8 @@
 #include "IReflectableAttribute.h"
 #include "ClassProperty.h"
 
+#include <boost/shared_ptr.hpp>
+
 namespace capputils {
 
 namespace attributes {
@@ -39,6 +41,44 @@ public:
   virtual bool isPointer() const {
     return false;
   }
+
+  virtual bool isSmartPointer() const {
+    return false;
+  }
+};
+
+template<class T>
+class ReflectableAttribute<boost::shared_ptr<T> > : public virtual IReflectableAttribute {
+public:
+  virtual reflection::ReflectableClass* getValuePtr(const reflection::ReflectableClass& object,
+        const reflection::IClassProperty* property) const
+  {
+    using namespace capputils::reflection;
+    const ClassProperty<boost::shared_ptr<T> >* typedProperty = dynamic_cast<const ClassProperty<boost::shared_ptr<T> >* >(property);
+    if (typedProperty) {
+      return typedProperty->getValue(object).get();
+    }
+    return 0;
+  }
+
+  virtual void setValuePtr(reflection::ReflectableClass& object,
+        reflection::IClassProperty* property, reflection::ReflectableClass* valuePtr) const
+  {
+    using namespace capputils::reflection;
+    ClassProperty<boost::shared_ptr<T> >* typedProperty = dynamic_cast<ClassProperty<boost::shared_ptr<T> >* >(property);
+    if (typedProperty) {
+      boost::shared_ptr<T> smartPtr((T*)valuePtr);
+      typedProperty->setValue(object, smartPtr);
+    }
+  }
+
+  virtual bool isPointer() const {
+    return false;
+  }
+
+  virtual bool isSmartPointer() const {
+    return true;
+  }
 };
 
 template<class T>
@@ -67,6 +107,10 @@ public:
 
   virtual bool isPointer() const {
     return true;
+  }
+
+  virtual bool isSmartPointer() const {
+    return false;
   }
 };
 

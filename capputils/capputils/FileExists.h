@@ -27,6 +27,8 @@ public:
       const reflection::ReflectableClass& object);
 
   virtual const std::string& getLastMessage() const;
+
+  static bool exists(const std::string& filename);
 };
 
 AttributeWrapper* FileExists();

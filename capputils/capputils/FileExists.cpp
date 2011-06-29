@@ -36,10 +36,7 @@ bool FileExistsAttribute::valid(const IClassProperty& property,
   if (stringProperty) {
     const string& filename = stringProperty->getValue(object);
 
-    FILE* file = fopen(filename.c_str(), "r");
-    if (file) {
-      fclose(file);
-    } else {
+    if (!exists(filename)) {
       lastError = string("File '") + filename + "' does not exist.";
       return false;
     }
@@ -52,10 +49,7 @@ bool FileExistsAttribute::valid(const IClassProperty& property,
       for (iter->reset(); !iter->eof(object); iter->next()) {
         const string& filename = iter->getStringValue(object);
 
-        FILE* file = fopen(filename.c_str(), "r");
-        if (file) {
-          fclose(file);
-        } else {
+        if (!exists(filename)) {
           lastError = string("File '") + filename + "' does not exist.";
           return false;
         }
@@ -68,6 +62,15 @@ bool FileExistsAttribute::valid(const IClassProperty& property,
 
 const string& FileExistsAttribute::getLastMessage() const {
   return lastError;
+}
+
+bool FileExistsAttribute::exists(const std::string& filename) {
+  FILE* file = fopen(filename.c_str(), "r");
+  if (file) {
+    fclose(file);
+    return true;
+  }
+  return false;
 }
 
 AttributeWrapper* FileExists() {

@@ -14,6 +14,7 @@
 #include <vector>
 #include <string>
 #include <capputils/TimedClass.h>
+#include <boost/shared_ptr.hpp>
 
 #include <capputils/Enumerators.h>
 
@@ -44,8 +45,8 @@ class Car : public capputils::reflection::ReflectableClass,
   Property(HighSpeed, float)
   Property(ModelName, std::string)
   Property(Help, bool)
-  Property(Engine, EngineDescription*)
-  Property(Owners, std::vector<Person*>*)
+  Property(Engine, boost::shared_ptr<EngineDescription>)
+  Property(Owners, boost::shared_ptr<std::vector< boost::shared_ptr<Person> > >)
   Property(SetOnCompilation, int)
 
 public:

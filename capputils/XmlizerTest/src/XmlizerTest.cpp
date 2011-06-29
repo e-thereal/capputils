@@ -19,6 +19,8 @@
 #include "Car.h"
 #include "Student.h"
 
+#include <boost/shared_ptr.hpp>
+
 using namespace std;
 using namespace capputils;
 using namespace capputils::attributes;
@@ -33,14 +35,33 @@ void changeHandler(ObservableClass* sender, int eventId) {
   }
 }
 
-ReflectableEnum(Test, Klappt, KlapptNicht);
+class SmartTest {
+public:
+  SmartTest() {
+    cout << "ctor" << endl;
+  }
+  virtual ~SmartTest() {
+    cout << "dtor" << endl;
+  }
 
-DefineEnum(Test);
+  void test() {
+    cout << "Test" << endl;
+  }
+};
 
 int main(int argc, char** argv) {
 	Car car;
 	cout << __DATE__" "__TIME__ << endl;
 	//car.Changed.connect(changeHandler);
+
+	vector<boost::shared_ptr<SmartTest> > tests;
+	cout << "Begin smart test" << endl;
+	{
+	  boost::shared_ptr<SmartTest> test(new SmartTest());
+	  tests.push_back(test);
+	}
+	cout << "End smart test" << endl;
+	tests.clear();
 
 	/*ReflectableClassFactory& factory = ReflectableClassFactory::getInstance();
 	vector<string>& classNames = factory.getClassNames();
@@ -57,29 +78,21 @@ int main(int argc, char** argv) {
 	Xmlizer::FromXml(car, "car2.xml");
 	ArgumentsParser::Parse(car, argc, argv);
 
-	Test test = Test::Klappt;
-	vector<IAttribute*>& attributes = test.getAttributes();
-	cout << "# attributes = " << attributes.size() << endl;
-
 	if (car.getHelp() || !Verifier::Valid(car)) {
 	  ArgumentsParser::PrintUsage(string("\nUsage: ") + argv[0] + " [switches], where switches are:", car);
 	  return 0;
   }
 
-  //vector<string>* owners = car.getOwners();
-  //owners->push_back("Tomble");
-  //owners->push_back("Anni");
-  //car.setOwners(owners);
-  //vector<Person*>* owners = car.getOwners();
-  //owners->push_back(new Person());
-  //owners->push_back(new Student());
+  boost::shared_ptr<vector<boost::shared_ptr<Person> > > owners = car.getOwners();
+  owners->push_back(new Person());
+  owners->push_back(new Student());
   
 	cout << "Xmlizer Test" << endl;
 	cout << "Doors: " << car.getProperty("DoorCount") << endl;
 	cout << "High Speed: " << car.getHighSpeed() << endl;
 	cout << "Model Name: " << car.getModelName() << endl;
 //	cout << "Engine Type: " << car.getEngine() << endl;
-	Xmlizer::ToXml("car2.xml", car);
+	Xmlizer::ToXml("car.xml", car);
 
 	return 0;
 }

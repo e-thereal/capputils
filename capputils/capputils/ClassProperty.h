@@ -9,6 +9,8 @@
 #include <iostream>
 #include <typeinfo>
 
+#include <boost/shared_ptr.hpp>
+
 namespace capputils {
 
 namespace reflection {
@@ -218,6 +220,76 @@ public:
 };
 
 template<class T>
+class ClassProperty<boost::shared_ptr<T> > : public virtual IClassProperty
+{
+private:
+  std::string name;
+  std::vector<attributes::IAttribute*> attributes;
+
+  boost::shared_ptr<T> (*getValueFunc) (const ReflectableClass& object);
+  void (*setValueFunc) (ReflectableClass& object, boost::shared_ptr<T> value);
+
+public:
+  /* The last parameter is a list of IAttribute* which must be terminated
+   * by null.
+   */
+  ClassProperty(const std::string& name,
+      boost::shared_ptr<T> (*getValue) (const ReflectableClass& object),
+      void (*setValue) (ReflectableClass& object, boost::shared_ptr<T> value),
+      ...)
+      : name(name), getValueFunc(getValue), setValueFunc(setValue)
+  {
+    va_list args;
+    va_start(args, setValue);
+
+    for (attributes::AttributeWrapper* attrWrap = va_arg(args, attributes::AttributeWrapper*); attrWrap; attrWrap = va_arg(args, attributes::AttributeWrapper*)) {
+      attributes.push_back(attrWrap->attribute);
+      delete attrWrap;
+    }
+  }
+
+  virtual ~ClassProperty() {
+    for (unsigned i = 0; i < attributes.size(); ++i)
+      delete attributes[i];
+  }
+
+  virtual const std::vector<attributes::IAttribute*>& getAttributes() const { return attributes; }
+  virtual const std::string& getName() const { return name; }
+  virtual void addAttribute(attributes::IAttribute* attribute) {
+    attributes.push_back(attribute);
+  }
+
+  virtual std::string getStringValue(const ReflectableClass& object) const {
+    return Converter<boost::shared_ptr<T> >::toString(getValue(object));
+  }
+
+  virtual void setStringValue(ReflectableClass& object, const std::string&/* value*/) const {
+    //setValueFunc(object, new T(convertFromString<T>(value)));
+    // TODO: static assert that getting pointer values from a string is not supported
+    throw "setting smart pointer values from a string is not supported";
+  }
+
+  virtual const std::type_info& getType() const {
+    return typeid(boost::shared_ptr<T>);
+  }
+
+  virtual boost::shared_ptr<T> getValue(const ReflectableClass& object) const {
+    return getValueFunc(object);
+  }
+
+  virtual void setValue(ReflectableClass& object, boost::shared_ptr<T> value) const {
+    setValueFunc(object, value);
+  }
+
+  virtual void setValue(ReflectableClass& object, const ReflectableClass& fromObject, const IClassProperty* fromProperty) {
+    const ClassProperty<boost::shared_ptr<T> >* typedProperty = dynamic_cast<const ClassProperty<boost::shared_ptr<T> >*>(fromProperty);
+    if (typedProperty) {
+      setValue(object, typedProperty->getValue(fromObject));
+    }
+  }
+};
+
+template<class T>
 class ClassProperty<T*> : public virtual IClassProperty
 {
 private:
@@ -265,7 +337,6 @@ public:
     //setValueFunc(object, new T(convertFromString<T>(value)));
     // TODO: static assert that getting pointer values from a string is not supported
     throw "setting pointer values from a string is not supported";
-    setValue(object, 0);
   }
 
   virtual const std::type_info& getType() const {
