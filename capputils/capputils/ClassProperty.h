@@ -11,6 +11,8 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include "ReflectionException.h"
+
 namespace capputils {
 
 namespace reflection {
@@ -266,7 +268,7 @@ public:
   virtual void setStringValue(ReflectableClass& object, const std::string&/* value*/) const {
     //setValueFunc(object, new T(convertFromString<T>(value)));
     // TODO: static assert that getting pointer values from a string is not supported
-    throw "setting smart pointer values from a string is not supported";
+    throw capputils::exceptions::ReflectionException("setting smart pointer values from a string is not supported");
   }
 
   virtual const std::type_info& getType() const {
@@ -336,7 +338,7 @@ public:
   virtual void setStringValue(ReflectableClass& object, const std::string&/* value*/) const {
     //setValueFunc(object, new T(convertFromString<T>(value)));
     // TODO: static assert that getting pointer values from a string is not supported
-    throw "setting pointer values from a string is not supported";
+    throw capputils::exceptions::ReflectionException("setting pointer values from a string is not supported");
   }
 
   virtual const std::type_info& getType() const {
