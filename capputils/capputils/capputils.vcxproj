@@ -88,6 +88,7 @@
     <ClInclude Include="LibraryException.h" />
     <ClInclude Include="LibraryLoader.h" />
     <ClInclude Include="OutputAttribute.h" />
+    <ClInclude Include="ReflectionException.h" />
     <ClInclude Include="ReuseAttribute.h" />
     <ClInclude Include="ScalarAttribute.h" />
     <ClInclude Include="ArgumentsParser.h" />
@@ -129,6 +130,7 @@
     <ClCompile Include="LibraryException.cpp" />
     <ClCompile Include="LibraryLoader.cpp" />
     <ClCompile Include="OutputAttribute.cpp" />
+    <ClCompile Include="ReflectionException.cpp" />
     <ClCompile Include="ReuseAttribute.cpp" />
     <ClCompile Include="ScalarAttribute.cpp" />
     <ClCompile Include="ArgumentsParser.cpp" />

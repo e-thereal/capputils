@@ -141,6 +141,9 @@
     <ClInclude Include="ToEnumerableAttribute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ReflectionException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="xmlizer.cpp">
@@ -231,6 +234,9 @@
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="EventHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReflectionException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
