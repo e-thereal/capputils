@@ -30,7 +30,7 @@ public:
   }
 
   virtual bool eof(const ReflectableClass& object) const {
-    return i >= collectionProperty->getValue(object).size();
+    return i >= (int)collectionProperty->getValue(object).size();
   }
 
   virtual void next() {
@@ -43,9 +43,9 @@ public:
 
   virtual void setValue(ReflectableClass& object, ValueType value) const {
     CollectionType collection = collectionProperty->getValue(object);
-    if (i < collection.size())
+    if (i < (int)collection.size())
       collection[i] = value;
-    else if (i == collection.size())
+    else if (i == (int)collection.size())
       collection.push_back(value);
     else
       throw "invalid iterator position!";
@@ -57,7 +57,7 @@ template<class CollectionType, class ValueType>
 class PropertyIterator<boost::shared_ptr<CollectionType>, ValueType> : public virtual IPropertyIterator, public ClassProperty<ValueType> {
 
 private:
-  unsigned i;
+  int i;
   const ClassProperty<boost::shared_ptr<CollectionType>>* collectionProperty;
 
 public:
@@ -72,7 +72,7 @@ public:
   }
 
   virtual bool eof(const ReflectableClass& object) const {
-    return i >= collectionProperty->getValue(object)->size();
+    return i >= (int)collectionProperty->getValue(object)->size();
   }
 
   virtual void next() {
@@ -85,9 +85,9 @@ public:
 
   virtual void setValue(ReflectableClass& object, ValueType value) const {
     boost::shared_ptr<CollectionType> collection = collectionProperty->getValue(object);
-    if (i < collection->size())
+    if (i < (int)collection->size())
       (*collection)[i] = value;
-    else if (i == collection->size())
+    else if (i == (int)collection->size())
       collection->push_back(value);
     else
       throw "invalid iterator position!";
@@ -99,7 +99,7 @@ template<class CollectionType, class ValueType>
 class PropertyIterator<CollectionType*, ValueType> : public virtual IPropertyIterator, public ClassProperty<ValueType> {
 
 private:
-  unsigned i;
+  int i;
   const ClassProperty<CollectionType*>* collectionProperty;
 
 public:
@@ -114,7 +114,7 @@ public:
   }
 
   virtual bool eof(const ReflectableClass& object) const {
-    return i >= collectionProperty->getValue(object)->size();
+    return i >= (int)collectionProperty->getValue(object)->size();
   }
 
   virtual void next() {
@@ -127,9 +127,9 @@ public:
 
   virtual void setValue(ReflectableClass& object, ValueType value) const {
     CollectionType* collection = collectionProperty->getValue(object);
-    if (i < collection->size())
+    if (i < (int)collection->size())
       (*collection)[i] = value;
-    else if (i == collection->size())
+    else if (i == (int)collection->size())
       collection->push_back(value);
     else
       throw "invalid iterator position!";
