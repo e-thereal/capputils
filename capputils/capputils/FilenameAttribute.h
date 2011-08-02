@@ -17,8 +17,8 @@ namespace attributes {
 class FilenameAttribute: public virtual IAssertionAttribute {
 private:
   std::string lastError;
-  bool multipleSelection;
   std::string pattern; ///< Qt file dialog style (e.g. "Text (*.txt)")
+  bool multipleSelection;
 
 public:
   FilenameAttribute(const std::string& pattern = "All (*)", bool multipleSelection = false);
