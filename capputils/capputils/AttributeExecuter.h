@@ -1,12 +1,13 @@
-/*
- * AttributeExecuter.h
+/**
+ * \brief Contains the \c AttributeExecuter class
+ * \file AttributeExecuter.h
  *
- *  Created on: Mar 2, 2011
- *      Author: tombr
+ * \date Mar 2, 2011
+ * \author Tom Brosch
  */
 
-#ifndef ATTRIBUTEEXECUTER_H_
-#define ATTRIBUTEEXECUTER_H_
+#ifndef CAPPUTILS_ATTRIBUTEEXECUTER_H_
+#define CAPPUTILS_ATTRIBUTEEXECUTER_H_
 
 #include "capputils.h"
 #include "ReflectableClass.h"
@@ -15,13 +16,30 @@ namespace capputils {
 
 namespace attributes {
 
+/**
+ * \brief Used internally in conjunction with the \c ExecutableAttribute
+ *
+ * This class is used to invoke \c executeBefore() and \c executeAfter() methods before and after
+ * a property has been set using the appropriate setter method.
+ */
 class CAPPUTILS_API AttributeExecuter {
 public:
-  AttributeExecuter();
-  virtual ~AttributeExecuter();
 
+  /**
+   * \brief Invokes the \c executeBefore() method of \c ExecutableAttributes
+   *
+   * \param[in] object    Object having the property \a property
+   * \param[in] property  Property whose executable attributes are about to be executed.
+   */
   static void ExecuteBefore(reflection::ReflectableClass& object,
       const reflection::IClassProperty& property);
+
+  /**
+     * \brief Invokes the \c executeAfter() method of \c ExecutableAttributes
+     *
+     * \param[in] object    Object having the property \a property
+     * \param[in] property  Property whose executable attributes are about to be executed.
+     */
   static void ExecuteAfter(reflection::ReflectableClass& object,
         const reflection::IClassProperty& property);
 };
@@ -30,4 +48,4 @@ public:
 
 }
 
-#endif /* ATTRIBUTEEXECUTER_H_ */
+#endif /* CAPPUTILS_ATTRIBUTEEXECUTER_H_ */

@@ -1,7 +1,15 @@
+/**
+ * \brief Contains the \c ClassProperty class and several \c Converter templates
+ * \file ClassProperty.h
+ *
+ * \date Jan 7, 2011
+ * \author Tom Brosch
+ */
+
 #pragma once
 
-#ifndef _CLASSPROPERTY_H_
-#define _CLASSPROPERTY_H_
+#ifndef CAPPUTILS_CLASSPROPERTY_H_
+#define CAPPUTILS_CLASSPROPERTY_H_
 
 #include "IClassProperty.h"
 
@@ -19,9 +27,25 @@ namespace reflection {
 
 class ReflectableClass;
 
+/**
+ * \brief Basic template for a \c Converter.
+ *
+ * \c Converters are used to convert the value
+ * of a property to a string and vice versa. The \c fromString() method need not to exists.
+ * This is handled by the template value parameter \c fromMethod which defaults to \c true.
+ */
 template<class T, bool fromMethod = true>
 class Converter {
 public:
+  /**
+   * \brief Converts a string to a value of type \c T
+   *
+   * \param[in] value Value as a \c std::string
+   * \returns   The value as an instance of type \c T.
+   *
+   * This method uses a \c std::stringstream for the conversion. This works for all
+   * types which implement the \c >> operator.
+   */
   static T fromString(const std::string& value) {
     T result;
     std::stringstream s(value);
@@ -29,6 +53,15 @@ public:
     return result;
   }
 
+  /**
+   * \brief Converts a value of type \c T to a \c std::string
+   *
+   * \param[in] value Value of type \c T
+   * \return    The value as a \c std::string.
+   *
+   * This method uses a \c std::stringstream for the conversion. This works for all
+   * types which implement the \c << operator.
+   */
   static std::string toString(const T& value) {
     std::stringstream s;
     s << value;
@@ -36,9 +69,26 @@ public:
   }
 };
 
+/**
+ * \brief Specialized \c Converter template without the \c fromString() method.
+ *
+ * Templates not featuring a \c fromString() method are used to convert pointers,
+ * since it is not possible to create an instance of the correct type without further
+ * type information. Furthermore, properties with a pointer type could be a pointer to
+ * an abstract class.
+ */
 template<class T>
 class Converter<T, false> {
 public:
+  /**
+   * \brief Converts a value of type \c T to a \c std::string
+   *
+   * \param[in] value Value of type \c T
+   * \return    The value as a \c std::string.
+   *
+   * This method uses a \c std::stringstream for the conversion. This works for all
+   * types which implement the \c << operator.
+   */
   static std::string toString(const T& value) {
     std::stringstream s;
     s << value;
@@ -60,9 +110,22 @@ public:
   }
 };*/
 
+/**
+ * \brief Generic converter to convert from and to a \c std::vector<T>
+ */
 template<class T>
 class Converter<std::vector<T>, true> {
 public:
+
+  /**
+   * \brief Converts from a \c std::string to a \c std::vector<T>.
+   *
+   * \param[in] value Values as a \c std::string.
+   * \return    A \c std::vector containing the parsed values.
+   *
+   * A stringstream is used to divide the input string into substring. The \c Converter<T>
+   * class is used to convert the substring to their values.
+   */
   static std::vector<T> fromString(const std::string& value) {
     std::string result;
     std::stringstream s(value);
@@ -74,6 +137,12 @@ public:
     return vec;
   }
 
+  /**
+   * \brief Converts a vector of values into a single string. Values are separated by spaces.
+   *
+   * \param[in] value Vector containing the values
+   * \return    A string representation of the input values.
+   */
   static std::string toString(const std::vector<T>& value) {
     std::stringstream s;
     if (value.size())
@@ -84,9 +153,18 @@ public:
   }
 };
 
+/**
+ * \brief Specialized template of the vector converter without a \c fromString() method.
+ */
 template<class T>
 class Converter<std::vector<T>, false> {
 public:
+  /**
+   * \brief Converts a vector of values into a single string. Values are separated by spaces.
+   *
+   * \param[in] value Vector containing the values
+   * \return    A string representation of the input values.
+   */
   static std::string toString(const std::vector<T>& value) {
     std::stringstream s;
     if (value.size())
@@ -97,18 +175,41 @@ public:
   }
 };
 
+/**
+ * \brief Specialized \c Converter template for strings.
+ *
+ * This is necessary in order to keep white spaces in strings.
+ */
 template<>
 class Converter<std::string> {
 public:
+  /**
+   * \Brief Returns a copy of the string
+   *
+   * \param[in] value Value as a string
+   * \return    Copy of \a value.
+   */
   static std::string fromString(const std::string& value) {
     return std::string(value);
   }
 
+  /**
+   * \Brief Returns a copy of the string
+   *
+   * \param[in] value Value as a string
+   * \return    Copy of \a value.
+   */
   static std::string toString(const std::string& value) {
     return std::string(value);
   }
 };
 
+/**
+ * \brief Specialized converter to convert a vector of string
+ *
+ * Unlike the general vector converter, values are separated by white spaces and enclosed
+ * in quotation marks. This allows for white spaces in strings.
+ */
 template<>
 class Converter<std::vector<std::string>, true> {
 public:
@@ -157,21 +258,47 @@ public:
   }
 };
 
+/**
+ * \brief Models the property concept of a class
+ *
+ * A property of a class is a field of a class and associated setter and getter methods.
+ * All three components are part of the class. A class property object provides the mapping
+ * between class name and according getter and setter methods. It therefore contains field
+ * for the property name and pointers to the static variants of the getter and setter methods.
+ * The pointers to the static getter and setter methods might be removed in the future and replaced
+ * by pointers to member functions.
+ *
+ * In addition, a class property contains a set of attributes which are stored in a vector of
+ * type IAttribute*.
+ */
 template<class T>
 class ClassProperty : public virtual IClassProperty
 {
 private:
-  std::string name;
-  std::vector<attributes::IAttribute*> attributes;
+  std::string name;                                             ///< Name of the property
+  std::vector<attributes::IAttribute*> attributes;              ///< Vector with property attributes
 
-  T (*getValueFunc) (const ReflectableClass& object);
-  void (*setValueFunc) (ReflectableClass& object, T value);
+  T (*getValueFunc) (const ReflectableClass& object);           ///< Pointer to the static getter method.
+  void (*setValueFunc) (ReflectableClass& object, T value);     ///< Pointer to the static setter method.
 
-  mutable T value;
+  //mutable T value;
 
 public:
   /* The last parameter is a list of IAttribute* which must be terminated
    * by null.
+   */
+  /**
+   * \brief Creates a new instance of \c ClassProperty
+   *
+   * \param[in] name        Name of the property
+   * \param[in] getValue    Pointer to the static getter method.
+   * \param[in] setValue    Pointer to the static setter method.
+   * \param[in] attributes  Null terminated list of AttributeWrapper*.
+   *
+   * The list of attributes must be terminated by null. Since variable argument
+   * lists are a plain C feature, type information is lost when reading the arguments.
+   * Hence the type of the arguments must be known. That is the reason why every
+   * attribute is wrapped in an instance of \c AttributeWrapper.
    */
   ClassProperty(const std::string& name,
       T (*getValue) (const ReflectableClass& object),
@@ -365,4 +492,4 @@ public:
 
 }
 
-#endif
+#endif /* CAPPUTILS_CLASSPROPERTY_H_ */

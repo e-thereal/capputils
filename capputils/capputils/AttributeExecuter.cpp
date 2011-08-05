@@ -16,12 +16,6 @@ namespace capputils {
 
 namespace attributes {
 
-AttributeExecuter::AttributeExecuter() {
-}
-
-AttributeExecuter::~AttributeExecuter() {
-}
-
 void AttributeExecuter::ExecuteBefore(ReflectableClass& object, const IClassProperty& property) {
   vector<IAttribute*> attributes = property.getAttributes();
   for (unsigned j = 0; j < attributes.size(); ++j) {

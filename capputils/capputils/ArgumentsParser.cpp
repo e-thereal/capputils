@@ -21,13 +21,6 @@ namespace capputils {
 using namespace reflection;
 using namespace attributes;
 
-ArgumentsParser::ArgumentsParser() {
-}
-
-ArgumentsParser::~ArgumentsParser() {
-
-}
-
 void ArgumentsParser::Parse(ReflectableClass& object, int argc, char** argv) {
   for (int i = 0; i < argc; ++i) {
     if (!strncmp(argv[i], "--", 2)) {

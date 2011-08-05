@@ -1,16 +1,16 @@
 /**
- * \brief Contains the class declaration of ReflecableClass and some useful makros
+ * \brief Contains the class declaration of ReflecableClass and some useful macros
  * \file ReflectableClass.h
  *
- *  Created on: Jan 7, 2011
+ *  \date   Jan 7, 2011
  *  \author Tom Brosch
  *  
  *  You must call InitReflectableClass and BeginProperyDefintions and EndPropertyDefinitions.
  *  See example for help. (minimal class)
  */
 
-#ifndef REFLECTABLECLASS_H_
-#define REFLECTABLECLASS_H_
+#ifndef CAPPUTILS_REFLECTABLECLASS_H_
+#define CAPPUTILS_REFLECTABLECLASS_H_
 
 #define CAPPUTILS_USE_CPP0x
 
@@ -340,4 +340,4 @@ protected: \
 #endif
 #define EndPropertyDefinitions initialized = true; }
 
-#endif /* XMLIZER_H_ */
+#endif /* CAPPUTILS_REFLECTABLECLASS_H_ */
