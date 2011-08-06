@@ -28,7 +28,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -75,6 +74,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="contents">
 <!-- doxytag: class="capputils::reflection::Converter&lt; std::vector&lt; T &gt;, true &gt;" -->
+<p>Generic converter to convert from and to a <code>std::vector&lt;T&gt;</code>  
+ <a href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1vector_3_01_t_01_4_00_01true_01_4.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_class_property_8h_source.html">ClassProperty.h</a>&gt;</code></p>
 
 <p><a href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1vector_3_01_t_01_4_00_01true_01_4-members.html">List of all members.</a></p>
@@ -82,12 +84,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static std::vector&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1vector_3_01_t_01_4_00_01true_01_4.html#a520633ea5baa46b60d7400b1ba37c479">fromString</a> (const std::string &amp;value)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts from a <code>std::string</code> to a <code>std::vector&lt;T&gt;</code>.  <a href="#a520633ea5baa46b60d7400b1ba37c479"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1vector_3_01_t_01_4_00_01true_01_4.html#afa1a1e17801d669e1ef4aff5b7aa085c">toString</a> (const std::vector&lt; T &gt; &amp;value)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a vector of values into a single string. Values are separated by spaces.  <a href="#afa1a1e17801d669e1ef4aff5b7aa085c"></a><br/></td></tr>
 </table>
-<h3>template&lt;class T&gt;<br/>
- class capputils::reflection::Converter&lt; std::vector&lt; T &gt;, true &gt;</h3>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><h3>template&lt;class T&gt;<br/>
+class capputils::reflection::Converter&lt; std::vector&lt; T &gt;, true &gt;</h3>
 
-<hr/><h2>Member Function Documentation</h2>
+<p>Generic converter to convert from and to a <code>std::vector&lt;T&gt;</code> </p>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a520633ea5baa46b60d7400b1ba37c479"></a><!-- doxytag: member="capputils::reflection::Converter&lt; std::vector&lt; T &gt;, true &gt;::fromString" ref="a520633ea5baa46b60d7400b1ba37c479" args="(const std::string &amp;value)" -->
 <div class="memitem">
 <div class="memproto">
@@ -104,6 +110,16 @@ template&lt;class T &gt; </div>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Converts from a <code>std::string</code> to a <code>std::vector&lt;T&gt;</code>. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>Values as a <code>std::string</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>A <code>std::vector</code> containing the parsed values.</dd></dl>
+<p>A stringstream is used to divide the input string into substring. The <code>Converter&lt;T&gt;</code> class is used to convert the substring to their values. </p>
 
 </div>
 </div>
@@ -124,6 +140,15 @@ template&lt;class T &gt; </div>
 </div>
 <div class="memdoc">
 
+<p>Converts a vector of values into a single string. Values are separated by spaces. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>Vector containing the values </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>A string representation of the input values. </dd></dl>
+
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
@@ -135,7 +160,7 @@ template&lt;class T &gt; </div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -144,7 +169,7 @@ template&lt;class T &gt; </div>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 14:30:03 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Aug 5 2011 17:13:50 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

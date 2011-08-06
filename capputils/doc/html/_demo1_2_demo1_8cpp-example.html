@@ -60,8 +60,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="fragment"><pre class="fragment">
 <span class="comment">/*** Begin: DataModel.h ***/</span>
 
-<span class="preprocessor">#include &lt;<a class="code" href="_reflectable_class_8h.html" title="Contains the class declaration of ReflecableClass and some useful makros.">capputils/ReflectableClass.h</a>&gt;</span>
-<span class="preprocessor">#include &lt;capputils/ArgumentsParser.h&gt;</span>
+<span class="preprocessor">#include &lt;<a class="code" href="_reflectable_class_8h.html" title="Contains the class declaration of ReflecableClass and some useful macros.">capputils/ReflectableClass.h</a>&gt;</span>
+<span class="preprocessor">#include &lt;<a class="code" href="_arguments_parser_8h.html" title="Contains the parser module for command line arguments.">capputils/ArgumentsParser.h</a>&gt;</span>
 
 <span class="keyword">class </span>DataModel : <span class="keyword">public</span> capputils::reflection::ReflectableClass {
   InitReflectableClass(DataModel)
@@ -104,9 +104,9 @@ DataModel::DataModel() : _InputName(&quot;&quot;), _OutputName(&quot;&quot;), _P
 
   DataModel model;
 
-  ArgumentsParser::Parse(model, argc, argv);
+  <a name="a1"></a><a class="code" href="classcapputils_1_1_arguments_parser.html#a5d664a44bb48edeebcc25e73faa5cca0" title="Parses command line arguments and sets the properties of a class accordingly.">ArgumentsParser::Parse</a>(model, argc, argv);
   <span class="keywordflow">if</span> (model.getHelp()) {
-    ArgumentsParser::PrintDefaultUsage(<span class="stringliteral">&quot;Demo1&quot;</span>, model);
+    <a name="a2"></a><a class="code" href="classcapputils_1_1_arguments_parser.html#aaf414f5cff608add16ad130c75a58915" title="Prints a usage message to standard output with a default header.">ArgumentsParser::PrintDefaultUsage</a>(<span class="stringliteral">&quot;Demo1&quot;</span>, model);
     <span class="keywordflow">return</span> 0;
   }
 
@@ -132,7 +132,7 @@ DataModel::DataModel() : _InputName(&quot;&quot;), _OutputName(&quot;&quot;), _P
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 15:36:19 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Aug 5 2011 17:13:50 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

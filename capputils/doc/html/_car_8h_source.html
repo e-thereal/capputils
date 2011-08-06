@@ -72,51 +72,52 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00009"></a>00009 <span class="preprocessor"></span><span class="preprocessor">#define CAR_H_</span>
 <a name="l00010"></a>00010 <span class="preprocessor"></span>
 <a name="l00011"></a>00011 <span class="preprocessor">#include &lt;capputils/Enumerators.h&gt;</span>
-<a name="l00012"></a>00012 <span class="preprocessor">#include &lt;<a class="code" href="_reflectable_class_8h.html" title="Contains the class declaration of ReflecableClass and some useful makros.">capputils/ReflectableClass.h</a>&gt;</span>
+<a name="l00012"></a>00012 <span class="preprocessor">#include &lt;<a class="code" href="_reflectable_class_8h.html" title="Contains the class declaration of ReflecableClass and some useful macros.">capputils/ReflectableClass.h</a>&gt;</span>
 <a name="l00013"></a>00013 <span class="preprocessor">#include &lt;capputils/ObservableClass.h&gt;</span>
 <a name="l00014"></a>00014 <span class="preprocessor">#include &lt;vector&gt;</span>
 <a name="l00015"></a>00015 <span class="preprocessor">#include &lt;string&gt;</span>
 <a name="l00016"></a>00016 <span class="preprocessor">#include &lt;capputils/TimedClass.h&gt;</span>
-<a name="l00017"></a>00017 
-<a name="l00018"></a>00018 <span class="preprocessor">#include &lt;capputils/Enumerators.h&gt;</span>
-<a name="l00019"></a>00019 
-<a name="l00020"></a>00020 <span class="preprocessor">#include &quot;Person.h&quot;</span>
-<a name="l00021"></a>00021 
-<a name="l00022"></a>00022 ReflectableEnum(Engine, NoEngine, Diesel, Gas);
-<a name="l00023"></a>00023 
-<a name="l00024"></a>00024 <span class="keyword">class </span>EngineDescription : <span class="keyword">public</span> capputils::reflection::ReflectableClass {
-<a name="l00025"></a>00025 
-<a name="l00026"></a>00026   InitReflectableClass(EngineDescription)
-<a name="l00027"></a>00027 
-<a name="l00028"></a>00028   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(CylinderCount, <span class="keywordtype">int</span>)
-<a name="l00029"></a>00029   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(PS, <span class="keywordtype">int</span>)
-<a name="l00030"></a>00030   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(Model, Engine)
-<a name="l00031"></a>00031 
-<a name="l00032"></a>00032 public:
-<a name="l00033"></a>00033   EngineDescription();
-<a name="l00034"></a>00034   virtual ~EngineDescription();
-<a name="l00035"></a>00035 };
-<a name="l00036"></a>00036 
-<a name="l00037"></a>00037 class Car : public capputils::reflection::ReflectableClass,
-<a name="l00038"></a>00038             public capputils::ObservableClass,
-<a name="l00039"></a>00039             public capputils::TimedClass
-<a name="l00040"></a>00040 {
-<a name="l00041"></a>00041   InitReflectableClass(Car)
-<a name="l00042"></a>00042 
-<a name="l00043"></a>00043   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(DoorCount, <span class="keywordtype">int</span>)
-<a name="l00044"></a>00044   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(HighSpeed, <span class="keywordtype">float</span>)
-<a name="l00045"></a>00045   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(ModelName, std::<span class="keywordtype">string</span>)
-<a name="l00046"></a>00046   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(Help, <span class="keywordtype">bool</span>)
-<a name="l00047"></a>00047   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(Engine, EngineDescription*)
-<a name="l00048"></a>00048   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(Owners, std::vector&lt;Person*&gt;*)
-<a name="l00049"></a>00049   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(SetOnCompilation, <span class="keywordtype">int</span>)
-<a name="l00050"></a>00050 
-<a name="l00051"></a>00051 public:
-<a name="l00052"></a>00052   Car();
-<a name="l00053"></a>00053   virtual ~Car();
-<a name="l00054"></a>00054 };
-<a name="l00055"></a>00055 
-<a name="l00056"></a>00056 <span class="preprocessor">#endif </span><span class="comment">/* CAR_H_ */</span>
+<a name="l00017"></a>00017 <span class="preprocessor">#include &lt;boost/shared_ptr.hpp&gt;</span>
+<a name="l00018"></a>00018 
+<a name="l00019"></a>00019 <span class="preprocessor">#include &lt;capputils/Enumerators.h&gt;</span>
+<a name="l00020"></a>00020 
+<a name="l00021"></a>00021 <span class="preprocessor">#include &quot;Person.h&quot;</span>
+<a name="l00022"></a>00022 
+<a name="l00023"></a>00023 ReflectableEnum(Engine, NoEngine, Diesel, Gas);
+<a name="l00024"></a>00024 
+<a name="l00025"></a>00025 <span class="keyword">class </span>EngineDescription : <span class="keyword">public</span> capputils::reflection::ReflectableClass {
+<a name="l00026"></a>00026 
+<a name="l00027"></a>00027   InitReflectableClass(EngineDescription)
+<a name="l00028"></a>00028 
+<a name="l00029"></a>00029   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(CylinderCount, <span class="keywordtype">int</span>)
+<a name="l00030"></a>00030   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(PS, <span class="keywordtype">int</span>)
+<a name="l00031"></a>00031   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(Model, Engine)
+<a name="l00032"></a>00032 
+<a name="l00033"></a>00033 public:
+<a name="l00034"></a>00034   EngineDescription();
+<a name="l00035"></a>00035   virtual ~EngineDescription();
+<a name="l00036"></a>00036 };
+<a name="l00037"></a>00037 
+<a name="l00038"></a>00038 class Car : public capputils::reflection::ReflectableClass,
+<a name="l00039"></a>00039             public capputils::ObservableClass,
+<a name="l00040"></a>00040             public capputils::TimedClass
+<a name="l00041"></a>00041 {
+<a name="l00042"></a>00042   InitReflectableClass(Car)
+<a name="l00043"></a>00043 
+<a name="l00044"></a>00044   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(DoorCount, <span class="keywordtype">int</span>)
+<a name="l00045"></a>00045   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(HighSpeed, <span class="keywordtype">float</span>)
+<a name="l00046"></a>00046   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(ModelName, std::<span class="keywordtype">string</span>)
+<a name="l00047"></a>00047   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(Help, <span class="keywordtype">bool</span>)
+<a name="l00048"></a>00048   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(Engine, boost::shared_ptr&lt;EngineDescription&gt;)
+<a name="l00049"></a>00049   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(Owners, boost::shared_ptr&lt;std::vector&lt; boost::shared_ptr&lt;Person&gt; &gt; &gt;)
+<a name="l00050"></a>00050   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(SetOnCompilation, <span class="keywordtype">int</span>)
+<a name="l00051"></a>00051 
+<a name="l00052"></a>00052 public:
+<a name="l00053"></a>00053   Car();
+<a name="l00054"></a>00054   virtual ~Car();
+<a name="l00055"></a>00055 };
+<a name="l00056"></a>00056 
+<a name="l00057"></a>00057 <span class="preprocessor">#endif </span><span class="comment">/* CAR_H_ */</span>
 </pre></div></div>
 </div>
 <!-- window showing the filter options -->
@@ -133,7 +134,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 15:36:19 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Aug 5 2011 17:13:50 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

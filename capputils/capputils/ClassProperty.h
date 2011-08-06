@@ -184,7 +184,7 @@ template<>
 class Converter<std::string> {
 public:
   /**
-   * \Brief Returns a copy of the string
+   * \brief Returns a copy of the string
    *
    * \param[in] value Value as a string
    * \return    Copy of \a value.
@@ -194,7 +194,7 @@ public:
   }
 
   /**
-   * \Brief Returns a copy of the string
+   * \brief Returns a copy of the string
    *
    * \param[in] value Value as a string
    * \return    Copy of \a value.

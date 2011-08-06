@@ -67,7 +67,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="contents">
 
-<p>Contains the class declaration of ReflecableClass and some useful makros.  
+<p>Contains the class declaration of ReflecableClass and some useful macros.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;sstream&gt;</code><br/>
 <code>#include &lt;string&gt;</code><br/>
@@ -77,8 +77,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;istream&gt;</code><br/>
 <code>#include &quot;capputils.h&quot;</code><br/>
 <code>#include &quot;IAttribute.h&quot;</code><br/>
-<code>#include &quot;ClassProperty.h&quot;</code><br/>
-<code>#include &quot;AttributeExecuter.h&quot;</code><br/>
+<code>#include &quot;<a class="el" href="_class_property_8h_source.html">ClassProperty.h</a>&quot;</code><br/>
+<code>#include &quot;<a class="el" href="_attribute_executer_8h_source.html">AttributeExecuter.h</a>&quot;</code><br/>
 <code>#include &quot;ReflectableAttribute.h&quot;</code><br/>
 <code>#include &quot;ReflectableClassFactory.h&quot;</code><br/>
 </div>
@@ -106,8 +106,8 @@ Defines</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares a property.  <a href="#a141cc4c043a592450c332d3512d211da"></a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><p>Contains the class declaration of ReflecableClass and some useful makros. </p>
-<p>Created on: Jan 7, 2011 </p>
+<div class="textblock"><p>Contains the class declaration of ReflecableClass and some useful macros. </p>
+<dl class="date"><dt><b>Date:</b></dt><dd>Jan 7, 2011 </dd></dl>
 <dl class="author"><dt><b>Author:</b></dt><dd>Tom Brosch</dd></dl>
 <p>You must call InitReflectableClass and BeginProperyDefintions and EndPropertyDefinitions. See example for help. (minimal class) </p>
 </div><hr/><h2>Define Documentation</h2>
@@ -138,7 +138,7 @@ Defines</h2></td></tr>
 <b>Value:</b><div class="fragment"><pre class="fragment"><span class="keyword">private</span>: type _##name; \
 <span class="keyword">public</span>: \
   type <span class="keyword">get</span>##name()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> _##name; } \
-  <span class="keywordtype">void</span> <span class="keyword">set</span>##name(type value) { static ::capputils::reflection::IClassProperty* <span class="keyword">property</span> = findProperty(#name); ::capputils::attributes::AttributeExecuter::ExecuteBefore(*<span class="keyword">this</span>, *property); _##name = value; ::capputils::attributes::AttributeExecuter::ExecuteAfter(*<span class="keyword">this</span>, *property); } \
+  <span class="keywordtype">void</span> <span class="keyword">set</span>##name(type value) { static ::capputils::reflection::IClassProperty* <span class="keyword">property</span> = findProperty(#name);<a class="code" href="classcapputils_1_1attributes_1_1_attribute_executer.html#ae060b1b56421a4fd0519c036f7665a1f" title="Invokes the executeBefore() method of ExecutableAttributes."> ::capputils::attributes::AttributeExecuter::ExecuteBefore</a>(*<span class="keyword">this</span>, *property); _##name = value;<a class="code" href="classcapputils_1_1attributes_1_1_attribute_executer.html#af0af49420c164adc15986446ae36248e" title="Invokes the executeAfter() method of ExecutableAttributes."> ::capputils::attributes::AttributeExecuter::ExecuteAfter</a>(*<span class="keyword">this</span>, *property); } \
 <span class="keyword">protected</span>: \
   <span class="keyword">static</span> <span class="keywordtype">void</span> <span class="keyword">set</span>##name(::<a class="code" href="classcapputils_1_1reflection_1_1_reflectable_class.html" title="Base class of all reflectable classes.">capputils::reflection::ReflectableClass</a>&amp; <span class="keywordtype">object</span>, type value) { <span class="keyword">dynamic_cast&lt;</span>ClassType*<span class="keyword">&gt;</span>(&amp;object)-&gt;<span class="keyword">set</span>##name(value); } \
   <span class="keyword">static</span> type <span class="keyword">get</span>##name(const ::capputils::reflection::ReflectableClass&amp; <span class="keywordtype">object</span>) { <span class="keywordflow">return</span> <span class="keyword">dynamic_cast&lt;</span><span class="keyword">const </span>ClassType*<span class="keyword">&gt;</span>(&amp;object)-&gt;<span class="keyword">get</span>##name(); }
@@ -169,7 +169,7 @@ Defines</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 15:36:19 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Aug 5 2011 17:13:50 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

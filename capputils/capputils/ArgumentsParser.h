@@ -3,7 +3,7 @@
  * \file ArgumentsParser.h
  *
  *  \date Feb 10, 2011
- *  \auther Tom Brosch
+ *  \author Tom Brosch
  */
 
 #ifndef CAPPUTILS_ARGUMENTSPARSER_H_

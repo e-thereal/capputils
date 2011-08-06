@@ -28,7 +28,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -62,67 +61,37 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="nav-path" class="navpath">
     <ul>
       <li class="navelem"><a class="el" href="namespacecapputils.html">capputils</a>      </li>
-      <li class="navelem"><a class="el" href="namespacecapputils_1_1attributes.html">attributes</a>      </li>
+      <li class="navelem"><b>attributes</b>      </li>
       <li class="navelem"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_executer.html">AttributeExecuter</a>      </li>
     </ul>
   </div>
 </div>
 <div class="header">
   <div class="summary">
-<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">capputils::attributes::AttributeExecuter Class Reference</div>  </div>
 </div>
 <div class="contents">
 <!-- doxytag: class="capputils::attributes::AttributeExecuter" -->
+<p>Used internally in conjunction with the <code>ExecutableAttribute</code>.  
+ <a href="classcapputils_1_1attributes_1_1_attribute_executer.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_attribute_executer_8h_source.html">AttributeExecuter.h</a>&gt;</code></p>
 
 <p><a href="classcapputils_1_1attributes_1_1_attribute_executer-members.html">List of all members.</a></p>
 <table class="memberdecls">
-<tr><td colspan="2"><h2><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_executer.html#af5f47bfe6b226b74c550a6c7664b35fb">AttributeExecuter</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_executer.html#ae1d1b2eef2f9cec4ffb228ce7ceee3a4">~AttributeExecuter</a> ()</td></tr>
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_executer.html#ae060b1b56421a4fd0519c036f7665a1f">ExecuteBefore</a> (<a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">reflection::ReflectableClass</a> &amp;object, const <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">reflection::IClassProperty</a> &amp;property)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Invokes the <code>executeBefore()</code> method of <code>ExecutableAttributes</code>.  <a href="#ae060b1b56421a4fd0519c036f7665a1f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_executer.html#af0af49420c164adc15986446ae36248e">ExecuteAfter</a> (<a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">reflection::ReflectableClass</a> &amp;object, const <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">reflection::IClassProperty</a> &amp;property)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Invokes the <code>executeAfter()</code> method of <code>ExecutableAttributes</code>.  <a href="#af0af49420c164adc15986446ae36248e"></a><br/></td></tr>
 </table>
-<hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="af5f47bfe6b226b74c550a6c7664b35fb"></a><!-- doxytag: member="capputils::attributes::AttributeExecuter::AttributeExecuter" ref="af5f47bfe6b226b74c550a6c7664b35fb" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">capputils::attributes::AttributeExecuter::AttributeExecuter </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae1d1b2eef2f9cec4ffb228ce7ceee3a4"></a><!-- doxytag: member="capputils::attributes::AttributeExecuter::~AttributeExecuter" ref="ae1d1b2eef2f9cec4ffb228ce7ceee3a4" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">capputils::attributes::AttributeExecuter::~AttributeExecuter </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>Used internally in conjunction with the <code>ExecutableAttribute</code>. </p>
+<p>This class is used to invoke <code>executeBefore()</code> and <code>executeAfter()</code> methods before and after a property has been set using the appropriate setter method. </p>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="af0af49420c164adc15986446ae36248e"></a><!-- doxytag: member="capputils::attributes::AttributeExecuter::ExecuteAfter" ref="af0af49420c164adc15986446ae36248e" args="(reflection::ReflectableClass &amp;object, const reflection::IClassProperty &amp;property)" -->
 <div class="memitem">
 <div class="memproto">
@@ -147,6 +116,15 @@ Static Public Member Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Invokes the <code>executeAfter()</code> method of <code>ExecutableAttributes</code>. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">object</td><td>Object having the property <em>property</em> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">property</td><td>Property whose executable attributes are about to be executed. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -175,11 +153,20 @@ Static Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Invokes the <code>executeBefore()</code> method of <code>ExecutableAttributes</code>. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">object</td><td>Object having the property <em>property</em> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">property</td><td>Property whose executable attributes are about to be executed. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>capputils/<a class="el" href="_attribute_executer_8h_source.html">AttributeExecuter.h</a></li>
-<li>capputils/<a class="el" href="_attribute_executer_8cpp.html">AttributeExecuter.cpp</a></li>
+<li>capputils/AttributeExecuter.cpp</li>
 </ul>
 </div>
 <!-- window showing the filter options -->
@@ -187,7 +174,7 @@ Static Public Member Functions</h2></td></tr>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -196,7 +183,7 @@ Static Public Member Functions</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 14:30:02 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Aug 5 2011 17:13:50 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

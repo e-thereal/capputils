@@ -86,7 +86,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::vector<br class="typebreak"/>
-&lt; IClassProperty * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a59fc62b722d79d5b0e0827a295406d41">getProperties</a> () const =0</td></tr>
+&lt; <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">IClassProperty</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a59fc62b722d79d5b0e0827a295406d41">getProperties</a> () const =0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns all properties of the class including properties of all of its base classes.  <a href="#a59fc62b722d79d5b0e0827a295406d41"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::vector<br class="typebreak"/>
 &lt; ::capputils::attributes::IAttribute * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a42e170cc2eee78959a37539374490590">getAttributes</a> () const =0</td></tr>
@@ -97,8 +97,10 @@ Public Member Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Overload this method to provide a customized way of writing a class to a stream.  <a href="#ae9e5a6212b882b29b80d2fb319525a2a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7b93c19d1b847fcf5f83fa9e28ad4b38">fromStream</a> (std::istream &amp;stream)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Overload this method to provide a customized way of reading a class from a stream.  <a href="#a7b93c19d1b847fcf5f83fa9e28ad4b38"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">IClassProperty *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7d811637be82d8b3396b8d256d6dc1e2">findProperty</a> (const std::string &amp;propertyName) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">IClassProperty</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7d811637be82d8b3396b8d256d6dc1e2">findProperty</a> (const std::string &amp;propertyName) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the pointer to a class property given its name.  <a href="#a7d811637be82d8b3396b8d256d6dc1e2"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a73a2f9c66865e610f3d7531ea1edb4fc">getPropertyIndex</a> (unsigned &amp;index, const std::string &amp;propertyName) const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the index of a property given its name.  <a href="#a73a2f9c66865e610f3d7531ea1edb4fc"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a5216875d2e539f6040958f7dc751ab34">hasProperty</a> (const std::string &amp;propertyName) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true of the current class has a property of the given name.  <a href="#a5216875d2e539f6040958f7dc751ab34"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#afa00c2f29cfed1ba4c85169be685b05b">setProperty</a> (const std::string &amp;propertyName, const std::string &amp;propertyValue)</td></tr>
@@ -117,7 +119,7 @@ Public Member Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">IClassProperty * capputils::reflection::ReflectableClass::findProperty </td>
+          <td class="memname"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">IClassProperty</a> * capputils::reflection::ReflectableClass::findProperty </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>propertyName</em></td><td>)</td>
@@ -240,7 +242,7 @@ template&lt;class AT &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual std::vector&lt;IClassProperty*&gt;&amp; capputils::reflection::ReflectableClass::getProperties </td>
+          <td class="memname">virtual std::vector&lt;<a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">IClassProperty</a>*&gt;&amp; capputils::reflection::ReflectableClass::getProperties </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [pure virtual]</code></td>
@@ -281,6 +283,43 @@ template&lt;class AT &gt; </div>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>Value of the property as a string </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a73a2f9c66865e610f3d7531ea1edb4fc"></a><!-- doxytag: member="capputils::reflection::ReflectableClass::getPropertyIndex" ref="a73a2f9c66865e610f3d7531ea1edb4fc" args="(unsigned &amp;index, const std::string &amp;propertyName) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool capputils::reflection::ReflectableClass::getPropertyIndex </td>
+          <td>(</td>
+          <td class="paramtype">unsigned &amp;&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>propertyName</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Returns the index of a property given its name. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">index</td><td>Will be set to the index of the property if a property with the given name exists. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">propertyName</td><td>Name of the property</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>true iff a property with the given name could be found. </dd></dl>
 
 </div>
 </div>
@@ -344,7 +383,7 @@ template&lt;class AT &gt; </div>
   </dd>
 </dl>
 <dl class="remark"><dt><b>Remarks:</b></dt><dd><ul>
-<li>This method is not type-safe. Use <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7d811637be82d8b3396b8d256d6dc1e2" title="Returns the pointer to a class property given its name.">findProperty()</a> and use one of the type-safe setters of IClassProperty to set the value safely. </li>
+<li>This method is not type-safe. Use <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7d811637be82d8b3396b8d256d6dc1e2" title="Returns the pointer to a class property given its name.">findProperty()</a> and use one of the type-safe setters of <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html" title="Models the property concept of a class.">IClassProperty</a> to set the value safely. </li>
 </ul>
 </dd></dl>
 
@@ -394,7 +433,7 @@ template&lt;class AT &gt; </div>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 15:36:19 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Aug 5 2011 17:13:50 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

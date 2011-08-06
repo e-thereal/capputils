@@ -28,7 +28,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -75,6 +74,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="contents">
 <!-- doxytag: class="capputils::reflection::Converter" -->
+<p>Basic template for a <code><a class="el" href="classcapputils_1_1reflection_1_1_converter.html" title="Basic template for a Converter.">Converter</a></code>.  
+ <a href="classcapputils_1_1reflection_1_1_converter.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_class_property_8h_source.html">ClassProperty.h</a>&gt;</code></p>
 
 <p><a href="classcapputils_1_1reflection_1_1_converter-members.html">List of all members.</a></p>
@@ -82,12 +84,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr><td colspan="2"><h2><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_converter.html#ab1988dfee1d756a233eb84d3480d22fa">fromString</a> (const std::string &amp;value)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a string to a value of type <code>T</code>.  <a href="#ab1988dfee1d756a233eb84d3480d22fa"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_converter.html#a609c3bee9a50193b6b7c30aeee36e2be">toString</a> (const T &amp;value)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a value of type <code>T</code> to a <code>std::string</code>.  <a href="#a609c3bee9a50193b6b7c30aeee36e2be"></a><br/></td></tr>
 </table>
-<h3>template&lt;class T, bool fromMethod = true&gt;<br/>
- class capputils::reflection::Converter&lt; T, fromMethod &gt;</h3>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><h3>template&lt;class T, bool fromMethod = true&gt;<br/>
+class capputils::reflection::Converter&lt; T, fromMethod &gt;</h3>
 
-<hr/><h2>Member Function Documentation</h2>
+<p>Basic template for a <code><a class="el" href="classcapputils_1_1reflection_1_1_converter.html" title="Basic template for a Converter.">Converter</a></code>. </p>
+<p><code>Converters</code> are used to convert the value of a property to a string and vice versa. The <code><a class="el" href="classcapputils_1_1reflection_1_1_converter.html#ab1988dfee1d756a233eb84d3480d22fa" title="Converts a string to a value of type T.">fromString()</a></code> method need not to exists. This is handled by the template value parameter <code>fromMethod</code> which defaults to <code>true</code>. </p>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="ab1988dfee1d756a233eb84d3480d22fa"></a><!-- doxytag: member="capputils::reflection::Converter::fromString" ref="ab1988dfee1d756a233eb84d3480d22fa" args="(const std::string &amp;value)" -->
 <div class="memitem">
 <div class="memproto">
@@ -104,6 +111,16 @@ template&lt;class T , bool fromMethod = true&gt; </div>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Converts a string to a value of type <code>T</code>. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>Value as a <code>std::string</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The value as an instance of type <code>T</code>.</dd></dl>
+<p>This method uses a <code>std::stringstream</code> for the conversion. This works for all types which implement the <code>&gt;&gt;</code> operator. </p>
 
 </div>
 </div>
@@ -124,6 +141,16 @@ template&lt;class T , bool fromMethod = true&gt; </div>
 </div>
 <div class="memdoc">
 
+<p>Converts a value of type <code>T</code> to a <code>std::string</code>. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>Value of type <code>T</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The value as a <code>std::string</code>.</dd></dl>
+<p>This method uses a <code>std::stringstream</code> for the conversion. This works for all types which implement the <code>&lt;&lt;</code> operator. </p>
+
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
@@ -135,7 +162,7 @@ template&lt;class T , bool fromMethod = true&gt; </div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -144,7 +171,7 @@ template&lt;class T , bool fromMethod = true&gt; </div>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 14:30:03 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Aug 5 2011 17:13:50 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

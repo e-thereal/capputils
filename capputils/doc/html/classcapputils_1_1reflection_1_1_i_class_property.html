@@ -28,7 +28,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
       <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
@@ -75,6 +74,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="contents">
 <!-- doxytag: class="capputils::reflection::IClassProperty" -->
+<p>Models the property concept of a class.  
+ <a href="classcapputils_1_1reflection_1_1_i_class_property.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_i_class_property_8h_source.html">IClassProperty.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for capputils::reflection::IClassProperty:</div>
@@ -82,14 +84,8 @@ Inheritance diagram for capputils::reflection::IClassProperty:</div>
  <div class="center">
   <img src="classcapputils_1_1reflection_1_1_i_class_property.png" usemap="#capputils::reflection::IClassProperty_map" alt=""/>
   <map id="capputils::reflection::IClassProperty_map" name="capputils::reflection::IClassProperty_map">
-<area href="classcapputils_1_1reflection_1_1_class_property.html" alt="capputils::reflection::ClassProperty&lt; T &gt;" shape="rect" coords="0,56,406,80"/>
-<area href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html" alt="capputils::reflection::ClassProperty&lt; T * &gt;" shape="rect" coords="416,56,822,80"/>
-<area href="classcapputils_1_1reflection_1_1_i_property_iterator.html" alt="capputils::reflection::IPropertyIterator" shape="rect" coords="832,56,1238,80"/>
-<area href="classcapputils_1_1reflection_1_1_class_property.html" alt="capputils::reflection::ClassProperty&lt; ValueType &gt;" shape="rect" coords="1664,56,2070,80"/>
-<area href="classcapputils_1_1reflection_1_1_property_iterator.html" alt="capputils::reflection::PropertyIterator&lt; CollectionType, ValueType &gt;" shape="rect" coords="624,112,1030,136"/>
-<area href="classcapputils_1_1reflection_1_1_property_iterator_3_01_collection_type_01_5_00_01_value_type_01_4.html" alt="capputils::reflection::PropertyIterator&lt; CollectionType *, ValueType &gt;" shape="rect" coords="1040,112,1446,136"/>
-<area href="classcapputils_1_1reflection_1_1_property_iterator.html" alt="capputils::reflection::PropertyIterator&lt; CollectionType, ValueType &gt;" shape="rect" coords="1456,112,1862,136"/>
-<area href="classcapputils_1_1reflection_1_1_property_iterator_3_01_collection_type_01_5_00_01_value_type_01_4.html" alt="capputils::reflection::PropertyIterator&lt; CollectionType *, ValueType &gt;" shape="rect" coords="1872,112,2278,136"/>
+<area href="classcapputils_1_1reflection_1_1_class_property.html" title="Models the property concept of a class." alt="capputils::reflection::ClassProperty&lt; T &gt;" shape="rect" coords="0,56,292,80"/>
+<area href="classcapputils_1_1reflection_1_1_class_property.html" alt="capputils::reflection::ClassProperty&lt; ValueType &gt;" shape="rect" coords="302,56,594,80"/>
 </map>
  </div></div>
 
@@ -97,36 +93,34 @@ Inheritance diagram for capputils::reflection::IClassProperty:</div>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a8febe2452b782d056b7fd6d4481740fb">~IClassProperty</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8febe2452b782d056b7fd6d4481740fb"></a><!-- doxytag: member="capputils::reflection::IClassProperty::~IClassProperty" ref="a8febe2452b782d056b7fd6d4481740fb" args="()" -->
+virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a8febe2452b782d056b7fd6d4481740fb">~IClassProperty</a> ()</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual destructor of an <code><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html" title="Models the property concept of a class.">IClassProperty</a></code>. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual const std::vector<br class="typebreak"/>
-&lt; <a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">attributes::IAttribute</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#aed2def89cfb7276951831298b9eb04d6">getAttributes</a> () const =0</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a08a09a19a47f25a90f95f4669c0fc1b6">addAttribute</a> (<a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">attributes::IAttribute</a> *attribute)=0</td></tr>
+&lt; attributes::IAttribute * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#aed2def89cfb7276951831298b9eb04d6">getAttributes</a> () const =0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns all attributes of a property.  <a href="#aed2def89cfb7276951831298b9eb04d6"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a08a09a19a47f25a90f95f4669c0fc1b6">addAttribute</a> (attributes::IAttribute *attribute)=0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an attribute to the property.  <a href="#a08a09a19a47f25a90f95f4669c0fc1b6"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#ab6777e47440611e8d5e0e84e5c7ead2f">getName</a> () const =0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the property name.  <a href="#ab6777e47440611e8d5e0e84e5c7ead2f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a28a1e3e1ec83adb105b6d78e8ae60470">getStringValue</a> (const <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">ReflectableClass</a> &amp;object) const =0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of the property as a string.  <a href="#a28a1e3e1ec83adb105b6d78e8ae60470"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#ac8bae55a0d416d8c561cec0143272ea4">setStringValue</a> (<a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">ReflectableClass</a> &amp;object, const std::string &amp;value) const =0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the value of a string.  <a href="#ac8bae55a0d416d8c561cec0143272ea4"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#af6d4ade4db9e12eabd1c4625d455a158">setValue</a> (<a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">ReflectableClass</a> &amp;object, const <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">ReflectableClass</a> &amp;fromObject, const <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">IClassProperty</a> *fromProperty)=0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Typed setter method. Reads a value from one property of one object and writes that value to another property of a possibly different object.  <a href="#af6d4ade4db9e12eabd1c4625d455a158"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual const std::type_info &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a623957322e5302f9b102ed07e876c4a5">getType</a> () const =0</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the type of the property value.  <a href="#a623957322e5302f9b102ed07e876c4a5"></a><br/></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;class AT &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">AT *&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a05fd9892ddd0654fe38cf088b424c383">getAttribute</a> () const </td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the first attribute in the attribute list matching the given template type.  <a href="#a05fd9892ddd0654fe38cf088b424c383"></a><br/></td></tr>
 </table>
-<hr/><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a8febe2452b782d056b7fd6d4481740fb"></a><!-- doxytag: member="capputils::reflection::IClassProperty::~IClassProperty" ref="a8febe2452b782d056b7fd6d4481740fb" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual capputils::reflection::IClassProperty::~IClassProperty </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td><code> [inline, virtual]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-</div>
-</div>
-<hr/><h2>Member Function Documentation</h2>
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>Models the property concept of a class. </p>
+<p>A property of a class is a field of a class and associated setter and getter methods. All three components are part of the class. A class property object provides the mapping between class name and according getter and setter methods. It therefore contains field for the property name and pointers to the static variants of the getter and setter methods. The pointers to the static getter and setter methods might be removed in the future and replaced by pointers to member functions.</p>
+<p>In addition, a class property contains a set of attributes which are stored in a vector of type IAttribute*.</p>
+<p>The interface serves as a common base class for all <code><a class="el" href="classcapputils_1_1reflection_1_1_class_property.html" title="Models the property concept of a class.">ClassProperty</a></code> objects. </p>
+</div><hr/><h2>Member Function Documentation</h2>
 <a class="anchor" id="a08a09a19a47f25a90f95f4669c0fc1b6"></a><!-- doxytag: member="capputils::reflection::IClassProperty::addAttribute" ref="a08a09a19a47f25a90f95f4669c0fc1b6" args="(attributes::IAttribute *attribute)=0" -->
 <div class="memitem">
 <div class="memproto">
@@ -134,7 +128,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">virtual void capputils::reflection::IClassProperty::addAttribute </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">attributes::IAttribute</a> *&#160;</td>
+          <td class="paramtype">attributes::IAttribute *&#160;</td>
           <td class="paramname"><em>attribute</em></td><td>)</td>
           <td><code> [pure virtual]</code></td>
         </tr>
@@ -142,7 +136,19 @@ Public Member Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#a565fdaede3ce5b33d4636af80816dd2f">capputils::reflection::ClassProperty&lt; T * &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
+<p>Adds an attribute to the property. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">attribute</td><td>Pointer to an attribute.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="remark"><dt><b>Remarks:</b></dt><dd><ul>
+<li>The pointer is merely added to the attribute vector. No copies are created. </li>
+</ul>
+</dd></dl>
+
+<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">capputils::reflection::ClassProperty&lt; boost::shared_ptr&lt; CollectionType &gt; &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
 
 </div>
 </div>
@@ -162,6 +168,11 @@ template&lt;class AT &gt; </div>
 </div>
 <div class="memdoc">
 
+<p>Returns the first attribute in the attribute list matching the given template type. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The first attribute of the attribute list that can be successfully casted to the given template type, or null if no such attribute exists.</dd></dl>
+<p>This methods tries a <code>dynamic_cast</code> for every attribute. If a cast is successful, the attribute is returned.</p>
+<p>This method can be used to test, if a property has an attribute of a given type and use the returned attribute for further processing. </p>
+
 </div>
 </div>
 <a class="anchor" id="aed2def89cfb7276951831298b9eb04d6"></a><!-- doxytag: member="capputils::reflection::IClassProperty::getAttributes" ref="aed2def89cfb7276951831298b9eb04d6" args="() const =0" -->
@@ -169,7 +180,7 @@ template&lt;class AT &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual const std::vector&lt;<a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">attributes::IAttribute</a>*&gt;&amp; capputils::reflection::IClassProperty::getAttributes </td>
+          <td class="memname">virtual const std::vector&lt;attributes::IAttribute*&gt;&amp; capputils::reflection::IClassProperty::getAttributes </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [pure virtual]</code></td>
@@ -178,7 +189,10 @@ template&lt;class AT &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a52ca298a2fc2861e1d2ddfa54cfe0c1e">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#aa5a1d2980c76d67c4e035f44999174c3">capputils::reflection::ClassProperty&lt; T * &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a52ca298a2fc2861e1d2ddfa54cfe0c1e">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a52ca298a2fc2861e1d2ddfa54cfe0c1e">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a52ca298a2fc2861e1d2ddfa54cfe0c1e">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
+<p>Returns all attributes of a property. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>Vector containing the attributes of a property. </dd></dl>
+
+<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a52ca298a2fc2861e1d2ddfa54cfe0c1e">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a52ca298a2fc2861e1d2ddfa54cfe0c1e">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a52ca298a2fc2861e1d2ddfa54cfe0c1e">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a52ca298a2fc2861e1d2ddfa54cfe0c1e">capputils::reflection::ClassProperty&lt; boost::shared_ptr&lt; CollectionType &gt; &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a52ca298a2fc2861e1d2ddfa54cfe0c1e">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
 
 </div>
 </div>
@@ -196,7 +210,10 @@ template&lt;class AT &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac28111803eb2a939384bcf9eb752100d">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#aef4672b2aae1f303aefd1fe92f9938ef">capputils::reflection::ClassProperty&lt; T * &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac28111803eb2a939384bcf9eb752100d">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac28111803eb2a939384bcf9eb752100d">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac28111803eb2a939384bcf9eb752100d">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
+<p>Returns the property name. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The name of the property. </dd></dl>
+
+<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac28111803eb2a939384bcf9eb752100d">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac28111803eb2a939384bcf9eb752100d">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac28111803eb2a939384bcf9eb752100d">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac28111803eb2a939384bcf9eb752100d">capputils::reflection::ClassProperty&lt; boost::shared_ptr&lt; CollectionType &gt; &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac28111803eb2a939384bcf9eb752100d">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
 
 </div>
 </div>
@@ -215,7 +232,20 @@ template&lt;class AT &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a2c3be6b20dafd428a5fc5b79856f1d0b">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#ab551cd2957c1a6f4589b9eb4254c56f6">capputils::reflection::ClassProperty&lt; T * &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a2c3be6b20dafd428a5fc5b79856f1d0b">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a2c3be6b20dafd428a5fc5b79856f1d0b">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a2c3be6b20dafd428a5fc5b79856f1d0b">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
+<p>Returns the value of the property as a string. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">object</td><td>Instance of <code><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html" title="Base class of all reflectable classes.">ReflectableClass</a></code> whose property is queried. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>Property value as a string.</dd></dl>
+<dl class="remark"><dt><b>Remarks:</b></dt><dd><ul>
+<li>This method uses a <code><a class="el" href="classcapputils_1_1reflection_1_1_converter.html" title="Basic template for a Converter.">Converter</a></code> to convert the value to a string. </li>
+</ul>
+</dd></dl>
+
+<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a2c3be6b20dafd428a5fc5b79856f1d0b">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a2c3be6b20dafd428a5fc5b79856f1d0b">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a2c3be6b20dafd428a5fc5b79856f1d0b">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a2c3be6b20dafd428a5fc5b79856f1d0b">capputils::reflection::ClassProperty&lt; boost::shared_ptr&lt; CollectionType &gt; &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a2c3be6b20dafd428a5fc5b79856f1d0b">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
 
 </div>
 </div>
@@ -233,7 +263,10 @@ template&lt;class AT &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a6bcafdf050e006ba440f1a1b6905da6c">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#a5b485f343ae0909afaa1ac5ab9374e39">capputils::reflection::ClassProperty&lt; T * &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a6bcafdf050e006ba440f1a1b6905da6c">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a6bcafdf050e006ba440f1a1b6905da6c">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a6bcafdf050e006ba440f1a1b6905da6c">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
+<p>Returns the type of the property value. </p>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The type of the property value as a <code>type_info</code> object. </dd></dl>
+
+<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a6bcafdf050e006ba440f1a1b6905da6c">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a6bcafdf050e006ba440f1a1b6905da6c">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a6bcafdf050e006ba440f1a1b6905da6c">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a6bcafdf050e006ba440f1a1b6905da6c">capputils::reflection::ClassProperty&lt; boost::shared_ptr&lt; CollectionType &gt; &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a6bcafdf050e006ba440f1a1b6905da6c">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
 
 </div>
 </div>
@@ -262,7 +295,20 @@ template&lt;class AT &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac25008cd5d55181437d991c25b9a084e">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#a43949aa027ae5c02910105a031ff5abb">capputils::reflection::ClassProperty&lt; T * &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac25008cd5d55181437d991c25b9a084e">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac25008cd5d55181437d991c25b9a084e">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac25008cd5d55181437d991c25b9a084e">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
+<p>Sets the value of a string. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">object</td><td>Reference to the <code>ReflectabelClass</code> whose property should be set. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>New value of the property as a string.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="remark"><dt><b>Remarks:</b></dt><dd><ul>
+<li>This method uses a <code><a class="el" href="classcapputils_1_1reflection_1_1_converter.html" title="Basic template for a Converter.">Converter</a></code> to convert the string to a typed value. </li>
+</ul>
+</dd></dl>
+
+<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac25008cd5d55181437d991c25b9a084e">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac25008cd5d55181437d991c25b9a084e">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac25008cd5d55181437d991c25b9a084e">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac25008cd5d55181437d991c25b9a084e">capputils::reflection::ClassProperty&lt; boost::shared_ptr&lt; CollectionType &gt; &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac25008cd5d55181437d991c25b9a084e">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
 
 </div>
 </div>
@@ -297,7 +343,21 @@ template&lt;class AT &gt; </div>
 </div>
 <div class="memdoc">
 
-<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ae621a84e0e7d1b783ca0d52b62af009c">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property_3_01_t_01_5_01_4.html#a488b0aa69766c5e7f7d61109e3123ea2">capputils::reflection::ClassProperty&lt; T * &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ae621a84e0e7d1b783ca0d52b62af009c">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ae621a84e0e7d1b783ca0d52b62af009c">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ae621a84e0e7d1b783ca0d52b62af009c">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
+<p>Typed setter method. Reads a value from one property of one object and writes that value to another property of a possibly different object. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">object</td><td>Object whose property will be set. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fromObject</td><td>Reference to a <code><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html" title="Base class of all reflectable classes.">ReflectableClass</a></code> whose property will be read. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fromProperty</td><td>Reference to the property that will be read.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="remark"><dt><b>Remarks:</b></dt><dd><ul>
+<li>The value is only transfered from one property to another, if both properties have exactly the same type. No casts are performed. Not even implicit casts. Also no down or up casts through a class hierarchy. </li>
+</ul>
+</dd></dl>
+
+<p>Implemented in <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ae621a84e0e7d1b783ca0d52b62af009c">capputils::reflection::ClassProperty&lt; T &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ae621a84e0e7d1b783ca0d52b62af009c">capputils::reflection::ClassProperty&lt; CollectionType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ae621a84e0e7d1b783ca0d52b62af009c">capputils::reflection::ClassProperty&lt; ValueType &gt;</a>, <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ae621a84e0e7d1b783ca0d52b62af009c">capputils::reflection::ClassProperty&lt; boost::shared_ptr&lt; CollectionType &gt; &gt;</a>, and <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ae621a84e0e7d1b783ca0d52b62af009c">capputils::reflection::ClassProperty&lt; CollectionType * &gt;</a>.</p>
 
 </div>
 </div>
@@ -310,7 +370,7 @@ template&lt;class AT &gt; </div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -319,7 +379,7 @@ template&lt;class AT &gt; </div>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 14:30:03 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Fri Aug 5 2011 17:13:50 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
