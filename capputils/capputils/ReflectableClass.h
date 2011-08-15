@@ -167,6 +167,15 @@ protected:
   void addAttributes(std::vector< ::capputils::attributes::IAttribute*>* attributes, ...) const;
 };
 
+/**
+ * \brief Converts a type name string obtained by \c std::type_info::name() into a standardized format
+ *
+ * \param[in] typeName  Type name in a compiler dependent format.
+ * \return              Type name in the format \c <namespace>::<classname>
+ * \remarks
+ * - The implementation depends on the compiler in use.
+ * - Currently supported compilers are MSVC 9 and 10 and GCC 4.
+ */
 std::string trimTypeName(const char* typeName); 
 
 }
@@ -176,7 +185,8 @@ std::string trimTypeName(const char* typeName);
 std::ostream& operator<< (std::ostream& stream, const capputils::reflection::ReflectableClass& object);
 std::istream& operator>> (std::istream& stream, capputils::reflection::ReflectableClass& object);
 
-/** \def Property(name, type)
+/**
+ * \def Property(name, type)
  * \brief Declares a property
  * 
  * The first parameter is the name of the property. Capitalization is recommended. The second parameter is the type of the property.
@@ -191,6 +201,15 @@ std::istream& operator>> (std::istream& stream, capputils::reflection::Reflectab
  *   std::string getName() const { ... }
  *   void setName(std::string value) { ... }
  * \endcode
+ *
+ * \def InitReflectableClass(name)
+ * \brief Must be called at the beginning of every reflectable class
+ *
+ * The parameter denotes the name of the class. This macro declares all static fields and methods
+ * used to store and initialize class meta information like:
+ * - Properties
+ * - Attributes
+ * - The class name
  */
 
 #if !defined(CAPPUTILS_USE_CPP0x)

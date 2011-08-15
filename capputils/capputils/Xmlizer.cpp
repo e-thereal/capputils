@@ -58,10 +58,12 @@ void populatePropertyElement(TiXmlElement* propertyElement, const ReflectableCla
   IEnumerableAttribute* enumerableAttribute = property->getAttribute<IEnumerableAttribute>();
   if (reflectableAttribute) {
     ReflectableClass* reflectable = reflectableAttribute->getValuePtr(object, property);
-    if (reflectable->getAttribute<ScalarAttribute>()) {
-      propertyElement->SetAttribute("value", property->getStringValue(object));
-    } else {
-      propertyElement->LinkEndChild(Xmlizer::CreateXml(*reflectable));
+    if (reflectable) {
+      if (reflectable->getAttribute<ScalarAttribute>()) {
+        propertyElement->SetAttribute("value", property->getStringValue(object));
+      } else {
+        propertyElement->LinkEndChild(Xmlizer::CreateXml(*reflectable));
+      }
     }
   } else if (enumerableAttribute) {
     TiXmlElement* collectionElement = new TiXmlElement("Collection");

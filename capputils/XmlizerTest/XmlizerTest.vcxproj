@@ -50,14 +50,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(BOOST_INC_PATH);$(SolutionDir)tinyxml;$(SolutionDir)capputils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_INC_PATH);$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(BOOST_LIB_PATH);$(OutDir)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>capputils.lib;tinyxml.lib;libboost_signals-vc100-mt-gd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>capputils.lib;tinyxml.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -80,11 +80,13 @@
   <ItemGroup>
     <ClCompile Include="src\Car.cpp" />
     <ClCompile Include="src\Person.cpp" />
+    <ClCompile Include="src\Student.cpp" />
     <ClCompile Include="src\XmlizerTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Car.h" />
     <ClInclude Include="src\Person.h" />
+    <ClInclude Include="src\Student.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -58,7 +58,7 @@ class PropertyIterator<boost::shared_ptr<CollectionType>, ValueType> : public vi
 
 private:
   int i;
-  const ClassProperty<boost::shared_ptr<CollectionType>>* collectionProperty;
+  const ClassProperty<boost::shared_ptr<CollectionType> >* collectionProperty;
 
 public:
   PropertyIterator(const ClassProperty<boost::shared_ptr<CollectionType> >* collectionProperty)

@@ -74,7 +74,7 @@ void ReflectableClass::toStream(std::ostream& stream) const {
 void ReflectableClass::fromStream(std::istream& str) {
 }
 
-#ifdef _WIN32
+#ifdef MSVC
 std::string trimTypeName(const char* typeName) {
   string name(typeName);
   if (name.find("class") == 0)
