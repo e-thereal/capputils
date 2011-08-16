@@ -153,7 +153,7 @@ void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClass
         ReflectableClass* oldObject = reflectable->getValuePtr(object, property);
         Xmlizer::FromXml(*oldObject, *element->FirstChild());
         reflectable->setValuePtr(object, property, oldObject);
-      } else { 
+      } else if (element->FirstChild()) {
         ReflectableClass* newObject = Xmlizer::CreateReflectableClass(*element->FirstChild());
         reflectable->setValuePtr(object, property, newObject);
         if (!reflectable->isPointer() && !reflectable->isSmartPointer())
