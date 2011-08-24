@@ -144,6 +144,9 @@
     <ClInclude Include="ReflectionException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Executer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="xmlizer.cpp">
@@ -237,6 +240,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReflectionException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Executer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

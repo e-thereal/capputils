@@ -81,6 +81,7 @@
   <ItemGroup>
     <ClInclude Include="capputils.h" />
     <ClInclude Include="EventHandler.h" />
+    <ClInclude Include="Executer.h" />
     <ClInclude Include="FactoryException.h" />
     <ClInclude Include="FromEnumerableAttribute.h" />
     <ClInclude Include="InputAttribute.h" />
@@ -124,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EventHandler.cpp" />
+    <ClCompile Include="Executer.cpp" />
     <ClCompile Include="FactoryException.cpp" />
     <ClCompile Include="FromEnumerableAttribute.cpp" />
     <ClCompile Include="InputAttribute.cpp" />
