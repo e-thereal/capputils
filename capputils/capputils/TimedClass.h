@@ -21,6 +21,7 @@ public:
   TimedClass();
   virtual ~TimedClass();
 
+  void setCurrentTime(int propertyId);
   void setTime(int propertyId, time_t time);
   time_t getTime(int propertyId) const;
 };

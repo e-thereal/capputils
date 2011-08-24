@@ -142,6 +142,23 @@ reflection::ReflectableClass* Xmlizer::CreateReflectableClass(const ::std::strin
 }
 
 void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClassProperty* property, const TiXmlElement* element) {
+
+  // TODO: how to read attributes right? Need an atomic read. Setting a property might change
+  //       an attribute (e.g. TimeStamps are set when the property is set). So attributes should
+  //       be read after setting the value of a property, thus overriding the false attribute with
+  //       the saved value. But setting a property could trigger other actions that read an attribute,
+  //       thus attributes should be read before setting the value of a property. Actions are triggered
+  //       through the observe mechanism. Probable solution is not to fire change events until all attributes
+  //       have been read. This required a lock and unlock mechanism for observable classes. Current workaround
+  //       is to read attributes twice. Make sure, that the observe attribute is the first attribute thus
+  //       guaranteeing, that no attributes are executed before the change event has been fired.
+  const vector<IAttribute*>& attributes = property->getAttributes();
+  for (unsigned i = 0; i < attributes.size(); ++i) {
+    IXmlableAttribute* xmlable = dynamic_cast<IXmlableAttribute*>(attributes[i]);
+    if (xmlable)
+      xmlable->getFromPropertyNode(*element, object, property);
+  }
+
   const char* value = element->Attribute("value");
   if (value) {
       property->setStringValue(object, value);
@@ -172,7 +189,7 @@ void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClass
       delete iter;
     }
   }
-  const vector<IAttribute*>& attributes = property->getAttributes();
+  //attributes = property->getAttributes();
   for (unsigned i = 0; i < attributes.size(); ++i) {
     IXmlableAttribute* xmlable = dynamic_cast<IXmlableAttribute*>(attributes[i]);
     if (xmlable)

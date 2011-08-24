@@ -15,6 +15,10 @@ TimedClass::TimedClass() {
 TimedClass::~TimedClass() {
 }
 
+void TimedClass::setCurrentTime(int propertyId) {
+  setTime(propertyId, std::time(0));
+}
+
 void TimedClass::setTime(int propertyId, time_t time) {
   times[propertyId] = time;
 }
