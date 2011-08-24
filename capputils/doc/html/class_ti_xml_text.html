@@ -29,6 +29,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
@@ -86,10 +87,7 @@ Inheritance diagram for TiXmlText:</div>
 <tr><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_text.html#af659e77c6b87d684827f35a8f4895960">TiXmlText</a> (const char *initValue)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a439792f6183a3d3fb6f2bc2b16fa5691"></a><!-- doxytag: member="TiXmlText::TiXmlText" ref="a439792f6183a3d3fb6f2bc2b16fa5691" args="(const std::string &amp;initValue)" -->
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_text.html#a439792f6183a3d3fb6f2bc2b16fa5691">TiXmlText</a> (const std::string &amp;initValue)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_text.html#ae74d56c5b3ddec6cc3103dd51821af92">Print</a> (FILE *cfile, int depth) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_text.html#a0cafbf6f236c7f02d12b2bffc2b7976b">Print</a> (FILE *cfile, int depth) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad1a6a6b83fa2271022dd97c072a2b586"></a><!-- doxytag: member="TiXmlText::CDATA" ref="ad1a6a6b83fa2271022dd97c072a2b586" args="() const " -->
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_text.html#ad1a6a6b83fa2271022dd97c072a2b586">CDATA</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Queries whether this represents text using a CDATA section. <br/></td></tr>
@@ -102,11 +100,11 @@ virtual const <a class="el" href="class_ti_xml_text.html">TiXmlText</a> *&#160;<
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae7c3a8fd3e4dbf6c0c4363a943d72f5b"></a><!-- doxytag: member="TiXmlText::ToText" ref="ae7c3a8fd3e4dbf6c0c4363a943d72f5b" args="()" -->
 virtual <a class="el" href="class_ti_xml_text.html">TiXmlText</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_text.html#ae7c3a8fd3e4dbf6c0c4363a943d72f5b">ToText</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast to a more defined type. Will return null not of the requested type. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_text.html#a43b9954ebf679557fac1a4453f337b7c">Accept</a> (<a class="el" href="class_ti_xml_visitor.html">TiXmlVisitor</a> *content) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_text.html#a8483d4415ce9de6c4fa8f63d067d5de6">Accept</a> (<a class="el" href="class_ti_xml_visitor.html">TiXmlVisitor</a> *content) const </td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adde1869dfb029be50713fbfd8ce4d21f"></a><!-- doxytag: member="TiXmlText::Clone" ref="adde1869dfb029be50713fbfd8ce4d21f" args="() const " -->
-virtual <a class="el" href="class_ti_xml_node.html">TiXmlNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_text.html#adde1869dfb029be50713fbfd8ce4d21f">Clone</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c411e93a27537369479d034cc82da3b"></a><!-- doxytag: member="TiXmlText::Clone" ref="a0c411e93a27537369479d034cc82da3b" args="() const " -->
+virtual <a class="el" href="class_ti_xml_node.html">TiXmlNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_text.html#a0c411e93a27537369479d034cc82da3b">Clone</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">[internal use] Creates a new Element and returns it. <br/></td></tr>
 <tr><td colspan="2"><h2><a name="friends"></a>
 Friends</h2></td></tr>
@@ -135,12 +133,12 @@ class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </div>
 </div>
 <hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a43b9954ebf679557fac1a4453f337b7c"></a><!-- doxytag: member="TiXmlText::Accept" ref="a43b9954ebf679557fac1a4453f337b7c" args="(TiXmlVisitor *content) const " -->
+<a class="anchor" id="a8483d4415ce9de6c4fa8f63d067d5de6"></a><!-- doxytag: member="TiXmlText::Accept" ref="a8483d4415ce9de6c4fa8f63d067d5de6" args="(TiXmlVisitor *content) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool TiXmlText::Accept </td>
+          <td class="memname">virtual bool TiXmlText::Accept </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_ti_xml_visitor.html">TiXmlVisitor</a> *&#160;</td>
           <td class="paramname"><em>content</em></td><td>)</td>
@@ -155,12 +153,12 @@ class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 
 </div>
 </div>
-<a class="anchor" id="ae74d56c5b3ddec6cc3103dd51821af92"></a><!-- doxytag: member="TiXmlText::Print" ref="ae74d56c5b3ddec6cc3103dd51821af92" args="(FILE *cfile, int depth) const " -->
+<a class="anchor" id="a0cafbf6f236c7f02d12b2bffc2b7976b"></a><!-- doxytag: member="TiXmlText::Print" ref="a0cafbf6f236c7f02d12b2bffc2b7976b" args="(FILE *cfile, int depth) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void TiXmlText::Print </td>
+          <td class="memname">virtual void TiXmlText::Print </td>
           <td>(</td>
           <td class="paramtype">FILE *&#160;</td>
           <td class="paramname"><em>cfile</em>, </td>
@@ -187,10 +185,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following files:<ul>
-<li>tinyxml/<a class="el" href="tinyxml_8h_source.html">tinyxml.h</a></li>
-<li>tinyxml/tinyxml.cpp</li>
-<li>tinyxml/tinyxmlparser.cpp</li>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/tinyxml/<a class="el" href="tinyxml_8h_source.html">tinyxml.h</a></li>
 </ul>
 </div>
 <!-- window showing the filter options -->
@@ -198,7 +194,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Friends</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -207,7 +203,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 14:43:53 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 09:21:31 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

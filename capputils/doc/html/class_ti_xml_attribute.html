@@ -29,6 +29,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
@@ -85,9 +86,6 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9cfa3c8179873fd485d83003b114f8e1"></a><!-- doxytag: member="TiXmlAttribute::TiXmlAttribute" ref="a9cfa3c8179873fd485d83003b114f8e1" args="()" -->
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#a9cfa3c8179873fd485d83003b114f8e1">TiXmlAttribute</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct an empty attribute. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a052213522caac3979960e0714063861d"></a><!-- doxytag: member="TiXmlAttribute::TiXmlAttribute" ref="a052213522caac3979960e0714063861d" args="(const std::string &amp;_name, const std::string &amp;_value)" -->
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#a052213522caac3979960e0714063861d">TiXmlAttribute</a> (const std::string &amp;_name, const std::string &amp;_value)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">std::string constructor. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a759d0b76fb8fcf765ecab243bc14f05e"></a><!-- doxytag: member="TiXmlAttribute::TiXmlAttribute" ref="a759d0b76fb8fcf765ecab243bc14f05e" args="(const char *_name, const char *_value)" -->
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#a759d0b76fb8fcf765ecab243bc14f05e">TiXmlAttribute</a> (const char *_name, const char *_value)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct an attribute with a name and value. <br/></td></tr>
@@ -96,9 +94,6 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the name of this attribute. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f874490eac8ca00ee0070765d0e97e3"></a><!-- doxytag: member="TiXmlAttribute::Value" ref="a0f874490eac8ca00ee0070765d0e97e3" args="() const " -->
 const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#a0f874490eac8ca00ee0070765d0e97e3">Value</a> () const </td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the value of this attribute. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a87705c3ccf9ee9417beb4f7cbacd4d33"></a><!-- doxytag: member="TiXmlAttribute::ValueStr" ref="a87705c3ccf9ee9417beb4f7cbacd4d33" args="() const " -->
-const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#a87705c3ccf9ee9417beb4f7cbacd4d33">ValueStr</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the value of this attribute. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa1a20ad59dc7e89a0ab265396360d50f"></a><!-- doxytag: member="TiXmlAttribute::IntValue" ref="aa1a20ad59dc7e89a0ab265396360d50f" args="() const " -->
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#aa1a20ad59dc7e89a0ab265396360d50f">IntValue</a> () const </td></tr>
@@ -122,17 +117,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0316da31373496c4368ad549bf711394"></a><!-- doxytag: member="TiXmlAttribute::SetDoubleValue" ref="a0316da31373496c4368ad549bf711394" args="(double _value)" -->
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#a0316da31373496c4368ad549bf711394">SetDoubleValue</a> (double _value)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the value from a double. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab296ff0c9a8c701055cd257a8a976e57"></a><!-- doxytag: member="TiXmlAttribute::SetName" ref="ab296ff0c9a8c701055cd257a8a976e57" args="(const std::string &amp;_name)" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#ab296ff0c9a8c701055cd257a8a976e57">SetName</a> (const std::string &amp;_name)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">STL std::string form. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab43f67a0cc3ec1d80e62606500f0925f"></a><!-- doxytag: member="TiXmlAttribute::SetValue" ref="ab43f67a0cc3ec1d80e62606500f0925f" args="(const std::string &amp;_value)" -->
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#ab43f67a0cc3ec1d80e62606500f0925f">SetValue</a> (const std::string &amp;_value)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">STL std::string form. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a776478980776a024f7c2846eec640f65"></a><!-- doxytag: member="TiXmlAttribute::Next" ref="a776478980776a024f7c2846eec640f65" args="() const " -->
-const <a class="el" href="class_ti_xml_attribute.html">TiXmlAttribute</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#a776478980776a024f7c2846eec640f65">Next</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1c78e92e223a40843f644ba48ef69f67"></a><!-- doxytag: member="TiXmlAttribute::Next" ref="a1c78e92e223a40843f644ba48ef69f67" args="() const " -->
+const <a class="el" href="class_ti_xml_attribute.html">TiXmlAttribute</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#a1c78e92e223a40843f644ba48ef69f67">Next</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next sibling attribute in the DOM. Returns null at end. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a54a5f8730c7b02b9a41b74e12e27fe86"></a><!-- doxytag: member="TiXmlAttribute::Previous" ref="a54a5f8730c7b02b9a41b74e12e27fe86" args="() const " -->
-const <a class="el" href="class_ti_xml_attribute.html">TiXmlAttribute</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#a54a5f8730c7b02b9a41b74e12e27fe86">Previous</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6ebbfe333fe76cd834bd6cbcca3130cf"></a><!-- doxytag: member="TiXmlAttribute::Previous" ref="a6ebbfe333fe76cd834bd6cbcca3130cf" args="() const " -->
+const <a class="el" href="class_ti_xml_attribute.html">TiXmlAttribute</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#a6ebbfe333fe76cd834bd6cbcca3130cf">Previous</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the previous sibling attribute in the DOM. Returns null at beginning. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_attribute.html#acc04956c1d5c4c31fe74f7a7528d109a">Print</a> (FILE *cfile, int depth) const </td></tr>
 </table>
@@ -191,10 +180,8 @@ const <a class="el" href="class_ti_xml_attribute.html">TiXmlAttribute</a> *&#160
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following files:<ul>
-<li>tinyxml/<a class="el" href="tinyxml_8h_source.html">tinyxml.h</a></li>
-<li>tinyxml/tinyxml.cpp</li>
-<li>tinyxml/tinyxmlparser.cpp</li>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/tinyxml/<a class="el" href="tinyxml_8h_source.html">tinyxml.h</a></li>
 </ul>
 </div>
 <!-- window showing the filter options -->
@@ -202,7 +189,7 @@ const <a class="el" href="class_ti_xml_attribute.html">TiXmlAttribute</a> *&#160
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Friends</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -211,7 +198,7 @@ const <a class="el" href="class_ti_xml_attribute.html">TiXmlAttribute</a> *&#160
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 14:43:52 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 09:21:31 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

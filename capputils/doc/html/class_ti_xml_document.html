@@ -29,6 +29,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
@@ -90,9 +91,6 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae4508b452d0c3061db085f3db27b8396"></a><!-- doxytag: member="TiXmlDocument::TiXmlDocument" ref="ae4508b452d0c3061db085f3db27b8396" args="(const char *documentName)" -->
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#ae4508b452d0c3061db085f3db27b8396">TiXmlDocument</a> (const char *documentName)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a document with a name. The name of the document is also the filename of the xml. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2c6e58fb99bfa76cc613f16840022225"></a><!-- doxytag: member="TiXmlDocument::TiXmlDocument" ref="a2c6e58fb99bfa76cc613f16840022225" args="(const std::string &amp;documentName)" -->
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a2c6e58fb99bfa76cc613f16840022225">TiXmlDocument</a> (const std::string &amp;documentName)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a4c852a889c02cf251117fd1d9fe1845f">LoadFile</a> (TiXmlEncoding encoding=TIXML_DEFAULT_ENCODING)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a21c0aeb0d0a720169ad4ac89523ebe93"></a><!-- doxytag: member="TiXmlDocument::SaveFile" ref="a21c0aeb0d0a720169ad4ac89523ebe93" args="() const " -->
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a21c0aeb0d0a720169ad4ac89523ebe93">SaveFile</a> () const </td></tr>
@@ -107,11 +105,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf1672b4538c6d1d441f9f108aea2bf4"></a><!-- doxytag: member="TiXmlDocument::SaveFile" ref="acf1672b4538c6d1d441f9f108aea2bf4" args="(FILE *) const " -->
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#acf1672b4538c6d1d441f9f108aea2bf4">SaveFile</a> (FILE *) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Save a file using the given FILE*. Returns true if successful. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a18ae6ed34fed7991ebc220862dfac884">LoadFile</a> (const std::string &amp;filename, TiXmlEncoding encoding=TIXML_DEFAULT_ENCODING)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d4fae0463f3f03679ba0b7cf6f2df52"></a><!-- doxytag: member="TiXmlDocument::SaveFile" ref="a3d4fae0463f3f03679ba0b7cf6f2df52" args="(const std::string &amp;filename) const " -->
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a3d4fae0463f3f03679ba0b7cf6f2df52">SaveFile</a> (const std::string &amp;filename) const </td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">&lt; STL std::string version. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a789ad2f06f93d52bdb5570b2f3670289">Parse</a> (const char *p, TiXmlParsingData *data=0, TiXmlEncoding encoding=TIXML_DEFAULT_ENCODING)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a17ebabe36926ef398e78dec0d0ad0378">Parse</a> (const char *p, TiXmlParsingData *data=0, TiXmlEncoding encoding=TIXML_DEFAULT_ENCODING)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_ti_xml_element.html">TiXmlElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#ad09d17927f908f40efb406af2fb873be">RootElement</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a6dfc01a6e5d58e56acd537dfd3bdeb29">Error</a> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d0f689f6e09ea494ea547be8d79c25e"></a><!-- doxytag: member="TiXmlDocument::ErrorDesc" ref="a9d0f689f6e09ea494ea547be8d79c25e" args="() const " -->
@@ -125,8 +119,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a51dac56316f89b35bdb7d0d433ba988e">SetTabSize</a> (int _tabsize)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#ac66b8c28db86363315712a3574e87c35">ClearError</a> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#af08389ec70ee9b2de7f800e206a18510">Print</a> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7b1aea204fee266b70b9c105c8bf2ada"></a><!-- doxytag: member="TiXmlDocument::Print" ref="a7b1aea204fee266b70b9c105c8bf2ada" args="(FILE *cfile, int depth=0) const " -->
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a7b1aea204fee266b70b9c105c8bf2ada">Print</a> (FILE *cfile, int depth=0) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8701fda1fa31b25abbc9c0df42da10e8"></a><!-- doxytag: member="TiXmlDocument::Print" ref="a8701fda1fa31b25abbc9c0df42da10e8" args="(FILE *cfile, int depth=0) const " -->
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a8701fda1fa31b25abbc9c0df42da10e8">Print</a> (FILE *cfile, int depth=0) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Print this Document to a FILE stream. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1dc977bde3e4fe85a8eb9d88a35ef5a4"></a><!-- doxytag: member="TiXmlDocument::ToDocument" ref="a1dc977bde3e4fe85a8eb9d88a35ef5a4" args="() const " -->
 virtual const <a class="el" href="class_ti_xml_document.html">TiXmlDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a1dc977bde3e4fe85a8eb9d88a35ef5a4">ToDocument</a> () const </td></tr>
@@ -134,20 +128,20 @@ virtual const <a class="el" href="class_ti_xml_document.html">TiXmlDocument</a> 
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1025d942a1f328fd742d545e37efdd42"></a><!-- doxytag: member="TiXmlDocument::ToDocument" ref="a1025d942a1f328fd742d545e37efdd42" args="()" -->
 virtual <a class="el" href="class_ti_xml_document.html">TiXmlDocument</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a1025d942a1f328fd742d545e37efdd42">ToDocument</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast to a more defined type. Will return null not of the requested type. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a3daab2f472418ef66315750202f762ae">Accept</a> (<a class="el" href="class_ti_xml_visitor.html">TiXmlVisitor</a> *content) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#aa545aae325d9752ad64120bc4ecf939a">Accept</a> (<a class="el" href="class_ti_xml_visitor.html">TiXmlVisitor</a> *content) const </td></tr>
 <tr><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_ti_xml_node.html">TiXmlNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#ac9e8f09b23454d953b32d1b65cd1409e">Clone</a> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_ti_xml_node.html">TiXmlNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_document.html#a4968661cab4a1f44a23329c6f8db1907">Clone</a> () const </td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Always the top level node. A document binds together all the XML pieces. It can be saved, loaded, and printed to the screen. The 'value' of a document node is the xml file name. </p>
 </div><hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a3daab2f472418ef66315750202f762ae"></a><!-- doxytag: member="TiXmlDocument::Accept" ref="a3daab2f472418ef66315750202f762ae" args="(TiXmlVisitor *content) const " -->
+<a class="anchor" id="aa545aae325d9752ad64120bc4ecf939a"></a><!-- doxytag: member="TiXmlDocument::Accept" ref="aa545aae325d9752ad64120bc4ecf939a" args="(TiXmlVisitor *content) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool TiXmlDocument::Accept </td>
+          <td class="memname">virtual bool TiXmlDocument::Accept </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_ti_xml_visitor.html">TiXmlVisitor</a> *&#160;</td>
           <td class="paramname"><em>content</em></td><td>)</td>
@@ -179,12 +173,12 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ac9e8f09b23454d953b32d1b65cd1409e"></a><!-- doxytag: member="TiXmlDocument::Clone" ref="ac9e8f09b23454d953b32d1b65cd1409e" args="() const " -->
+<a class="anchor" id="a4968661cab4a1f44a23329c6f8db1907"></a><!-- doxytag: member="TiXmlDocument::Clone" ref="a4968661cab4a1f44a23329c6f8db1907" args="() const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_ti_xml_node.html">TiXmlNode</a> * TiXmlDocument::Clone </td>
+          <td class="memname">virtual <a class="el" href="class_ti_xml_node.html">TiXmlNode</a>* TiXmlDocument::Clone </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [protected, virtual]</code></td>
@@ -255,36 +249,21 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a18ae6ed34fed7991ebc220862dfac884"></a><!-- doxytag: member="TiXmlDocument::LoadFile" ref="a18ae6ed34fed7991ebc220862dfac884" args="(const std::string &amp;filename, TiXmlEncoding encoding=TIXML_DEFAULT_ENCODING)" -->
+<a class="anchor" id="a4c852a889c02cf251117fd1d9fe1845f"></a><!-- doxytag: member="TiXmlDocument::LoadFile" ref="a4c852a889c02cf251117fd1d9fe1845f" args="(TiXmlEncoding encoding=TIXML_DEFAULT_ENCODING)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">bool TiXmlDocument::LoadFile </td>
           <td>(</td>
-          <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>filename</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">TiXmlEncoding&#160;</td>
-          <td class="paramname"><em>encoding</em> = <code>TIXML_DEFAULT_ENCODING</code>&#160;</td>
-        </tr>
-        <tr>
+          <td class="paramname"><em>encoding</em> = <code>TIXML_DEFAULT_ENCODING</code></td><td>)</td>
           <td></td>
-          <td>)</td>
-          <td></td><td><code> [inline]</code></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tr><td class="paramname">encoding</td><td>STL std::string version. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Load a file using the current document value. Returns true if successful. Will delete any existing document data before loading. </p>
 
 </div>
 </div>
@@ -296,7 +275,7 @@ Protected Member Functions</h2></td></tr>
           <td class="memname">bool TiXmlDocument::LoadFile </td>
           <td>(</td>
           <td class="paramtype">FILE *&#160;</td>
-          <td class="paramname"><em>file</em>, </td>
+          <td class="paramname">, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -316,30 +295,12 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a4c852a889c02cf251117fd1d9fe1845f"></a><!-- doxytag: member="TiXmlDocument::LoadFile" ref="a4c852a889c02cf251117fd1d9fe1845f" args="(TiXmlEncoding encoding=TIXML_DEFAULT_ENCODING)" -->
+<a class="anchor" id="a17ebabe36926ef398e78dec0d0ad0378"></a><!-- doxytag: member="TiXmlDocument::Parse" ref="a17ebabe36926ef398e78dec0d0ad0378" args="(const char *p, TiXmlParsingData *data=0, TiXmlEncoding encoding=TIXML_DEFAULT_ENCODING)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool TiXmlDocument::LoadFile </td>
-          <td>(</td>
-          <td class="paramtype">TiXmlEncoding&#160;</td>
-          <td class="paramname"><em>encoding</em> = <code>TIXML_DEFAULT_ENCODING</code></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-<p>Load a file using the current document value. Returns true if successful. Will delete any existing document data before loading. </p>
-
-</div>
-</div>
-<a class="anchor" id="a789ad2f06f93d52bdb5570b2f3670289"></a><!-- doxytag: member="TiXmlDocument::Parse" ref="a789ad2f06f93d52bdb5570b2f3670289" args="(const char *p, TiXmlParsingData *data=0, TiXmlEncoding encoding=TIXML_DEFAULT_ENCODING)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">const char * TiXmlDocument::Parse </td>
+          <td class="memname">virtual const char* TiXmlDocument::Parse </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>p</em>, </td>
@@ -431,10 +392,8 @@ Protected Member Functions</h2></td></tr>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following files:<ul>
-<li>tinyxml/<a class="el" href="tinyxml_8h_source.html">tinyxml.h</a></li>
-<li>tinyxml/tinyxml.cpp</li>
-<li>tinyxml/tinyxmlparser.cpp</li>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/tinyxml/<a class="el" href="tinyxml_8h_source.html">tinyxml.h</a></li>
 </ul>
 </div>
 <!-- window showing the filter options -->
@@ -442,7 +401,7 @@ Protected Member Functions</h2></td></tr>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Friends</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -451,7 +410,7 @@ Protected Member Functions</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 14:43:52 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 09:21:31 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

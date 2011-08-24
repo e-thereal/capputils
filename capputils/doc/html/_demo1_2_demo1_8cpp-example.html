@@ -56,17 +56,39 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Demo1/Demo1.cpp</div>  </div>
 </div>
 <div class="contents">
-<p>Shows how to read parameters from the command line. This is a first example.</p>
+<p>Shows how to read parameters from the command line. This example demonstrates the basics of argument parsing using <code>capputils</code>. The program has 4 parameters:</p>
+<ul>
+<li>An input name of type <code>string</code> </li>
+<li>An output name of type <code>string</code> </li>
+<li>A parameter of type <code>int</code> </li>
+<li>A parameter help of type <code>bool</code>.</li>
+</ul>
+<p>The help parameter is somewhat special. It is used as a command line flag that is either active or not. If it is active, its value is set to <code>true</code> and <code>false</code> otherwise. The property has the attribute <code>Flag()</code> that indicates that this parameter is not followed by a value while paring for command line arguments. The example also features the <code>DescriptionAttribute</code>. This attribute can be used to add a description to a property within code. It is used to print usage information.</p>
+<p>The program generates the following outputs: </p>
 <div class="fragment"><pre class="fragment">
+&gt; Demo1.exe --Help
+ 
+Usage: Demo1 [switches], where switches are:
+
+  --InputName    Name of the input file.
+  --OutputName   Name of the output file.
+  --Parameter    Parameter of type int.
+  --Help         Shows this help.
+</pre></div> <div class="fragment"><pre class="fragment">
+&gt; Demo1.exe --InputName Hello --OutputName World --Parameter 42
+
+InputName: Hello
+OuputName: World
+Parameter: 42
+</pre></div><div class="fragment"><pre class="fragment">
 <span class="comment">/*** Begin: DataModel.h ***/</span>
 
 <span class="preprocessor">#include &lt;<a class="code" href="_reflectable_class_8h.html" title="Contains the class declaration of ReflecableClass and some useful macros.">capputils/ReflectableClass.h</a>&gt;</span>
-<span class="preprocessor">#include &lt;<a class="code" href="_arguments_parser_8h.html" title="Contains the parser module for command line arguments.">capputils/ArgumentsParser.h</a>&gt;</span>
 
 <span class="keyword">class </span>DataModel : <span class="keyword">public</span> capputils::reflection::ReflectableClass {
-  InitReflectableClass(DataModel)
+  <a name="a0"></a><a class="code" href="_reflectable_class_8h.html#af407f433b556d813802a968d545ee1e9" title="Must be called at the beginning of every reflectable class.">InitReflectableClass</a>(DataModel)
 
-  <a name="a0"></a><a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(InputName, std::string)
+  <a name="a1"></a><a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(InputName, std::string)
   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(OutputName, std::string)
   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(Parameter, <span class="keywordtype">int</span>)
   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(Help, <span class="keywordtype">bool</span>)
@@ -98,21 +120,24 @@ DataModel::DataModel() : _InputName(&quot;&quot;), _OutputName(&quot;&quot;), _P
 
 <span class="preprocessor">#include &lt;iostream&gt;</span>
 
+<span class="preprocessor">#include &lt;<a class="code" href="_arguments_parser_8h.html" title="Contains the parser module for command line arguments.">capputils/ArgumentsParser.h</a>&gt;</span>
+
 <span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[])
 {
   <span class="keyword">using namespace </span>capputils;
 
   DataModel model;
 
-  <a name="a1"></a><a class="code" href="classcapputils_1_1_arguments_parser.html#a5d664a44bb48edeebcc25e73faa5cca0" title="Parses command line arguments and sets the properties of a class accordingly.">ArgumentsParser::Parse</a>(model, argc, argv);
+  <a name="a2"></a><a class="code" href="classcapputils_1_1_arguments_parser.html#a5d664a44bb48edeebcc25e73faa5cca0" title="Parses command line arguments and sets the properties of a class accordingly.">ArgumentsParser::Parse</a>(model, argc, argv);
   <span class="keywordflow">if</span> (model.getHelp()) {
-    <a name="a2"></a><a class="code" href="classcapputils_1_1_arguments_parser.html#aaf414f5cff608add16ad130c75a58915" title="Prints a usage message to standard output with a default header.">ArgumentsParser::PrintDefaultUsage</a>(<span class="stringliteral">&quot;Demo1&quot;</span>, model);
+    <a name="a3"></a><a class="code" href="classcapputils_1_1_arguments_parser.html#aaf414f5cff608add16ad130c75a58915" title="Prints a usage message to standard output with a default header.">ArgumentsParser::PrintDefaultUsage</a>(<span class="stringliteral">&quot;Demo1&quot;</span>, model);
     <span class="keywordflow">return</span> 0;
   }
 
+  std::cout &lt;&lt; std::endl;
   std::cout &lt;&lt; <span class="stringliteral">&quot;InputName: &quot;</span> &lt;&lt; model.getInputName() &lt;&lt; std::endl;
   std::cout &lt;&lt; <span class="stringliteral">&quot;OuputName: &quot;</span> &lt;&lt; model.getOutputName() &lt;&lt; std::endl;
-  std::cout &lt;&lt; <span class="stringliteral">&quot;ParameterName: &quot;</span> &lt;&lt; model.getParameter() &lt;&lt; std::endl;
+  std::cout &lt;&lt; <span class="stringliteral">&quot;Parameter: &quot;</span> &lt;&lt; model.getParameter() &lt;&lt; std::endl;
 
   <span class="keywordflow">return</span> 0;
 }
@@ -132,7 +157,7 @@ DataModel::DataModel() : _InputName(&quot;&quot;), _OutputName(&quot;&quot;), _P
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Fri Aug 5 2011 17:13:50 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 10:10:22 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

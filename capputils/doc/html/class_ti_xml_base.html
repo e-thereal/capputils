@@ -29,6 +29,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li><a href="examples.html"><span>Examples</span></a></li>
@@ -112,7 +113,7 @@ Static Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad4b1472531c647a25b1840a87ae42438"></a><!-- doxytag: member="TiXmlBase::IsWhiteSpaceCondensed" ref="ad4b1472531c647a25b1840a87ae42438" args="()" -->
 static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_base.html#ad4b1472531c647a25b1840a87ae42438">IsWhiteSpaceCondensed</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the current white space setting. <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_base.html#a32ed202562b58de64c7d799ca3c9db98">EncodeString</a> (const TIXML_STRING &amp;str, TIXML_STRING *out)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_ti_xml_base.html#a6bd8c315c1acb09e34107b8736505948">EncodeString</a> (const TIXML_STRING &amp;str, TIXML_STRING *out)</td></tr>
 <tr><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab242c01590191f644569fa89a080d97c"></a><!-- doxytag: member="TiXmlBase::userData" ref="ab242c01590191f644569fa89a080d97c" args="" -->
@@ -144,12 +145,12 @@ class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 
 	A Decleration contains: Attributes (not on tree)
 	</pre></div> </div><hr/><h2>Member Function Documentation</h2>
-<a class="anchor" id="a32ed202562b58de64c7d799ca3c9db98"></a><!-- doxytag: member="TiXmlBase::EncodeString" ref="a32ed202562b58de64c7d799ca3c9db98" args="(const TIXML_STRING &amp;str, TIXML_STRING *out)" -->
+<a class="anchor" id="a6bd8c315c1acb09e34107b8736505948"></a><!-- doxytag: member="TiXmlBase::EncodeString" ref="a6bd8c315c1acb09e34107b8736505948" args="(const TIXML_STRING &amp;str, TIXML_STRING *out)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void TiXmlBase::EncodeString </td>
+          <td class="memname">static void TiXmlBase::EncodeString </td>
           <td>(</td>
           <td class="paramtype">const TIXML_STRING &amp;&#160;</td>
           <td class="paramname"><em>str</em>, </td>
@@ -200,7 +201,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 <p>This is a formatted print, and will insert tabs and newlines.</p>
 <p>(For an unformatted stream, use the &lt;&lt; operator.) </p>
 
-<p>Implemented in <a class="el" href="class_ti_xml_attribute.html#acc04956c1d5c4c31fe74f7a7528d109a">TiXmlAttribute</a>, <a class="el" href="class_ti_xml_element.html#ad9d0c008866982ab8d9aafae7e14d692">TiXmlElement</a>, <a class="el" href="class_ti_xml_comment.html#a17398061d62c470f57801ce28fa33ad4">TiXmlComment</a>, <a class="el" href="class_ti_xml_text.html#ae74d56c5b3ddec6cc3103dd51821af92">TiXmlText</a>, <a class="el" href="class_ti_xml_declaration.html#abf6303db4bd05b5be554036817ff1cb4">TiXmlDeclaration</a>, <a class="el" href="class_ti_xml_unknown.html#a025f19c21ef01ea9be50febb8fe0ba06">TiXmlUnknown</a>, and <a class="el" href="class_ti_xml_document.html#a7b1aea204fee266b70b9c105c8bf2ada">TiXmlDocument</a>.</p>
+<p>Implemented in <a class="el" href="class_ti_xml_attribute.html#acc04956c1d5c4c31fe74f7a7528d109a">TiXmlAttribute</a>, <a class="el" href="class_ti_xml_element.html#afbf52736e70fc91ec9d760721d6f4fd2">TiXmlElement</a>, <a class="el" href="class_ti_xml_comment.html#a6b316527aaa8da0370cd68c22a5a0f5f">TiXmlComment</a>, <a class="el" href="class_ti_xml_text.html#a0cafbf6f236c7f02d12b2bffc2b7976b">TiXmlText</a>, <a class="el" href="class_ti_xml_declaration.html#abf6303db4bd05b5be554036817ff1cb4">TiXmlDeclaration</a>, <a class="el" href="class_ti_xml_unknown.html#a31ba089a40fb5a1869750fce09b0bacb">TiXmlUnknown</a>, and <a class="el" href="class_ti_xml_document.html#a8701fda1fa31b25abbc9c0df42da10e8">TiXmlDocument</a>.</p>
 
 </div>
 </div>
@@ -243,11 +244,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following files:<ul>
-<li>tinyxml/<a class="el" href="tinyxml_8h_source.html">tinyxml.h</a></li>
-<li>tinyxml/tinyxml.cpp</li>
-<li>tinyxml/tinyxmlerror.cpp</li>
-<li>tinyxml/tinyxmlparser.cpp</li>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>include/tinyxml/<a class="el" href="tinyxml_8h_source.html">tinyxml.h</a></li>
 </ul>
 </div>
 <!-- window showing the filter options -->
@@ -255,7 +253,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Friends</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -264,7 +262,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cla
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Sat Jun 11 2011 14:43:52 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 09:21:31 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

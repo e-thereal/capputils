@@ -61,7 +61,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
-<a href="#define-members">Defines</a>  </div>
+<a href="#define-members">Defines</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">capputils/ReflectableClass.h File Reference</div>  </div>
 </div>
@@ -104,6 +105,12 @@ Namespaces</h2></td></tr>
 Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da">Property</a>(name, type)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares a property.  <a href="#a141cc4c043a592450c332d3512d211da"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#af407f433b556d813802a968d545ee1e9">InitReflectableClass</a>(name)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Must be called at the beginning of every reflectable class.  <a href="#af407f433b556d813802a968d545ee1e9"></a><br/></td></tr>
+<tr><td colspan="2"><h2><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1reflection.html#a675dfbdf05bc4e1829b7f6f7dc34db34">capputils::reflection::trimTypeName</a> (const char *typeName)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a type name string obtained by <code>std::type_info::name()</code> into a standardized format.  <a href="#a675dfbdf05bc4e1829b7f6f7dc34db34"></a><br/></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock"><p>Contains the class declaration of ReflecableClass and some useful macros. </p>
@@ -111,6 +118,49 @@ Defines</h2></td></tr>
 <dl class="author"><dt><b>Author:</b></dt><dd>Tom Brosch</dd></dl>
 <p>You must call InitReflectableClass and BeginProperyDefintions and EndPropertyDefinitions. See example for help. (minimal class) </p>
 </div><hr/><h2>Define Documentation</h2>
+<a class="anchor" id="af407f433b556d813802a968d545ee1e9"></a><!-- doxytag: member="ReflectableClass.h::InitReflectableClass" ref="af407f433b556d813802a968d545ee1e9" args="(name)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define InitReflectableClass</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<b>Value:</b><div class="fragment"><pre class="fragment"><span class="keyword">typedef</span> name ClassType;                         \
+  <span class="keyword">protected</span>: <span class="keyword">static</span> std::vector&lt; ::capputils::reflection::IClassProperty*&gt; properties;                \
+  <span class="keyword">protected</span>: <span class="keyword">static</span> std::vector&lt; ::capputils::attributes::IAttribute*&gt; attributes;                \
+  <span class="keyword">public</span>: <span class="keyword">virtual</span> std::vector&lt; ::capputils::reflection::IClassProperty*&gt;&amp; getProperties()<span class="keyword"> const </span>{  \
+    initializeClass();                            \
+    <span class="keywordflow">return</span> properties;                            \
+  }                                               \
+  <span class="keyword">public</span>: <span class="keyword">virtual</span> std::vector&lt; ::capputils::attributes::IAttribute*&gt;&amp; getAttributes()<span class="keyword"> const </span>{  \
+    initializeClass();                            \
+    <span class="keywordflow">return</span> attributes;                            \
+  }                                               \
+  <span class="keyword">public</span>: <span class="keyword">static</span> <span class="keyword">const</span> std::string ClassName;     \
+  <span class="keyword">public</span>: <span class="keyword">virtual</span> <span class="keyword">const</span> std::string&amp; getClassName()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> ClassType::ClassName; } \
+  <span class="keyword">private</span>: <span class="keywordtype">void</span> initializeClass() <span class="keyword">const</span>; \
+  <span class="keyword">private</span>: <span class="keyword">static</span> capputils::reflection::RegisterClass _registration; \
+  <span class="keyword">public</span>: <span class="keyword">static</span> ReflectableClass* newInstance() { <span class="keywordflow">return</span> <span class="keyword">new</span> name(); } \
+  <span class="keyword">public</span>: <span class="keyword">static</span> <span class="keywordtype">void</span> deleteInstance(ReflectableClass* instance) { <span class="keyword">delete</span> instance; }
+</pre></div>
+<p>Must be called at the beginning of every reflectable class. </p>
+<p>The parameter denotes the name of the class. This macro declares all static fields and methods used to store and initialize class meta information like:</p>
+<ul>
+<li>Properties</li>
+<li>Attributes</li>
+<li>The class name </li>
+</ul>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="_demo1_2_demo1_8cpp-example.html#a0">Demo1/Demo1.cpp</a>.</dd>
+</dl>
+</div>
+</div>
 <a class="anchor" id="a141cc4c043a592450c332d3512d211da"></a><!-- doxytag: member="ReflectableClass.h::Property" ref="a141cc4c043a592450c332d3512d211da" args="(name, type)" -->
 <div class="memitem">
 <div class="memproto">
@@ -150,7 +200,7 @@ Defines</h2></td></tr>
 </pre></div><p> will generate </p>
 <div class="fragment"><pre class="fragment">   std::string getName()<span class="keyword"> const </span>{ ... }
    <span class="keywordtype">void</span> setName(std::string value) { ... }
-</pre></div> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="_demo1_2_demo1_8cpp-example.html#a0">Demo1/Demo1.cpp</a>.</dd>
+</pre></div> <dl><dt><b>Examples: </b></dt><dd><a class="el" href="_demo1_2_demo1_8cpp-example.html#a1">Demo1/Demo1.cpp</a>.</dd>
 </dl>
 </div>
 </div>
@@ -169,7 +219,7 @@ Defines</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Fri Aug 5 2011 17:13:50 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 10:10:23 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
