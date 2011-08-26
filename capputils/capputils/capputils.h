@@ -15,6 +15,10 @@
 
 #define CAPPUTILS_API
 
+#ifndef CAPPUTILS_COMMA
+#define CAPPUTILS_COMMA() ,
+#endif
+
 /**
  * \mainpage \c capputils - A \c C++ toolkit for console applications
  *
