@@ -53,7 +53,7 @@ TimeStampAttribute::TimeStampAttribute(const std::string& timeStamp) : propertyI
   time = fromString(timeStamp);
 }
 
-TimeStampAttribute::TimeStampAttribute(int propertyId) : time(0), propertyId(propertyId) {
+TimeStampAttribute::TimeStampAttribute(int propertyId) : propertyId(propertyId), time(0) {
 }
 
 TimeStampAttribute::~TimeStampAttribute() {

@@ -462,7 +462,7 @@ public:
     return Converter<T*>::toString(getValue(object));
   }
 
-  virtual void setStringValue(ReflectableClass& object, const std::string&/* value*/) const {
+  virtual void setStringValue(ReflectableClass& /*object*/, const std::string&/* value*/) const {
     //setValueFunc(object, new T(convertFromString<T>(value)));
     // TODO: static assert that getting pointer values from a string is not supported
     throw capputils::exceptions::ReflectionException("setting pointer values from a string is not supported");
