@@ -5,7 +5,7 @@
  *  \date   Jan 7, 2011
  *  \author Tom Brosch
  *  
- *  You must call InitReflectableClass and BeginProperyDefintions and EndPropertyDefinitions.
+ *  You must call InitReflectableClass, BeginProperyDefintions and EndPropertyDefinitions.
  *  See example for help. (minimal class)
  */
 
@@ -203,13 +203,41 @@ std::istream& operator>> (std::istream& stream, capputils::reflection::Reflectab
  * \endcode
  *
  * \def InitReflectableClass(name)
- * \brief Must be called at the beginning of every reflectable class
+ * \brief Must be called at the beginning of every reflectable class declaration
  *
  * The parameter denotes the name of the class. This macro declares all static fields and methods
  * used to store and initialize class meta information like:
  * - Properties
  * - Attributes
  * - The class name
+ *
+ * \def BeginPropertyDefinitions(name, args...)
+ * \brief Starts a property definition block
+ *
+ * \param[in] name  The name of the reflectable class
+ * \param[in] args  A list of class attributes. Can be empty.
+ *
+ * This macro must be called for every reflectable class implementation, even if
+ * the class does not define any properties. After calling this macro, properties
+ * can be defined using the \c DefineProperty macro. A property definition block
+ * must be closed by calling the \c EndPropertyDefinitions macro.
+ *
+ * \def DefineProperty(name, args...)
+ * \brief Defines a class property
+ *
+ * \param[in] name  The of the property
+ * \param[in] args  A list of property attributes. Can be empty.
+ *
+ * This macro adds the property to the internal list of properties. Calling this
+ * macro is required in order to make a property reflectable. Attributes can be
+ * attached to describe the intended use of the property. This macro is only allowed
+ * within a property definition block (between BeginPropertyDefinitions and
+ * EndPropertyDefinitions.
+ *
+ * \def EndPropertyDefinitions
+ * \brief Closes a property definition block
+ *
+ * Every property definition block must be closed using this macro.
  */
 
 #if !defined(CAPPUTILS_USE_CPP0x)
