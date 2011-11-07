@@ -57,6 +57,7 @@ bool FileExistsAttribute::valid(const IClassProperty& property,
       return true;
     }
   }
+  lastError = string("Property is not of type string and not enumerable!");
   return false;
 }
 
