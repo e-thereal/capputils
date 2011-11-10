@@ -22,6 +22,9 @@
 namespace tbblas {
 
 template<class T>
+class device_vector;
+
+template<class T>
 class device_matrix;
 
 template<class T>
@@ -62,7 +65,12 @@ void gemm(char transa, char transb, int m, int n, int k, float alpha, const floa
   cublasSgemm(transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 }
 
-
+template<>
+void gemm(char transa, char transb, int m, int n, int k, double alpha, const double* A, int lda,
+    const double* B, int ldb, double beta, double *C, int ldc)
+{
+  cublasDgemm(transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
+}
 
 template<class T>
 class device_matrix {
@@ -225,7 +233,7 @@ public:
     return *this;
   }
 
-  boost::numeric::ublas::matrix<T, boost::numeric::ublas::row_major> ublas() {
+  boost::numeric::ublas::matrix<T, boost::numeric::ublas::row_major> ublasRowMajor() {
     assert(_offset == 0);
 
     boost::numeric::ublas::matrix<T, boost::numeric::ublas::row_major> m(size2(), size1());
@@ -236,8 +244,23 @@ public:
       return _scalar * m;
   }
 
+  boost::numeric::ublas::matrix<T, boost::numeric::ublas::column_major> ublasColumnMajor() {
+    assert(_offset == 0);
+
+    boost::numeric::ublas::matrix<T, boost::numeric::ublas::column_major> m(size1(), size2());
+    thrust::copy(data().begin(), data().end(), m.data().begin());
+    if (_transpose)
+      return _scalar * boost::numeric::ublas::trans(m);
+    else
+      return _scalar * m;
+  }
+
   operator boost::numeric::ublas::matrix<T, boost::numeric::ublas::row_major>() {
-    return ublas();
+    return ublasRowMajor();
+  }
+
+  operator boost::numeric::ublas::matrix<T, boost::numeric::ublas::column_major>() {
+    return ublasColumnMajor();
   }
 };
 
