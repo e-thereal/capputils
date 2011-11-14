@@ -24,6 +24,10 @@ ObservableClass::~ObservableClass() {
     (*i)->removeParent(this);
 }
 
+void ObservableClass::connectHandler(void (*handler)(ObservableClass* sender, int eventId)) {
+  Changed.connect(handler);
+}
+
 void ObservableClass::fireChangeEvent(int eventId) {
   Changed(this, eventId);
   for (map<ObservableClass*, int>::iterator i = parents.begin(); i != parents.end(); ++i)

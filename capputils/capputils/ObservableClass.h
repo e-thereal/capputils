@@ -5,8 +5,8 @@
  *      Author: tombr
  */
 
-#ifndef OBSERVABLECLASS_H_
-#define OBSERVABLECLASS_H_
+#ifndef CAPPUTILS_OBSERVABLECLASS_H_
+#define CAPPUTILS_OBSERVABLECLASS_H_
 
 #include <boost/signal.hpp>
 #include "IClassProperty.h"
@@ -27,6 +27,7 @@ public:
   ObservableClass();
   virtual ~ObservableClass();
 
+  void connectHandler(void (*handler)(ObservableClass* sender, int eventId));
   void fireChangeEvent(int eventId);
   void addChild(ObservableClass* child, int eventId);
   void removeChild(ObservableClass* child);
@@ -38,4 +39,4 @@ protected:
 
 }
 
-#endif /* OBSERVABLECLASS_H_ */
+#endif /* CAPPUTILS_OBSERVABLECLASS_H_ */

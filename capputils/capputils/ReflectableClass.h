@@ -12,7 +12,9 @@
 #ifndef CAPPUTILS_REFLECTABLECLASS_H_
 #define CAPPUTILS_REFLECTABLECLASS_H_
 
+#ifndef CAPPUTILS_NO_CPP0x
 #define CAPPUTILS_USE_CPP0x
+#endif
 
 #include <sstream>
 #include <string>
@@ -240,24 +242,8 @@ std::istream& operator>> (std::istream& stream, capputils::reflection::Reflectab
  * Every property definition block must be closed using this macro.
  */
 
-#if !defined(CAPPUTILS_USE_CPP0x)
-#define Property(name,type) \
-private: type _##name; \
-public: \
-  type get##name() const { return _##name; } \
-  void set##name(const type& value) { static ::capputils::reflection::IClassProperty* property = findProperty(#name); _##name = value; ::capputils::attributes::AttributeExecuter::Execute(*this, *property); } \
-protected: \
-  static void set##name(::capputils::reflection::ReflectableClass& object, const type& value) { dynamic_cast<ClassType*>(&object)->set##name(value); } \
-  static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); } \
-  typedef type name##Type;
-#define VirtualProperty(name,type) \
-public: \
-  type get##name() const; \
-protected: \
-  static void set##name(::capputils::reflection::ReflectableClass& object, type value) { } \
-  static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); } \
-  typedef type name##Type;
-#else
+#if defined(CAPPUTILS_USE_CPP0x)
+
 #define Property(name,type) \
 private: type _##name; \
 public: \
@@ -266,13 +252,71 @@ public: \
 protected: \
   static void set##name(::capputils::reflection::ReflectableClass& object, type value) { dynamic_cast<ClassType*>(&object)->set##name(value); } \
   static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); }
+
 #define VirtualProperty(name,type) \
 public: \
   type get##name() const; \
 protected: \
   static void set##name(::capputils::reflection::ReflectableClass& object, type value) { } \
   static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); }
-#endif
+
+#if defined(_MSC_VER)
+
+#define DefineProperty(name, ...) \
+  properties.push_back(new ::capputils::reflection::ClassProperty<decltype(((ClassType*)0)->get##name())>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, 0));
+
+#define ReflectableProperty(name, ...) \
+  properties.push_back(new ::capputils::reflection::ClassProperty<decltype(((ClassType*)0)->get##name())>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Reflectable<decltype(((ClassType*)0)->get##name())>(), 0));
+
+#else /* !defined(_MSC_VER) */
+
+#define DefineProperty(name, arguments...) \
+  properties.push_back(new ::capputils::reflection::ClassProperty<decltype(((ClassType*)0)->get##name())>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0));
+
+#define ReflectableProperty(name, arguments...) \
+  properties.push_back(new ::capputils::reflection::ClassProperty<decltype(((ClassType*)0)->get##name())>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable<decltype(((ClassType*)0)->get##name())>(), 0));
+
+#endif /* defined(_MSC_VER) */
+
+#else /* !defined(CAPPUTILS_USE_CPP0x) */
+
+#define Property(name,type) \
+private: type _##name; \
+public: \
+  type get##name() const { return _##name; } \
+  void set##name(const type& value) { static ::capputils::reflection::IClassProperty* property = findProperty(#name); ::capputils::attributes::AttributeExecuter::ExecuteBefore(*this, *property); _##name = value; ::capputils::attributes::AttributeExecuter::ExecuteAfter(*this, *property); } \
+protected: \
+  static void set##name(::capputils::reflection::ReflectableClass& object, const type& value) { dynamic_cast<ClassType*>(&object)->set##name(value); } \
+  static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); } \
+  typedef type name##Type;
+
+#define VirtualProperty(name,type) \
+public: \
+  type get##name() const; \
+protected: \
+  static void set##name(::capputils::reflection::ReflectableClass& object, type value) { } \
+  static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); } \
+  typedef type name##Type;
+
+#if defined(_MSC_VER)
+
+#define DefineProperty(name, ...) \
+  properties.push_back(new ::capputils::reflection::ClassProperty<name##Type>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, 0));
+
+#define ReflectableProperty(name, ...) \
+  properties.push_back(new ::capputils::reflection::ClassProperty<name##Type>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Reflectable<name##Type>(), 0));
+
+#else /* ! defined(_MSC_VER) */
+
+#define DefineProperty(name, arguments...) \
+  properties.push_back(new ::capputils::reflection::ClassProperty<name##Type>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0));
+
+#define ReflectableProperty(name, arguments...) \
+  properties.push_back(new ::capputils::reflection::ClassProperty<name##Type>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable<name##Type>(), 0));
+
+#endif /* defined(_MSC_VER) */
+
+#endif /* defined(CAPPUTILS_USE_CPP0x) */
 
 #define InitReflectableClass(name)                    \
   typedef name ClassType;                         \
@@ -309,33 +353,8 @@ protected: \
   public: virtual const std::string& getClassName() const { return ClassType::ClassName; } \
   private: void initializeClass() const;
 
-#if !defined(CAPPUTILS_USE_CPP0x)
-#if defined(_MSC_VER)
-#define DefineProperty(name, ...) \
-  properties.push_back(new ::capputils::reflection::ClassProperty<name##Type>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, 0));
-#define ReflectableProperty(name, ...) \
-  properties.push_back(new ::capputils::reflection::ClassProperty<name##Type>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Reflectable<name##Type>(), 0));
-#else
-#define DefineProperty(name, arguments...) \
-  properties.push_back(new ::capputils::reflection::ClassProperty<name##Type>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0));
-#define ReflectableProperty(name, arguments...) \
-  properties.push_back(new ::capputils::reflection::ClassProperty<name##Type>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable<name##Type>(), 0));
-#endif
-#else
-#if defined(_MSC_VER)
-#define DefineProperty(name, ...) \
-  properties.push_back(new ::capputils::reflection::ClassProperty<decltype(((ClassType*)0)->get##name())>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, 0));
-#define ReflectableProperty(name, ...) \
-  properties.push_back(new ::capputils::reflection::ClassProperty<decltype(((ClassType*)0)->get##name())>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Reflectable<decltype(((ClassType*)0)->get##name())>(), 0));
-#else
-#define DefineProperty(name, arguments...) \
-  properties.push_back(new ::capputils::reflection::ClassProperty<decltype(((ClassType*)0)->get##name())>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0));
-#define ReflectableProperty(name, arguments...) \
-  properties.push_back(new ::capputils::reflection::ClassProperty<decltype(((ClassType*)0)->get##name())>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable<decltype(((ClassType*)0)->get##name())>(), 0));
-#endif
-#endif
-
 #define PROPERTY_ID properties.size()
+
 #define ReflectableBase(BaseClass) \
   { \
     std::vector<capputils::reflection::IClassProperty*>& baseProperties = BaseClass::getProperties(); \
@@ -347,6 +366,7 @@ protected: \
   }
 
 #if defined(_MSC_VER)
+
 #define BeginPropertyDefinitions(cname, ...)   \
   std::vector< ::capputils::reflection::IClassProperty*> cname :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> cname :: attributes;     \
@@ -365,7 +385,9 @@ protected: \
     static bool initialized = false; \
     if (initialized) return; \
     addAttributes(&cname::attributes, __VA_ARGS__, 0);
-#else
+
+#else /* !defined(_MSC_VER) */
+
 #define BeginPropertyDefinitions(cname, args...)   \
   std::vector< ::capputils::reflection::IClassProperty*> cname :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> cname :: attributes;     \
@@ -384,7 +406,9 @@ protected: \
     static bool initialized = false; \
     if (initialized) return; \
     addAttributes(&cname::attributes, ##args, 0);
-#endif
+
+#endif /* defined(_MSC_VER) */
+
 #define EndPropertyDefinitions initialized = true; }
 
 #endif /* CAPPUTILS_REFLECTABLECLASS_H_ */
