@@ -23,12 +23,14 @@
 #include <ostream>
 #include <istream>
 
+#include <boost/config.hpp>
+
 #include "capputils.h"
 #include "IAttribute.h"
 #include "ClassProperty.h"
 #include "AttributeExecuter.h"
 #include "ReflectableAttribute.h"
-#include "ReflectableClassFactory.h"
+#include "RegisterClass.h"
 
 /** \brief main namespace */
 namespace capputils {
@@ -242,7 +244,7 @@ std::istream& operator>> (std::istream& stream, capputils::reflection::Reflectab
  * Every property definition block must be closed using this macro.
  */
 
-#if defined(CAPPUTILS_USE_CPP0x)
+#if !defined(BOOST_NO_DECLTYPE)
 
 #define Property(name,type) \
 private: type _##name; \

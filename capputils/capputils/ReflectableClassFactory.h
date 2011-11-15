@@ -16,6 +16,8 @@
 #include <boost/interprocess/managed_windows_shared_memory.hpp>
 #endif
 
+#include "RegisterClass.h"
+
 namespace capputils {
 
 namespace reflection {
@@ -24,10 +26,6 @@ class ReflectableClass;
 
 class ReflectableClassFactory {
 friend class InitFactory;
-
-public:
-  typedef ReflectableClass* (*ConstructorType)();
-  typedef void (*DestructorType)(ReflectableClass*);
 
 private:
   std::map<std::string, ConstructorType> constructors;
@@ -50,16 +48,7 @@ public:
   std::vector<std::string>& getClassNames();
 };
 
-class RegisterClass {
-private:
-  std::string classname;
 
-public:
-  RegisterClass(const std::string& classname,
-      ReflectableClassFactory::ConstructorType constructor,
-      ReflectableClassFactory::DestructorType destructor);
-  virtual ~RegisterClass();
-};
 
 }
 

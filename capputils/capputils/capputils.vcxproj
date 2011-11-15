@@ -90,6 +90,7 @@
     <ClInclude Include="LibraryLoader.h" />
     <ClInclude Include="OutputAttribute.h" />
     <ClInclude Include="ReflectionException.h" />
+    <ClInclude Include="RegisterClass.h" />
     <ClInclude Include="ReuseAttribute.h" />
     <ClInclude Include="ScalarAttribute.h" />
     <ClInclude Include="ArgumentsParser.h" />
@@ -133,6 +134,7 @@
     <ClCompile Include="LibraryLoader.cpp" />
     <ClCompile Include="OutputAttribute.cpp" />
     <ClCompile Include="ReflectionException.cpp" />
+    <ClCompile Include="RegisterClass.cpp" />
     <ClCompile Include="ReuseAttribute.cpp" />
     <ClCompile Include="ScalarAttribute.cpp" />
     <ClCompile Include="ArgumentsParser.cpp" />

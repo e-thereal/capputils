@@ -111,17 +111,6 @@ std::vector<std::string>& ReflectableClassFactory::getClassNames() {
   return classNames;
 }
 
-RegisterClass::RegisterClass(const std::string& classname,
-      ReflectableClassFactory::ConstructorType constructor,
-      ReflectableClassFactory::DestructorType destructor) : classname(classname)
-{
-  ReflectableClassFactory::getInstance().registerClass(classname, constructor, destructor);
-}
-
-RegisterClass::~RegisterClass() {
-  ReflectableClassFactory::getInstance().freeClass(classname);
-}
-
 }
 
 }
