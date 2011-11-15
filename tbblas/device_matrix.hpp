@@ -17,7 +17,14 @@
 #include <thrust/reduce.h>
 #include <thrust/transform.h>
 
+#include <thrust/iterator/counting_iterator.h>
+#include <thrust/iterator/transform_iterator.h>
+#include <thrust/iterator/permutation_iterator.h>
+#include <thrust/functional.h>
+
 #include <cublas.h>
+
+#include "device_vector.hpp"
 
 namespace tbblas {
 
@@ -35,21 +42,18 @@ struct copy_matrix_operation {
 };
 
 template<class T>
+struct add_matrix_operation {
+  device_matrix<T> m1, m2;
+
+  add_matrix_operation(const device_matrix<T>& m1, const device_matrix<T>& m2) : m1(m1), m2(m2) { }
+};
+
+template<class T>
 struct prod_matrix_operation {
   device_matrix<T> m1, m2;
 
   prod_matrix_operation(const device_matrix<T>& m1, const device_matrix<T>& m2) : m1(m1), m2(m2) { }
 };
-
-template<class T>
-copy_matrix_operation<T> copy(const device_matrix<T>& m) {
-  return copy_matrix_operation<T>(m);
-}
-
-template<class T>
-prod_matrix_operation<T> prod(const device_matrix<T>& m1, const device_matrix<T> m2) {
-  return prod_matrix_operation<T>(m1, m2);
-}
 
 template<class T>
 void gemm(char transa, char transb, int m, int n, int k, T alpha, const T* A, int lda,
@@ -76,6 +80,34 @@ template<class T>
 class device_matrix {
   friend class device_vector<T>;
 
+public:
+  typedef thrust::device_vector<float>::iterator Iterator;
+  typedef thrust::device_vector<float>::const_iterator const_Iterator;
+
+  typedef typename thrust::iterator_difference<Iterator>::type difference_type;
+
+  struct subrange_functor : public thrust::unary_function<difference_type,difference_type> {
+    difference_type width, pitch;
+
+    subrange_functor(difference_type width, difference_type pitch)
+        : width(width), pitch(pitch) {}
+
+    __host__ __device__
+    difference_type operator()(const difference_type& i) const
+    { 
+        return i + (i / width) * (pitch - width);
+    }
+  };
+
+  typedef typename thrust::counting_iterator<difference_type>                     CountingIterator;
+  typedef typename thrust::transform_iterator<subrange_functor, CountingIterator> TransformIterator;
+  typedef typename thrust::permutation_iterator<Iterator,TransformIterator>       PermutationIterator;
+  typedef typename thrust::permutation_iterator<const_Iterator, TransformIterator> const_PermutationIterator;
+
+  // type of the strided_range iterator
+  typedef PermutationIterator iterator;
+  typedef const_PermutationIterator const_iterator;
+
 private:
   size_t _rowCount, _columnCount, _offset, _leadingDimension;
   bool _transpose;
@@ -83,7 +115,7 @@ private:
   boost::shared_ptr<thrust::device_vector<T> > _data;
 
 public:
-  device_matrix(size_t rowCount, size_t columnCount)
+  device_matrix(size_t rowCount = 0, size_t columnCount = 0)
     : _rowCount(rowCount), _columnCount(columnCount), _offset(0),
       _leadingDimension(rowCount), _transpose(false), _scalar(1),
       _data(new thrust::device_vector<T>(rowCount * columnCount))
@@ -114,6 +146,39 @@ public:
 
   size_t columnCount() const {
     return _columnCount;
+  }
+
+  iterator begin(void) {
+    assert(!_transpose);
+      return PermutationIterator(data().begin() + _offset,
+        TransformIterator(CountingIterator(0), subrange_functor(_rowCount, _leadingDimension)));
+  }
+
+  iterator end(void) {
+      return begin() + _rowCount * _columnCount;
+  }
+
+  const_iterator begin(void) const {
+    assert(!_transpose);
+      return const_PermutationIterator(data().begin() + _offset,
+        TransformIterator(CountingIterator(0), subrange_functor(_rowCount, _leadingDimension)));
+  }
+
+  const_iterator end(void) const {
+      return begin() + _rowCount * _columnCount;
+  }
+
+  /**
+   * \brief Creates new storage container
+   */
+  void resize(size_t rowCount, size_t columnCount) {
+    _rowCount = rowCount;
+    _columnCount = columnCount;
+    _offset = 0;
+    _leadingDimension = rowCount;
+    _transpose = false;
+    _scalar = 1;
+    _data = boost::shared_ptr<thrust::device_vector<T> >(new thrust::device_vector<T>(rowCount * columnCount));
   }
 
   /*** Matrix operations applied by the assignment operator ***/
@@ -155,21 +220,60 @@ public:
     return prod(op.m1, op.m2, true);
   }
 
+  device_matrix<T>& operator=(const add_matrix_operation<T>& op) {
+    const device_matrix<T>& m1 = op.m1;
+    const device_matrix<T>& m2 = op.m2;
+
+    assert(m1.size1() == m2.size1());
+    assert(m1.size2() == m2.size2());
+    assert(size1() == m1.size1());
+    assert(size2() == m1.size2());
+
+    // TODO: Loosen the contraint to m1._transpose == m2._transpose
+    assert(_transpose == false);
+    assert(m1._transpose == false);
+    assert(m2._transpose == false);
+
+    thrust::transform(m1.begin(), m1.end(), m2.begin(), begin(), axpby<T>(m1._scalar / _scalar, m2._scalar / _scalar));
+
+    return *this;
+  }
+
+  // TODO: could be implemented using <t>gemm
   device_matrix<T>& operator+=(const device_matrix<T>& dm) {
     assert(size1() == dm.size1());
     assert(size2() == dm.size2());
     assert(!_transpose);
     assert(!dm._transpose);
-    assert(_leadingDimension == size1());
-    assert(dm._leadingDimension == dm.size1());
 
-    thrust::transform(data().begin() + _offset, data().begin() + _offset + (size1() * size2()),
-        dm.data().begin() + dm._offset, data().begin() + _offset, axpby<T>(1, dm._scalar / _scalar));
-
+    thrust::transform(begin(), end(), dm.begin(), begin(), axpby<T>(1, dm._scalar / _scalar));
     return *this;
   }
 
+  device_matrix<T>& operator-=(const device_matrix<T>& dm) {
+    return *this += -dm;
+  }
+
+  /*** Direct calcuations ***/
+  T norm_1() const {
+    assert(_transpose || _leadingDimension == _rowCount);
+    assert(!_transpose || _leadingDimension == _columnCount);
+    return cublasSasum(_rowCount * _columnCount, data().data().get() + _offset, 1) * _scalar;
+  }
+
+  T norm_2() const {
+    assert(_transpose || _leadingDimension == _rowCount);
+    assert(!_transpose || _leadingDimension == _columnCount);
+    return cublasSnrm2(_rowCount * _columnCount, data().data().get() + _offset, 1) * _scalar;
+  }
+
   /*** Operations that create a simple proxy ***/
+
+  device_matrix<T> operator-(void) const {
+    device_matrix<T> dm(*this);
+    dm._scalar = -dm._scalar;
+    return dm;
+  }
 
   device_matrix<T> mult(const T& scalar) const {
     device_matrix<T> dm(*this);
@@ -265,8 +369,18 @@ public:
 };
 
 template<class T>
-device_matrix<T> trans(const device_matrix<T>& m) {
-  return m.transpose();
+T norm_1(const device_matrix<T>& dm) {
+  return dm.norm_1();
+}
+
+template<class T>
+T norm_2(const device_matrix<T>& m) {
+  return m.norm_2();
+}
+
+template<class T>
+device_matrix<T> trans(const device_matrix<T>& dm) {
+  return dm.transpose();
 }
 
 template<class T>
@@ -292,6 +406,31 @@ device_matrix<T> operator*(const device_matrix<T>& m, const T& scalar) {
 template<class T>
 device_matrix<T> operator*(const T& scalar, const device_matrix<T>& m) {
   return m.mult(scalar);
+}
+
+template<class T>
+device_matrix<T> operator/(const device_matrix<T>& m, const T& scalar) {
+  return m.mult(1/scalar);
+}
+
+template<class T>
+copy_matrix_operation<T> copy(const device_matrix<T>& m) {
+  return copy_matrix_operation<T>(m);
+}
+
+template<class T>
+prod_matrix_operation<T> prod(const device_matrix<T>& m1, const device_matrix<T> m2) {
+  return prod_matrix_operation<T>(m1, m2);
+}
+
+template<class T>
+add_matrix_operation<T> operator+(const device_matrix<T>& m1, const device_matrix<T>& m2) {
+  return add_matrix_operation<T>(m1, m2);
+}
+
+template<class T>
+add_matrix_operation<T> operator-(const device_matrix<T>& m1, const device_matrix<T>& m2) {
+  return add_matrix_operation<T>(m1, -m2);
 }
 
 }

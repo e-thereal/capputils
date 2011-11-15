@@ -55,7 +55,7 @@ private:
   boost::shared_ptr<thrust::device_vector<T> > _data;
 
 public:
-  device_vector(size_t length)
+  device_vector(size_t length = 0)
    : _length(length), _offset(0), _increment(1), _scalar(1),
      _data(new thrust::device_vector<T>(length))
   {
@@ -76,17 +76,43 @@ public:
     return *_data;
   }
 
+  size_t size() const {
+    return _length;
+  }
+
+  void resize(size_t size) {
+    _length = size;
+    _offset = 0;
+    _increment = 1;
+    _scalar = 1;
+    _data = boost::shared_ptr<thrust::device_vector<T> >(new thrust::device_vector<T>(size));
+  }
+
+  typename thrust::device_vector<T>::reference operator()(size_t i) {
+    assert(_scalar == 1);
+    return data()[_offset + _increment * i];
+  }
+
   T sum() const {
     // TODO: allow arbitrary increments
     assert(_increment == 1);
     return _scalar * thrust::reduce(data().begin() + _offset, data().begin() + _offset + _length);
   }
 
+  T norm_1() const {
+    return cublasSasum(_length, data().data().get() + _offset, _increment) * _scalar;
+  }
+
   device_vector<T>& operator+=(const device_vector<T>& v) {
     assert(_length == v._length);
+    // TODO: use templated axpy operation
     cublasSaxpy(_length, v._scalar / _scalar, v.data().data().get() + v._offset, v._increment,
         data().data().get() + _offset, _increment);
     return *this;
+  }
+
+  device_vector<T>& operator-=(const device_vector<T>& v) {
+    return *this += -v;
   }
 
   sum_vector_operation<T> operator+(const device_vector<T>& v) const {
@@ -129,6 +155,11 @@ public:
 template<class T>
 T sum(const device_vector<T>& v) {
   return v.sum();
+}
+
+template<class T>
+T norm_1(const device_vector<T>& v) {
+  return v.norm_1();
 }
 
 template<class T>
