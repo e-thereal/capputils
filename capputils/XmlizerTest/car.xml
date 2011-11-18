@@ -1,6 +1,61 @@
 <?xml version="1.0" ?>
 <Car>
+    <!--Number of doors (default = 3)-->
     <DoorCount value="3" />
-    <HighSpeed value="240" />
-    <ModelName value="BMW 3er" />
+    <HighSpeed value="100" timestamp="Dec 31 1969 16:00:00" />
+    <ModelName value="BMW" />
+    <!--Show options-->
+    <Help value="0" />
+    <Engine>
+        <EngineDescription>
+            <CylinderCount value="12" />
+            <PS value="120" />
+            <Model value="Diesel" />
+        </EngineDescription>
+    </Engine>
+    <Owners>
+        <Collection>
+            <Item>
+                <Person>
+                    <!--Persons given name.-->
+                    <FirstName value="Tom" />
+                    <!--Name of our parents.-->
+                    <Name value="Brosch" />
+                    <!--Age in years.-->
+                    <Age value="27" timestamp="Dec 31 1969 16:00:00" />
+                    <!--Address with everything.-->
+                    <Address>
+                        <Address>
+                            <Street value="W 11th Ave" />
+                            <City value="Vancouver" />
+                            <StreetNumber value="1065" />
+                            <AppartmentNumber value="207" />
+                        </Address>
+                    </Address>
+                    <Gender value="Male" />
+                </Person>
+            </Item>
+            <Item>
+                <Student>
+                    <!--Persons given name.-->
+                    <FirstName value="Tom" />
+                    <!--Name of our parents.-->
+                    <Name value="Brosch" />
+                    <!--Age in years.-->
+                    <Age value="27" timestamp="Dec 31 1969 16:00:00" />
+                    <!--Address with everything.-->
+                    <Address>
+                        <Address>
+                            <Street value="W 11th Ave" />
+                            <City value="Vancouver" />
+                            <StreetNumber value="1065" />
+                            <AppartmentNumber value="207" />
+                        </Address>
+                    </Address>
+                    <Gender value="Male" />
+                    <Matrikel value="0" />
+                </Student>
+            </Item>
+        </Collection>
+    </Owners>
 </Car>
