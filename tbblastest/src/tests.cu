@@ -12,7 +12,6 @@
 #include <tbblas/device_matrix.hpp>
 #include <boost/signals.hpp>
 #include <boost/progress.hpp>
-//#include <boost/any.hpp>
 
 //#include <boost/lambda/lambda.hpp>
 
@@ -21,6 +20,7 @@
 #include <boost/timer.hpp>
 
 #include <thrust/transform.h>
+#include <thrust/reduce.h>
 
 namespace ublas = boost::numeric::ublas;
 
@@ -72,16 +72,60 @@ int runtests() {
     cout << v[i] << " ";
   cout << endl;
 
-  tbblas::device_matrix<float> dm1000(1000,1000);
-  timer.restart();
-  for (int i = 0; i < 100; ++i)
-    thrust::transform(dm1000.data().begin(), dm1000.data().end(), dm1000.data().begin(), dm1000.data().begin(), thrust::plus<float>());
-  cout << timer.elapsed() << endl;
+  thrust::device_vector<float> column_sums(sdm.size2());
+  thrust::device_vector<float> indices(sdm.size2());
 
-  timer.restart();
-  for (int i = 0; i < 100; ++i)
-    thrust::transform(dm1000.begin(), dm1000.end(), dm1000.begin(), dm1000.begin(), thrust::plus<float>());
-  cout << timer.elapsed() << endl;
+  tbblas::device_vector<float> csums(dm.size2());
+  csums = tbblas::sum(dm);
+  for (int i = 0; i < csums.size(); ++i)
+    cout << csums(i) << " ";
+  cout << endl;
+
+#if 1
+  cout << "n, prod, trans(all), trans(sub)" << endl;
+  for (int n = 100; n < 1500; n *= 1.4) {
+    const int reps = 2000 / n * 50;
+    cout << n << ", ";
+    tbblas::device_matrix<float> dm1000(n,n), dm4(n,n);
+    timer.restart();
+    for (int i = 0; i < reps; ++i)
+      dm4 = tbblas::prod(dm1000, dm1000);
+    cudaThreadSynchronize();
+    cout << timer.elapsed() / reps << ", ";
+    timer.restart();
+    for (int i = 0; i < reps; ++i)
+      thrust::transform(dm1000.data().begin(), dm1000.data().end(), dm1000.data().begin(), dm1000.data().begin(), thrust::plus<float>());
+    cudaThreadSynchronize();
+    cout << timer.elapsed() / reps << ", ";
+
+    timer.restart();
+    for (int i = 0; i < reps; ++i)
+      thrust::transform(dm1000.begin(), dm1000.end(), dm1000.begin(), dm1000.begin(), thrust::plus<float>());
+    cudaThreadSynchronize();
+    cout << timer.elapsed() / reps << endl;
+  }
+  for (int n = 128; n <= 2048; n += 128) {
+    const int reps = 2048 / n * 100;
+      cout << n << ", ";
+      tbblas::device_matrix<float> dm1000(n,n), dm4(n,n);
+      timer.restart();
+      for (int i = 0; i < reps; ++i)
+        dm4 = tbblas::prod(dm1000, dm1000);
+      cudaThreadSynchronize();
+      cout << timer.elapsed() / reps << ", ";
+      timer.restart();
+      for (int i = 0; i < reps; ++i)
+        thrust::transform(dm1000.data().begin(), dm1000.data().end(), dm1000.data().begin(), dm1000.data().begin(), thrust::plus<float>());
+      cudaThreadSynchronize();
+      cout << timer.elapsed() / reps << ", ";
+
+      timer.restart();
+      for (int i = 0; i < reps; ++i)
+        thrust::transform(dm1000.begin(), dm1000.end(), dm1000.begin(), dm1000.begin(), thrust::plus<float>());
+      cudaThreadSynchronize();
+      cout << timer.elapsed() / reps << endl;
+    }
+#endif
 
   return 0;
 }

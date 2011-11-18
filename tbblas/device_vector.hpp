@@ -12,8 +12,12 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include <cuda_runtime.h>
 #include <thrust/device_vector.h>
 #include <thrust/reduce.h>
+#include <thrust/iterator/counting_iterator.h>
+#include <thrust/iterator/transform_iterator.h>
+#include <thrust/iterator/discard_iterator.h>
 #include <thrust/transform.h>
 
 #include <cublas.h>
@@ -27,10 +31,13 @@ template<class T>
 class device_matrix;
 
 template<class T>
-struct sum_vector_operation {
+struct sum_matrix_operation;
+
+template<class T>
+struct add_vector_operation {
   device_vector<T> v1, v2;
 
-  sum_vector_operation<T>(const device_vector<T>& v1, const device_vector<T>& v2) : v1(v1), v2(v2) { }
+  add_vector_operation<T>(const device_vector<T>& v1, const device_vector<T>& v2) : v1(v1), v2(v2) { }
 };
 
 // c = alpha * a + beta * b
@@ -48,6 +55,23 @@ struct axpby {
 template<class T>
 class device_vector {
   friend class device_matrix<T>;
+
+public:
+  // convert a linear index to a row index
+  template <typename T1>
+  struct linear_index_to_row_index : public thrust::unary_function<T1,T1>
+  {
+      T1 C; // number of columns
+
+      __host__ __device__
+      linear_index_to_row_index(T1 _C) : C(_C) {}
+
+      __host__ __device__
+      T1 operator()(T1 i)
+      {
+          return i / C;
+      }
+  };
 
 private:
   size_t _length, _offset, _increment;
@@ -115,12 +139,12 @@ public:
     return *this += -v;
   }
 
-  sum_vector_operation<T> operator+(const device_vector<T>& v) const {
-    return sum_vector_operation<T>(*this, v);
+  add_vector_operation<T> operator+(const device_vector<T>& v) const {
+    return add_vector_operation<T>(*this, v);
   }
 
-  sum_vector_operation<T> operator-(const device_vector<T>& v) const {
-    return sum_vector_operation<T>(*this, -v);
+  add_vector_operation<T> operator-(const device_vector<T>& v) const {
+    return add_vector_operation<T>(*this, -v);
   }
 
   device_vector<T> operator-(void) const {
@@ -135,7 +159,7 @@ public:
     return v;
   }
 
-  device_vector<T>& operator=(const sum_vector_operation<T>& op) {
+  device_vector<T>& operator=(const add_vector_operation<T>& op) {
     const device_vector<T>& v1 = op.v1;
     const device_vector<T>& v2 = op.v2;
 
@@ -147,6 +171,32 @@ public:
 
     thrust::transform(v1.data().begin() + v1._offset, v1.data().begin() + v1._offset + _length,
         v2.data().begin() + v2._offset, data().begin() + _offset, axpby<T>(v1._scalar / _scalar, v2._scalar / _scalar));
+
+    return *this;
+  }
+
+  device_vector<T>& operator=(const sum_matrix_operation<T>& op) {
+    const device_matrix<T>& m = op.m;
+
+    // TODO: Loosen constraints
+    assert(m._transpose == false);
+    assert(m._scalar == _scalar);
+    assert(_increment == 1);
+    assert(m.size2() == size());
+
+    if (m._leadingDimension == m.size1()) {
+      thrust::reduce_by_key(thrust::make_transform_iterator(thrust::counting_iterator<int>(0), linear_index_to_row_index<int>(m.size1())),
+            thrust::make_transform_iterator(thrust::counting_iterator<int>(0), linear_index_to_row_index<int>(m.size1())) + (m.size1() * m.size2()),
+            m.data().begin() + m._offset,
+            thrust::make_discard_iterator(),
+            data().begin() + _offset);
+    } else {
+      thrust::reduce_by_key(thrust::make_transform_iterator(thrust::counting_iterator<int>(0), linear_index_to_row_index<int>(m.size1())),
+            thrust::make_transform_iterator(thrust::counting_iterator<int>(0), linear_index_to_row_index<int>(m.size1())) + (m.size1() * m.size2()),
+            m.begin(),
+            thrust::make_discard_iterator(),
+            data().begin() + _offset);
+    }
 
     return *this;
   }

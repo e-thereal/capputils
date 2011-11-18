@@ -3,6 +3,7 @@
 	<name>tbblastest</name>
 	<comment></comment>
 	<projects>
+		<project>tbblas</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

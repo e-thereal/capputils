@@ -13,6 +13,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
+#include <cuda_runtime.h>
 #include <thrust/device_vector.h>
 #include <thrust/reduce.h>
 #include <thrust/transform.h>
@@ -56,6 +57,13 @@ struct prod_matrix_operation {
 };
 
 template<class T>
+struct sum_matrix_operation {
+  device_matrix<T> m;
+
+  sum_matrix_operation(const device_matrix<T>& m) : m(m) { }
+};
+
+template<class T>
 void gemm(char transa, char transb, int m, int n, int k, T alpha, const T* A, int lda,
     const T* B, int ldb, T beta, T *C, int ldc)
 {
@@ -64,17 +72,27 @@ void gemm(char transa, char transb, int m, int n, int k, T alpha, const T* A, in
 
 template<>
 void gemm(char transa, char transb, int m, int n, int k, float alpha, const float* A, int lda,
-    const float* B, int ldb, float beta, float *C, int ldc)
-{
-  cublasSgemm(transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
-}
+    const float* B, int ldb, float beta, float *C, int ldc);
 
 template<>
 void gemm(char transa, char transb, int m, int n, int k, double alpha, const double* A, int lda,
-    const double* B, int ldb, double beta, double *C, int ldc)
-{
-  cublasDgemm(transa, transb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
-}
+    const double* B, int ldb, double beta, double *C, int ldc);
+
+/**
+ * \brief Calculates B = alpha * A + B
+ */
+template<class T>
+void tbblas_geaxpy(int m, int n, T alpha, const T* A, int lda,
+    T* B, int ldb)
+{ }
+
+template<>
+void tbblas_geaxpy(int m, int n, float alpha, const float* A, int lda,
+    float* B, int ldb);
+
+// TODO: Introduce new matrix proxy for repmat operations
+//       Can also be used with vectors to create a matrix
+//       by repeatedly copying a column or row vector
 
 template<class T>
 class device_matrix {
@@ -86,6 +104,7 @@ public:
 
   typedef typename thrust::iterator_difference<Iterator>::type difference_type;
 
+  // TODO: Handle transpose case correctly
   struct subrange_functor : public thrust::unary_function<difference_type,difference_type> {
     difference_type width, pitch;
 
@@ -246,7 +265,14 @@ public:
     assert(!_transpose);
     assert(!dm._transpose);
 
-    thrust::transform(begin(), end(), dm.begin(), begin(), axpby<T>(1, dm._scalar / _scalar));
+    if (size1() == _leadingDimension && dm.size1() == dm._leadingDimension) {
+      thrust::transform(data().begin() + _offset, data().begin() + _offset + (size1() * size2()),
+          dm.data().begin() + dm._offset, begin() + _offset, axpby<T>(1, dm._scalar / _scalar));
+    } else {
+    //  thrust::transform(begin(), end(), dm.begin(), begin(), axpby<T>(1, dm._scalar / _scalar));
+      tbblas_geaxpy<T>(size1(), size2(), dm._scalar / _scalar, dm.data().data().get() + dm._offset, dm._leadingDimension,
+          data().data().get() + _offset, _leadingDimension);
+    }
     return *this;
   }
 
@@ -421,6 +447,11 @@ copy_matrix_operation<T> copy(const device_matrix<T>& m) {
 template<class T>
 prod_matrix_operation<T> prod(const device_matrix<T>& m1, const device_matrix<T> m2) {
   return prod_matrix_operation<T>(m1, m2);
+}
+
+template<class T>
+sum_matrix_operation<T> sum(const device_matrix<T>& m) {
+  return sum_matrix_operation<T>(m);
 }
 
 template<class T>
