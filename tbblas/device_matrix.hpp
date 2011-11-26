@@ -364,10 +364,8 @@ public:
   }
 
   boost::numeric::ublas::matrix<T, boost::numeric::ublas::row_major> ublasRowMajor() {
-    assert(_offset == 0);
-
     boost::numeric::ublas::matrix<T, boost::numeric::ublas::row_major> m(size2(), size1());
-    thrust::copy(data().begin(), data().end(), m.data().begin());
+    thrust::copy(begin(), end(), m.data().begin());
     if (!_transpose)
       return _scalar * boost::numeric::ublas::trans(m);
     else

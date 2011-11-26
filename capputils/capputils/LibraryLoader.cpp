@@ -98,7 +98,7 @@ LibraryData::LibraryData(const char* filename) {
 }
 
 LibraryData::~LibraryData() {
-  //cout << "Unloading library: " << filename << endl;
+  cout << "Unloading library: " << filename << endl;
   if (dlclose(handle))
     throw exceptions::LibraryException(filename, dlerror());
 }
@@ -140,16 +140,16 @@ void LibraryLoader::loadLibrary(const string& filename) {
 }
 
 void LibraryLoader::freeLibrary(const string& filename) {
-//  cout << "Try to free library " << filename << endl;
+  cout << "Try to free library " << filename << endl;
   map<string, LibraryData*>::iterator iter = libraryTable.find(filename);
   if (iter != libraryTable.end()) {
     LibraryData* data = iter->second;
     data->loadCount = data->loadCount - 1;
-//    cout << filename << " library counter decremented (" << data->loadCount << ")." << endl;
+    cout << filename << " library counter decremented (" << data->loadCount << ")." << endl;
     if (!data->loadCount) {
       libraryTable.erase(filename);
       delete data;
-//      cout << "Library freed." << endl;
+      cout << "Library freed." << endl;
     }
   }
 }
