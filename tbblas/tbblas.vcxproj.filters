@@ -24,5 +24,16 @@
     <ClInclude Include="subrange_proxy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tbblas.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="device_matrix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="device_matrix_gpu.cu" />
   </ItemGroup>
 </Project>

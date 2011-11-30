@@ -8,6 +8,8 @@
 #ifndef TBBLAS_DEVICE_MATRIX_HPP_
 #define TBBLAS_DEVICE_MATRIX_HPP_
 
+#include "tbblas.hpp"
+
 #include <cassert>
 
 #include <boost/shared_ptr.hpp>
