@@ -27,7 +27,6 @@ namespace ublas = boost::numeric::ublas;
 using namespace std;
 
 // TODO: transform2d like thrust::transform but with 2d index
-// TODO: sum(matrix) = vector containing colum sums
 // TODO: sum(trans(matrix)) = vector containing row sums
 
 int runtests() {
@@ -65,6 +64,9 @@ int runtests() {
   dm1 = m1;
   dm2 = m2;
 
+  dm1 *= tbblas::subrange(dm, 1, 3, 1, 3);
+  cout << dm1.ublasColumnMajor() << endl;
+
   thrust::host_vector<float> v(2 * 3);
   tbblas::device_matrix<float> sdm = tbblas::subrange(dm, 1, 4, 1, 3);
   thrust::copy(sdm.begin(), sdm.end(), v.begin());
@@ -72,16 +74,13 @@ int runtests() {
     cout << v[i] << " ";
   cout << endl;
 
-  thrust::device_vector<float> column_sums(sdm.size2());
-  thrust::device_vector<float> indices(sdm.size2());
-
   tbblas::device_vector<float> csums(dm.size2());
   csums = tbblas::sum(dm);
   for (int i = 0; i < csums.size(); ++i)
     cout << csums(i) << " ";
   cout << endl;
 
-#if 1
+#if 0
   cout << "n, prod, trans(all), trans(sub)" << endl;
   for (int n = 100; n < 1500; n *= 1.4) {
     const int reps = 2000 / n * 50;

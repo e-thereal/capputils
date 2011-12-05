@@ -52,6 +52,13 @@ struct add_matrix_operation {
 };
 
 template<class T>
+struct element_prod_matrix_operation {
+  device_matrix<T> m1, m2;
+
+  element_prod_matrix_operation(const device_matrix<T>& m1, const device_matrix<T>& m2) : m1(m1), m2(m2) { }
+};
+
+template<class T>
 struct prod_matrix_operation {
   device_matrix<T> m1, m2;
 
@@ -282,6 +289,28 @@ public:
     return *this += -dm;
   }
 
+  // TODO: multiply out the scalar values
+  device_matrix<T>& element_prod(const device_matrix<T>& m1, const device_matrix<T>& m2) {
+    assert(size1() == m1.size1());
+    assert(m1.size1() == m2.size1());
+    assert(size2() == m1.size2());
+    assert(m1.size2() == m2.size2());
+    assert(_transpose == m1._transpose);
+    assert(m1._transpose == m2._transpose);
+
+    thrust::transform(m1.begin(), m1.end(), m2.begin(), begin(), thrust::multiplies<T>());
+    _scalar = m1._scalar * m2._scalar / _scalar;
+    return *this;
+  }
+
+  device_matrix<T>& operator=(const element_prod_matrix_operation<T>& op) {
+    return element_prod(op.m1, op.m2);
+  }
+
+  device_matrix<T>& operator*=(const device_matrix<T>& m) {
+    return element_prod(*this, m);
+  }
+
   /*** Direct calcuations ***/
   T norm_1() const {
     assert(_transpose || _leadingDimension == _rowCount);
@@ -462,6 +491,11 @@ add_matrix_operation<T> operator+(const device_matrix<T>& m1, const device_matri
 template<class T>
 add_matrix_operation<T> operator-(const device_matrix<T>& m1, const device_matrix<T>& m2) {
   return add_matrix_operation<T>(m1, -m2);
+}
+
+template<class T>
+element_prod_matrix_operation<T> operator*(const device_matrix<T>& m1, const device_matrix<T>& m2) {
+  return element_prod_matrix_operation<T>(m1, m2);
 }
 
 }
