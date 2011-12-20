@@ -153,6 +153,9 @@
     <ClInclude Include="SerializeAttribute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Serializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="xmlizer.cpp">
@@ -255,6 +258,9 @@
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="SerializeAttribute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Serializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

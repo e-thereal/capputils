@@ -15,6 +15,8 @@
 #include <capputils/ReflectableClassFactory.h>
 #include <capputils/ClassProperty.h>
 #include <capputils/IAttribute.h>
+#include <capputils/SerializeAttribute.h>
+#include <capputils/Serializer.h>
 
 #include "Car.h"
 #include "Student.h"
@@ -35,33 +37,28 @@ void changeHandler(ObservableClass* sender, int eventId) {
   }
 }
 
-class SmartTest {
-public:
-  SmartTest() {
-    cout << "ctor" << endl;
-  }
-  virtual ~SmartTest() {
-    cout << "dtor" << endl;
-  }
+class SerializeTest : public capputils::reflection::ReflectableClass {
 
-  void test() {
-    cout << "Test" << endl;
-  }
+  InitReflectableClass(SerializeTest)
+
+  Property(Width, unsigned)
+  Property(Height, unsigned)
+  Property(Data, boost::shared_ptr<std::vector<int> >)
+
 };
+
+BeginPropertyDefinitions(SerializeTest)
+
+  DefineProperty(Width, Serialize<TYPE_OF(Width)>())
+  DefineProperty(Height, Serialize<TYPE_OF(Height)>())
+  DefineProperty(Data, Serialize<TYPE_OF(Data)>())
+
+EndPropertyDefinitions
 
 int main(int argc, char** argv) {
   Car car;
-  cout << __DATE__" "__TIME__ << "test" << endl;
+  //cout << __DATE__" "__TIME__ << "test" << endl;
   //car.Changed.connect(changeHandler);
-
-  vector<boost::shared_ptr<SmartTest> > tests;
-  cout << "Begin smart test" << endl;
-  {
-    boost::shared_ptr<SmartTest> test(new SmartTest());
-    tests.push_back(test);
-  }
-  cout << "End smart test" << endl;
-  tests.clear();
 
   /*ReflectableClassFactory& factory = ReflectableClassFactory::getInstance();
   vector<string>& classNames = factory.getClassNames();
@@ -74,6 +71,24 @@ int main(int argc, char** argv) {
     delete object;
     cout << endl;
   }*/
+
+  SerializeTest test, test2;
+  test.setWidth(0xCAFEBABE);
+  test.setHeight(0xBADF00D);
+  
+  boost::shared_ptr<std::vector<int> > data(new std::vector<int>());
+  data->push_back(1);
+  data->push_back(2);
+  data->push_back(3);
+  test.setData(data);
+  
+  Serializer::writeToFile(test, "test.bin");
+  
+  Serializer::readFromFile(test2, "test.bin");
+  test2.getData()->push_back(4);
+  Serializer::writeToFile(test2, "test2.bin");
+
+  return 0;
 
   //Xmlizer::FromXml(car, "car2.xml");
   ArgumentsParser::Parse(car, argc, argv);
