@@ -116,6 +116,7 @@
     <ClInclude Include="ReflectableAttribute.h" />
     <ClInclude Include="ReflectableClass.h" />
     <ClInclude Include="ReflectableClassFactory.h" />
+    <ClInclude Include="SerializeAttribute.h" />
     <ClInclude Include="ShortNameAttribute.h" />
     <ClInclude Include="TimedClass.h" />
     <ClInclude Include="TimeStampAttribute.h" />
@@ -151,6 +152,7 @@
     <ClCompile Include="ReflectableAttribute.cpp" />
     <ClCompile Include="ReflectableClass.cpp" />
     <ClCompile Include="ReflectableClassFactory.cpp" />
+    <ClCompile Include="SerializeAttribute.cpp" />
     <ClCompile Include="ShortNameAttribute.cpp" />
     <ClCompile Include="TimedClass.cpp" />
     <ClCompile Include="TimeStampAttribute.cpp" />
