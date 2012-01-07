@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="device_matrix.cpp" />
+    <ClCompile Include="device_vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="device_matrix_gpu.cu" />

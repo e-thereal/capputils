@@ -20,6 +20,7 @@
 #include <thrust/reduce.h>
 #include <thrust/transform.h>
 
+#include <thrust/iterator/constant_iterator.h>
 #include <thrust/iterator/counting_iterator.h>
 #include <thrust/iterator/transform_iterator.h>
 #include <thrust/iterator/permutation_iterator.h>
@@ -49,6 +50,14 @@ struct add_matrix_operation {
   device_matrix<T> m1, m2;
 
   add_matrix_operation(const device_matrix<T>& m1, const device_matrix<T>& m2) : m1(m1), m2(m2) { }
+};
+
+template<class T>
+struct scalar_add_matrix_operation {
+  device_matrix<T> m;
+  T scalar;
+
+  scalar_add_matrix_operation(const device_matrix<T>& m, const T& scalar) : m(m), scalar(scalar) { }
 };
 
 template<class T>
@@ -108,8 +117,8 @@ class device_matrix {
   friend class device_vector<T>;
 
 public:
-  typedef thrust::device_vector<float>::iterator Iterator;
-  typedef thrust::device_vector<float>::const_iterator const_Iterator;
+  typedef typename thrust::device_vector<T>::iterator Iterator;
+  typedef typename thrust::device_vector<T>::const_iterator const_Iterator;
 
   typedef typename thrust::iterator_difference<Iterator>::type difference_type;
 
@@ -311,17 +320,36 @@ public:
     return element_prod(*this, m);
   }
 
+  device_matrix<T>& scalar_add(const device_matrix<T>& m, const T& scalar) {
+    assert(_scalar == 1);
+    assert(m._scalar == 1);
+    thrust::transform(m.begin(), m.end(), thrust::make_constant_iterator<T>(scalar), begin(), thrust::plus<T>());
+    return *this;
+  }
+
+  device_matrix<T>& operator=(const scalar_add_matrix_operation<T>& op) {
+    return scalar_add(op.m, op.scalar);
+  }
+
+  device_matrix<T>& operator+=(const T& scalar) {
+    return scalar_add(*this, scalar);
+  }
+
+  device_matrix<T>& operator-=(const T& scalar) {
+    return scalar_add(*this, -scalar);
+  }
+
   /*** Direct calcuations ***/
   T norm_1() const {
     assert(_transpose || _leadingDimension == _rowCount);
     assert(!_transpose || _leadingDimension == _columnCount);
-    return cublasSasum(_rowCount * _columnCount, data().data().get() + _offset, 1) * _scalar;
+    return asum<T>(_rowCount * _columnCount, data().data().get() + _offset, 1) * _scalar;
   }
 
   T norm_2() const {
     assert(_transpose || _leadingDimension == _rowCount);
     assert(!_transpose || _leadingDimension == _columnCount);
-    return cublasSnrm2(_rowCount * _columnCount, data().data().get() + _offset, 1) * _scalar;
+    return nrm2<T>(_rowCount * _columnCount, data().data().get() + _offset, 1) * _scalar;
   }
 
   /*** Operations that create a simple proxy ***/
@@ -496,6 +524,21 @@ add_matrix_operation<T> operator-(const device_matrix<T>& m1, const device_matri
 template<class T>
 element_prod_matrix_operation<T> operator*(const device_matrix<T>& m1, const device_matrix<T>& m2) {
   return element_prod_matrix_operation<T>(m1, m2);
+}
+
+template<class T>
+scalar_add_matrix_operation<T> operator+(const device_matrix<T>& m, const T& scalar) {
+  return scalar_add_matrix_operation<T>(m, scalar);
+}
+
+template<class T>
+scalar_add_matrix_operation<T> operator-(const device_matrix<T>& m, const T& scalar) {
+  return scalar_add_matrix_operation<T>(m, -scalar);
+}
+
+template<class T>
+scalar_add_matrix_operation<T> operator+(const T& scalar, const device_matrix<T>& m) {
+  return scalar_add_matrix_operation<T>(m, scalar);
 }
 
 }

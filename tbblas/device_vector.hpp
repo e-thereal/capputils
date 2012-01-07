@@ -8,6 +8,8 @@
 #ifndef TBBLAS_DEVICE_VECTOR_HPP_
 #define TBBLAS_DEVICE_VECTOR_HPP_
 
+#include "tbblas.hpp"
+
 #include <cassert>
 
 #include <boost/shared_ptr.hpp>
@@ -23,6 +25,44 @@
 #include <cublas.h>
 
 namespace tbblas {
+
+template<class T>
+void axpy(int n, const T alpha, const T* x, int incx, T* y, int incy) {
+  // TODO static assert
+}
+
+template<>
+void axpy(int n, const float alpha, const float* x, int incx, float* y, int incy);
+
+template<>
+void axpy(int n, const double alpha, const double* x, int incx, double* y, int incy);
+
+template<class T>
+T asum(int n, const T* x, int incx) { }
+
+template<>
+float asum(int n, const float* x, int incx);
+
+template<>
+double asum(int n, const double* x, int incx);
+
+template<class T>
+T nrm2(int n, const T* x, int incx) { }
+
+template<>
+float nrm2(int n, const float* x, int incx);
+
+template<>
+double nrm2(int n, const double* x, int incx);
+
+template<class T>
+void swap(int n, T* x, int incx, T* y, int incy) { }
+
+template<>
+void swap(int n, float* x, int incx, float* y, int incy);
+
+template<>
+void swap(int n, double* x, int incx, double* y, int incy);
 
 template<class T>
 class device_vector;
@@ -124,13 +164,17 @@ public:
   }
 
   T norm_1() const {
-    return cublasSasum(_length, data().data().get() + _offset, _increment) * _scalar;
+    return asum<T>(_length, data().data().get() + _offset, _increment) * _scalar;
+  }
+
+  void swap(device_vector<T>& v) {
+    assert(size() == v.size());
+    tbblas::swap<T>(size(), data().data().get() + _offset, _increment, v.data().data().get() + v._offset, v._increment);
   }
 
   device_vector<T>& operator+=(const device_vector<T>& v) {
     assert(_length == v._length);
-    // TODO: use templated axpy operation
-    cublasSaxpy(_length, v._scalar / _scalar, v.data().data().get() + v._offset, v._increment,
+    axpy<T>(_length, v._scalar / _scalar, v.data().data().get() + v._offset, v._increment,
         data().data().get() + _offset, _increment);
     return *this;
   }
