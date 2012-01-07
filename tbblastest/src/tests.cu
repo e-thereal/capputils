@@ -22,6 +22,9 @@
 #include <thrust/transform.h>
 #include <thrust/reduce.h>
 
+#include <fstream>
+#include <sstream>
+
 namespace ublas = boost::numeric::ublas;
 
 using namespace std;
@@ -32,6 +35,36 @@ using namespace std;
 int runtests() {
   //using namespace boost::lambda;
   boost::timer timer;
+
+  ifstream file("test.txt");
+  if (file) {
+    cout << "Reading file" << endl;
+
+    string line;
+    int rowCount = 0, columnCount = 0;
+    std::vector<float> values;
+    float value;
+    while(getline(file, line)) {
+      ++columnCount;
+      stringstream lineStream(line);
+      int rows = 0;
+      while(!lineStream.eof()) {
+        ++rows;
+        lineStream >> value;
+        values.push_back(value);
+      }
+      rowCount = std::max(columnCount, rows);
+    }
+    cout << "RowCount: " << rowCount << endl;
+    cout << "ColumnCount: " << columnCount << endl;
+    
+    file.close();
+
+    tbblas::device_matrix<float> dm(rowCount, columnCount);
+    thrust::copy(values.begin(), values.end(), dm.data().begin());
+  }
+
+  return 0;
 
   cout << "tbblas" << endl;
 
@@ -125,6 +158,8 @@ int runtests() {
       cout << timer.elapsed() / reps << endl;
     }
 #endif
+
+  tbblas::device_matrix<double> doubleM(10, 10);
 
   return 0;
 }
