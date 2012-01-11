@@ -167,7 +167,7 @@ public:
     return asum<T>(_length, data().data().get() + _offset, _increment) * _scalar;
   }
 
-  void swap(device_vector<T>& v) {
+  void swap(device_vector<T> v) {
     assert(size() == v.size());
     tbblas::swap<T>(size(), data().data().get() + _offset, _increment, v.data().data().get() + v._offset, v._increment);
   }
