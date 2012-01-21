@@ -276,21 +276,20 @@ public:
     return *this;
   }
 
-  // TODO: could be implemented using <t>gemm
   device_matrix<T>& operator+=(const device_matrix<T>& dm) {
     assert(size1() == dm.size1());
     assert(size2() == dm.size2());
     assert(!_transpose);
     assert(!dm._transpose);
 
-    if (size1() == _leadingDimension && dm.size1() == dm._leadingDimension) {
-      thrust::transform(data().begin() + _offset, data().begin() + _offset + (size1() * size2()),
-          dm.data().begin() + dm._offset, begin() + _offset, axpby<T>(1, dm._scalar / _scalar));
-    } else {
-    //  thrust::transform(begin(), end(), dm.begin(), begin(), axpby<T>(1, dm._scalar / _scalar));
-      tbblas_geaxpy<T>(size1(), size2(), dm._scalar / _scalar, dm.data().data().get() + dm._offset, dm._leadingDimension,
-          data().data().get() + _offset, _leadingDimension);
-    }
+    //if (size1() == _leadingDimension && dm.size1() == dm._leadingDimension) {
+    //  thrust::transform(data().begin() + _offset, data().begin() + _offset + (size1() * size2()),
+    //      dm.data().begin() + dm._offset, data().begin() + _offset, axpby<T>(1, dm._scalar / _scalar));
+    //} else {
+      thrust::transform(begin(), end(), dm.begin(), begin(), axpby<T>(1, dm._scalar / _scalar));
+    //  tbblas_geaxpy<T>(size1(), size2(), dm._scalar / _scalar, dm.data().data().get() + dm._offset, dm._leadingDimension,
+    //      data().data().get() + _offset, _leadingDimension);
+    //}
     return *this;
   }
 
