@@ -43,6 +43,7 @@ class SerializeTest : public capputils::reflection::ReflectableClass {
 
   Property(Width, unsigned)
   Property(Height, unsigned)
+  Property(Weight, double)
   Property(Data, boost::shared_ptr<std::vector<int> >)
 
 };
@@ -51,9 +52,20 @@ BeginPropertyDefinitions(SerializeTest)
 
   DefineProperty(Width, Serialize<TYPE_OF(Width)>())
   DefineProperty(Height, Serialize<TYPE_OF(Height)>())
+  DefineProperty(Weight, Serialize<TYPE_OF(Weight)>())
   DefineProperty(Data, Serialize<TYPE_OF(Data)>())
 
 EndPropertyDefinitions
+
+struct EmptyBase {
+public:
+  virtual ~EmptyBase() { }
+};
+
+struct TestStruct : public EmptyBase {
+  int a;
+  int b;
+};
 
 int main(int argc, char** argv) {
   Car car;
@@ -75,6 +87,7 @@ int main(int argc, char** argv) {
   SerializeTest test, test2;
   test.setWidth(0xCAFEBABE);
   test.setHeight(0xBADF00D);
+  test.setWeight(72.6);
   
   boost::shared_ptr<std::vector<int> > data(new std::vector<int>());
   data->push_back(1);
@@ -85,8 +98,13 @@ int main(int argc, char** argv) {
   Serializer::writeToFile(test, "test.bin");
   
   Serializer::readFromFile(test2, "test.bin");
+  cout << test.getWeight() << " == " << test2.getWeight() << endl;
   test2.getData()->push_back(4);
   Serializer::writeToFile(test2, "test2.bin");
+
+  TestStruct st;
+  cout << (char*)&st.a - (char*)&st << endl;
+  cout << (char*)&st.b - (char*)&st << endl;
 
   return 0;
 
