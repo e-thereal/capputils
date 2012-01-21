@@ -22,6 +22,7 @@ namespace attributes {
 class IEnumerableAttribute: public virtual IAttribute {
 public:
   virtual reflection::IPropertyIterator* getPropertyIterator(const reflection::IClassProperty* property) = 0;
+  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) = 0;
 };
 
 }

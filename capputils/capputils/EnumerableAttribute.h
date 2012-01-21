@@ -157,6 +157,12 @@ public:
     IPropertyIterator* iter = new reflection::PropertyIterator<CollectionType, ValueType>(typedProperty);
     return iter;
   }
+
+  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
+    using namespace reflection;
+    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
+    typedProperty->setValue(object, CollectionType());
+  }
 };
 
 template<class T>
@@ -176,6 +182,12 @@ public:
     iter->addAttribute(new ReflectableAttribute<ValueType>());
     return iter;
   }
+
+  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
+    using namespace reflection;
+    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
+    typedProperty->setValue(object, CollectionType());
+  }
 };
 
 template<class T>
@@ -192,6 +204,12 @@ public:
       throw "unexpected error.";
     IPropertyIterator* iter = new reflection::PropertyIterator<CollectionType, ValueType>(typedProperty);
     return iter;
+  }
+
+  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
+    using namespace reflection;
+    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
+    typedProperty->getValue(object)->clear();
   }
 };
 
@@ -211,6 +229,12 @@ public:
     iter->addAttribute(new ReflectableAttribute<ValueType>());
     return iter;
   }
+
+  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
+    using namespace reflection;
+    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
+    typedProperty->getValue(object)->clear();
+  }
 };
 
 template<class T>
@@ -227,6 +251,12 @@ public:
       throw "unexpected error.";
     IPropertyIterator* iter = new reflection::PropertyIterator<CollectionType, ValueType>(typedProperty);
     return iter;
+  }
+
+  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
+    using namespace reflection;
+    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
+    typedProperty->getValue(object)->clear();
   }
 };
 
@@ -245,6 +275,12 @@ public:
     IPropertyIterator* iter = new reflection::PropertyIterator<CollectionType, ValueType>(typedProperty);
     iter->addAttribute(new ReflectableAttribute<ValueType>());
     return iter;
+  }
+
+  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
+    using namespace reflection;
+    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
+    typedProperty->getValue(object)->clear();
   }
 };
 
