@@ -8,6 +8,7 @@
 #include "Executer.h"
 
 #include <cstdio>
+#include <iostream>
 
 #ifdef WIN32
 #define popen   _popen
@@ -16,7 +17,7 @@
 
 namespace capputils {
 
-Executer::Executer() {
+Executer::Executer(int verbose) : verbose(verbose) {
 }
 
 Executer::~Executer() {
@@ -32,6 +33,8 @@ int Executer::execute() {
   if (stream) {
     while ((ch=fgetc(stream)) != EOF ) {
       output << (char)ch;
+      if (verbose)
+        std::cout << (char)ch;
     }
     pclose(stream);
   } else {
@@ -39,6 +42,10 @@ int Executer::execute() {
   }
 
   return 0;
+}
+
+std::string Executer::getCommandString() const {
+  return command.str();
 }
 
 std::string Executer::getOutput() const {

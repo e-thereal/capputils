@@ -48,7 +48,6 @@ public:
     assert(typedProperty);
     readFromFile(typedProperty, object, file);
   }
-
 };
 
 template<class T>
@@ -88,6 +87,22 @@ public:
     assert(typedProperty);
     readFromFile(typedProperty, object, file);
   }
+};
+
+template<>
+class SerializeAttribute<std::string> : public virtual ISerializeAttribute {
+public:
+  virtual void writeToFile(capputils::reflection::ClassProperty<std::string>* prop,
+      const capputils::reflection::ReflectableClass& object, FILE* file);
+
+  virtual void readFromFile(capputils::reflection::ClassProperty<std::string>* prop,
+      capputils::reflection::ReflectableClass& object, FILE* file);
+
+  virtual void writeToFile(capputils::reflection::IClassProperty* prop,
+      const capputils::reflection::ReflectableClass& object, FILE* file);
+
+  virtual void readFromFile(capputils::reflection::IClassProperty* prop,
+      capputils::reflection::ReflectableClass& object, FILE* file);
 };
 
 template<class T>

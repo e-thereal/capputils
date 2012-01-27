@@ -16,12 +16,14 @@ class Executer {
 private:
   std::stringstream command;
   std::stringstream output;
+  bool verbose;
 
 public:
-  Executer();
+  Executer(int verbose = false);
   virtual ~Executer();
 
   std::ostream& getCommand();
+  std::string getCommandString() const;
   int execute();
   std::string getOutput() const;
 };
