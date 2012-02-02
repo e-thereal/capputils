@@ -114,9 +114,9 @@ public:
   };
 
 private:
-  size_t _length, _offset, _increment;
   T _scalar;
   boost::shared_ptr<thrust::device_vector<T> > _data;
+  size_t _length, _offset, _increment;
 
 public:
   device_vector(size_t length = 0)

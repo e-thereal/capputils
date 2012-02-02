@@ -146,10 +146,12 @@ public:
   typedef const_PermutationIterator const_iterator;
 
 private:
-  size_t _rowCount, _columnCount, _offset, _leadingDimension;
-  bool _transpose;
   T _scalar;
   boost::shared_ptr<thrust::device_vector<T> > _data;
+  size_t _rowCount, _columnCount, _offset, _leadingDimension;
+  bool _transpose;
+
+
 
 public:
   device_matrix(size_t rowCount = 0, size_t columnCount = 0)
