@@ -18,6 +18,16 @@
 #include <capputils/SerializeAttribute.h>
 #include <capputils/Serializer.h>
 
+#include <fstream>
+#include <sstream>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/range.hpp>
+
 #include "Car.h"
 #include "Student.h"
 
@@ -67,7 +77,32 @@ struct TestStruct : public EmptyBase {
   int b;
 };
 
+void saveMe(std::ostream& out) {
+  out << "I need way way way more data to put into the stream or what?";
+}
+
+namespace bio = boost::iostreams;
+
 int main(int argc, char** argv) {
+
+  {
+    bio::filtering_ostream out;
+    out.push(boost::iostreams::gzip_compressor());
+    out.push(bio::file_descriptor_sink("test.gz"));
+    saveMe(out);
+  }
+
+  boost::iostreams::filtering_istream in;
+  in.push(boost::iostreams::gzip_decompressor());
+  in.push(bio::file_descriptor_source("test.gz"));
+
+  string testString;
+  while (!in.eof()) {
+    in >> testString;
+    cout << testString << endl;
+  }
+  return 0;
+
   Car car;
   //cout << __DATE__" "__TIME__ << "test" << endl;
   //car.Changed.connect(changeHandler);
