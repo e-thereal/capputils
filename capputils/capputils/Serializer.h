@@ -4,13 +4,15 @@
 #include "ReflectableClass.h"
 #include "ClassProperty.h"
 
+#include <iostream>
+
 namespace capputils {
 
 class Serializer {
 public:
-  static void writeToFile(const capputils::reflection::ReflectableClass& object, FILE* file);
+  static void writeToFile(const capputils::reflection::ReflectableClass& object, std::ostream& file);
   static bool writeToFile(const capputils::reflection::ReflectableClass& object, const std::string& filename);
-  static bool readFromFile(capputils::reflection::ReflectableClass& object, FILE* file);
+  static bool readFromFile(capputils::reflection::ReflectableClass& object, std::istream& file);
   static bool readFromFile(capputils::reflection::ReflectableClass& object, const std::string& filename);
 };
 

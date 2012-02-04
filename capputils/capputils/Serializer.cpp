@@ -1,12 +1,13 @@
 #include "Serializer.h"
 
 #include "SerializeAttribute.h"
+#include <fstream>
 
 using namespace capputils::attributes;
 
 namespace capputils {
 
-void Serializer::writeToFile(const capputils::reflection::ReflectableClass& object, FILE* file) {
+void Serializer::writeToFile(const capputils::reflection::ReflectableClass& object, std::ostream& file) {
   std::vector<capputils::reflection::IClassProperty*>& properties = object.getProperties();
   for (unsigned i = 0; i < properties.size(); ++i) {
     capputils::attributes::ISerializeAttribute* serialize = properties[i]->getAttribute<ISerializeAttribute>();
@@ -16,17 +17,17 @@ void Serializer::writeToFile(const capputils::reflection::ReflectableClass& obje
 }
 
 bool Serializer::writeToFile(const capputils::reflection::ReflectableClass& object, const std::string& filename) {
-  FILE* file = fopen(filename.c_str(), "wb");
-  if (!file)
+  std::ofstream file(filename.c_str());
+  if(!file)
     return false;
     
   writeToFile(object, file);
-  fclose(file);
+  file.close();
 
-  return true;
+  return file.good();
 }
 
-bool Serializer::readFromFile(capputils::reflection::ReflectableClass& object, FILE* file) {
+bool Serializer::readFromFile(capputils::reflection::ReflectableClass& object, std::istream& file) {
   std::vector<capputils::reflection::IClassProperty*>& properties = object.getProperties();
   for (unsigned i = 0; i < properties.size(); ++i) {
     capputils::attributes::ISerializeAttribute* serialize = properties[i]->getAttribute<ISerializeAttribute>();
@@ -37,14 +38,14 @@ bool Serializer::readFromFile(capputils::reflection::ReflectableClass& object, F
 }
 
 bool Serializer::readFromFile(capputils::reflection::ReflectableClass& object, const std::string& filename) {
-  FILE* file = fopen(filename.c_str(), "rb");
+  std::ifstream file(filename.c_str());
   if (!file)
     return false;
     
   readFromFile(object, file);
-  fclose(file);
+  file.close();
 
-  return true;
+  return file.good();
 }
 
 }
