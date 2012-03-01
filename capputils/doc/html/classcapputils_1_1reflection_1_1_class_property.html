@@ -95,11 +95,11 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a3456e443f37c4969f8c60c2ed34c599d">ClassProperty</a> (const std::string &amp;name, T(*getValue)(const <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">ReflectableClass</a> &amp;object), void(*setValue)(<a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">ReflectableClass</a> &amp;object, T value),...)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new instance of <code><a class="el" href="classcapputils_1_1reflection_1_1_class_property.html" title="Models the property concept of a class.">ClassProperty</a></code>.  <a href="#a3456e443f37c4969f8c60c2ed34c599d"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual const std::vector<br class="typebreak"/>
-&lt; attributes::IAttribute * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a52ca298a2fc2861e1d2ddfa54cfe0c1e">getAttributes</a> () const </td></tr>
+&lt; <a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">attributes::IAttribute</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a52ca298a2fc2861e1d2ddfa54cfe0c1e">getAttributes</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns all attributes of a property.  <a href="#a52ca298a2fc2861e1d2ddfa54cfe0c1e"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#ac28111803eb2a939384bcf9eb752100d">getName</a> () const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the property name.  <a href="#ac28111803eb2a939384bcf9eb752100d"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">addAttribute</a> (attributes::IAttribute *attribute)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">addAttribute</a> (<a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">attributes::IAttribute</a> *attribute)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an attribute to the property.  <a href="#adab07fa0b16e504496ec0e4ab6f6df1e"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a2c3be6b20dafd428a5fc5b79856f1d0b">getStringValue</a> (const <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">ReflectableClass</a> &amp;object) const </td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the value of the property as a string.  <a href="#a2c3be6b20dafd428a5fc5b79856f1d0b"></a><br/></td></tr>
@@ -181,7 +181,7 @@ template&lt;class T&gt; </div>
         <tr>
           <td class="memname">virtual void <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html">capputils::reflection::ClassProperty</a>&lt; T &gt;::addAttribute </td>
           <td>(</td>
-          <td class="paramtype">attributes::IAttribute *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">attributes::IAttribute</a> *&#160;</td>
           <td class="paramname"><em>attribute</em></td><td>)</td>
           <td><code> [inline, virtual]</code></td>
         </tr>
@@ -212,7 +212,7 @@ template&lt;class T&gt; </div>
 template&lt;class T&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">virtual const std::vector&lt;attributes::IAttribute*&gt;&amp; <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html">capputils::reflection::ClassProperty</a>&lt; T &gt;::getAttributes </td>
+          <td class="memname">virtual const std::vector&lt;<a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">attributes::IAttribute</a>*&gt;&amp; <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html">capputils::reflection::ClassProperty</a>&lt; T &gt;::getAttributes </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [inline, virtual]</code></td>
@@ -412,7 +412,7 @@ template&lt;class T&gt; </div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -421,7 +421,7 @@ template&lt;class T&gt; </div>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 10:10:23 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 1 2012 08:25:41 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

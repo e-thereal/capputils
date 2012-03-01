@@ -67,6 +67,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="textblock">Here are the classes, structs, unions and interfaces with brief descriptions:</div><table>
   <tr><td class="indexkey"><a class="el" href="classcapputils_1_1_arguments_parser.html">capputils::ArgumentsParser</a></td><td class="indexvalue">This class contains static methods in order to parse command line arguments and to show a usage message </td></tr>
   <tr><td class="indexkey"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_executer.html">capputils::attributes::AttributeExecuter</a></td><td class="indexvalue">Used internally in conjunction with the <code>ExecutableAttribute</code> </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html">capputils::attributes::AttributeWrapper</a></td><td class="indexvalue">Attribute wrappers are used internally </td></tr>
   <tr><td class="indexkey"><a class="el" href="classcapputils_1_1reflection_1_1_class_property.html">capputils::reflection::ClassProperty&lt; T &gt;</a></td><td class="indexvalue">Models the property concept of a class </td></tr>
   <tr><td class="indexkey"><a class="el" href="classcapputils_1_1reflection_1_1_converter.html">capputils::reflection::Converter&lt; T, fromMethod &gt;</a></td><td class="indexvalue">Basic template for a <code><a class="el" href="classcapputils_1_1reflection_1_1_converter.html" title="Basic template for a Converter.">Converter</a></code> </td></tr>
   <tr><td class="indexkey"><a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1string_01_4.html">capputils::reflection::Converter&lt; std::string &gt;</a></td><td class="indexvalue">Specialized <code><a class="el" href="classcapputils_1_1reflection_1_1_converter.html" title="Basic template for a Converter.">Converter</a></code> template for strings </td></tr>
@@ -74,6 +75,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <tr><td class="indexkey"><a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1vector_3_01_t_01_4_00_01false_01_4.html">capputils::reflection::Converter&lt; std::vector&lt; T &gt;, false &gt;</a></td><td class="indexvalue">Specialized template of the vector converter without a <code>fromString()</code> method </td></tr>
   <tr><td class="indexkey"><a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1vector_3_01_t_01_4_00_01true_01_4.html">capputils::reflection::Converter&lt; std::vector&lt; T &gt;, true &gt;</a></td><td class="indexvalue">Generic converter to convert from and to a <code>std::vector&lt;T&gt;</code> </td></tr>
   <tr><td class="indexkey"><a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01_t_00_01false_01_4.html">capputils::reflection::Converter&lt; T, false &gt;</a></td><td class="indexvalue">Specialized <code><a class="el" href="classcapputils_1_1reflection_1_1_converter.html" title="Basic template for a Converter.">Converter</a></code> template without the <code>fromString()</code> method </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classcapputils_1_1attributes_1_1_description_attribute.html">capputils::attributes::DescriptionAttribute</a></td><td class="indexvalue">Attaches a description to a property </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classcapputils_1_1attributes_1_1_flag_attribute.html">capputils::attributes::FlagAttribute</a></td><td class="indexvalue">Makes a class property a boolean flag which is either set or not </td></tr>
+  <tr><td class="indexkey"><a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">capputils::attributes::IAttribute</a></td><td class="indexvalue">This is the base interface of all attributes </td></tr>
   <tr><td class="indexkey"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">capputils::reflection::IClassProperty</a></td><td class="indexvalue">Models the property concept of a class </td></tr>
   <tr><td class="indexkey"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html">capputils::reflection::ReflectableClass</a></td><td class="indexvalue">Base class of all reflectable classes </td></tr>
 </table>
@@ -83,7 +87,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -92,7 +96,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 10:10:23 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 1 2012 08:25:41 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

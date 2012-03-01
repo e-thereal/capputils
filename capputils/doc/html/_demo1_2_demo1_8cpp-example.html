@@ -86,7 +86,7 @@ Parameter: 42
 <span class="preprocessor">#include &lt;<a class="code" href="_reflectable_class_8h.html" title="Contains the class declaration of ReflecableClass and some useful macros.">capputils/ReflectableClass.h</a>&gt;</span>
 
 <span class="keyword">class </span>DataModel : <span class="keyword">public</span> capputils::reflection::ReflectableClass {
-  <a name="a0"></a><a class="code" href="_reflectable_class_8h.html#af407f433b556d813802a968d545ee1e9" title="Must be called at the beginning of every reflectable class.">InitReflectableClass</a>(DataModel)
+  <a name="a0"></a><a class="code" href="_reflectable_class_8h.html#af407f433b556d813802a968d545ee1e9" title="Must be called at the beginning of every reflectable class declaration.">InitReflectableClass</a>(DataModel)
 
   <a name="a1"></a><a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(InputName, std::string)
   <a class="code" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da" title="Declares a property.">Property</a>(OutputName, std::string)
@@ -101,18 +101,18 @@ Parameter: 42
 
 <span class="comment">/*** Begin: DataModel.cpp ***/</span>
 
-<span class="preprocessor">#include &lt;capputils/DescriptionAttribute.h&gt;</span>
+<span class="preprocessor">#include &lt;<a class="code" href="_description_attribute_8h.html" title="Contains the description attribute.">capputils/DescriptionAttribute.h</a>&gt;</span>
 <span class="preprocessor">#include &lt;capputils/FlagAttribute.h&gt;</span>
 
-BeginPropertyDefinitions(DataModel)
+<a name="a2"></a><a class="code" href="_reflectable_class_8h.html#a0846dc07b3afef4a0dfa8cb260ada5a2" title="Starts a property definition block.">BeginPropertyDefinitions</a>(DataModel)
   using namespace capputils::attributes;
 
-  DefineProperty(InputName, Description(&quot;Name of the input file.&quot;))
-  DefineProperty(OutputName, Description(&quot;Name of the output file.&quot;))
-  DefineProperty(Parameter, Description(&quot;Parameter of type <span class="keywordtype">int</span>.&quot;))
-  DefineProperty(Help, Description(&quot;Shows this help.&quot;), Flag())
+  <a name="a3"></a><a class="code" href="_reflectable_class_8h.html#a4e588a7b9d7a950363f16a642e9d65bf" title="Defines a class property.">DefineProperty</a>(InputName, Description(&quot;Name of the input file.&quot;))
+  <a class="code" href="_reflectable_class_8h.html#a4e588a7b9d7a950363f16a642e9d65bf" title="Defines a class property.">DefineProperty</a>(OutputName, Description(&quot;Name of the output file.&quot;))
+  <a class="code" href="_reflectable_class_8h.html#a4e588a7b9d7a950363f16a642e9d65bf" title="Defines a class property.">DefineProperty</a>(Parameter, Description(&quot;Parameter of type <span class="keywordtype">int</span>.&quot;))
+  <a class="code" href="_reflectable_class_8h.html#a4e588a7b9d7a950363f16a642e9d65bf" title="Defines a class property.">DefineProperty</a>(Help, Description(&quot;Shows this help.&quot;), Flag())
   
-EndPropertyDefinitions
+<a name="a4"></a><a class="code" href="_reflectable_class_8h.html#a87cac6d918200dd05f7597409c1a31c9" title="Closes a property definition block.">EndPropertyDefinitions</a>
 
 DataModel::DataModel() : _InputName(&quot;&quot;), _OutputName(&quot;&quot;), _Parameter(0), _Help(false) { }
 
@@ -128,9 +128,9 @@ DataModel::DataModel() : _InputName(&quot;&quot;), _OutputName(&quot;&quot;), _P
 
   DataModel model;
 
-  <a name="a2"></a><a class="code" href="classcapputils_1_1_arguments_parser.html#a5d664a44bb48edeebcc25e73faa5cca0" title="Parses command line arguments and sets the properties of a class accordingly.">ArgumentsParser::Parse</a>(model, argc, argv);
+  <a name="a5"></a><a class="code" href="classcapputils_1_1_arguments_parser.html#a5d664a44bb48edeebcc25e73faa5cca0" title="Parses command line arguments and sets the properties of a class accordingly.">ArgumentsParser::Parse</a>(model, argc, argv);
   <span class="keywordflow">if</span> (model.getHelp()) {
-    <a name="a3"></a><a class="code" href="classcapputils_1_1_arguments_parser.html#aaf414f5cff608add16ad130c75a58915" title="Prints a usage message to standard output with a default header.">ArgumentsParser::PrintDefaultUsage</a>(<span class="stringliteral">&quot;Demo1&quot;</span>, model);
+    <a name="a6"></a><a class="code" href="classcapputils_1_1_arguments_parser.html#aaf414f5cff608add16ad130c75a58915" title="Prints a usage message to standard output with a default header.">ArgumentsParser::PrintDefaultUsage</a>(<span class="stringliteral">&quot;Demo1&quot;</span>, model);
     <span class="keywordflow">return</span> 0;
   }
 
@@ -148,7 +148,7 @@ DataModel::DataModel() : _InputName(&quot;&quot;), _OutputName(&quot;&quot;), _P
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -157,7 +157,7 @@ DataModel::DataModel() : _InputName(&quot;&quot;), _OutputName(&quot;&quot;), _P
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 10:10:22 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 1 2012 08:25:41 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

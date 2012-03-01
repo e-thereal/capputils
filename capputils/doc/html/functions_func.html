@@ -62,12 +62,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="functions.html"><span>All</span></a></li>
       <li class="current"><a href="functions_func.html"><span>Functions</span></a></li>
+      <li><a href="functions_vars.html"><span>Variables</span></a></li>
     </ul>
   </div>
   <div id="navrow4" class="tabs3">
     <ul class="tablist">
       <li><a href="#index_a"><span>a</span></a></li>
       <li><a href="#index_c"><span>c</span></a></li>
+      <li><a href="#index_d"><span>d</span></a></li>
       <li><a href="#index_e"><span>e</span></a></li>
       <li><a href="#index_f"><span>f</span></a></li>
       <li><a href="#index_g"><span>g</span></a></li>
@@ -87,12 +89,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 : <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#adab07fa0b16e504496ec0e4ab6f6df1e">capputils::reflection::ClassProperty&lt; T &gt;</a>
 , <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a08a09a19a47f25a90f95f4669c0fc1b6">capputils::reflection::IClassProperty</a>
 </li>
+<li>AttributeWrapper()
+: <a class="el" href="classcapputils_1_1attributes_1_1_attribute_wrapper.html#a4c53702967d6fdf70a35789c5cf61b78">capputils::attributes::AttributeWrapper</a>
+</li>
 </ul>
 
 
 <h3><a class="anchor" id="index_c"></a>- c -</h3><ul>
 <li>ClassProperty()
 : <a class="el" href="classcapputils_1_1reflection_1_1_class_property.html#a3456e443f37c4969f8c60c2ed34c599d">capputils::reflection::ClassProperty&lt; T &gt;</a>
+</li>
+</ul>
+
+
+<h3><a class="anchor" id="index_d"></a>- d -</h3><ul>
+<li>DescriptionAttribute()
+: <a class="el" href="classcapputils_1_1attributes_1_1_description_attribute.html#a09d0965620ac34ed21a3464e6d42f1ca">capputils::attributes::DescriptionAttribute</a>
 </li>
 </ul>
 
@@ -111,12 +123,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <li>findProperty()
 : <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7d811637be82d8b3396b8d256d6dc1e2">capputils::reflection::ReflectableClass</a>
 </li>
+<li>FlagAttribute()
+: <a class="el" href="classcapputils_1_1attributes_1_1_flag_attribute.html#a05f771706d50526ce5e30e2123701d2b">capputils::attributes::FlagAttribute</a>
+</li>
 <li>fromStream()
 : <a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a7b93c19d1b847fcf5f83fa9e28ad4b38">capputils::reflection::ReflectableClass</a>
 </li>
 <li>fromString()
-: <a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1vector_3_01_t_01_4_00_01true_01_4.html#a520633ea5baa46b60d7400b1ba37c479">capputils::reflection::Converter&lt; std::vector&lt; T &gt;, true &gt;</a>
-, <a class="el" href="classcapputils_1_1reflection_1_1_converter.html#ab1988dfee1d756a233eb84d3480d22fa">capputils::reflection::Converter&lt; T, fromMethod &gt;</a>
+: <a class="el" href="classcapputils_1_1reflection_1_1_converter.html#ab1988dfee1d756a233eb84d3480d22fa">capputils::reflection::Converter&lt; T, fromMethod &gt;</a>
+, <a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1vector_3_01_t_01_4_00_01true_01_4.html#a520633ea5baa46b60d7400b1ba37c479">capputils::reflection::Converter&lt; std::vector&lt; T &gt;, true &gt;</a>
 , <a class="el" href="classcapputils_1_1reflection_1_1_converter_3_01std_1_1string_01_4.html#aeb63511b9bfb08f4a553d8074c1ee2e4">capputils::reflection::Converter&lt; std::string &gt;</a>
 </li>
 </ul>
@@ -209,6 +224,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <h3><a class="anchor" id="index_0x7e"></a>- ~ -</h3><ul>
+<li>~DescriptionAttribute()
+: <a class="el" href="classcapputils_1_1attributes_1_1_description_attribute.html#a17394b57d9d162baa7a614311ec89430">capputils::attributes::DescriptionAttribute</a>
+</li>
+<li>~FlagAttribute()
+: <a class="el" href="classcapputils_1_1attributes_1_1_flag_attribute.html#af426d8831ab4f5cc330f7d2681e82319">capputils::attributes::FlagAttribute</a>
+</li>
+<li>~IAttribute()
+: <a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html#aea5ed801524311e97705ebe5e9c983c4">capputils::attributes::IAttribute</a>
+</li>
 <li>~IClassProperty()
 : <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a8febe2452b782d056b7fd6d4481740fb">capputils::reflection::IClassProperty</a>
 </li>
@@ -219,7 +243,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -228,7 +252,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 10:10:23 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 1 2012 08:25:41 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

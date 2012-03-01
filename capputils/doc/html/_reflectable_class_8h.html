@@ -76,12 +76,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;cstdarg&gt;</code><br/>
 <code>#include &lt;ostream&gt;</code><br/>
 <code>#include &lt;istream&gt;</code><br/>
+<code>#include &lt;boost/config.hpp&gt;</code><br/>
 <code>#include &quot;capputils.h&quot;</code><br/>
-<code>#include &quot;IAttribute.h&quot;</code><br/>
+<code>#include &quot;<a class="el" href="_i_attribute_8h_source.html">IAttribute.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="_class_property_8h_source.html">ClassProperty.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="_attribute_executer_8h_source.html">AttributeExecuter.h</a>&quot;</code><br/>
 <code>#include &quot;ReflectableAttribute.h&quot;</code><br/>
-<code>#include &quot;ReflectableClassFactory.h&quot;</code><br/>
+<code>#include &quot;RegisterClass.h&quot;</code><br/>
 </div>
 <p><a href="_reflectable_class_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -105,8 +106,14 @@ Namespaces</h2></td></tr>
 Defines</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a141cc4c043a592450c332d3512d211da">Property</a>(name, type)</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Declares a property.  <a href="#a141cc4c043a592450c332d3512d211da"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a4e588a7b9d7a950363f16a642e9d65bf">DefineProperty</a>(name, arguments...)&#160;&#160;&#160;properties.push_back(new ::<a class="el" href="classcapputils_1_1reflection_1_1_class_property.html">capputils::reflection::ClassProperty</a>&lt;TYPE_OF(name)&gt;(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0));</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Defines a class property.  <a href="#a4e588a7b9d7a950363f16a642e9d65bf"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#af407f433b556d813802a968d545ee1e9">InitReflectableClass</a>(name)</td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Must be called at the beginning of every reflectable class.  <a href="#af407f433b556d813802a968d545ee1e9"></a><br/></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Must be called at the beginning of every reflectable class declaration.  <a href="#af407f433b556d813802a968d545ee1e9"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a0846dc07b3afef4a0dfa8cb260ada5a2">BeginPropertyDefinitions</a>(cname, args...)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts a property definition block.  <a href="#a0846dc07b3afef4a0dfa8cb260ada5a2"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_reflectable_class_8h.html#a87cac6d918200dd05f7597409c1a31c9">EndPropertyDefinitions</a>&#160;&#160;&#160;initialized = true; }</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes a property definition block.  <a href="#a87cac6d918200dd05f7597409c1a31c9"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecapputils_1_1reflection.html#a675dfbdf05bc4e1829b7f6f7dc34db34">capputils::reflection::trimTypeName</a> (const char *typeName)</td></tr>
@@ -116,8 +123,109 @@ Functions</h2></td></tr>
 <div class="textblock"><p>Contains the class declaration of ReflecableClass and some useful macros. </p>
 <dl class="date"><dt><b>Date:</b></dt><dd>Jan 7, 2011 </dd></dl>
 <dl class="author"><dt><b>Author:</b></dt><dd>Tom Brosch</dd></dl>
-<p>You must call InitReflectableClass and BeginProperyDefintions and EndPropertyDefinitions. See example for help. (minimal class) </p>
+<p>You must call InitReflectableClass, BeginProperyDefintions and EndPropertyDefinitions. See example for help. (minimal class) </p>
 </div><hr/><h2>Define Documentation</h2>
+<a class="anchor" id="a0846dc07b3afef4a0dfa8cb260ada5a2"></a><!-- doxytag: member="ReflectableClass.h::BeginPropertyDefinitions" ref="a0846dc07b3afef4a0dfa8cb260ada5a2" args="(cname, args...)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BeginPropertyDefinitions</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">cname, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">args...&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+<b>Value:</b><div class="fragment"><pre class="fragment">std::vector&lt; ::capputils::reflection::IClassProperty*&gt; cname :: properties;     \
+  std::vector&lt; ::capputils::attributes::IAttribute*&gt; cname :: attributes;     \
+  <span class="keyword">const</span> std::string cname :: ClassName = <a class="code" href="namespacecapputils_1_1reflection.html#a675dfbdf05bc4e1829b7f6f7dc34db34" title="Converts a type name string obtained by std::type_info::name() into a standardized format...">capputils::reflection::trimTypeName</a>(<span class="keyword">typeid</span>(cname).name());  \
+  capputils::reflection::RegisterClass cname::_registration(<a class="code" href="namespacecapputils_1_1reflection.html#a675dfbdf05bc4e1829b7f6f7dc34db34" title="Converts a type name string obtained by std::type_info::name() into a standardized format...">capputils::reflection::trimTypeName</a>(<span class="keyword">typeid</span>(cname).name()), cname::newInstance, cname::deleteInstance); \
+  <span class="keywordtype">void</span> cname::initializeClass()<span class="keyword"> const </span>{ \
+    <span class="keyword">static</span> <span class="keywordtype">bool</span> initialized = <span class="keyword">false</span>; \
+    <span class="keywordflow">if</span> (initialized) <span class="keywordflow">return</span>; \
+    addAttributes(&amp;cname::attributes, ##args, 0);
+</pre></div>
+<p>Starts a property definition block. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>The name of the reflectable class </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">args</td><td>A list of class attributes. Can be empty.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This macro must be called for every reflectable class implementation, even if the class does not define any properties. After calling this macro, properties can be defined using the <code>DefineProperty</code> macro. A property definition block must be closed by calling the <code>EndPropertyDefinitions</code> macro. </p>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="_demo1_2_demo1_8cpp-example.html#a2">Demo1/Demo1.cpp</a>.</dd>
+</dl>
+</div>
+</div>
+<a class="anchor" id="a4e588a7b9d7a950363f16a642e9d65bf"></a><!-- doxytag: member="ReflectableClass.h::DefineProperty" ref="a4e588a7b9d7a950363f16a642e9d65bf" args="(name, arguments...)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DefineProperty</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">arguments...&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;properties.push_back(new ::<a class="el" href="classcapputils_1_1reflection_1_1_class_property.html">capputils::reflection::ClassProperty</a>&lt;TYPE_OF(name)&gt;(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0));</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Defines a class property. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>The of the property </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">args</td><td>A list of property attributes. Can be empty.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This macro adds the property to the internal list of properties. Calling this macro is required in order to make a property reflectable. Attributes can be attached to describe the intended use of the property. This macro is only allowed within a property definition block (between BeginPropertyDefinitions and EndPropertyDefinitions. </p>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="_demo1_2_demo1_8cpp-example.html#a3">Demo1/Demo1.cpp</a>.</dd>
+</dl>
+</div>
+</div>
+<a class="anchor" id="a87cac6d918200dd05f7597409c1a31c9"></a><!-- doxytag: member="ReflectableClass.h::EndPropertyDefinitions" ref="a87cac6d918200dd05f7597409c1a31c9" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EndPropertyDefinitions&#160;&#160;&#160;initialized = true; }</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Closes a property definition block. </p>
+<p>Every property definition block must be closed using this macro. </p>
+<dl><dt><b>Examples: </b></dt><dd><a class="el" href="_demo1_2_demo1_8cpp-example.html#a4">Demo1/Demo1.cpp</a>.</dd>
+</dl>
+</div>
+</div>
 <a class="anchor" id="af407f433b556d813802a968d545ee1e9"></a><!-- doxytag: member="ReflectableClass.h::InitReflectableClass" ref="af407f433b556d813802a968d545ee1e9" args="(name)" -->
 <div class="memitem">
 <div class="memproto">
@@ -150,7 +258,7 @@ Functions</h2></td></tr>
   <span class="keyword">public</span>: <span class="keyword">static</span> ReflectableClass* newInstance() { <span class="keywordflow">return</span> <span class="keyword">new</span> name(); } \
   <span class="keyword">public</span>: <span class="keyword">static</span> <span class="keywordtype">void</span> deleteInstance(ReflectableClass* instance) { <span class="keyword">delete</span> instance; }
 </pre></div>
-<p>Must be called at the beginning of every reflectable class. </p>
+<p>Must be called at the beginning of every reflectable class declaration. </p>
 <p>The parameter denotes the name of the class. This macro declares all static fields and methods used to store and initialize class meta information like:</p>
 <ul>
 <li>Properties</li>
@@ -210,7 +318,7 @@ Functions</h2></td></tr>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -219,7 +327,7 @@ Functions</h2></td></tr>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 10:10:23 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 1 2012 08:25:41 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

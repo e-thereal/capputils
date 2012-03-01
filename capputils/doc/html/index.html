@@ -103,10 +103,10 @@ Reflection</h3>
 <p>Since <code>C++</code> does not support reflection per se, a class has to be made reflectable. Adding reflection for a class is done using the following steps:</p>
 <ul>
 <li>The class must be directly or indirectly inherited from <code>ReflectableClass</code> </li>
-<li>You must call the macro <code><a class="el" href="_reflectable_class_8h.html#af407f433b556d813802a968d545ee1e9" title="Must be called at the beginning of every reflectable class.">InitReflectableClass()</a></code> with the class name at the beginning of the declaration of the class</li>
+<li>You must call the macro <code><a class="el" href="_reflectable_class_8h.html#af407f433b556d813802a968d545ee1e9" title="Must be called at the beginning of every reflectable class declaration.">InitReflectableClass()</a></code> with the class name at the beginning of the declaration of the class</li>
 <li>All properties are declared using the <code>Property</code> macro</li>
 <li>All properties must be defined in the source (CPP) file</li>
-<li>The macro <code>BeginPropertyDefinitions()</code> marks the beginning of all property definitions of one class and must must be called once for every reflectable class. (even if that class does not define any properties)</li>
+<li>The macro <code><a class="el" href="_reflectable_class_8h.html#a0846dc07b3afef4a0dfa8cb260ada5a2" title="Starts a property definition block.">BeginPropertyDefinitions()</a></code> marks the beginning of all property definitions of one class and must must be called once for every reflectable class. (even if that class does not define any properties)</li>
 <li>The macro <code>EndPropertyDefinitions</code> marks the end of all property definitions of one class</li>
 <li>Properties are defined using the <code>DefineProperty</code> macro. You can declare a property without defining it. Declaring a property through <code>Property</code> generates appropriate getter and setter methods but the property will not be accessable through reflection unless you define it using <code>DefineProperty</code>.</li>
 <li>Use the macro <code>ReflectableProperty</code> instead of <code>DefineProperty</code> if the property type is derived from <code>ReflectableClass</code>.</li>
@@ -118,7 +118,7 @@ Reflection</h3>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -127,7 +127,7 @@ Reflection</h3>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 10:10:22 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 1 2012 08:25:41 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

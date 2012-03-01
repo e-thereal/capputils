@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00015"></a>00015 <span class="preprocessor">#include &lt;vector&gt;</span>
 <a name="l00016"></a>00016 <span class="preprocessor">#include &lt;cstdarg&gt;</span>
 <a name="l00017"></a>00017 
-<a name="l00018"></a>00018 <span class="preprocessor">#include &quot;IAttribute.h&quot;</span>
+<a name="l00018"></a>00018 <span class="preprocessor">#include &quot;<a class="code" href="_i_attribute_8h.html" title="Declares the base interface IAttribute of all attributes.">IAttribute.h</a>&quot;</span>
 <a name="l00019"></a>00019 
 <a name="l00020"></a>00020 <span class="preprocessor">#include &lt;typeinfo&gt;</span>
 <a name="l00021"></a>00021 
@@ -88,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00050"></a>00050 
 <a name="l00056"></a>00056   <span class="keyword">virtual</span> <span class="keyword">const</span> std::vector&lt;attributes::IAttribute*&gt;&amp; <a class="code" href="classcapputils_1_1reflection_1_1_i_class_property.html#aed2def89cfb7276951831298b9eb04d6" title="Returns all attributes of a property.">getAttributes</a>() <span class="keyword">const</span> = 0;
 <a name="l00057"></a>00057 
-<a name="l00066"></a>00066   <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classcapputils_1_1reflection_1_1_i_class_property.html#a08a09a19a47f25a90f95f4669c0fc1b6" title="Adds an attribute to the property.">addAttribute</a>(attributes::IAttribute* attribute) = 0;
+<a name="l00066"></a>00066   <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classcapputils_1_1reflection_1_1_i_class_property.html#a08a09a19a47f25a90f95f4669c0fc1b6" title="Adds an attribute to the property.">addAttribute</a>(<a class="code" href="classcapputils_1_1attributes_1_1_i_attribute.html" title="This is the base interface of all attributes.">attributes::IAttribute</a>* attribute) = 0;
 <a name="l00067"></a>00067 
 <a name="l00073"></a>00073   <span class="keyword">virtual</span> <span class="keyword">const</span> std::string&amp; <a class="code" href="classcapputils_1_1reflection_1_1_i_class_property.html#ab6777e47440611e8d5e0e84e5c7ead2f" title="Returns the property name.">getName</a>() <span class="keyword">const</span> = 0;
 <a name="l00074"></a>00074 
@@ -125,7 +125,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -134,7 +134,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 10:10:23 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 1 2012 08:25:41 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

@@ -97,9 +97,9 @@ Public Member Functions</h2></td></tr>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a8febe2452b782d056b7fd6d4481740fb">~IClassProperty</a> ()</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual destructor of an <code><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html" title="Models the property concept of a class.">IClassProperty</a></code>. <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual const std::vector<br class="typebreak"/>
-&lt; attributes::IAttribute * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#aed2def89cfb7276951831298b9eb04d6">getAttributes</a> () const =0</td></tr>
+&lt; <a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">attributes::IAttribute</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#aed2def89cfb7276951831298b9eb04d6">getAttributes</a> () const =0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns all attributes of a property.  <a href="#aed2def89cfb7276951831298b9eb04d6"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a08a09a19a47f25a90f95f4669c0fc1b6">addAttribute</a> (attributes::IAttribute *attribute)=0</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#a08a09a19a47f25a90f95f4669c0fc1b6">addAttribute</a> (<a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">attributes::IAttribute</a> *attribute)=0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an attribute to the property.  <a href="#a08a09a19a47f25a90f95f4669c0fc1b6"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html#ab6777e47440611e8d5e0e84e5c7ead2f">getName</a> () const =0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the property name.  <a href="#ab6777e47440611e8d5e0e84e5c7ead2f"></a><br/></td></tr>
@@ -128,7 +128,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
         <tr>
           <td class="memname">virtual void capputils::reflection::IClassProperty::addAttribute </td>
           <td>(</td>
-          <td class="paramtype">attributes::IAttribute *&#160;</td>
+          <td class="paramtype"><a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">attributes::IAttribute</a> *&#160;</td>
           <td class="paramname"><em>attribute</em></td><td>)</td>
           <td><code> [pure virtual]</code></td>
         </tr>
@@ -180,7 +180,7 @@ template&lt;class AT &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual const std::vector&lt;attributes::IAttribute*&gt;&amp; capputils::reflection::IClassProperty::getAttributes </td>
+          <td class="memname">virtual const std::vector&lt;<a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">attributes::IAttribute</a>*&gt;&amp; capputils::reflection::IClassProperty::getAttributes </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [pure virtual]</code></td>
@@ -370,7 +370,7 @@ template&lt;class AT &gt; </div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -379,7 +379,7 @@ template&lt;class AT &gt; </div>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 10:10:23 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 1 2012 08:25:41 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>

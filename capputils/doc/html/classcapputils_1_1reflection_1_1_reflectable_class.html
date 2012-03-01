@@ -79,7 +79,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <p><code>#include &lt;<a class="el" href="_reflectable_class_8h_source.html">ReflectableClass.h</a>&gt;</code></p>
 
-<p>Inherited by Address, capputils::reflection::Enumerator, Car, DataModel, EngineDescription, and Person.</p>
+<p>Inherited by Address, capputils::reflection::Enumerator, Car, DataModel, EngineDescription, Person, and SerializeTest.</p>
 
 <p><a href="classcapputils_1_1reflection_1_1_reflectable_class-members.html">List of all members.</a></p>
 <table class="memberdecls">
@@ -89,7 +89,7 @@ Public Member Functions</h2></td></tr>
 &lt; <a class="el" href="classcapputils_1_1reflection_1_1_i_class_property.html">IClassProperty</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a59fc62b722d79d5b0e0827a295406d41">getProperties</a> () const =0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns all properties of the class including properties of all of its base classes.  <a href="#a59fc62b722d79d5b0e0827a295406d41"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual std::vector<br class="typebreak"/>
-&lt; ::capputils::attributes::IAttribute * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a42e170cc2eee78959a37539374490590">getAttributes</a> () const =0</td></tr>
+&lt; ::<a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">capputils::attributes::IAttribute</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#a42e170cc2eee78959a37539374490590">getAttributes</a> () const =0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns all attributes of a class.  <a href="#a42e170cc2eee78959a37539374490590"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcapputils_1_1reflection_1_1_reflectable_class.html#aedf1bd195c69b5e7d73e464a1a150e30">getClassName</a> () const =0</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the full class name including its namespaces.  <a href="#aedf1bd195c69b5e7d73e464a1a150e30"></a><br/></td></tr>
@@ -195,7 +195,7 @@ template&lt;class AT &gt; </div>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual std::vector&lt; ::capputils::attributes::IAttribute*&gt;&amp; capputils::reflection::ReflectableClass::getAttributes </td>
+          <td class="memname">virtual std::vector&lt; ::<a class="el" href="classcapputils_1_1attributes_1_1_i_attribute.html">capputils::attributes::IAttribute</a>*&gt;&amp; capputils::reflection::ReflectableClass::getAttributes </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const<code> [pure virtual]</code></td>
@@ -424,7 +424,7 @@ template&lt;class AT &gt; </div>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -433,7 +433,7 @@ template&lt;class AT &gt; </div>
 </iframe>
 </div>
 
-<hr class="footer"/><address class="footer"><small>Generated on Tue Aug 9 2011 10:10:23 for Capputils by&#160;
+<hr class="footer"/><address class="footer"><small>Generated on Thu Mar 1 2012 08:25:41 for Capputils by&#160;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.7.4 </small></address>
 </body>
