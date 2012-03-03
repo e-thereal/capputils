@@ -151,8 +151,6 @@ private:
   size_t _rowCount, _columnCount, _offset, _leadingDimension;
   bool _transpose;
 
-
-
 public:
   device_matrix(size_t rowCount = 0, size_t columnCount = 0)
     : _rowCount(rowCount), _columnCount(columnCount), _offset(0),

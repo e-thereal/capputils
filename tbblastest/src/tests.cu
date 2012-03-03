@@ -8,15 +8,17 @@
 
 #define BOOST_TYPEOF_COMPLIANT
 
-#include <tbblas/device_vector.hpp>
-#include <tbblas/device_matrix.hpp>
+//#include <tbblas/device_vector.hpp>
+//#include <tbblas/device_matrix.hpp>
+#include <tbblas/device_tensor.hpp>
+
 #include <boost/signals.hpp>
 #include <boost/progress.hpp>
 
 //#include <boost/lambda/lambda.hpp>
 
-#include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/ublas/matrix_proxy.hpp>
+//#include <boost/numeric/ublas/io.hpp>
+//#include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/timer.hpp>
 
 #include <thrust/transform.h>
@@ -25,17 +27,54 @@
 #include <fstream>
 #include <sstream>
 
-namespace ublas = boost::numeric::ublas;
+//namespace ublas = boost::numeric::ublas;
 
 using namespace std;
 
 // TODO: transform2d like thrust::transform but with 2d index
 // TODO: sum(trans(matrix)) = vector containing row sums
 
+typedef tbblas::device_tensor<float, 3> tensor_t;
+typedef tbblas::tensor_proxy<tensor_t::const_iterator, 3> const_proxy_t;
+
 int runtests() {
   //using namespace boost::lambda;
   boost::timer timer;
 
+  tensor_t tensor(256, 256, 160), kernel(20, 20, 160), result(236, 236, 1);
+
+  float floats[] = {
+      1, 2, 3, 4,
+      5, 6, 7, 8,
+      9, 10, 11, 12,
+
+      10, 11, 12, 13,
+      12, 14, 15, 16,
+      16, 17, 18, 19
+  };
+
+  float fkernel[] = {
+      1, 0,
+      0, 0
+  };
+  //thrust::copy(floats, floats + tensor.data().size(), tensor.data().begin());
+  //thrust::copy(fkernel, fkernel + kernel.data().size(), kernel.data().begin());
+
+  tensor = tbblas::flip(kernel) + 2.f * result;
+
+  timer.restart();
+  for (int i = 0; i < 1000; ++i)
+    result = tbblas::conv(tbblas::flip(kernel), tensor);
+  cout << "Time: " << timer.elapsed() << "ms" << endl;
+
+
+  /*std::vector<float> vec(result.data().size());
+  thrust::copy(result.begin(), result.end(), vec.begin());
+  for (int i = 0; i < vec.size(); ++i)
+    cout << vec[i] << " ";
+  cout << endl;*/
+
+#if 0
   ifstream file("test.txt");
   if (file) {
     cout << "Reading file" << endl;
@@ -113,7 +152,6 @@ int runtests() {
     cout << csums(i) << " ";
   cout << endl;
 
-#if 0
   cout << "n, prod, trans(all), trans(sub)" << endl;
   for (int n = 100; n < 1500; n *= 1.4) {
     const int reps = 2000 / n * 50;
@@ -158,8 +196,6 @@ int runtests() {
       cout << timer.elapsed() / reps << endl;
     }
 #endif
-
-  tbblas::device_matrix<double> doubleM(10, 10);
 
   return 0;
 }
