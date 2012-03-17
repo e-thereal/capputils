@@ -42,6 +42,14 @@ template<>
 void ifft<float, 3, true>(thrust::device_vector<complex_type<float>::complex_t>& ftdata,
     const size_t (&size)[3], tensor_base<float, 3>& dt);
 
+template<>
+void fft<double, 3, true>(const tensor_base<double, 3>& dt, const size_t (&size)[3],
+    thrust::device_vector<complex_type<double>::complex_t>& ftdata);
+
+template<>
+void ifft<double, 3, true>(thrust::device_vector<complex_type<double>::complex_t>& ftdata,
+    const size_t (&size)[3], tensor_base<double, 3>& dt);
+
 template<class T, unsigned dim>
 class device_tensor : public tensor_base<T, dim, true>
 {
@@ -68,6 +76,11 @@ public:
 
   tensor_t& operator-=(const base_t& tensor) {
     apply(tensor_element_plus<base_t>(*this, T(-1) * tensor));
+    return *this;
+  }
+
+  tensor_t& operator+=(const T& scalar) {
+    apply(tensor_scalar_plus<base_t>(*this, scalar));
     return *this;
   }
 };
@@ -105,7 +118,12 @@ public:
   }
 
   tensor_t& operator-=(const base_t& tensor) {
-    apply(tensor_element_plus<base_t>(*this, T(-1) * tensor));
+    apply(tensor_element_plus<base_t>(*this, -1 * tensor));
+    return *this;
+  }
+
+  tensor_t& operator+=(const T& scalar) {
+    apply(tensor_scalar_plus<base_t>(*this, scalar));
     return *this;
   }
 };
@@ -115,15 +133,6 @@ public:
 template<class T, unsigned dim>
 device_tensor<T, dim> flip(const device_tensor<T, dim>& dt) {
   return flip_tensor(dt);
-}
-
-/*** Operation wrapper generating operations ***/
-
-template<class T, unsigned dim>
-tensor_convolution<tensor_base<T, dim, true> > conv(
-    const tensor_base<T, dim, true>& dt1, const tensor_base<T, dim, true>& dt2)
-{
-  return tensor_convolution<tensor_base<T, dim, true> >(dt1, dt2);
 }
 
 } // end tbblas

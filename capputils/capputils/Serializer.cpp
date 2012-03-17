@@ -7,7 +7,7 @@ using namespace capputils::attributes;
 
 namespace capputils {
 
-void Serializer::writeToFile(const capputils::reflection::ReflectableClass& object, std::ostream& file) {
+void Serializer::WriteToFile(const capputils::reflection::ReflectableClass& object, std::ostream& file) {
   std::vector<capputils::reflection::IClassProperty*>& properties = object.getProperties();
   for (unsigned i = 0; i < properties.size(); ++i) {
     capputils::attributes::ISerializeAttribute* serialize = properties[i]->getAttribute<ISerializeAttribute>();
@@ -16,18 +16,18 @@ void Serializer::writeToFile(const capputils::reflection::ReflectableClass& obje
   }
 }
 
-bool Serializer::writeToFile(const capputils::reflection::ReflectableClass& object, const std::string& filename) {
+bool Serializer::WriteToFile(const capputils::reflection::ReflectableClass& object, const std::string& filename) {
   std::ofstream file(filename.c_str());
   if(!file)
     return false;
     
-  writeToFile(object, file);
+  WriteToFile(object, file);
   file.close();
 
   return file.good();
 }
 
-bool Serializer::readFromFile(capputils::reflection::ReflectableClass& object, std::istream& file) {
+bool Serializer::ReadFromFile(capputils::reflection::ReflectableClass& object, std::istream& file) {
   std::vector<capputils::reflection::IClassProperty*>& properties = object.getProperties();
   for (unsigned i = 0; i < properties.size(); ++i) {
     capputils::attributes::ISerializeAttribute* serialize = properties[i]->getAttribute<ISerializeAttribute>();
@@ -37,12 +37,12 @@ bool Serializer::readFromFile(capputils::reflection::ReflectableClass& object, s
   return true;
 }
 
-bool Serializer::readFromFile(capputils::reflection::ReflectableClass& object, const std::string& filename) {
+bool Serializer::ReadFromFile(capputils::reflection::ReflectableClass& object, const std::string& filename) {
   std::ifstream file(filename.c_str());
   if (!file)
     return false;
     
-  readFromFile(object, file);
+  ReadFromFile(object, file);
   file.close();
 
   return file.good();

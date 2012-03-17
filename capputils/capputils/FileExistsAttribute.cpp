@@ -5,7 +5,7 @@
  *      Author: tombr
  */
 
-#include "FileExists.h"
+#include "FileExistsAttribute.h"
 
 #include <cstdio>
 

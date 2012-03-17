@@ -28,6 +28,8 @@
 #include <boost/iostreams/device/file_descriptor.hpp>
 #include <boost/range.hpp>
 
+#include <boost/regex.hpp>
+
 #include "Car.h"
 #include "Student.h"
 
@@ -83,9 +85,15 @@ void saveMe(std::ostream& out) {
 
 namespace bio = boost::iostreams;
 
-int main(int argc, char** argv) {
+enum Days {Monday, Tuesday};
+ReflectableEnum(Tage, Montag, Dienstag);
+DefineEnum(Tage);
 
-  {
+int main(int argc, char** argv) {
+  Days day = Monday;
+  Tage tag = Tage::Montag; tag = 0; tag = "Montag";
+
+  /*{
     bio::filtering_ostream out;
     out.push(boost::iostreams::gzip_compressor());
     out.push(bio::file_descriptor_sink("test.gz"));
@@ -100,7 +108,22 @@ int main(int argc, char** argv) {
   while (!in.eof()) {
     in >> testString;
     cout << testString << endl;
-  }
+  }*/
+
+  //std::tr1::cmatch res;
+  //std::string str = "<h2>Egg prices</h2>";
+  //std::regex rx("<h(.)>([^<]+)");
+  //if (std::regex_search(str.c_str(), res, rx))
+  //  std::cout << res[1] << ". " << res[2] << "\n";
+
+  boost::cmatch res;
+  std::string str = "segmentation/O145101X_0063200.tif";
+  boost::regex rx("(.*)/(.*)01X_.*");
+  if (boost::regex_search(str.c_str(), res, rx))
+    std::cout << res.format("results1/${2}02.tif") << std::endl;
+  else
+    std::cout << "Not found!" << std::endl;
+
   return 0;
 
   Car car;

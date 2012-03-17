@@ -31,6 +31,7 @@
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
 									<listOptionValue builtIn="false" value="/"/>
 								</option>
+								<option id="cuda.toolchain.compiler.option.misc.other.1112520598" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fmessage-length=0 -gencode=arch=compute_20,code=\&quot;sm_20,compute_20\&quot;" valueType="string"/>
 								<inputType id="cuda.toolchain.compiler.input.263340465" superClass="cuda.toolchain.compiler.input"/>
 							</tool>
 							<tool id="cuda.toolchain.gnu.cpp.compiler.1701481600" name="GCC C++ Compiler" superClass="cuda.toolchain.gnu.cpp.compiler">
@@ -61,6 +62,7 @@
 									<listOptionValue builtIn="false" value="boost_signals"/>
 									<listOptionValue builtIn="false" value="tbblas"/>
 									<listOptionValue builtIn="false" value="cufft"/>
+									<listOptionValue builtIn="false" value="curand"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.cuda.2029110645" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths.cuda" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblas/Debug}&quot;"/>

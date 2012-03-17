@@ -1,40 +1,13 @@
 /*
  * FileExists.h
  *
- *  Created on: Feb 11, 2011
+ *  Created on: Feb 17, 2012
  *      Author: tombr
  */
 
-#ifndef FILEEXISTS_H_
-#define FILEEXISTS_H_
+#ifndef _CAPPUTLIS_FILEEXISTS_H_
+#define _CAPPUTLIS_FILEEXISTS_H_
 
-#include "capputils.h"
-#include "IAssertionAttribute.h"
+#include "FileExistsAttribute.h"
 
-namespace capputils {
-
-namespace attributes {
-
-class CAPPUTILS_API FileExistsAttribute: public virtual IAssertionAttribute {
-private:
-  std::string lastError;
-
-public:
-  FileExistsAttribute();
-  virtual ~FileExistsAttribute();
-
-  virtual bool valid(const reflection::IClassProperty& property,
-      const reflection::ReflectableClass& object);
-
-  virtual const std::string& getLastMessage() const;
-
-  static bool exists(const std::string& filename);
-};
-
-AttributeWrapper* FileExists();
-
-}
-
-}
-
-#endif /* FILEEXISTS_H_ */
+#endif /* _CAPPUTLIS_FILEEXISTS_H_ */

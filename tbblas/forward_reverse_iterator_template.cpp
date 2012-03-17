@@ -16,7 +16,7 @@
 
 #include "forward_reverse_iterator.hpp"
 
-#include <thrust/detail/device/dereference.h>
+#include <thrust/detail/backend/dereference.h>
 #include <thrust/iterator/iterator_traits.h>
 
 namespace tbblas
@@ -123,7 +123,7 @@ namespace thrust
 namespace detail
 {
 
-namespace device
+namespace backend
 {
 
 template<typename DeviceBidirectionalIterator>

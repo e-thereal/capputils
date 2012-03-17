@@ -11,6 +11,7 @@
 //#include <tbblas/device_vector.hpp>
 //#include <tbblas/device_matrix.hpp>
 #include <tbblas/device_tensor.hpp>
+#include <tbblas/host_tensor.hpp>
 
 #include <boost/signals.hpp>
 #include <boost/progress.hpp>
@@ -27,6 +28,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <curand.h>
+
 //namespace ublas = boost::numeric::ublas;
 
 using namespace std;
@@ -37,11 +40,23 @@ using namespace std;
 typedef tbblas::device_tensor<float, 3> tensor_t;
 typedef tbblas::tensor_proxy<tensor_t::const_iterator, 3> const_proxy_t;
 
-int runtests() {
-  //using namespace boost::lambda;
-  boost::timer timer;
+template<class T>
+struct reference_test : thrust::binary_function<T, unsigned, T> {
+  __device__
+  T operator()(const T& value, const unsigned& i) const {
+    const unsigned size = 3;
+    T res = 0;
+    for (unsigned k = 0; k < size; ++k)
+      res += *(&value - (i % size) + k);
+    return res;
+  }
+};
 
-  tensor_t tensor(256, 256, 160), kernel(20, 20, 160), result(236, 236, 1);
+int runtests() {
+  boost::timer timer;
+  using namespace thrust::placeholders;
+
+  tensor_t tensor(4, 3, 2), kernel(2, 2, 1), result(3, 2, 2), tensor2(5, 4, 2);
 
   float floats[] = {
       1, 2, 3, 4,
@@ -57,22 +72,32 @@ int runtests() {
       1, 0,
       0, 0
   };
-  //thrust::copy(floats, floats + tensor.data().size(), tensor.data().begin());
-  //thrust::copy(fkernel, fkernel + kernel.data().size(), kernel.data().begin());
-
-  tensor = tbblas::flip(kernel) + 2.f * result;
-
-  timer.restart();
-  for (int i = 0; i < 1000; ++i)
-    result = tbblas::conv(tbblas::flip(kernel), tensor);
-  cout << "Time: " << timer.elapsed() << "ms" << endl;
+  thrust::copy(floats, floats + tensor.data().size(), tensor.data().begin());
+  thrust::copy(fkernel, fkernel + kernel.data().size(), kernel.data().begin());
 
 
-  /*std::vector<float> vec(result.data().size());
+//  tensor = tbblas::flip(kernel) + 2.f * result;
+
+  //timer.restart();
+  //for (int i = 0; i < 1000; ++i)
+    tbblas::flip(result) = tbblas::conv(kernel, tbblas::flip(tensor));
+//    tensor = tbblas::conv(kernel, tensor2);
+  //cout << "Time: " << timer.elapsed() << "ms" << endl;
+
+//  thrust::device_vector<float> states(result.data().size());
+//
+//  curandGenerator_t gen;
+//  curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+//  curandGenerateUniform(gen, states.data().get(), states.size());
+//  curandDestroyGenerator(gen);
+//
+//  thrust::transform(states.begin(), states.end(), thrust::make_counting_iterator(0), result.begin(), reference_test<float>());
+
+  std::vector<float> vec(result.data().size());
   thrust::copy(result.begin(), result.end(), vec.begin());
   for (int i = 0; i < vec.size(); ++i)
     cout << vec[i] << " ";
-  cout << endl;*/
+  cout << endl;
 
 #if 0
   ifstream file("test.txt");
