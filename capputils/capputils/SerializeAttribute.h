@@ -22,88 +22,67 @@ public:
 };
 
 template<class T>
-class SerializeAttribute : public virtual ISerializeAttribute {
+class serialize_trait {
 public:
-  virtual void writeToFile(capputils::reflection::ClassProperty<T>* prop, const capputils::reflection::ReflectableClass& object, std::ostream& file) {
-    assert(prop);
-    T value = prop->getValue(object);
+  static void writeToFile(const T& value, std::ostream& file) {
     file.write((char*)&value, sizeof(T));
   }
 
-  virtual void readFromFile(capputils::reflection::ClassProperty<T>* prop, capputils::reflection::ReflectableClass& object, std::istream& file) {
-    assert(prop);
-    T value;
+  static void readFromFile(T& value, std::istream& file) {
     file.read((char*)&value, sizeof(T));
-    prop->setValue(object, value);
-  }
-
-  virtual void writeToFile(capputils::reflection::IClassProperty* prop, const capputils::reflection::ReflectableClass& object, std::ostream& file) {
-    capputils::reflection::ClassProperty<T>* typedProperty = dynamic_cast<capputils::reflection::ClassProperty<T>* >(prop);
-    assert(typedProperty);
-    writeToFile(typedProperty, object, file);
-  }
-
-  virtual void readFromFile(capputils::reflection::IClassProperty* prop, capputils::reflection::ReflectableClass& object, std::istream& file) {
-    capputils::reflection::ClassProperty<T>* typedProperty = dynamic_cast<capputils::reflection::ClassProperty<T>* >(prop);
-    assert(typedProperty);
-    readFromFile(typedProperty, object, file);
   }
 };
 
 template<class T>
-class SerializeAttribute<boost::shared_ptr<std::vector<T> > > : public virtual ISerializeAttribute {
-
-  typedef boost::shared_ptr<std::vector<T> > PCollectionType;
-
+class SerializeAttribute : public virtual ISerializeAttribute {
 public:
-  virtual void writeToFile(capputils::reflection::ClassProperty<PCollectionType>* prop, const capputils::reflection::ReflectableClass& object, std::ostream& file) {
-    assert(prop);
-    PCollectionType collection = prop->getValue(object);
-    assert(collection);
-
-    unsigned count = collection->size();
-    file.write((char*)&count, sizeof(unsigned));
-    file.write((char*)&collection->at(0), sizeof(T) * count);
-    assert(file.good());
-  }
-
-  virtual void readFromFile(capputils::reflection::ClassProperty<PCollectionType>* prop, capputils::reflection::ReflectableClass& object, std::istream& file) {
-    assert(prop);
-    unsigned count;
-    file.read((char*)&count, sizeof(unsigned));
-
-    PCollectionType collection(new std::vector<T>(count));
-    file.read((char*)&collection->at(0), sizeof(T) * count);
-    prop->setValue(object, collection);
-  }
-
   virtual void writeToFile(capputils::reflection::IClassProperty* prop, const capputils::reflection::ReflectableClass& object, std::ostream& file) {
-    capputils::reflection::ClassProperty<PCollectionType>* typedProperty = dynamic_cast<capputils::reflection::ClassProperty<PCollectionType>* >(prop);
+    capputils::reflection::ClassProperty<T>* typedProperty = dynamic_cast<capputils::reflection::ClassProperty<T>* >(prop);
     assert(typedProperty);
-    writeToFile(typedProperty, object, file);
+    serialize_trait<T>::writeToFile(typedProperty->getValue(object), file);
   }
 
   virtual void readFromFile(capputils::reflection::IClassProperty* prop, capputils::reflection::ReflectableClass& object, std::istream& file) {
-    capputils::reflection::ClassProperty<PCollectionType>* typedProperty = dynamic_cast<capputils::reflection::ClassProperty<PCollectionType>* >(prop);
+    capputils::reflection::ClassProperty<T>* typedProperty = dynamic_cast<capputils::reflection::ClassProperty<T>* >(prop);
     assert(typedProperty);
-    readFromFile(typedProperty, object, file);
+    T value;
+    serialize_trait<T>::readFromFile(value, file);
+    typedProperty->setValue(object, value);
+  }
+};
+
+template<class T>
+class serialize_trait<boost::shared_ptr<std::vector<T> > >  {
+  typedef boost::shared_ptr<std::vector<T> > PCollectionType;
+  typedef T value_t;
+
+public:
+  static void writeToFile(const PCollectionType& collection, std::ostream& file) {
+    unsigned count = collection->size();
+    file.write((char*)&count, sizeof(unsigned));
+    for (unsigned i = 0; i < count; ++i)
+       serialize_trait<value_t>::writeToFile(collection->at(i), file);
+    assert(file.good());
+  }
+
+  static void readFromFile(PCollectionType& collection, std::istream& file) {
+    unsigned count;
+    file.read((char*)&count, sizeof(unsigned));
+
+    collection = boost::shared_ptr<std::vector<T> >(new std::vector<T>());
+    for (unsigned i = 0; i < count; ++i) {
+      value_t value;
+      serialize_trait<value_t>::readFromFile(value, file);
+      collection->push_back(value);
+    }
   }
 };
 
 template<>
-class SerializeAttribute<std::string> : public virtual ISerializeAttribute {
+class serialize_trait<std::string> {
 public:
-  virtual void writeToFile(capputils::reflection::ClassProperty<std::string>* prop,
-      const capputils::reflection::ReflectableClass& object, std::ostream& file);
-
-  virtual void readFromFile(capputils::reflection::ClassProperty<std::string>* prop,
-      capputils::reflection::ReflectableClass& object, std::istream& file);
-
-  virtual void writeToFile(capputils::reflection::IClassProperty* prop,
-      const capputils::reflection::ReflectableClass& object, std::ostream& file);
-
-  virtual void readFromFile(capputils::reflection::IClassProperty* prop,
-      capputils::reflection::ReflectableClass& object, std::istream& file);
+  static void writeToFile(const std::string& value, std::ostream& file);
+  static void readFromFile(std::string& value, std::istream& file);
 };
 
 template<class T>
