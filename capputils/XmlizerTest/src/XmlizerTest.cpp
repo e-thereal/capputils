@@ -29,6 +29,7 @@
 #include <boost/range.hpp>
 
 #include <boost/regex.hpp>
+#include <boost/timer.hpp>
 
 #include "Car.h"
 #include "Student.h"
@@ -91,7 +92,7 @@ DefineEnum(Tage);
 
 int main(int argc, char** argv) {
   Days day = Monday;
-  Tage tag = Tage::Montag; tag = 0; tag = "Montag";
+  Tage tag = Tage::Montag; // tag = 0; tag = "Montag";
 
   /*{
     bio::filtering_ostream out;
@@ -115,6 +116,10 @@ int main(int argc, char** argv) {
   //std::regex rx("<h(.)>([^<]+)");
   //if (std::regex_search(str.c_str(), res, rx))
   //  std::cout << res[1] << ". " << res[2] << "\n";
+
+  boost::timer timer;
+  std::cout << "Max elapsed: " << timer.elapsed_max() << "s." << std::endl;
+  return 0;
 
   boost::cmatch res;
   std::string str = "segmentation/O145101X_0063200.tif";

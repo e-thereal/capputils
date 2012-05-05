@@ -17,6 +17,8 @@
 #include <cassert>
 #include <iostream>
 
+#include <cutil_math.h>
+
 #include "tensor_proxy.hpp"
 
 namespace tbblas {
@@ -109,6 +111,13 @@ struct tensor_convolution : public tensor_operation<Tensor> {
    : tensor1(tensor1), tensor2(tensor2), reuseFlag(reuseFlag) { }
 };
 
+template<class Tensor>
+struct tensor_copy : public tensor_operation<Tensor> {
+  Tensor tensor;
+
+  tensor_copy(const Tensor& tensor) : tensor(tensor) { }
+};
+
 template<class T, unsigned dim, bool device = true>
 class tensor_base {
 public:
@@ -143,7 +152,6 @@ public:
 
 protected:
   boost::shared_ptr<data_t> _data;
-  boost::shared_ptr<cdata_t> _cdata;
   dim_t _size;
   T _scalar;
   bool _flipped;
@@ -151,11 +159,11 @@ protected:
 protected:
   tensor_base(const size_t& count)
      : _data(new data_t(count)),
-       _cdata(new cdata_t()), _scalar(1), _flipped(false)
+       _scalar(1), _flipped(false)
   { }
 
   tensor_base(const dim_t& size)
-   : _cdata(new cdata_t()), _scalar(1), _flipped(false)
+   : _scalar(1), _flipped(false)
   {
     size_t count = 1;
     for (unsigned i = 0; i < dim; ++i) {
@@ -163,6 +171,22 @@ protected:
       count *= size[i];
     }
     _data = boost::shared_ptr<data_t>(new data_t(count));
+  }
+
+  template<class T2, bool device2>
+  tensor_base(const tensor_copy<tensor_base<T2, dim, device2> >& copy_op)
+   : _scalar(1), _flipped(false)
+  {
+    const tensor_base<T2, dim, device2>& tensor = copy_op.tensor;
+    const dim_t& size = tensor.size();
+
+    size_t count = 1;
+    for (unsigned i = 0; i < dim; ++i) {
+      _size[i] = size[i];
+      count *= size[i];
+    }
+    _data = boost::shared_ptr<data_t>(new data_t(count));
+    thrust::copy(tensor.cbegin(), tensor.cend(), data().begin());
   }
 
 public:
@@ -248,18 +272,34 @@ public:
 
   /*** apply operations ***/
 
-  void apply(const tensor_operation<tensor_t>& op) {
+  template<class T2, unsigned dim2, bool device2>
+  void apply(const tensor_operation<tensor_base<T2, dim2, device2> >& op) {
     const tensor_element_plus<tensor_t>* add = dynamic_cast<const tensor_element_plus<tensor_t>*>(&op);
-    if (add)
+    if (add) {
       apply(*add);
+      return;
+    }
 
     const tensor_convolution<tensor_t>* convolve = dynamic_cast<const tensor_convolution<tensor_t>*>(&op);
-    if (convolve)
+    if (convolve) {
       apply(*convolve);
+      return;
+    }
 
     const tensor_scalar_plus<tensor_t>* add_scalar = dynamic_cast<const tensor_scalar_plus<tensor_t>*>(&op);
-    if (add_scalar)
+    if (add_scalar) {
       apply(*add_scalar);
+      return;
+    }
+
+    const tensor_copy<tensor_base<T2, dim, device2> > *copy_op =
+        dynamic_cast<const tensor_copy<tensor_base<T2, dim, device2> >*>(&op);
+    if (copy_op) {
+      apply(*copy_op);
+      return;
+    }
+
+    assert(0); // TODO: unhandeled operation exception
   }
 
   void apply(const tensor_element_plus<tensor_t>& op) {
@@ -287,38 +327,27 @@ public:
     }
   };
 
-  void resizeFtData(const dim_t& size) const {
-    size_t newSize = 1;
-    for (int i = 0; i < dim; ++i) {
-      newSize *= size[i];
-    }
-
-    if (_cdata->size() != newSize) {
-//      std::cout << "New size: " << _cdata->size() << " -> " << newSize << std::endl;
-//      boost::shared_ptr<cdata_t> cdata(new cdata_t(newSize));
-//      _cdata = cdata;
-      _cdata->resize(newSize);
-    }
-  }
-
   void apply(const tensor_convolution<tensor_t>& op) {
     // calculate the convolution and write the result to the tensor
-    // reuse the fft vector
+    // the fft vector is not reused by default
     const tensor_t &dt1 = op.tensor1, &dt2 = op.tensor2;
 
     for (unsigned i = 0; i < dim; ++i)
       assert(size()[i] == abs((int)dt1.size()[i] - (int)dt2.size()[i]) + 1);
 
     dim_t ftsize;
-    for (int i = 0; i < dim; ++i)
-      ftsize[i] = max(dt1.size()[i], dt2.size()[i]);
+    unsigned ftcount = 1;
+    for (unsigned i = 0; i < dim; ++i)
+      ftcount *= (ftsize[i] = max(dt1.size()[i], dt2.size()[i]));
 
-    cdata_t& ftdata1 = (op.reuseFlag & ReuseFT1) ? *dt1._cdata : dt1.fft(ftsize);
-    cdata_t& ftdata2 = (op.reuseFlag & ReuseFT2) ? *dt2._cdata : dt2.fft(ftsize);
-    resizeFtData(ftsize);
-    thrust::transform(ftdata1.begin(), ftdata1.end(), ftdata2.begin(),
-        _cdata->begin(), complex_mult());
-    ifft(*_cdata, ftsize);
+    cdata_t cdata1(ftcount), cdata2(ftcount), cresult(ftcount);
+    tbblas::fft(dt1, ftsize, cdata1);
+    tbblas::fft(dt2, ftsize, cdata2);
+
+    thrust::transform(cdata1.begin(), cdata1.end(), cdata2.begin(),
+        cresult.begin(), complex_mult());
+
+    tbblas::ifft(cresult, ftsize, *this);
   }
 
   void apply(const tensor_scalar_plus<tensor_t>& op) {
@@ -333,21 +362,21 @@ public:
       thrust::transform(dt.cbegin(), dt.cend(), begin(), _1 + scalar);
   }
 
+  template<class T2, bool device2>
+  void apply(const tensor_copy<tensor_base<T2, dim, device2> >& copy_op)
+  {
+    const tensor_base<T2, dim, device2>& tensor = copy_op.tensor;
+    const dim_t& size = tensor.size();
+
+    for (unsigned i = 0; i < dim; ++i) {
+      assert(_size[i] == size[i]);    // todo: throw exception instead
+    }
+    thrust::copy(tensor.cbegin(), tensor.cend(), begin());
+  }
+
   /*** tensor operations ***/
   T sum() const {
     return thrust::reduce(data().begin(), data().end()) * _scalar;
-  }
-
-  // Calculate the fourier transformation of the tensor and return the complex sequence
-  cdata_t& fft(const dim_t& ftsize) const {
-    resizeFtData(ftsize);
-    tbblas::fft(*this, ftsize, *_cdata);
-    return *_cdata;
-  }
-
-  // Calculate the inverse fourier transform of the given complex sequence and write the result to the tensor
-  void ifft(const cdata_t& fourier, const dim_t& ftsize) {
-    tbblas::ifft(*_cdata, ftsize, *this);
   }
 };
 
@@ -413,7 +442,7 @@ template<class T, unsigned dim, bool device>
 T dot(const tensor_base<T, dim, device>& dt1, const tensor_base<T, dim, device>& dt2) {
   for (unsigned i = 0; i < dim; ++i)
     assert(dt1.size()[i] == dt2.size()[i]);
-  return thrust::inner_product(dt1.frbegin(), dt1.frend(), dt2.frbegin(), 0) * dt1.scalar() * dt2.scalar();
+  return thrust::inner_product(dt1.frbegin(), dt1.frend(), dt2.frbegin(), T(0)) * dt1.scalar() * dt2.scalar();
 }
 
 /*** Operation wrapper generating operations ***/
@@ -424,6 +453,11 @@ tensor_convolution<tensor_base<T, dim, device> > conv(
     int reuseFlag = ReuseFTNone)
 {
   return tensor_convolution<tensor_base<T, dim, device> >(dt1, dt2, reuseFlag);
+}
+
+template<class T, unsigned dim, bool device>
+tensor_copy<tensor_base<T, dim, device> > copy(const tensor_base<T, dim, device>& tensor) {
+  return tensor_copy<tensor_base<T, dim, device> >(tensor);
 }
 
 } // end tbblas
@@ -456,6 +490,13 @@ tbblas::tensor_scalar_plus<tbblas::tensor_base<T, dim, device> > operator+(
     const T& scalar, const tbblas::tensor_base<T, dim, device>& dt)
 {
   return tbblas::tensor_scalar_plus<tbblas::tensor_base<T, dim, device> >(dt, scalar);
+}
+
+template<class T, unsigned dim, bool device>
+tbblas::tensor_scalar_plus<tbblas::tensor_base<T, dim, device> > operator-(
+    const tbblas::tensor_base<T, dim, device>& dt, const T& scalar)
+{
+  return tbblas::tensor_scalar_plus<tbblas::tensor_base<T, dim, device> >(dt, -scalar);
 }
 
 #endif /* TENSOR_BASE_HPP_ */

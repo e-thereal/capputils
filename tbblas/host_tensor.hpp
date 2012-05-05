@@ -50,12 +50,14 @@ public:
   typedef typename base_t::dim_t dim_t;
 
 public:
-  host_tensor(const dim_t& size)
-   : base_t(size)
-  { }
+  host_tensor(const dim_t& size) : base_t(size) { }
+
+  template<class Tensor>
+  host_tensor(const tensor_copy<Tensor>& copy_op) : base_t(copy_op) { }
 
 public:
-  tensor_t& operator=(const tensor_operation<base_t>& op) {
+  template<class Tensor>
+  tensor_t& operator=(const tensor_operation<Tensor>& op) {
     apply(op);
     return *this;
   }
@@ -97,8 +99,12 @@ public:
     this->_size[2] = depth;
   }
 
+  template<class Tensor>
+  host_tensor(const tensor_copy<Tensor>& copy_op) : base_t(copy_op) { }
+
 public:
-  tensor_t& operator=(const tensor_operation<base_t>& op) {
+  template<class Tensor>
+  tensor_t& operator=(const tensor_operation<Tensor>& op) {
     apply(op);
     return *this;
   }

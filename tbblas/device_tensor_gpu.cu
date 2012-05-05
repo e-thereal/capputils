@@ -7,6 +7,8 @@
 
 #include "device_tensor.hpp"
 
+#include <culib/CulibException.h>
+
 namespace tbblas {
 
 template<>
@@ -28,6 +30,7 @@ void fft<float, 3, true>(const tensor_base<float, 3, true>& dt, const size_t (&s
   res = cufftPlan3d(&plan, size[2], size[1], size[0], CUFFT_R2C);
   cufftExecR2C(plan, padded.data().data().get(), ftdata.data().get());
   cufftDestroy(plan);
+//  CULIB_SAFE_CALL(cudaThreadSynchronize());
 }
 
 template<>
@@ -52,6 +55,7 @@ void ifft<float, 3, true>(thrust::device_vector<complex_type<float>::complex_t>&
 
   const_proxy_t proxy = subrange(padded / (float)count, start, dt.size());
   thrust::copy(proxy.begin(), proxy.end(), dt.begin());
+//  CULIB_SAFE_CALL(cudaThreadSynchronize());
 }
 
 template<>
@@ -74,6 +78,7 @@ void fft<double, 3, true>(const tensor_base<double, 3, true>& dt, const size_t (
   res = cufftPlan3d(&plan, size[2], size[1], size[0], CUFFT_D2Z);
   cufftExecD2Z(plan, padded.data().data().get(), ftdata.data().get());
   cufftDestroy(plan);
+//  CULIB_SAFE_CALL(cudaThreadSynchronize());
 }
 
 template<>
@@ -100,6 +105,7 @@ void ifft<double, 3, true>(thrust::device_vector<complex_type<double>::complex_t
 
   const_proxy_t proxy = subrange(padded / (value_t)count, start, dt.size());
   thrust::copy(proxy.begin(), proxy.end(), dt.begin());
+//  CULIB_SAFE_CALL(cudaThreadSynchronize());
 }
 
 }

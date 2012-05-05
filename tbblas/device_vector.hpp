@@ -179,8 +179,21 @@ public:
     return *this;
   }
 
+  device_vector<T>& operator+=(const T& scalar) {
+    using namespace thrust::placeholders;
+
+    assert(_increment == 1);
+    thrust::transform(data().begin() + _offset, data().begin() + _offset + _length,
+        data().begin() + _offset, _1 + scalar / _scalar);
+    return *this;
+  }
+
   device_vector<T>& operator-=(const device_vector<T>& v) {
     return *this += -v;
+  }
+
+  device_vector<T>& operator-=(const T& scalar) {
+    return *this += -scalar;
   }
 
   add_vector_operation<T> operator+(const device_vector<T>& v) const {

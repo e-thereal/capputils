@@ -34,6 +34,8 @@
 								<option id="cuda.toolchain.compiler.general.incpath.1553328911" name="Include paths (-I)" superClass="cuda.toolchain.compiler.general.incpath" valueType="includePath">
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
+									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
 								</option>
 								<option id="cuda.toolchain.compiler.option.misc.other.1540825661" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fmessage-length=0 -gencode=arch=compute_20,code=\&quot;sm_20,compute_20\&quot;" valueType="string"/>
 								<inputType id="cuda.toolchain.compiler.input.755964807" superClass="cuda.toolchain.compiler.input"/>
@@ -42,15 +44,20 @@
 								<option id="gnu.cpp.compiler.option.include.paths.1351488001" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
+									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.optimization.level.1886348830" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.409847136" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.other.other.920110357" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1793942868" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cuda.toolchain.gnu.c.compiler.716961184" name="GCC C Compiler" superClass="cuda.toolchain.gnu.c.compiler">
 								<option id="gnu.c.compiler.option.include.paths.616277059" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
+									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
 								</option>
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.416942655" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.1152336015" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
@@ -62,6 +69,8 @@
 								<option id="gnu.both.asm.option.include.paths.1830859052" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
+									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.455216557" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -105,6 +114,8 @@
 								<option id="gnu.cpp.compiler.option.include.paths.731867776" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
+									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1367007534" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -114,6 +125,8 @@
 								<option id="gnu.c.compiler.option.include.paths.694388262" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
+									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.544485165" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -123,6 +136,8 @@
 								<option id="gnu.both.asm.option.include.paths.1314191168" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
+									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.248268743" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
