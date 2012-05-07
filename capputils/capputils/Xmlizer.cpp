@@ -112,6 +112,15 @@ void Xmlizer::ToXml(TiXmlNode& xmlNode, const ReflectableClass& object) {
   }
 }
 
+void Xmlizer::ToXml(std::ostream& os, const reflection::ReflectableClass& object) {
+  TiXmlNode* node = Xmlizer::CreateXml(object);
+
+  TiXmlPrinter printer;
+  printer.SetIndent("  ");
+  node->Accept(&printer);
+  os << printer.Str();
+}
+
 void Xmlizer::ToXml(const ::std::string& filename, const reflection::ReflectableClass& object) {
   ToFile(filename, Xmlizer::CreateXml(object));
 }

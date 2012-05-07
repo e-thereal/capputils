@@ -88,6 +88,7 @@
     <ClInclude Include="IXmlableAttribute.h" />
     <ClInclude Include="LibraryException.h" />
     <ClInclude Include="LibraryLoader.h" />
+    <ClInclude Include="NoParameterAttribute.h" />
     <ClInclude Include="OutputAttribute.h" />
     <ClInclude Include="ReflectionException.h" />
     <ClInclude Include="RegisterClass.h" />
@@ -130,10 +131,12 @@
     <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="Executer.cpp" />
     <ClCompile Include="FactoryException.cpp" />
+    <ClCompile Include="FileExistsAttribute.cpp" />
     <ClCompile Include="FromEnumerableAttribute.cpp" />
     <ClCompile Include="InputAttribute.cpp" />
     <ClCompile Include="LibraryException.cpp" />
     <ClCompile Include="LibraryLoader.cpp" />
+    <ClCompile Include="NoParameterAttribute.cpp" />
     <ClCompile Include="OutputAttribute.cpp" />
     <ClCompile Include="ReflectionException.cpp" />
     <ClCompile Include="RegisterClass.cpp" />
@@ -144,7 +147,6 @@
     <ClCompile Include="ClassProperty.cpp" />
     <ClCompile Include="DescriptionAttribute.cpp" />
     <ClCompile Include="Enumerator.cpp" />
-    <ClCompile Include="FileExists.cpp" />
     <ClCompile Include="FilenameAttribute.cpp" />
     <ClCompile Include="FlagAttribute.cpp" />
     <ClCompile Include="IAttribute.cpp" />

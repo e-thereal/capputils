@@ -26,6 +26,7 @@ public:
   static TiXmlElement* CreateXml(const reflection::ReflectableClass& object);
   static void ToXml(TiXmlNode& xmlNode, const reflection::ReflectableClass& object);
   static void ToXml(const ::std::string& filename, const reflection::ReflectableClass& object);
+  static void ToXml(std::ostream& os, const reflection::ReflectableClass& object);
   static void ToFile(const ::std::string& filename, TiXmlNode* node);
 
   static void GetPropertyFromXml(reflection::ReflectableClass& object,

@@ -13,6 +13,7 @@
 #include <dlfcn.h>
 #else
 #include <Windows.h>
+#include <strsafe.h>
 #define BOOST_FILESYSTEM_VERSION 3
 #endif
 #include <iostream>
@@ -26,6 +27,39 @@ using namespace boost::filesystem;
 namespace capputils {
 
 #ifdef _WIN32
+
+void showError(LPTSTR lpszFunction) 
+{ 
+    // Retrieve the system error message for the last-error code
+
+    LPVOID lpMsgBuf;
+    LPVOID lpDisplayBuf;
+    DWORD dw = GetLastError(); 
+
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &lpMsgBuf,
+        0, NULL );
+
+    // Display the error message and exit the process
+
+    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
+        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR)); 
+    StringCchPrintf((LPTSTR)lpDisplayBuf, 
+        LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+        TEXT("%s failed with error %d: %s"), 
+        lpszFunction, dw, lpMsgBuf); 
+    MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK); 
+
+    LocalFree(lpMsgBuf);
+    LocalFree(lpDisplayBuf);
+}
+
 struct HandleWrapper {
   HMODULE handle;
 };
@@ -46,6 +80,7 @@ LibraryData::LibraryData(const char* filename) {
   loadCount = 1;
   handleWrapper->handle = LoadLibraryA(tmpName.c_str());
   if (!handleWrapper->handle) {
+    showError(TEXT("LoadLibrary"));
     throw exceptions::LibraryException(filename, "Unknown load error.");
   }
   lastModified = last_write_time(filename);
