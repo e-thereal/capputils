@@ -51,15 +51,16 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;TBBLAS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(BOOST_INC_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(NVSDKCOMPUTE_ROOT)/C/common/inc;$(BOOST_INC_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <CudaCompile>
-      <Include>$(BOOST_INC_PATH)</Include>
+      <Include>$(BOOST_INC_PATH);$(NVSDKCOMPUTE_ROOT)/C/common/inc;$(SolutionDir)</Include>
       <Defines>TBBLAS_EXPORTS</Defines>
+      <CodeGeneration>compute_20,sm_20</CodeGeneration>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -81,9 +82,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="device_matrix.hpp" />
+    <ClInclude Include="device_tensor.hpp" />
     <ClInclude Include="device_vector.hpp" />
+    <ClInclude Include="disk_tensor.hpp" />
+    <ClInclude Include="forward_reverse_iterator.hpp" />
+    <ClInclude Include="forward_reverse_iterator_base.hpp" />
+    <ClInclude Include="host_tensor.hpp" />
     <ClInclude Include="subrange_proxy.hpp" />
     <ClInclude Include="tbblas.hpp" />
+    <ClInclude Include="tensor_base.hpp" />
+    <ClInclude Include="tensor_proxy.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="device_matrix.cpp" />
@@ -91,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="device_matrix_gpu.cu" />
+    <CudaCompile Include="device_tensor_gpu.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -27,6 +27,27 @@
     <ClInclude Include="tbblas.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="device_tensor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="forward_reverse_iterator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="forward_reverse_iterator_base.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="host_tensor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tensor_base.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tensor_proxy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="disk_tensor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="device_matrix.cpp">
@@ -38,5 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="device_matrix_gpu.cu" />
+    <CudaCompile Include="device_tensor_gpu.cu" />
   </ItemGroup>
 </Project>
