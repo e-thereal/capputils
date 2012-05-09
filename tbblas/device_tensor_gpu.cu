@@ -9,7 +9,14 @@
 
 #include <culib/CulibException.h>
 
+#include <iostream>
+
 namespace tbblas {
+
+#define CHECK_CUFFT_ERROR(a) \
+  if ((res = a) != CUFFT_SUCCESS) { \
+    std::cout << "Error in file " << __FILE__ << ", line " << __LINE__ << ": " << res << std::endl; \
+  }
 
 template<>
 void fft<float, 3, true>(const tensor_base<float, 3, true>& dt, const size_t (&size)[3],
@@ -27,10 +34,11 @@ void fft<float, 3, true>(const tensor_base<float, 3, true>& dt, const size_t (&s
   cufftHandle plan;
   cufftResult res;
 
-  res = cufftPlan3d(&plan, size[2], size[1], size[0], CUFFT_R2C);
-  cufftExecR2C(plan, padded.data().data().get(), ftdata.data().get());
-  cufftDestroy(plan);
-//  CULIB_SAFE_CALL(cudaThreadSynchronize());
+  // TODO: potential problem with the size order. Find a way to test it!
+  CHECK_CUFFT_ERROR(cufftPlan3d(&plan, size[2], size[1], size[0], CUFFT_R2C));
+  CHECK_CUFFT_ERROR(cufftExecR2C(plan, padded.data().data().get(), ftdata.data().get()));
+  CHECK_CUFFT_ERROR(cufftDestroy(plan));
+  CULIB_SAFE_CALL(cudaThreadSynchronize());
 }
 
 template<>
@@ -45,9 +53,9 @@ void ifft<float, 3, true>(thrust::device_vector<complex_type<float>::complex_t>&
   cufftResult res;
 
   tensor_t padded(size);
-  res = cufftPlan3d(&plan, size[2], size[1], size[0], CUFFT_C2R);
-  cufftExecC2R(plan, ftdata.data().get(), padded.data().data().get());
-  cufftDestroy(plan);
+  CHECK_CUFFT_ERROR(cufftPlan3d(&plan, size[2], size[1], size[0], CUFFT_C2R));
+  CHECK_CUFFT_ERROR(cufftExecC2R(plan, ftdata.data().get(), padded.data().data().get()));
+  CHECK_CUFFT_ERROR(cufftDestroy(plan));
 
   size_t start[3];
   for (int i = 0; i < 3; ++i)
@@ -55,7 +63,7 @@ void ifft<float, 3, true>(thrust::device_vector<complex_type<float>::complex_t>&
 
   const_proxy_t proxy = subrange(padded / (float)count, start, dt.size());
   thrust::copy(proxy.begin(), proxy.end(), dt.begin());
-//  CULIB_SAFE_CALL(cudaThreadSynchronize());
+  CULIB_SAFE_CALL(cudaThreadSynchronize());
 }
 
 template<>
@@ -75,10 +83,24 @@ void fft<double, 3, true>(const tensor_base<double, 3, true>& dt, const size_t (
   cufftHandle plan;
   cufftResult res;
 
-  res = cufftPlan3d(&plan, size[2], size[1], size[0], CUFFT_D2Z);
-  cufftExecD2Z(plan, padded.data().data().get(), ftdata.data().get());
-  cufftDestroy(plan);
-//  CULIB_SAFE_CALL(cudaThreadSynchronize());
+//  std::cout << "Size: " << dt.size()[0] << ", " << dt.size()[1] << ", " << dt.size()[2] << std::endl;
+//  std::cout << "Padded Size: " << size[0] << ", " << size[1] << ", " << size[2] << std::endl;
+//  std::cout << padded.data().size() << " == " << ftdata.size() << std::endl;
+
+  assert(size[0] > 1);
+
+  if (size[1] > 1) {
+    if (size[2] > 1) {
+      CHECK_CUFFT_ERROR(cufftPlan3d(&plan, size[2], size[1], size[0], CUFFT_D2Z));
+    } else {
+      CHECK_CUFFT_ERROR(cufftPlan2d(&plan, size[1], size[0], CUFFT_D2Z));
+    }
+  } else {
+    CHECK_CUFFT_ERROR(cufftPlan1d(&plan, size[0], CUFFT_D2Z, 1));
+  }
+  CHECK_CUFFT_ERROR(cufftExecD2Z(plan, padded.data().data().get(), ftdata.data().get()));
+  CHECK_CUFFT_ERROR(cufftDestroy(plan));
+  CULIB_SAFE_CALL(cudaThreadSynchronize());
 }
 
 template<>
@@ -95,9 +117,20 @@ void ifft<double, 3, true>(thrust::device_vector<complex_type<double>::complex_t
   cufftResult res;
 
   tensor_t padded(size);
-  res = cufftPlan3d(&plan, size[2], size[1], size[0], CUFFT_Z2D);
-  cufftExecZ2D(plan, ftdata.data().get(), padded.data().data().get());
-  cufftDestroy(plan);
+
+  assert(size[0] > 1);
+
+  if (size[1] > 1) {
+    if (size[2] > 1) {
+      CHECK_CUFFT_ERROR(cufftPlan3d(&plan, size[2], size[1], size[0], CUFFT_Z2D));
+    } else {
+      CHECK_CUFFT_ERROR(cufftPlan2d(&plan, size[1], size[0], CUFFT_Z2D));
+    }
+  } else {
+    CHECK_CUFFT_ERROR(cufftPlan1d(&plan, size[0], CUFFT_Z2D, 1));
+  }
+  CHECK_CUFFT_ERROR(cufftExecZ2D(plan, ftdata.data().get(), padded.data().data().get()));
+  CHECK_CUFFT_ERROR(cufftDestroy(plan));
 
   size_t start[3];
   for (int i = 0; i < 3; ++i)
@@ -105,7 +138,7 @@ void ifft<double, 3, true>(thrust::device_vector<complex_type<double>::complex_t
 
   const_proxy_t proxy = subrange(padded / (value_t)count, start, dt.size());
   thrust::copy(proxy.begin(), proxy.end(), dt.begin());
-//  CULIB_SAFE_CALL(cudaThreadSynchronize());
+  CULIB_SAFE_CALL(cudaThreadSynchronize());
 }
 
 }

@@ -113,12 +113,7 @@ void Xmlizer::ToXml(TiXmlNode& xmlNode, const ReflectableClass& object) {
 }
 
 void Xmlizer::ToXml(std::ostream& os, const reflection::ReflectableClass& object) {
-  TiXmlNode* node = Xmlizer::CreateXml(object);
-
-  TiXmlPrinter printer;
-  printer.SetIndent("  ");
-  node->Accept(&printer);
-  os << printer.Str();
+  ToDocument(os, Xmlizer::CreateXml(object));
 }
 
 void Xmlizer::ToXml(const ::std::string& filename, const reflection::ReflectableClass& object) {
@@ -130,6 +125,17 @@ void Xmlizer::ToFile(const ::std::string& filename, TiXmlNode* node) {
   xmlDoc.LinkEndChild(new TiXmlDeclaration("1.0", "", ""));
   xmlDoc.LinkEndChild(node);
   xmlDoc.SaveFile(filename);
+}
+
+void Xmlizer::ToDocument(std::ostream& os, TiXmlNode* node) {
+  TiXmlDocument xmlDoc;
+  xmlDoc.LinkEndChild(new TiXmlDeclaration("1.0", "", ""));
+  xmlDoc.LinkEndChild(node);
+
+  TiXmlPrinter printer;
+  printer.SetIndent("  ");
+  xmlDoc.Accept(&printer);
+  os << printer.Str();
 }
 
 ReflectableClass* Xmlizer::CreateReflectableClass(const TiXmlNode& xmlNode) {
@@ -265,6 +271,12 @@ void Xmlizer::FromXml(reflection::ReflectableClass& object, const ::std::string&
     // TODO: Error handling
     return;
   }
+  Xmlizer::FromXml(object, doc);
+}
+
+void Xmlizer::FromXmlString(reflection::ReflectableClass& object, const std::string& xmlString) {
+  TiXmlDocument doc;
+  doc.Parse(xmlString.c_str(), 0, TIXML_ENCODING_UTF8);
   Xmlizer::FromXml(object, doc);
 }
 

@@ -30,6 +30,8 @@
 
 #include <curand.h>
 
+#include <culib/CulibException.h>
+
 //namespace ublas = boost::numeric::ublas;
 
 using namespace std;
@@ -52,10 +54,34 @@ struct reference_test : thrust::binary_function<T, unsigned, T> {
   }
 };
 
+#define CHECK_CUFFT_ERROR(a) \
+  if ((res = a) != CUFFT_SUCCESS) { \
+    std::cout << "Error in file " << __FILE__ << ", line " << __LINE__ << ": " << res << std::endl; \
+  }
+
 int runtests() {
   boost::timer timer;
   using namespace thrust::placeholders;
 
+  cufftResult res;
+
+  #define NX 34
+  #define NY 32
+  cufftHandle plan;
+  cufftDoubleComplex *idata;
+  cufftDoubleReal *odata;
+  cudaMalloc((void**)&idata, sizeof(cufftDoubleComplex)*NX*NY);
+  cudaMalloc((void**)&odata, sizeof(cufftDoubleReal)*NX*NY);
+  /* Create a 2D FFT plan. */
+  cufftPlan2d(&plan, NX, NY, CUFFT_D2Z);
+  /* Use the CUFFT plan to transform the signal out of place. */
+  CHECK_CUFFT_ERROR(cufftExecD2Z(plan, odata, idata));
+  /* Destroy the CUFFT plan. */
+  cufftDestroy(plan);
+  cudaFree(idata); cudaFree(odata);
+
+
+#if 0
   tensor_t tensor(4, 3, 2), kernel(2, 2, 1), result(3, 2, 2), tensor2(5, 4, 2);
 
   float floats[] = {
@@ -99,7 +125,7 @@ int runtests() {
     cout << vec[i] << " ";
   cout << endl;
 
-#if 0
+
   ifstream file("test.txt");
   if (file) {
     cout << "Reading file" << endl;

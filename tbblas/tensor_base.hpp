@@ -46,6 +46,8 @@ struct complex_type<float> {
   }
 };
 
+
+// TODO: temporary hack cause doubles cause problems with certain filter sizes
 template<>
 struct complex_type<double> {
   typedef cufftDoubleComplex complex_t;
