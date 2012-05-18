@@ -88,7 +88,7 @@ void fft<double, 3, true>(const tensor_base<double, 3, true>& dt, const size_t (
 //  std::cout << padded.data().size() << " == " << ftdata.size() << std::endl;
 
   assert(size[0] > 1);
-
+  CULIB_SAFE_CALL(cudaThreadSynchronize());
   if (size[1] > 1) {
     if (size[2] > 1) {
       CHECK_CUFFT_ERROR(cufftPlan3d(&plan, size[2], size[1], size[0], CUFFT_D2Z));
@@ -119,7 +119,7 @@ void ifft<double, 3, true>(thrust::device_vector<complex_type<double>::complex_t
   tensor_t padded(size);
 
   assert(size[0] > 1);
-
+  CULIB_SAFE_CALL(cudaThreadSynchronize());
   if (size[1] > 1) {
     if (size[2] > 1) {
       CHECK_CUFFT_ERROR(cufftPlan3d(&plan, size[2], size[1], size[0], CUFFT_Z2D));

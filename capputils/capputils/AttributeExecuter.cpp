@@ -17,7 +17,7 @@ namespace capputils {
 namespace attributes {
 
 void AttributeExecuter::ExecuteBefore(ReflectableClass& object, const IClassProperty& property) {
-  vector<IAttribute*> attributes = property.getAttributes();
+  const vector<IAttribute*>& attributes = property.getAttributes();
   for (unsigned j = 0; j < attributes.size(); ++j) {
     IExecutableAttribute* executable = dynamic_cast<IExecutableAttribute*>(attributes[j]);
     if (executable) {
@@ -27,7 +27,7 @@ void AttributeExecuter::ExecuteBefore(ReflectableClass& object, const IClassProp
 }
 
 void AttributeExecuter::ExecuteAfter(ReflectableClass& object, const IClassProperty& property) {
-  vector<IAttribute*> attributes = property.getAttributes();
+  const vector<IAttribute*>& attributes = property.getAttributes();
   for (unsigned j = 0; j < attributes.size(); ++j) {
     IExecutableAttribute* executable = dynamic_cast<IExecutableAttribute*>(attributes[j]);
     if (executable) {
