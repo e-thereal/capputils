@@ -4,13 +4,12 @@
 
 #include "IAttribute.h"
 #include "ShortNameAttribute.h"
-#include "NoParameterAttribute.h"
 
 namespace capputils {
 
 namespace attributes {
 
-class InputAttribute : public virtual IAttribute, public NoParameterAttribute
+class InputAttribute : public virtual IAttribute
 {
 public:
   InputAttribute(void);
