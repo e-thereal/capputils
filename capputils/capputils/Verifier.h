@@ -15,6 +15,8 @@
 
 namespace capputils {
 
+class Logbook;
+
 class Verifier {
 public:
   Verifier();
@@ -22,8 +24,15 @@ public:
 
   static bool Valid(const reflection::ReflectableClass& object,
       const reflection::IClassProperty& property, std::ostream& stream = std::cout);
+
+  static bool Valid(const reflection::ReflectableClass& object,
+      const reflection::IClassProperty& property, Logbook& logbook);
+
   static bool Valid(const reflection::ReflectableClass& object,
       std::ostream& stream = std::cout);
+
+  static bool Valid(const reflection::ReflectableClass& object, Logbook& logbook);
+
   static bool UpToDate(const reflection::ReflectableClass& object);
 };
 

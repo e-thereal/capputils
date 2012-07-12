@@ -17,6 +17,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "Logbook.h"
+
 using namespace std;
 using namespace capputils::reflection;
 using namespace capputils::attributes;
@@ -47,12 +49,40 @@ bool Verifier::Valid(const ReflectableClass& object, const IClassProperty& prope
   return isValid;
 }
 
+bool Verifier::Valid(const ReflectableClass& object, const IClassProperty& property, Logbook& logbook) {
+  bool isValid = true;
+
+  vector<IAttribute*> attributes = property.getAttributes();
+  for (unsigned j = 0; j < attributes.size(); ++j) {
+    IAssertionAttribute* assertion = dynamic_cast<IAssertionAttribute*>(attributes[j]);
+    if (assertion) {
+      if (!assertion->valid(property, object)) {
+        isValid = false;
+        logbook(Severity::Warning) << assertion->getLastMessage();
+      }
+    }
+  }
+
+  return isValid;
+}
+
 bool Verifier::Valid(const ReflectableClass& object, ostream& stream) {
   bool isValid = true;
 
   vector<IClassProperty*>& properties = object.getProperties();
   for (unsigned i = 0; i < properties.size(); ++i)
     if (!Verifier::Valid(object, *properties[i], stream))
+      isValid = false;
+
+  return isValid;
+}
+
+bool Verifier::Valid(const reflection::ReflectableClass& object, Logbook& logbook) {
+  bool isValid = true;
+
+  vector<IClassProperty*>& properties = object.getProperties();
+  for (unsigned i = 0; i < properties.size(); ++i)
+    if (!Verifier::Valid(object, *properties[i], logbook))
       isValid = false;
 
   return isValid;
