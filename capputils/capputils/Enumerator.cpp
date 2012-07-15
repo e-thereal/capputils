@@ -7,14 +7,7 @@
 
 #include "Enumerator.h"
 
-#include "ScalarAttribute.h"
-
 namespace capputils {
-
-namespace reflection {
-
-BeginAbstractPropertyDefinitions(Enumerator, capputils::attributes::Scalar())
-EndPropertyDefinitions
 
 Enumerator::Enumerator() {
 }
@@ -32,4 +25,12 @@ void Enumerator::fromStream(std::istream& stream) {
 
 }
 
+std::ostream& operator<< (std::ostream& stream, const capputils::Enumerator& enumerator) {
+  enumerator.toStream(stream);
+  return stream;
+}
+
+std::istream& operator>> (std::istream& stream, capputils::Enumerator& enumerator) {
+  enumerator.fromStream(stream);
+  return stream;
 }

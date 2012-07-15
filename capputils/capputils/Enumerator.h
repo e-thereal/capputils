@@ -9,19 +9,15 @@
 #define CAPPUTILS_ENUMERATOR_H_
 
 #include "capputils.h"
-#include "ReflectableClass.h"
 
 #include <vector>
 #include <string>
+#include <ostream>
+#include <istream>
 
 namespace capputils {
 
-namespace reflection {
-
-class CAPPUTILS_API Enumerator: public ReflectableClass {
-
-InitAbstractReflectableClass(Enumerator)
-
+class Enumerator {
 protected:
   std::string value;
 
@@ -38,6 +34,7 @@ public:
 
 }
 
-}
+std::ostream& operator<< (std::ostream& stream, const capputils::Enumerator& enumerator);
+std::istream& operator>> (std::istream& stream, capputils::Enumerator& enumerator);
 
 #endif /* CAPPUTILS_ENUMERATOR_H_ */

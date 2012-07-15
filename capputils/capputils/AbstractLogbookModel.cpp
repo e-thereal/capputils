@@ -11,8 +11,6 @@
 
 namespace capputils {
 
-DefineEnum(Severity);
-
 AbstractLogbookModel::~AbstractLogbookModel() { }
 
 } /* namespace gapputils */

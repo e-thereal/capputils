@@ -159,6 +159,21 @@
     <ClInclude Include="NoParameterAttribute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Logbook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractLogbookModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Variant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertyMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EnumeratorAttribute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="xmlizer.cpp">
@@ -267,6 +282,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FileExistsAttribute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Logbook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractLogbookModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Variant.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

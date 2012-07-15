@@ -17,7 +17,7 @@
 
 namespace capputils {
 
-ReflectableEnum(Severity, Trace, Message, Warning, Error);
+CapputilsEnumerator(Severity, Trace, Message, Warning, Error);
 
 class AbstractLogbookModel {
 public:
