@@ -34,7 +34,6 @@ ReflectableClassFactory::~ReflectableClassFactory() {
 }
 
 ReflectableClass* ReflectableClassFactory::newInstance(const string& classname) {
-  // TODO: Tell which class could not be loaded
   if (constructors.find(classname) != constructors.end()) {
     ReflectableClass* object = constructors[classname]();
     if (object)

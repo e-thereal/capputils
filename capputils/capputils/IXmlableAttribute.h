@@ -23,17 +23,17 @@ namespace attributes {
 
 class IXmlableAttribute : public virtual IAttribute {
 public:
-  virtual void addToPropertyNode(TiXmlElement& node,
-      const reflection::ReflectableClass& object,
-      const reflection::IClassProperty* property) const { }
-  virtual void getFromPropertyNode(const TiXmlElement& node,
-      reflection::ReflectableClass& object,
-      reflection::IClassProperty* property) const { }
+  virtual void addToPropertyNode(TiXmlElement& /*node*/,
+      const reflection::ReflectableClass& /*object*/,
+      const reflection::IClassProperty* /*property*/) const { }
+  virtual void getFromPropertyNode(const TiXmlElement& /*node*/,
+      reflection::ReflectableClass& /*object*/,
+      reflection::IClassProperty* /*property*/) const { }
 
-  virtual void addToReflectableClassNode(TiXmlElement& node,
-      const reflection::ReflectableClass& object) const { }
-  virtual void getFromReflectableClassNode(const TiXmlElement& node,
-      reflection::ReflectableClass& object) const { }
+  virtual void addToReflectableClassNode(TiXmlElement& /*node*/,
+      const reflection::ReflectableClass& /*object*/) const { }
+  virtual void getFromReflectableClassNode(const TiXmlElement& /*node*/,
+      reflection::ReflectableClass& /*object*/) const { }
 };
 
 }

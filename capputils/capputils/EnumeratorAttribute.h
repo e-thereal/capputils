@@ -28,7 +28,7 @@ public:
     if (typedProperty) {
       return std::shared_ptr<capputils::Enumerator>(new T(typedProperty->getValue(object)));
     } else {
-      return std::shared_ptr<capputils::Enumerator>(0);
+      return std::shared_ptr<capputils::Enumerator>();
     }
   }
 };
@@ -40,11 +40,12 @@ public:
         const reflection::IClassProperty* property) const
   {
     using namespace capputils::reflection;
+    using namespace std;
     const ClassProperty<std::shared_ptr<T> >* typedProperty = dynamic_cast<const ClassProperty<std::shared_ptr<T> >* >(property);
     if (typedProperty) {
       return dynamic_pointer_cast<capputils::Enumerator>(typedProperty->getValue(object));
     }
-    return std::shared_ptr<capputils::Enumerator>(0);
+    return std::shared_ptr<capputils::Enumerator>();
   }
 };
 
@@ -59,7 +60,7 @@ public:
       if (typedProperty) {
         return std::shared_ptr<capputils::Enumerator>(new T(*typedProperty->getValue(object)));
       }
-      return std::shared_ptr<capputils::Enumerator>(0);
+      return std::shared_ptr<capputils::Enumerator>();
     }
 };
 
