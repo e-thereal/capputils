@@ -24,7 +24,7 @@ void fft<float, 3, true>(const tensor_base<float, 3, true>& dt, const size_t (&s
 {
   typedef device_tensor<float, 3> tensor_t;
   typedef tensor_proxy<tensor_t::iterator, 3> proxy_t;
-
+  
   const size_t start[3] = {0, 0, 0};
 
   tensor_t padded(size);

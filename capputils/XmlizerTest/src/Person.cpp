@@ -1,13 +1,12 @@
 #include "Person.h"
 
 #include <capputils/DescriptionAttribute.h>
+#include <capputils/EnumeratorAttribute.h>
 #include <capputils/ScalarAttribute.h>
 #include <capputils/ObserveAttribute.h>
 #include <capputils/TimeStampAttribute.h>
 
 using namespace capputils::attributes;
-
-DefineEnum(Gender)
 
 BeginPropertyDefinitions(Address)
 
@@ -34,7 +33,7 @@ DefineProperty(Age,
 ReflectableProperty(Address,
   Description("Address with everything."), Observe(PROPERTY_ID))
 
-ReflectableProperty(Gender, Observe(PROPERTY_ID))
+DefineProperty(Gender, Enumerator<Gender>(), Observe(PROPERTY_ID))
 
 EndPropertyDefinitions
 

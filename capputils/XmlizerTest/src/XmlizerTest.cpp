@@ -30,6 +30,7 @@
 
 #include <boost/regex.hpp>
 #include <boost/timer.hpp>
+#include <memory>
 
 #include "Car.h"
 #include "Student.h"
@@ -87,10 +88,115 @@ void saveMe(std::ostream& out) {
 namespace bio = boost::iostreams;
 
 enum Days {Monday, Tuesday};
-ReflectableEnum(Tage, Montag, Dienstag);
-DefineEnum(Tage);
+CapputilsEnumerator(Tage, Montag, Dienstag);
+
+class IWorkflowElement {
+public:
+  virtual ~IWorkflowElement() { }
+
+  virtual void startUpdate() const = 0;
+  virtual void writeResults() = 0;
+};
+
+template<class T>
+class WorkflowElement : public virtual IWorkflowElement {
+
+protected:
+  mutable T* newState;
+
+public:
+  WorkflowElement() : newState(0) { }
+  virtual ~WorkflowElement() { if (newState) delete newState; }
+
+  virtual void startUpdate() const {
+    if (!newState)
+      newState = new T();
+  }
+
+  virtual void writeResults() {
+    // Go throw the properties and transfer the outputs
+  }
+
+protected:
+  virtual void update() const = 0;
+};
+
+class HelloWorldElement : public WorkflowElement<HelloWorldElement> {
+public:
+  void sayHello() { }
+
+protected:
+  virtual void update() const {
+    // do something here
+
+    newState->sayHello();
+  }
+};
+
+class LogBoard;
+
+class ScopeTest {
+private:
+  boost::shared_ptr<std::stringstream> s;
+  LogBoard* logBoard;
+
+public:
+  ScopeTest(LogBoard* logBoard) : s(new std::stringstream()), logBoard(logBoard) {
+  }
+
+  virtual ~ScopeTest();
+
+  template<class T>
+  std::ostream& operator<<(const T& value) {
+    return *s << value;
+  }
+};
+
+class LogBoard {
+private:
+  std::string uuid;
+
+public:
+  LogBoard(const std::string& uuid) : uuid(uuid) { }
+
+  ScopeTest operator()() {
+    return ScopeTest(this);
+  }
+
+  void showMessage(const std::string& message) {
+    std::cout << uuid << ": " << message << std::endl;
+  }
+};
+
+ScopeTest::~ScopeTest() {
+  logBoard->showMessage(s->str());
+}
+
+class A {
+public:
+  virtual ~A() { }
+};
+
+class B : public A { };
 
 int main(int argc, char** argv) {
+
+  std::shared_ptr<A> ptr = std::make_shared<B>();
+  std::shared_ptr<B> ptr2 = dynamic_pointer_cast<B>(ptr);
+
+  std::cout << "start scope test." << std::endl;
+  LogBoard dlog("ModuleA");
+  {
+    dlog() << "Hello World " << 2;
+    dlog() << "Bla bla bla" << &dlog;
+    std::cout << "test." << std::endl;
+  }
+  std::cout << "end scope test." << std::endl;
+
+  HelloWorldElement element;
+  element.startUpdate();
+  element.writeResults();
+
   Days day = Monday;
   Tage tag = Tage::Montag; // tag = 0; tag = "Montag";
 

@@ -8,6 +8,7 @@
 #include "Car.h"
 
 #include <capputils/DescriptionAttribute.h>
+#include <capputils/EnumeratorAttribute.h>
 #include <capputils/FlagAttribute.h>
 #include <capputils/NotEqualAssertion.h>
 #include <capputils/ObserveAttribute.h>
@@ -22,15 +23,13 @@ using namespace std;
 using namespace capputils::attributes;
 using namespace capputils::reflection;
 
-DefineEnum(Engine)
-
 BeginPropertyDefinitions(EngineDescription)
   DefineProperty(CylinderCount)
   DefineProperty(PS)
-  DefineProperty(Model)
+  DefineProperty(Model, Enumerator<EngineType>())
 EndPropertyDefinitions
 
-EngineDescription::EngineDescription() : _CylinderCount(12), _PS(120), _Model(Engine::Diesel) {
+EngineDescription::EngineDescription() : _CylinderCount(12), _PS(120), _Model(EngineType::Diesel) {
   cout << "Create EngineDescription" << endl;
 }
 

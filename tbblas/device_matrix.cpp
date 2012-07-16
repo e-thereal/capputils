@@ -26,4 +26,3 @@ void gemm(char transa, char transb, int m, int n, int k, double alpha, const dou
 }
 
 }
-

@@ -20,7 +20,7 @@
 
 #include "Person.h"
 
-ReflectableEnum(Engine, NoEngine, Diesel, Gas);
+CapputilsEnumerator(EngineType, NoEngine, Diesel, Gas);
 
 class EngineDescription : public capputils::reflection::ReflectableClass {
 
@@ -28,7 +28,7 @@ class EngineDescription : public capputils::reflection::ReflectableClass {
 
   Property(CylinderCount, int)
   Property(PS, int)
-  Property(Model, Engine)
+  Property(Model, EngineType)
 
 public:
   EngineDescription();
