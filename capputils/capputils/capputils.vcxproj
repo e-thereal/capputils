@@ -81,6 +81,7 @@
   <ItemGroup>
     <ClInclude Include="AbstractLogbookModel.h" />
     <ClInclude Include="capputils.h" />
+    <ClInclude Include="DeprecatedAttribute.h" />
     <ClInclude Include="EventHandler.h" />
     <ClInclude Include="Executer.h" />
     <ClInclude Include="FactoryException.h" />
@@ -134,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AbstractLogbookModel.cpp" />
+    <ClCompile Include="DeprecatedAttribute.cpp" />
     <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="Executer.cpp" />
     <ClCompile Include="FactoryException.cpp" />

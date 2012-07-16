@@ -110,6 +110,16 @@ void Xmlizer::ToXml(TiXmlNode& xmlNode, const ReflectableClass& object) {
 
     AddPropertyToXml(xmlNode, object, properties[i]);
   }
+
+  const vector<IAttribute*>& attributes = object.getAttributes();
+  for (unsigned i = 0; i < attributes.size(); ++i) {
+    IXmlableAttribute* xmlable = dynamic_cast<IXmlableAttribute*>(attributes[i]);
+    if (xmlable) {
+      TiXmlElement* element = dynamic_cast<TiXmlElement*>(&xmlNode);
+      if (element)
+        xmlable->addToReflectableClassNode(*element, object);
+    }
+  }
 }
 
 void Xmlizer::ToXml(std::ostream& os, const reflection::ReflectableClass& object) {
