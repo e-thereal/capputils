@@ -47,7 +47,7 @@ public:
     return true;
   }
 
-  virtual const std::string& getLastMessage() const {
+  virtual std::string getLastMessage() const {
     return message;
   }
 };

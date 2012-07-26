@@ -34,7 +34,7 @@ bool FilenameAttribute::valid(const IClassProperty& property,
   return true;
 }
 
-const string& FilenameAttribute::getLastMessage() const {
+string FilenameAttribute::getLastMessage() const {
   return lastError;
 }
 

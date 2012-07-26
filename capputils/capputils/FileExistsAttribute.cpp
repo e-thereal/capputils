@@ -61,7 +61,7 @@ bool FileExistsAttribute::valid(const IClassProperty& property,
   return false;
 }
 
-const string& FileExistsAttribute::getLastMessage() const {
+string FileExistsAttribute::getLastMessage() const {
   return lastError;
 }
 

@@ -246,6 +246,7 @@ std::istream& operator>> (std::istream& stream, capputils::reflection::Reflectab
 
 #if !defined(BOOST_NO_DECLTYPE)
 
+#define PROPERTY_TYPE CapputilsPropertyType
 #define TYPE_OF(name) decltype(((ClassType*)0)->get##name())
 
 #define Property(name,type) \
@@ -267,7 +268,10 @@ protected: \
 #if defined(_MSC_VER)
 
 #define DefineProperty(name, ...) \
-  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, 0));
+  { \
+    typedef TYPE_OF(name) CapputilsPropertyType; \
+    properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, 0)); \
+  }
 
 #define ReflectableProperty(name, ...) \
   properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Reflectable<TYPE_OF(name)>(), 0));
@@ -275,7 +279,10 @@ protected: \
 #else /* !defined(_MSC_VER) */
 
 #define DefineProperty(name, arguments...) \
-  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0));
+{ \
+  typedef TYPE_OF(name) CapputilsPropertyType; \
+  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0)); \
+}
 
 #define ReflectableProperty(name, arguments...) \
   properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable<TYPE_OF(name)>(), 0));

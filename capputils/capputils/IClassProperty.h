@@ -16,6 +16,7 @@
 #include <cstdarg>
 
 #include "IAttribute.h"
+#include "Variant.h"
 
 #include <typeinfo>
 
@@ -114,6 +115,24 @@ public:
    */
   virtual const std::type_info& getType() const = 0;
   
+  /**
+   * \brief Returns the value of the property as a capputils::IVariant
+   * \returns Value of the property wrapped into a capputils::IVariant
+   */
+  virtual IVariant* toVariant(const ReflectableClass& object) const = 0;
+
+  /**
+   * \brief Sets the value of a property from a variant
+   *
+   * \param[in] value   Value as a capputils::IVariant
+   * \param[in] object  Reference to the ReflectableClass object
+   *
+   * The value is only written if the types of the variant and the property are identical
+   *
+   * \returns True if the value could be read from the variant.
+   */
+  virtual bool fromVariant(const IVariant& value, ReflectableClass& object) const = 0;
+
   /**
    * \brief Returns the first attribute in the attribute list matching the given template type
    *

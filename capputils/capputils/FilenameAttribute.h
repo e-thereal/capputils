@@ -27,7 +27,7 @@ public:
   virtual bool valid(const reflection::IClassProperty& property,
       const reflection::ReflectableClass& object);
 
-  virtual const std::string& getLastMessage() const;
+  virtual std::string getLastMessage() const;
 
   bool getMultipleSelection() const;
   const std::string& getPattern() const;

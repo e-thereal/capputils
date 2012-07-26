@@ -26,7 +26,7 @@ public:
   virtual bool valid(const reflection::IClassProperty& property,
       const reflection::ReflectableClass& object);
 
-  virtual const std::string& getLastMessage() const;
+  virtual std::string getLastMessage() const;
 
   static bool exists(const std::string& filename);
 };
