@@ -37,13 +37,22 @@ public:
     ++i;
   }
 
+  virtual void prev() {
+    if (i > 0)
+      --i;
+  }
+
   virtual ValueType getValue(const ReflectableClass& object) const {
+    assert(i >= 0);
+    assert(i < (int)collectionProperty->getValue(object).size());
     return collectionProperty->getValue(object)[i];
   }
 
   virtual void setValue(ReflectableClass& object, ValueType value) const {
     CollectionType collection = collectionProperty->getValue(object);
-    if (i < (int)collection.size())
+    if (i < 0)
+      throw "invalid iterator position! (negative)";
+    else if (i < (int)collection.size())
       collection[i] = value;
     else if (i == (int)collection.size())
       collection.push_back(value);
@@ -79,13 +88,22 @@ public:
     ++i;
   }
 
+  virtual void prev() {
+    if (i > 0)
+      --i;
+  }
+
   virtual ValueType getValue(const ReflectableClass& object) const {
+    assert(i >= 0);
+    assert(i < (int)collectionProperty->getValue(object)->size());
     return collectionProperty->getValue(object)->at(i);
   }
 
   virtual void setValue(ReflectableClass& object, ValueType value) const {
     boost::shared_ptr<CollectionType> collection = collectionProperty->getValue(object);
-    if (i < (int)collection->size())
+    if (i < 0)
+      throw "invalid iterator position! (negative)";
+    else if (i < (int)collection->size())
       (*collection)[i] = value;
     else if (i == (int)collection->size())
       collection->push_back(value);
@@ -121,13 +139,22 @@ public:
     ++i;
   }
 
+  virtual void prev() {
+    if (i > 0)
+      --i;
+  }
+
   virtual ValueType getValue(const ReflectableClass& object) const {
+    assert(i >= 0);
+    assert(i < (int)collectionProperty->getValue(object)->size());
     return collectionProperty->getValue(object)->at(i);
   }
 
   virtual void setValue(ReflectableClass& object, ValueType value) const {
     CollectionType* collection = collectionProperty->getValue(object);
-    if (i < (int)collection->size())
+    if (i < 0)
+      throw "invalid iterator position! (negative)";
+    else if (i < (int)collection->size())
       (*collection)[i] = value;
     else if (i == (int)collection->size())
       collection->push_back(value);

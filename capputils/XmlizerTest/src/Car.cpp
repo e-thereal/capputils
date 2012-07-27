@@ -39,13 +39,13 @@ EngineDescription::~EngineDescription() {
 
 BeginPropertyDefinitions(Car)
 
-  DefineProperty(DoorCount, Description("Number of doors (default = 3)"), Observe(PROPERTY_ID))
-  DefineProperty(HighSpeed, Observe(PROPERTY_ID), TimeStamp(PROPERTY_ID))
-  DefineProperty(ModelName, NotEqual<std::string>("Audi"), Observe(PROPERTY_ID))
-  DefineProperty(Help, Flag(), Description("Show options"), Observe(PROPERTY_ID))
-  ReflectableProperty(Engine, Observe(PROPERTY_ID))
+  DefineProperty(DoorCount, Description("Number of doors (default = 3)"), Observe(Id))
+  DefineProperty(HighSpeed, Observe(Id), TimeStamp(Id))
+  DefineProperty(ModelName, NotEqual<std::string>("Audi"), Observe(Id))
+  DefineProperty(Help, Flag(), Description("Show options"), Observe(Id))
+  ReflectableProperty(Engine, Observe(Id))
   DefineProperty(Owners, Enumerable<boost::shared_ptr<vector<boost::shared_ptr<Person> > >, true>())
-  DefineProperty(SetOnCompilation, TimeStamp(PROPERTY_ID), Volatile())
+  DefineProperty(SetOnCompilation, TimeStamp(Id), Volatile())
 
 EndPropertyDefinitions
 

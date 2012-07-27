@@ -15,7 +15,7 @@
 namespace capputils {
 namespace attributes {
 
-class INotNullAttribute : public IAssertionAttribute {
+class INotNullAttribute : public virtual IAssertionAttribute {
 protected:
   std::string message, lastMessage;
 

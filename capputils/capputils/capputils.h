@@ -19,6 +19,10 @@
 #define CAPPUTILS_COMMA() ,
 #endif
 
+#ifndef CAPPUTILS_UNUSED
+#define CAPPUTILS_UNUSED(a) (void)a
+#endif
+
 /**
  * \mainpage \c capputils - A \c C++ toolkit for console applications
  *

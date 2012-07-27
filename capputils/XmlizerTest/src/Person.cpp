@@ -10,10 +10,10 @@ using namespace capputils::attributes;
 
 BeginPropertyDefinitions(Address)
 
-DefineProperty(Street, Observe(PROPERTY_ID))
-DefineProperty(City, Observe(PROPERTY_ID))
-DefineProperty(StreetNumber, Observe(PROPERTY_ID))
-DefineProperty(AppartmentNumber, Observe(PROPERTY_ID))
+DefineProperty(Street, Observe(Id))
+DefineProperty(City, Observe(Id))
+DefineProperty(StreetNumber, Observe(Id))
+DefineProperty(AppartmentNumber, Observe(Id))
 
 EndPropertyDefinitions
 
@@ -22,18 +22,18 @@ Address::Address() : _Street("W 11th Ave"), _City("Vancouver"), _StreetNumber(10
 BeginPropertyDefinitions(Person)
 
 DefineProperty(FirstName,
-  Description("Persons given name."), Observe(PROPERTY_ID))
+  Description("Persons given name."), Observe(Id))
 
 DefineProperty(Name,
-  Description("Name of our parents."), Observe(PROPERTY_ID))
+  Description("Name of our parents."), Observe(Id))
 
 DefineProperty(Age,
-  Description("Age in years."), Observe(PROPERTY_ID), TimeStamp(PROPERTY_ID))
+  Description("Age in years."), Observe(Id), TimeStamp(Id))
 
 ReflectableProperty(Address,
-  Description("Address with everything."), Observe(PROPERTY_ID))
+  Description("Address with everything."), Observe(Id))
 
-DefineProperty(Gender, Enumerator<Gender>(), Observe(PROPERTY_ID))
+DefineProperty(Gender, Enumerator<Gender>(), Observe(Id))
 
 EndPropertyDefinitions
 

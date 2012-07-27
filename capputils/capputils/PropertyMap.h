@@ -52,7 +52,8 @@ public:
     if (pos != values.end()) {
       Variant<T>* typedValue = dynamic_cast<Variant<T>*>(pos->second);
       if (typedValue) {
-        return typedValue->setValue(value);
+        typedValue->setValue(value);
+        return true;
       }
     }
     return false;
