@@ -14,6 +14,8 @@
 #include <sstream>
 #include <vector>
 
+#include <boost/weak_ptr.hpp>
+
 namespace capputils {
 
 namespace reflection {
