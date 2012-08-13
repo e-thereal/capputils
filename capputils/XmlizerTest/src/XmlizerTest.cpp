@@ -36,6 +36,7 @@
 #include "Student.h"
 
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 using namespace std;
 using namespace capputils;
@@ -59,6 +60,7 @@ class SerializeTest : public capputils::reflection::ReflectableClass {
   Property(Height, unsigned)
   Property(Weight, double)
   Property(Data, boost::shared_ptr<std::vector<int> >)
+  Property(Data2, boost::weak_ptr<int>)
 
 };
 
@@ -68,6 +70,7 @@ BeginPropertyDefinitions(SerializeTest)
   DefineProperty(Height, Serialize<TYPE_OF(Height)>())
   DefineProperty(Weight, Serialize<TYPE_OF(Weight)>())
   DefineProperty(Data, Serialize<TYPE_OF(Data)>())
+  DefineProperty(Data2)
 
 EndPropertyDefinitions
 
@@ -182,7 +185,8 @@ class B : public A { };
 int main(int argc, char** argv) {
 
   std::shared_ptr<A> ptr = std::make_shared<B>();
-  std::shared_ptr<B> ptr2 = dynamic_pointer_cast<B>(ptr);
+  std::weak_ptr<A> ptr2 = ptr;
+  std::weak_ptr<B> ptr3 = dynamic_pointer_cast<B>(ptr2.lock());
 
   std::cout << "start scope test." << std::endl;
   LogBoard dlog("ModuleA");

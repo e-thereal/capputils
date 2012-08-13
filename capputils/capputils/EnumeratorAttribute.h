@@ -5,7 +5,7 @@
 #include "Enumerator.h"
 #include "ReflectableClass.h"
 
-#include <memory>
+#include <boost/shared_ptr.hpp>
 
 namespace capputils {
 
@@ -13,54 +13,53 @@ namespace attributes {
 
 class IEnumeratorAttribute : public virtual IAttribute {
 public:
-  virtual std::shared_ptr<capputils::Enumerator> getEnumerator(const reflection::ReflectableClass& object,
+  virtual boost::shared_ptr<capputils::Enumerator> getEnumerator(const reflection::ReflectableClass& object,
       const reflection::IClassProperty* property) const = 0;
 };
 
 template<class T>
 class EnumeratorAttribute : public virtual IEnumeratorAttribute {
 public:
-  virtual std::shared_ptr<capputils::Enumerator> getEnumerator(const reflection::ReflectableClass& object,
+  virtual boost::shared_ptr<capputils::Enumerator> getEnumerator(const reflection::ReflectableClass& object,
       const reflection::IClassProperty* property) const
   {
     using namespace capputils::reflection;
     const ClassProperty<T>* typedProperty = dynamic_cast<const ClassProperty<T>* >(property);
     if (typedProperty) {
-      return std::shared_ptr<capputils::Enumerator>(new T(typedProperty->getValue(object)));
+      return boost::shared_ptr<capputils::Enumerator>(new T(typedProperty->getValue(object)));
     } else {
-      return std::shared_ptr<capputils::Enumerator>();
+      return boost::shared_ptr<capputils::Enumerator>();
     }
   }
 };
 
 template<class T>
-class EnumeratorAttribute<std::shared_ptr<T> > : public virtual IEnumeratorAttribute {
+class EnumeratorAttribute<boost::shared_ptr<T> > : public virtual IEnumeratorAttribute {
 public:
-  virtual std::shared_ptr<capputils::Enumerator> getEnumerator(const reflection::ReflectableClass& object,
+  virtual boost::shared_ptr<capputils::Enumerator> getEnumerator(const reflection::ReflectableClass& object,
         const reflection::IClassProperty* property) const
   {
     using namespace capputils::reflection;
-    using namespace std;
-    const ClassProperty<std::shared_ptr<T> >* typedProperty = dynamic_cast<const ClassProperty<std::shared_ptr<T> >* >(property);
+    const ClassProperty<boost::shared_ptr<T> >* typedProperty = dynamic_cast<const ClassProperty<boost::shared_ptr<T> >* >(property);
     if (typedProperty) {
-      return dynamic_pointer_cast<capputils::Enumerator>(typedProperty->getValue(object));
+      return boost::dynamic_pointer_cast<capputils::Enumerator>(typedProperty->getValue(object));
     }
-    return std::shared_ptr<capputils::Enumerator>();
+    return boost::shared_ptr<capputils::Enumerator>();
   }
 };
 
 template<class T>
 class EnumeratorAttribute<T*> : public virtual IEnumeratorAttribute {
 public:
-  virtual std::shared_ptr<capputils::Enumerator> getEnumerator(const reflection::ReflectableClass& object,
+  virtual boost::shared_ptr<capputils::Enumerator> getEnumerator(const reflection::ReflectableClass& object,
         const reflection::IClassProperty* property) const
     {
       using namespace capputils::reflection;
       const ClassProperty<T*>* typedProperty = dynamic_cast<const ClassProperty<T*>* >(property);
       if (typedProperty) {
-        return std::shared_ptr<capputils::Enumerator>(new T(*typedProperty->getValue(object)));
+        return boost::shared_ptr<capputils::Enumerator>(new T(*typedProperty->getValue(object)));
       }
-      return std::shared_ptr<capputils::Enumerator>();
+      return boost::shared_ptr<capputils::Enumerator>();
     }
 };
 

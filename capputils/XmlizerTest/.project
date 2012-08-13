@@ -3,8 +3,8 @@
 	<name>XmlizerTest</name>
 	<comment></comment>
 	<projects>
-		<project>tinyxml</project>
 		<project>capputils</project>
+		<project>tinyxml</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
