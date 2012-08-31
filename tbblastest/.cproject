@@ -26,7 +26,6 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="cuda.toolchain.compiler.option.optimization.level.547710651" name="Optimization Level" superClass="cuda.toolchain.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="cuda.toolchain.compiler.option.debugging.level.512750363" name="Debug Level" superClass="cuda.toolchain.compiler.option.debugging.level"/>
 								<option id="cuda.toolchain.compiler.general.incpath.1406827721" name="Include paths (-I)" superClass="cuda.toolchain.compiler.general.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/culib}&quot;"/>
 									<listOptionValue builtIn="false" value="/home/tombr/Projects"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
@@ -40,7 +39,6 @@
 								<option id="gnu.cpp.compiler.option.optimization.level.1989024589" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.589951382" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.192406100" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/culib}&quot;"/>
 									<listOptionValue builtIn="false" value="/home/tombr/Projects"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
@@ -53,7 +51,6 @@
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1205204289" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.1520306756" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.include.paths.1797183159" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/culib}&quot;"/>
 									<listOptionValue builtIn="false" value="/home/tombr/Projects"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
@@ -63,7 +60,6 @@
 							</tool>
 							<tool id="cuda.toolchain.gnu.cpp.linker.1683949766" name="NVCC Linker" superClass="cuda.toolchain.gnu.cpp.linker">
 								<option id="gnu.cpp.link.option.libs.cuda.24015805" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs.cuda" valueType="libs">
-									<listOptionValue builtIn="false" value="culib"/>
 									<listOptionValue builtIn="false" value="cudart"/>
 									<listOptionValue builtIn="false" value="cublas"/>
 									<listOptionValue builtIn="false" value="boost_signals"/>
@@ -72,7 +68,6 @@
 									<listOptionValue builtIn="false" value="curand"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.cuda.2029110645" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths.cuda" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/culib/Debug}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblas/Debug}&quot;"/>
 									<listOptionValue builtIn="false" value="/home/tombr/lib"/>
 									<listOptionValue builtIn="false" value="/res1/software/cuda/lib"/>
@@ -84,11 +79,9 @@
 							</tool>
 							<tool id="cuda.toolchain.gnu.c.linker.945448563" name="NVCC LinkerC" superClass="cuda.toolchain.gnu.c.linker">
 								<option id="gnu.cpp.link.option.paths.933466280" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/culib/Debug}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblas/Debug}&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1646689160" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="culib"/>
 									<listOptionValue builtIn="false" value="tbblas"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1195275156" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
@@ -98,7 +91,6 @@
 							</tool>
 							<tool id="cuda.toolchain.gnu.assembler.47140270" name="GCC Assembler" superClass="cuda.toolchain.gnu.assembler">
 								<option id="gnu.both.asm.option.include.paths.683968662" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/culib}&quot;"/>
 									<listOptionValue builtIn="false" value="/home/tombr/Projects"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
@@ -120,13 +112,6 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tbblas"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tbblas/Debug"/>
 						<entry flags="RESOLVED" kind="libraryFile" name="tbblas"/>
-					</externalSetting>
-				</externalSettings>
-				<externalSettings containerId="culib;" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
-					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/culib"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/culib/Debug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="culib"/>
 					</externalSetting>
 				</externalSettings>
 			</storageModule>
