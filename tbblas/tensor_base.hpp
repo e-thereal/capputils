@@ -8,22 +8,23 @@
 #ifndef TBBLAS_TENSOR_BASE_HPP_
 #define TBBLAS_TENSOR_BASE_HPP_
 
-//#include <thrust/inner_product.h>
 #include <thrust/functional.h>
 
 #include <tbblas/forward_reverse_iterator.hpp>
 #include <thrust/iterator/transform_iterator.h>
+#include <thrust/copy.h>
 #include <boost/shared_ptr.hpp>
 
-//#include <cassert>
-//#include <iostream>
-
-//#include <cutil_math.h>
-
 #include <tbblas/type_traits.hpp>
-//#include <tbblas/tensor_proxy.hpp>
 
 namespace tbblas {
+
+template<class Tensor>
+struct tensor_copy {
+  Tensor tensor;
+
+  tensor_copy(const Tensor& tensor) : tensor(tensor) { }
+};
 
 template<class Tensor, class Operation>
 void apply_operation(Tensor& tensor, const Operation& operation) {
@@ -94,21 +95,21 @@ public:
     _data = boost::shared_ptr<data_t>(new data_t(count));
   }
 
-//  template<class T2, bool device2>
-//  tensor_base(const tensor_copy<tensor_base<T2, dim, device2> >& copy_op)
-//   : _scalar(1), _flipped(false)
-//  {
-//    const tensor_base<T2, dim, device2>& tensor = copy_op.tensor;
-//    const dim_t& size = tensor.size();
-//
-//    size_t count = 1;
-//    for (unsigned i = 0; i < dim; ++i) {
-//      _size[i] = size[i];
-//      count *= size[i];
-//    }
-//    _data = boost::shared_ptr<data_t>(new data_t(count));
-//    thrust::copy(tensor.cbegin(), tensor.cend(), data().begin());
-//  }
+  template<class T2, bool device2>
+  tensor_base(const tensor_copy<tensor_base<T2, dim, device2> >& copy_op)
+   : _scalar(1), _flipped(false)
+  {
+    const tensor_base<T2, dim, device2>& tensor = copy_op.tensor;
+    const dim_t& size = tensor.size();
+
+    size_t count = 1;
+    for (unsigned i = 0; i < dim; ++i) {
+      _size[i] = size[i];
+      count *= size[i];
+    }
+    _data = boost::shared_ptr<data_t>(new data_t(count));
+    thrust::copy(tensor.cbegin(), tensor.cend(), data().begin());
+  }
 
 public:
   virtual ~tensor_base() { }
@@ -215,6 +216,23 @@ public:
     return *this;
   }
 };
+
+template<class Tensor>
+void apply_operation(Tensor& tensor, const tensor_copy<Tensor>& copy_op)
+{
+  const Tensor& t = copy_op.tensor;
+  const typename Tensor::dim_t& size = t.size();
+
+  for (unsigned i = 0; i < Tensor::dimCount; ++i) {
+    assert(tensor.size()[i] == size[i]);    // todo: throw exception instead
+  }
+  thrust::copy(t.cbegin(), t.cend(), tensor.begin());
+}
+
+template<class T, unsigned dim, bool device>
+tensor_copy<tensor_base<T, dim, device> > copy(const tensor_base<T, dim, device>& tensor) {
+  return tensor_copy<tensor_base<T, dim, device> >(tensor);
+}
 
 template<class T, unsigned dim, bool device>
 tensor_base<T, dim, device> flip(const tensor_base<T, dim, device>& t) {

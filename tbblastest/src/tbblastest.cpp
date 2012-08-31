@@ -9,10 +9,10 @@
 #include "tests.h"
 
 int main() {
-  //helloworld();
+  helloworld();
   //convtest();
   //sumtest();
-  entropytest();
+  //entropytest();
 
   return 0;
 }

@@ -33,5 +33,21 @@ int helloworld() {
   std::cout << "B = " << B << std::endl;
   std::cout << "A + B = " << C << std::endl;
   
+  // Copy tests
+  
+  std::cout << "Copy tests:\n" << std::endl;
+  
+  tensor_t D = A, E = copy(A), F(3, 4), G(3, 4);
+  F = A;
+  G = copy(A);
+  
+  std::cout << "A1 = " << A << std::endl;
+  A = A + B;
+  std::cout << "A2 = " << A << std::endl;
+  std::cout << "D = " << D << std::endl;
+  std::cout << "E = " << E << std::endl;
+  std::cout << "F = " << F << std::endl;
+  std::cout << "G = " << G << std::endl;
+  
   return 0;
 }
