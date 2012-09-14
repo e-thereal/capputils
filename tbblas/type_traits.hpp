@@ -49,6 +49,21 @@ struct vector_type<T, true> {
   typedef thrust::device_vector<T> vector_t;
 };
 
+template<class T>
+struct is_expression {
+  static const bool value = false;
+};
+
+template<class T>
+struct is_operation {
+  static const bool value = false;
+};
+
+template<class T>
+struct is_tensor {
+  static const bool value = false;
+};
+
 }
 
 

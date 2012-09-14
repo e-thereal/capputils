@@ -73,4 +73,7 @@ public: \
   }\
 }
 
+#define ReflectableEnum(...) CapputilsEnumerator(__VA_ARGS__)
+#define DefineEnum(...)
+
 #endif /* CAPPUTILS_ENUMERATORS_H_ */

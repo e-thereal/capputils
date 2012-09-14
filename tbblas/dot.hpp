@@ -22,5 +22,4 @@ T dot(const tensor_base<T, dim, device>& dt1, const tensor_base<T, dim, device>&
 
 }
 
-
 #endif /* TBBLAS_DOT_HPP_ */

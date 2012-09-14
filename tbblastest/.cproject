@@ -29,7 +29,6 @@
 									<listOptionValue builtIn="false" value="/home/tombr/Projects"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
-									<listOptionValue builtIn="false" value="/"/>
 									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
 								</option>
 								<option id="cuda.toolchain.compiler.option.misc.other.1112520598" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fmessage-length=0 -gencode=arch=compute_20,code=\&quot;sm_20,compute_20\&quot;" valueType="string"/>
@@ -62,7 +61,6 @@
 								<option id="gnu.cpp.link.option.libs.cuda.24015805" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs.cuda" valueType="libs">
 									<listOptionValue builtIn="false" value="cudart"/>
 									<listOptionValue builtIn="false" value="cublas"/>
-									<listOptionValue builtIn="false" value="boost_signals"/>
 									<listOptionValue builtIn="false" value="tbblas"/>
 									<listOptionValue builtIn="false" value="cufft"/>
 									<listOptionValue builtIn="false" value="curand"/>
@@ -126,53 +124,80 @@
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.fixstars.cuda.toolchain.NVCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.exe.release.279225839" name="Release" parent="cdt.managedbuild.config.gnu.exe.release">
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.279225839." name="/" resourcePath="">
-						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.release.1665546321" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.release">
-							<targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.release.1880774880" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.release"/>
-							<builder buildPath="${workspace_loc:/tbblastest/Release}" id="cdt.managedbuild.target.gnu.builder.exe.release.503250740" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.exe.release"/>
-							<tool id="cdt.managedbuild.tool.gnu.archiver.base.2043684443" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1160446019" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.release">
-								<option id="gnu.cpp.compiler.exe.release.option.optimization.level.1150396098" name="Optimization Level" superClass="gnu.cpp.compiler.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.exe.release.option.debugging.level.1791853713" name="Debug Level" superClass="gnu.cpp.compiler.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.cpp.compiler.option.include.paths.1859283236" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/home/tombr/Projects"/>
-									<listOptionValue builtIn="false" value="/home/tombr/Programs/cuda/include"/>
+						<toolChain id="cuda.toolchain.exe.debug.2025085933" name="CUDA Toolchain" superClass="cuda.toolchain.exe.debug">
+							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="cuda.toolchain.targetplatform.exe.debug.342280628" isAbstract="false" name="Linux Release Platform" osList="linux" superClass="cuda.toolchain.targetplatform.exe.debug"/>
+							<builder buildPath="${workspace_loc:/tbblastest/Release}" id="cuda.toolchain.builder.exe.debug.2083157846" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cuda.toolchain.builder.exe.debug"/>
+							<tool id="cuda.toolchain.compiler.exe.debug.460090257" name="NVIDIA CUDA Compiler" superClass="cuda.toolchain.compiler.exe.debug">
+								<option id="cuda.toolchain.compiler.general.incpath.992490745" name="Include paths (-I)" superClass="cuda.toolchain.compiler.general.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblas}&quot;"/>
 									<listOptionValue builtIn="false" value="/home/tombr/include"/>
+									<listOptionValue builtIn="false" value="/home/tombr/Projects"/>
+									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
 									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
 								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1135913661" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+								<option defaultValue="gnu.c.optimization.level.most" id="cuda.toolchain.compiler.option.optimization.level.70631186" name="Optimization Level" superClass="cuda.toolchain.compiler.option.optimization.level" valueType="enumerated"/>
+								<option id="cuda.toolchain.compiler.option.debugging.level.1371945401" name="Debug Level" superClass="cuda.toolchain.compiler.option.debugging.level" value="cuda.toolchain.compiler.option.debugging.level.none" valueType="enumerated"/>
+								<inputType id="cuda.toolchain.compiler.input.154128504" superClass="cuda.toolchain.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.release.1028649868" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.release">
-								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.exe.release.option.optimization.level.301288172" name="Optimization Level" superClass="gnu.c.compiler.exe.release.option.optimization.level" valueType="enumerated"/>
-								<option id="gnu.c.compiler.exe.release.option.debugging.level.258545740" name="Debug Level" superClass="gnu.c.compiler.exe.release.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.include.paths.1900591879" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/home/tombr/Projects"/>
-									<listOptionValue builtIn="false" value="/home/tombr/Programs/cuda/include"/>
-									<listOptionValue builtIn="false" value="/home/tombr/include"/>
-									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
+							<tool id="cuda.toolchain.gnu.cpp.compiler.55856132" name="GCC C++ Compiler" superClass="cuda.toolchain.gnu.cpp.compiler">
+								<option id="gnu.cpp.compiler.option.optimization.level.1372205680" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.debugging.level.1915197686" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.include.paths.1176124389" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblas}&quot;"/>
 								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1321693967" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.644255974" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.release.1945561037" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.release"/>
-							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.1114418825" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
-								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2017673449" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+							<tool id="cuda.toolchain.gnu.c.compiler.870328440" name="GCC C Compiler" superClass="cuda.toolchain.gnu.c.compiler">
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.1233654452" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.debugging.level.1320845578" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.1566068354" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblas}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.593848911" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cuda.toolchain.gnu.cpp.linker.2130752548" name="NVCC Linker" superClass="cuda.toolchain.gnu.cpp.linker">
+								<option id="gnu.cpp.link.option.paths.cuda.123931125" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths.cuda" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblas/Release}&quot;"/>
+									<listOptionValue builtIn="false" value="/home/tombr/lib"/>
+									<listOptionValue builtIn="false" value="/res1/software/cuda/lib"/>
+								</option>
+								<option id="gnu.cpp.link.option.libs.cuda.448390781" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs.cuda" valueType="libs">
+									<listOptionValue builtIn="false" value="tbblas"/>
+									<listOptionValue builtIn="false" value="cudart"/>
+									<listOptionValue builtIn="false" value="cufft"/>
+									<listOptionValue builtIn="false" value="curand"/>
+									<listOptionValue builtIn="false" value="cublas"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1987775841" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
 							</tool>
-							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.544441324" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release">
-								<option id="gnu.both.asm.option.include.paths.285189859" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/home/tombr/Projects"/>
-									<listOptionValue builtIn="false" value="/home/tombr/Programs/cuda/include"/>
-									<listOptionValue builtIn="false" value="/home/tombr/include"/>
-									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
+							<tool id="cuda.toolchain.gnu.c.linker.1787745820" name="NVCC LinkerC" superClass="cuda.toolchain.gnu.c.linker">
+								<option id="gnu.cpp.link.option.paths.2017936746" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblas/Release}&quot;"/>
 								</option>
-								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1832962454" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+								<option id="gnu.cpp.link.option.libs.430131798" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="tbblas"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1972943425" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
 							</tool>
+							<tool id="cuda.toolchain.gnu.assembler.1849871585" name="GCC Assembler" superClass="cuda.toolchain.gnu.assembler">
+								<option id="gnu.both.asm.option.include.paths.1628902342" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblas}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.537668777" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="cuda.toolchain.gnu.archiver.2046780430" name="GCC Archiver" superClass="cuda.toolchain.gnu.archiver"/>
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
@@ -180,7 +205,15 @@
 					</sourceEntries>
 				</configuration>
 			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="tbblas;cdt.managedbuild.config.gnu.lib.release.193622929" factoryId="org.eclipse.cdt.core.cfg.export.settings.sipplier">
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tbblas"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tbblas/Release"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="tbblas"/>
+					</externalSetting>
+				</externalSettings>
+			</storageModule>
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -189,6 +222,7 @@
 	<storageModule moduleId="refreshScope" versionNumber="1">
 		<resource resourceType="PROJECT" workspacePath="/tbblastest"/>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1862065465;cdt.managedbuild.config.gnu.exe.debug.1862065465.;cuda.toolchain.gnu.c.compiler.1860064810;cdt.managedbuild.tool.gnu.c.compiler.input.1144166779">
@@ -200,10 +234,16 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.279225839;cdt.managedbuild.config.gnu.exe.release.279225839.;cdt.managedbuild.tool.gnu.cpp.compiler.exe.release.1160446019;cdt.managedbuild.tool.gnu.cpp.compiler.input.1135913661">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.279225839;cdt.managedbuild.config.gnu.exe.release.279225839.;ai3.tool.cuda.cpp_compiler.404209600;ai3.tool.cuda.cpp_compiler.input.13852901">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1862065465;cdt.managedbuild.config.gnu.exe.debug.1862065465.;cdt.managedbuild.tool.gnu.c.compiler.exe.debug.167308824;cdt.managedbuild.tool.gnu.c.compiler.input.473155221">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1862065465;cdt.managedbuild.config.gnu.exe.debug.1862065465.;cuda.toolchain.gnu.cpp.compiler.1701481600;cdt.managedbuild.tool.gnu.cpp.compiler.input.1925804253">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.279225839;cdt.managedbuild.config.gnu.exe.release.279225839.;ai3.tool.cuda.c_compiler.1284441475;cdt.managedbuild.tool.gnu.c.compiler.input.1712117410">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.279225839;cdt.managedbuild.config.gnu.exe.release.279225839.;cuda.toolchain.gnu.cpp.compiler.55856132;cdt.managedbuild.tool.gnu.cpp.compiler.input.644255974">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1862065465;cdt.managedbuild.config.gnu.exe.debug.1862065465.;cuda.toolchain.compiler.exe.debug.1511912667;cuda.toolchain.compiler.input.263340465">
@@ -212,6 +252,23 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.279225839;cdt.managedbuild.config.gnu.exe.release.279225839.;cdt.managedbuild.tool.gnu.c.compiler.exe.release.1028649868;cdt.managedbuild.tool.gnu.c.compiler.input.1321693967">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.279225839;cdt.managedbuild.config.gnu.exe.release.279225839.;ai3.tool.cuda.c_compiler.692355545;cdt.managedbuild.tool.gnu.c.compiler.input.2040074984">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.279225839;cdt.managedbuild.config.gnu.exe.release.279225839.;cuda.toolchain.compiler.exe.debug.1336803815;cuda.toolchain.compiler.input.1624002278">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.279225839;cdt.managedbuild.config.gnu.exe.release.279225839.;cuda.toolchain.gnu.c.compiler.870328440;cdt.managedbuild.tool.gnu.c.compiler.input.593848911">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.debug.1862065465;cdt.managedbuild.config.gnu.exe.debug.1862065465.;cuda.toolchain.gnu.cpp.compiler.1701481600;cdt.managedbuild.tool.gnu.cpp.compiler.input.1925804253">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.279225839;cdt.managedbuild.config.gnu.exe.release.279225839.;cuda.toolchain.compiler.exe.debug.460090257;cuda.toolchain.compiler.input.154128504">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.exe.release.279225839;cdt.managedbuild.config.gnu.exe.release.279225839.;ai3.tool.cuda.cpp_compiler.280936682;ai3.tool.cuda.cpp_compiler.input.1182218361">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
+		</scannerConfigBuildInfo>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>

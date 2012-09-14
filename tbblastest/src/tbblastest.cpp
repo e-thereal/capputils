@@ -13,6 +13,7 @@ int main() {
   //convtest();
   //sumtest();
   //entropytest();
+  //copytest();
 
   return 0;
 }

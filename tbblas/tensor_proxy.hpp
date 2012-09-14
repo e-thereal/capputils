@@ -88,5 +88,4 @@ public:
 
 }
 
-
 #endif /* TBBLAS_TENSOR_PROXY_HPP_ */

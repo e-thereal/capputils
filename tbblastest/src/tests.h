@@ -8,9 +8,10 @@
 #ifndef TESTS_H_
 #define TESTS_H_
 
-int helloworld();
-int convtest();
+void helloworld();
+void convtest();
 void sumtest();
 void entropytest();
+void copytest();
 
 #endif /* TESTS_H_ */
