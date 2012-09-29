@@ -8,12 +8,19 @@
 
 #include "tests.h"
 
-int main() {
-  helloworld();
-  //convtest();
-  //sumtest();
-  //entropytest();
-  //copytest();
+#include <iostream>
+
+int main(int argc, char** argv) {
+  if (!argc) {
+    helloworld();
+    convtest();
+    sumtest();
+    entropytest();
+    copytest();
+    proxycopy();
+  }
+  ffttest();
+//  fftbenchmarks();
 
   return 0;
 }

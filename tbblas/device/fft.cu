@@ -21,7 +21,7 @@ namespace tbblas {
 
 template<>
 void fft(const tensor_base<float, 2, true>& dt, const size_t (&size)[2],
-    thrust::device_vector<complex_type<float>::complex_t>& ftdata)
+    thrust::device_vector<typename complex_type<float>::type>& ftdata)
 {
   typedef tensor_base<float, 2, true> tensor_t;
   typedef tensor_proxy<tensor_t::iterator, 2> proxy_t;
@@ -42,7 +42,7 @@ void fft(const tensor_base<float, 2, true>& dt, const size_t (&size)[2],
 }
 
 template<>
-void ifft(thrust::device_vector<complex_type<float>::complex_t>& ftdata,
+void ifft(thrust::device_vector<complex_type<float>::type>& ftdata,
     const size_t (&size)[2], tensor_base<float, 2, true>& dt)
 {
   const size_t count = size[0] * size[1];
@@ -69,7 +69,7 @@ void ifft(thrust::device_vector<complex_type<float>::complex_t>& ftdata,
 
 template<>
 void fft(const tensor_base<float, 3, true>& dt, const size_t (&size)[3],
-    thrust::device_vector<complex_type<float>::complex_t>& ftdata)
+    thrust::device_vector<complex_type<float>::type>& ftdata)
 {
   typedef tensor_base<float, 3, true> tensor_t;
   typedef tensor_proxy<tensor_t::iterator, 3> proxy_t;
@@ -90,7 +90,7 @@ void fft(const tensor_base<float, 3, true>& dt, const size_t (&size)[3],
 }
 
 template<>
-void ifft(thrust::device_vector<complex_type<float>::complex_t>& ftdata,
+void ifft(thrust::device_vector<complex_type<float>::type>& ftdata,
     const size_t (&size)[3], tensor_base<float, 3, true>& dt)
 {
   const size_t count = size[0] * size[1] * size[2];
@@ -115,7 +115,7 @@ void ifft(thrust::device_vector<complex_type<float>::complex_t>& ftdata,
 
 template<>
 void fft(const tensor_base<double, 3, true>& dt, const size_t (&size)[3],
-    thrust::device_vector<complex_type<double>::complex_t>& ftdata)
+    thrust::device_vector<complex_type<double>::type>& ftdata)
 {
   typedef double value_t;
   typedef tensor_base<value_t, 3, true> tensor_t;
@@ -149,7 +149,7 @@ void fft(const tensor_base<double, 3, true>& dt, const size_t (&size)[3],
 }
 
 template<>
-void ifft(thrust::device_vector<complex_type<double>::complex_t>& ftdata,
+void ifft(thrust::device_vector<complex_type<double>::type>& ftdata,
     const size_t (&size)[3], tensor_base<double, 3, true>& dt)
 {
   typedef double value_t;

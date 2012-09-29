@@ -15,15 +15,22 @@
 #include <thrust/copy.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_same.hpp>
 
 #include <tbblas/type_traits.hpp>
+#include <tbblas/sequence.hpp>
 
 namespace tbblas {
 
-template<class Tensor, class Operation>
-void apply_operation2(Tensor& tensor, const Operation& operation) {
-  assert(0);
-}
+template<class T, unsigned dim, bool device>
+class tensor;
+
+template<class Tensor>
+struct proxy;
+
+template<class T, unsigned dim, bool device>
+proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
+    const sequence<unsigned, dim>& start, const sequence<unsigned, dim>& size);
 
 template<class T, unsigned dim, bool device = true>
 class tensor {
@@ -36,6 +43,7 @@ public:
   typedef size_t dim_t[dim];
 
   const static unsigned dimCount = dim;
+  const static bool cuda_enabled = device;
 
 public:
   typedef typename data_t::iterator iterator;
@@ -80,6 +88,19 @@ public:
     thrust::copy(tensor.begin(), tensor.end(), begin());
   }
 
+  template<class Operation>
+  inline
+  tensor(const Operation& op, typename boost::enable_if<is_operation<Operation>,
+      typename boost::enable_if<boost::is_same<typename Operation::tensor_t, tensor_t>, int>::type>::type = 0)
+  {
+    const dim_t& size = op.size();
+    for (unsigned i = 0; i < dimCount; ++i) {
+      _size[i] = size[i];
+    }
+    _data = boost::shared_ptr<data_t>(new data_t(count()));
+    op.apply(*this);
+  }
+
   template<class Expression>
   tensor(const Expression& expr, typename boost::enable_if<is_expression<Expression>,
       typename boost::enable_if_c<Expression::dimCount == dimCount, int>::type>::type = 0)
@@ -115,6 +136,10 @@ public:
     return *_data;
   }
 
+  boost::shared_ptr<data_t> shared_data() {
+    return _data;
+  }
+
   inline iterator begin() {
     return _data->begin();
   }
@@ -131,6 +156,30 @@ public:
     return _data->end();
   }
 
+  typename data_t::reference operator[](const sequence<unsigned, dim>& index) {
+    size_t idx = index[dim-1];
+    for (int i = dim - 2; i >= 0; --i) {
+      idx = idx * _size[i] + index[i];
+    }
+    return data()[idx];
+  }
+
+  typename data_t::reference operator[](const sequence<int, dim>& index) {
+    size_t idx = index[dim-1];
+    for (int i = dim - 2; i >= 0; --i) {
+      idx = idx * _size[i] + index[i];
+    }
+    return data()[idx];
+  }
+
+  const proxy<tensor_t> operator[](const std::pair<sequence<unsigned, dim>, sequence<unsigned, dim> >& pair) {
+    return subrange(*this, pair.first, pair.second);
+  }
+
+  const proxy<tensor_t> operator[](const std::pair<sequence<int, dim>, sequence<int, dim> >& pair) {
+    return subrange(*this, pair.first, pair.second);
+  }
+
   /*** apply operations ***/
 
   template<class T2, bool device2>
@@ -139,14 +188,15 @@ public:
     bool realloc = false;
 
     for (unsigned i = 0; i < dim; ++i) {
-      if (size[i] != _size[1]) {
+      if (size[i] != _size[i]) {
         realloc = true;
         _size[i] = size[i];
       }
     }
 
-    if (realloc)
+    if (realloc) {
       _data = boost::shared_ptr<data_t>(new data_t(count()));
+    }
     thrust::copy(tensor.begin(), tensor.end(), begin());
 
     return *this;
@@ -154,27 +204,50 @@ public:
 
   template<class Operation>
   inline typename boost::enable_if<is_operation<Operation>,
-      typename boost::enable_if_c<Operation::dimCount == dimCount, tensor_t&>::type>::type
-  operator=(const Operation& op) {
-    apply_operation2(*this, op);
-    return *this;
-  }
-
-  template<class Expression>
-  inline typename boost::enable_if<is_expression<Expression>,
-      typename boost::enable_if_c<Expression::dimCount == dimCount, tensor_t&>::type>::type
-  operator=(const Expression& expr) {
-    const dim_t& size = expr.size();
+    typename boost::enable_if<boost::is_same<typename Operation::tensor_t, tensor_t>,
+      tensor_t
+    >::type
+  >::type&
+  operator=(const Operation& op)
+  {
+    const dim_t& size = op.size();
     bool realloc = false;
     for (unsigned i = 0; i < dimCount; ++i) {
-      if (size[i] != _size[1]) {
+      if (size[i] != _size[i]) {
         realloc = true;
         _size[i] = size[i];
       }
     }
 
-    if (realloc)
+    if (realloc) {
       _data = boost::shared_ptr<data_t>(new data_t(count()));
+    }
+    op.apply(*this);
+    return *this;
+  }
+
+  template<class Expression>
+  inline typename boost::enable_if<is_expression<Expression>,
+    typename boost::enable_if_c<Expression::dimCount == dimCount,
+      typename boost::disable_if<is_operation<Expression>,
+        tensor_t
+      >::type
+    >::type
+  >::type&
+  operator=(const Expression& expr)
+  {
+    const dim_t& size = expr.size();
+    bool realloc = false;
+    for (unsigned i = 0; i < dimCount; ++i) {
+      if (size[i] != _size[i]) {
+        realloc = true;
+        _size[i] = size[i];
+      }
+    }
+
+    if (realloc) {
+      _data = boost::shared_ptr<data_t>(new data_t(count()));
+    }
     thrust::copy(expr.begin(), expr.end(), begin());
 
     return *this;
@@ -192,5 +265,13 @@ struct is_expression<tensor<T, dim, device> > {
 };
 
 }
+
+// Include default headers
+
+#include <tbblas/proxy.hpp>
+#include <tbblas/plus2.hpp>
+#include <tbblas/minus.hpp>
+#include <tbblas/multiplies.hpp>
+#include <tbblas/divides.hpp>
 
 #endif /* TBBLAS_TENSOR_HPP_ */

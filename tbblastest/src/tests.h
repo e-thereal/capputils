@@ -13,5 +13,8 @@ void convtest();
 void sumtest();
 void entropytest();
 void copytest();
+void proxycopy();
+void ffttest();
+void fftbenchmarks();
 
 #endif /* TESTS_H_ */

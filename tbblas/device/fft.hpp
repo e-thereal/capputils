@@ -16,10 +16,10 @@ namespace tbblas {
 
 template<class T, unsigned dim, bool device>
 void fft(const tensor_base<T, dim, device>& dt, const size_t (&size)[dim],
-    typename vector_type<typename complex_type<T>::complex_t, device>::vector_t& ftdata);
+    typename vector_type<typename complex_type<T>::type, device>::vector_t& ftdata);
 
 template<class T, unsigned dim, bool device>
-void ifft(typename vector_type<typename complex_type<T>::complex_t, device>::vector_t& ftdata,
+void ifft(typename vector_type<typename complex_type<T>::type, device>::vector_t& ftdata,
     const size_t (&size)[dim], tensor_base<T, dim, device>& dt);
 
 // Template specializations
@@ -28,28 +28,28 @@ void ifft(typename vector_type<typename complex_type<T>::complex_t, device>::vec
 
 template<>
 void fft(const tensor_base<float, 2, true>& dt, const size_t (&size)[2],
-    thrust::device_vector<complex_type<float>::complex_t>& ftdata);
+    thrust::device_vector<complex_type<float>::type>& ftdata);
 
 template<>
-void ifft(thrust::device_vector<complex_type<float>::complex_t>& ftdata,
+void ifft(thrust::device_vector<complex_type<float>::type>& ftdata,
     const size_t (&size)[2], tensor_base<float, 2, true>& dt);
 
 // 3D cases
 
 template<>
 void fft(const tensor_base<float, 3, true>& dt, const size_t (&size)[3],
-    thrust::device_vector<complex_type<float>::complex_t>& ftdata);
+    thrust::device_vector<complex_type<float>::type>& ftdata);
 
 template<>
-void ifft(thrust::device_vector<complex_type<float>::complex_t>& ftdata,
+void ifft(thrust::device_vector<complex_type<float>::type>& ftdata,
     const size_t (&size)[3], tensor_base<float, 3, true>& dt);
 
 template<>
 void fft(const tensor_base<double, 3, true>& dt, const size_t (&size)[3],
-    thrust::device_vector<complex_type<double>::complex_t>& ftdata);
+    thrust::device_vector<complex_type<double>::type>& ftdata);
 
 template<>
-void ifft(thrust::device_vector<complex_type<double>::complex_t>& ftdata,
+void ifft(thrust::device_vector<complex_type<double>::type>& ftdata,
     const size_t (&size)[3], tensor_base<double, 3, true>& dt);
 
 }

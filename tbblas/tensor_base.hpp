@@ -60,7 +60,7 @@ public:
   typedef typename tbblas::forward_reverse_iterator<data_iterator> iterator;
   typedef typename thrust::transform_iterator<apply_scaling, const_reverse_iterator> const_iterator;
   typedef size_t dim_t[dim];
-  typedef typename complex_type<T>::complex_t complex_t;
+  typedef typename complex_type<T>::type complex_t;
   typedef typename vector_type<complex_t, device>::vector_t cdata_t;
 
 protected:

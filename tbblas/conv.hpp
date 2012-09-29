@@ -26,7 +26,7 @@ struct tensor_convolution {
 
 template<class T>
 struct complex_mult {
-  typedef typename complex_type<T>::complex_t complex_t;
+  typedef typename complex_type<T>::type complex_t;
 
   __host__ __device__
   complex_t operator()(const complex_t& c1, const complex_t& c2) const {

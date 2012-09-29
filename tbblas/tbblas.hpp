@@ -7,4 +7,8 @@
 #endif
 #endif
 
+#ifndef TBBLAS_UNUSED
+#define TBBLAS_UNUSED(a) (void)a
+#endif
+
 #endif
