@@ -16,13 +16,13 @@ namespace tbblas {
 
 template<class T, unsigned dim, bool device>
 void fft(const tensor_base<T, dim, device>& dt, const size_t (&size)[dim],
-    typename vector_type<typename complex_type<T>::complex_t, device>::vector_t& ftdata)
+    typename vector_type<typename complex_type<T>::type, device>::vector_t& ftdata)
 {
   assert(0);
 }
 
 template<class T, unsigned dim, bool device>
-void ifft(typename vector_type<typename complex_type<T>::complex_t, device>::vector_t& ftdata,
+void ifft(typename vector_type<typename complex_type<T>::type, device>::vector_t& ftdata,
     const size_t (&size)[dim], tensor_base<T, dim, device>& dt)
 {
   assert(0);

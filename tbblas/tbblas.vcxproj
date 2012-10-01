@@ -81,25 +81,51 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="device_matrix.hpp" />
-    <ClInclude Include="device_tensor.hpp" />
-    <ClInclude Include="device_vector.hpp" />
-    <ClInclude Include="disk_tensor.hpp" />
-    <ClInclude Include="forward_reverse_iterator.hpp" />
-    <ClInclude Include="forward_reverse_iterator_base.hpp" />
-    <ClInclude Include="host_tensor.hpp" />
-    <ClInclude Include="subrange_proxy.hpp" />
-    <ClInclude Include="tbblas.hpp" />
-    <ClInclude Include="tensor_base.hpp" />
-    <ClInclude Include="tensor_proxy.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="device_matrix.cpp" />
     <ClCompile Include="device_vector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="device\fft.cu" />
     <CudaCompile Include="device_matrix_gpu.cu" />
-    <CudaCompile Include="device_tensor_gpu.cu" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="complex.hpp" />
+    <ClInclude Include="conv.hpp" />
+    <ClInclude Include="device_matrix.hpp" />
+    <ClInclude Include="device_vector.hpp" />
+    <ClInclude Include="disk_tensor.hpp" />
+    <ClInclude Include="divides.hpp" />
+    <ClInclude Include="dot.hpp" />
+    <ClInclude Include="dot2.hpp" />
+    <ClInclude Include="entropy.hpp" />
+    <ClInclude Include="fft.hpp" />
+    <ClInclude Include="fft2.hpp" />
+    <ClInclude Include="fft_plan.hpp" />
+    <ClInclude Include="flip.hpp" />
+    <ClInclude Include="forward_reverse_iterator.hpp" />
+    <ClInclude Include="forward_reverse_iterator_base.hpp" />
+    <ClInclude Include="ifft.hpp" />
+    <ClInclude Include="img.hpp" />
+    <ClInclude Include="io.hpp" />
+    <ClInclude Include="io2.hpp" />
+    <ClInclude Include="minus.hpp" />
+    <ClInclude Include="multiplies.hpp" />
+    <ClInclude Include="ones.hpp" />
+    <ClInclude Include="plus.hpp" />
+    <ClInclude Include="plus2.hpp" />
+    <ClInclude Include="proxy.hpp" />
+    <ClInclude Include="random.hpp" />
+    <ClInclude Include="real.hpp" />
+    <ClInclude Include="sequence.hpp" />
+    <ClInclude Include="subrange.hpp" />
+    <ClInclude Include="subrange_proxy.hpp" />
+    <ClInclude Include="sum.hpp" />
+    <ClInclude Include="tbblas.hpp" />
+    <ClInclude Include="tensor.hpp" />
+    <ClInclude Include="tensor_base.hpp" />
+    <ClInclude Include="tensor_proxy.hpp" />
+    <ClInclude Include="type_traits.hpp" />
+    <ClInclude Include="zeros.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
