@@ -14,10 +14,11 @@
     <ClCompile Include="src\tbblastest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="src\tests.cu" />
+    <ClInclude Include="src\tests.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\tests.h" />
+    <CudaCompile Include="src\helloworld.cu" />
+    <CudaCompile Include="src\proxybenchmarks.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6C9621A3-AB6C-4846-A7AE-298517E991A7}</ProjectGuid>

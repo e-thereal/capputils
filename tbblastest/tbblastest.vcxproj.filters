@@ -20,11 +20,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="src\tests.cu" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="src\tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="src\proxybenchmarks.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="src\helloworld.cu" />
   </ItemGroup>
 </Project>

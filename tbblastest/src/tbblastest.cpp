@@ -12,15 +12,15 @@
 
 int main(int argc, char** argv) {
   if (!argc) {
-    helloworld();
-    convtest();
-    sumtest();
-    entropytest();
-    copytest();
-    proxycopy();
+    //helloworld();
+    //convtest();
+    //sumtest();
+    //entropytest();
+    //copytest();
+    //proxycopy();
   }
-  ffttest();
-//  fftbenchmarks();
-
+  //ffttest();
+  //fftbenchmarks();
+  helloworld();
   return 0;
 }
