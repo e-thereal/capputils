@@ -17,15 +17,15 @@ template<class T, unsigned dim, bool device>
 proxy<tensor<T, dim, device> > flip(const proxy<tensor<T, dim, device> >& p) {
   proxy<tensor<T, dim, device> > proxy = p;
   for (unsigned i = 0; i < dim; ++i)
-    proxy.flipped[i] = !proxy.flipped[i];
+    proxy.flipped()[i] = !proxy.flipped()[i];
   return proxy;
 }
 
 template<class T, unsigned dim, bool device>
-proxy<tensor<T, dim, device> > flip(const tensor<T, dim, device>& t) {
+proxy<tensor<T, dim, device> > flip(tensor<T, dim, device>& t) {
   proxy<tensor<T, dim, device> > proxy(t);
   for (unsigned i = 0; i < dim; ++i)
-    proxy.flipped[i] = !proxy.flipped[i];
+    proxy.flipped()[i] = !proxy.flipped()[i];
   return proxy;
 }
 
@@ -34,16 +34,16 @@ proxy<tensor<T, dim, device> > flip(const proxy<tensor<T, dim, device> >& p, siz
   assert(idx < dim);
 
   proxy<tensor<T, dim, device> > proxy = p;
-  proxy.flipped[idx] = !proxy.flipped[idx];
+  proxy.flipped()[idx] = !proxy.flipped()[idx];
   return proxy;
 }
 
 template<class T, unsigned dim, bool device>
-proxy<tensor<T, dim, device> > flip(const tensor<T, dim, device>& t, size_t idx) {
+proxy<tensor<T, dim, device> > flip(tensor<T, dim, device>& t, size_t idx) {
   assert(idx < dim);
 
   proxy<tensor<T, dim, device> > proxy(t);
-  proxy.flipped[idx] = !proxy.flipped[idx];
+  proxy.flipped()[idx] = !proxy.flipped()[idx];
   return proxy;
 }
 

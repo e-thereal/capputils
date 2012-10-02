@@ -33,7 +33,7 @@ struct scalar_plus_expression {
       return value + scalar;
     }
 
-    apply_plus(const value_t& summand) : scalar(scalar) { }
+    apply_plus(const value_t& scalar) : scalar(scalar) { }
 
   private:
     value_t scalar;

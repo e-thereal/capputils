@@ -10,6 +10,7 @@
 
 #include <tbblas/tensor.hpp>
 #include <tbblas/type_traits.hpp>
+#include <tbblas/sequence.hpp>
 
 #include <thrust/iterator/constant_iterator.h>
 
@@ -19,7 +20,7 @@ namespace tbblas {
 
 template<class T, unsigned dim>
 struct zeros_expression {
-  typedef size_t dim_t[dim];
+  typedef sequence<size_t, dim> dim_t;
   typedef T value_t;
   static const unsigned dimCount = dim;
 
@@ -88,7 +89,7 @@ zeros_expression<T, 4> zeros(const size_t& x1, const size_t& x2, const size_t& x
 }
 
 template<class T, unsigned dim>
-zeros_expression<T, dim> zeros(const typename zeros_expression<T, dim>::dim_t& size) {
+zeros_expression<T, dim> zeros(const sequence<size_t, dim>& size) {
   return zeros_expression<T, dim>(size);
 }
 

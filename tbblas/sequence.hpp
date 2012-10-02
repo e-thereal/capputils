@@ -82,6 +82,11 @@ struct POD_sequence {
   unsigned data[20];
 };
 
+//template<class T, unsigned dim>
+//sequence<T, dim> seq(const T seq[]) {
+//  return sequence<T, dim>(seq);
+//}
+
 template<class T>
 sequence<T, 1u> seq(T x1) {
   T seq[] = {x1};
@@ -121,6 +126,46 @@ std::ostream& operator<<(std::ostream& out, const tbblas::sequence<T, size>& seq
   for (unsigned i = 1; i < size; ++i)
     out << ", " << seq[i];
   return out;
+}
+
+template<class T, unsigned size>
+tbblas::sequence<T, size> operator+(const tbblas::sequence<T, size>& seq1,
+    const tbblas::sequence<T, size>& seq2)
+{
+  tbblas::sequence<T, size> result;
+  for (unsigned i = 0; i < size; ++i)
+    result[i] = seq1[i] + seq2[i];
+  return result;
+}
+
+template<class T, unsigned size>
+tbblas::sequence<T, size> operator-(const tbblas::sequence<T, size>& seq1,
+    const tbblas::sequence<T, size>& seq2)
+{
+  tbblas::sequence<T, size> result;
+  for (unsigned i = 0; i < size; ++i)
+    result[i] = seq1[i] - seq2[i];
+  return result;
+}
+
+template<class T, unsigned size>
+tbblas::sequence<T, size> operator+(const tbblas::sequence<T, size>& seq,
+    const T& value)
+{
+  tbblas::sequence<T, size> result;
+  for (unsigned i = 0; i < size; ++i)
+    result[i] = seq[i] + value;
+  return result;
+}
+
+template<class T, unsigned size>
+tbblas::sequence<T, size> operator/(const tbblas::sequence<T, size>& seq,
+    const T& value)
+{
+  tbblas::sequence<T, size> result;
+  for (unsigned i = 0; i < size; ++i)
+    result[i] = seq[i] / value;
+  return result;
 }
 
 #endif /* TBBLAS_SEQUENCE_HPP_ */

@@ -40,7 +40,7 @@ public:
 
   typedef typename vector_type<T, device>::vector_t data_t;
   typedef T value_t;
-  typedef size_t dim_t[dim];
+  typedef sequence<size_t, dim> dim_t;
 
   const static unsigned dimCount = dim;
   const static bool cuda_enabled = device;

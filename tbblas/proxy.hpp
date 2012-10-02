@@ -50,7 +50,7 @@ struct proxy {
 
   struct index_functor : public thrust::unary_function<difference_type,difference_type> {
 
-    typedef bool flipped_t[dimCount];
+    typedef sequence<bool,dimCount> flipped_t;
 
     dim_t _size;
     dim_t _pitch;
@@ -91,23 +91,23 @@ struct proxy {
   typedef iterator const_iterator;
 
   proxy(Tensor& tensor)
-   : data(tensor.shared_data()), size(tensor.size()), pitch(tensor.size()), flipped(false)
+   : _data(tensor.shared_data()), _size(tensor.size()), _pitch(tensor.size()), _flipped(false)
   { }
 
   proxy(Tensor& tensor, const sequence<unsigned, dimCount>& start,
       const sequence<unsigned, dimCount>& size)
-   : data(tensor.shared_data()), start(start), size(size), pitch(tensor.size()), flipped(false)
+   : _data(tensor.shared_data()), _start(start), _size(size), _pitch(tensor.size()), _flipped(false)
   {
     for (unsigned i = 0; i < dimCount; ++i) {
-      assert(start[i] + size[i] <= pitch[i]);
+      assert(_start[i] + _size[i] <= _pitch[i]);
     }
   }
 
   inline iterator begin() const {
-    index_functor functor(start.get(), size.get(), pitch.get(), flipped.get());
+    index_functor functor(_start, _size, _pitch, _flipped);
     CountingIterator counting(0);
     TransformIterator transform(counting, functor);
-    PermutationIterator permu(data->begin(), transform);
+    PermutationIterator permu(_data->begin(), transform);
     return permu;
 //    return PermutationIterator(first, TransformIterator(CountingIterator(0), subrange_functor(_size, _pitch)));
   }
@@ -119,8 +119,20 @@ struct proxy {
   inline size_t count() const {
     size_t count = 1;
     for (int i = 0; i < dimCount; ++i)
-      count *= size[i];
+      count *= _size[i];
     return count;
+  }
+
+  inline const dim_t& size() const {
+    return _size;
+  }
+
+  inline sequence<bool, dimCount>& flipped() {
+    return _flipped;
+  }
+
+  inline const sequence<bool, dimCount>& flipped() const {
+    return _flipped;
   }
 
   template<class Expression>
@@ -132,7 +144,7 @@ struct proxy {
   operator=(const Expression& expr) const {
     const dim_t& size = expr.size();
     for (unsigned i = 0; i < dimCount; ++i) {
-      assert(size[i] == this->size[i]);
+      assert(size[i] == _size[i]);
     }
     thrust::copy(expr.begin(), expr.end(), begin());
     return *this;
@@ -159,10 +171,10 @@ struct proxy {
   }
 #endif
 
-public:
-  boost::shared_ptr<data_t> data;
-  sequence<unsigned, dimCount> start, size, pitch;
-  sequence<bool, dimCount> flipped;
+private:
+  boost::shared_ptr<data_t> _data;
+  sequence<unsigned, dimCount> _start, _size, _pitch;
+  sequence<bool, dimCount> _flipped;
 };
 
 template<class T>

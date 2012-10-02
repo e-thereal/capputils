@@ -26,7 +26,7 @@ namespace tbblas {
 template<class T, unsigned dim, bool device, class Distribution>
 struct random_tensor : boost::enable_if_c<device == true>
 {
-  typedef size_t dim_t[dim];
+  typedef typename tensor<T, dim, device>::dim_t dim_t;
   typedef T value_t;
   static const unsigned dimCount = dim;
 
