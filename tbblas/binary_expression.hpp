@@ -17,8 +17,6 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
 
-#include <thrust/functional.h>
-
 namespace tbblas {
 
 template<class T1, class T2, class Operation>
@@ -78,21 +76,6 @@ template<class T1, class T2, class Operation>
 struct is_expression<binary_expression<T1, T2, Operation> > {
   static const bool value = true;
 };
-
-template<class Expression1, class Expression2>
-inline typename boost::enable_if<is_expression<Expression1>,
-  typename boost::enable_if<is_expression<Expression2>,
-    typename boost::enable_if<boost::is_same<typename Expression1::value_t, typename Expression2::value_t>,
-      typename boost::enable_if_c<Expression1::dimCount == Expression2::dimCount,
-        binary_expression<Expression1, Expression2, thrust::equal_to<typename Expression1::value_t> >
-      >::type
-    >::type
-  >::type
->::type
-operator==(const Expression1& expr1, const Expression2& expr2) {
-  return binary_expression<Expression1, Expression2, thrust::equal_to<typename Expression1::value_t> >(
-      expr1, expr2, thrust::equal_to<typename Expression1::value_t>());
-}
 
 }
 

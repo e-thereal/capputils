@@ -8,10 +8,8 @@
 #ifndef TBBLAS_TENSOR_HPP_
 #define TBBLAS_TENSOR_HPP_
 
-#include <thrust/functional.h>
+//#include <thrust/functional.h>
 
-#include <tbblas/forward_reverse_iterator.hpp>
-#include <thrust/iterator/transform_iterator.h>
 #include <thrust/copy.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -40,7 +38,7 @@ public:
 
   typedef typename vector_type<T, device>::vector_t data_t;
   typedef T value_t;
-  typedef sequence<size_t, dim> dim_t;
+  typedef sequence<int, dim> dim_t;
 
   const static unsigned dimCount = dim;
   const static bool cuda_enabled = device;
@@ -51,7 +49,7 @@ public:
 
 protected:
   boost::shared_ptr<data_t> _data;
-  dim_t _size;
+  dim_t _size, _fullsize;
 
 public:
   tensor(size_t x1 = 1, size_t x2 = 1, size_t x3 = 1, size_t x4 = 1) {
@@ -62,6 +60,7 @@ public:
       _size[i] = size[i];
       count *= size[i];
     }
+    _fullsize = _size;
 
     _data = boost::shared_ptr<data_t>(new data_t(count));
   }
@@ -72,7 +71,23 @@ public:
       _size[i] = size[i];
       count *= size[i];
     }
+    _fullsize = _size;
+
     _data = boost::shared_ptr<data_t>(new data_t(count));
+  }
+
+  tensor(const tensor_t& tensor) {
+    const dim_t& size = tensor.size();
+
+    size_t count = 1;
+    for (unsigned i = 0; i < dim; ++i) {
+      _size[i] = size[i];
+      count *= size[i];
+    }
+    _fullsize = _size;
+
+    _data = boost::shared_ptr<data_t>(new data_t(count));
+    thrust::copy(tensor.begin(), tensor.end(), begin());
   }
 
   template<class T2, bool device2>
@@ -84,6 +99,8 @@ public:
       _size[i] = size[i];
       count *= size[i];
     }
+    _fullsize = _size;
+
     _data = boost::shared_ptr<data_t>(new data_t(count));
     thrust::copy(tensor.begin(), tensor.end(), begin());
   }
@@ -97,6 +114,8 @@ public:
     for (unsigned i = 0; i < dimCount; ++i) {
       _size[i] = size[i];
     }
+    _fullsize = _size;
+
     _data = boost::shared_ptr<data_t>(new data_t(count()));
     op.apply(*this);
   }
@@ -109,6 +128,8 @@ public:
     for (unsigned i = 0; i < dimCount; ++i) {
       _size[i] = size[i];
     }
+    _fullsize = _size;
+
     _data = boost::shared_ptr<data_t>(new data_t(count()));
     thrust::copy(expr.begin(), expr.end(), begin());
   }
@@ -118,6 +139,14 @@ public:
 public:
   inline const dim_t& size() const {
     return _size;
+  }
+
+  const dim_t& full_size() const {
+    return _fullsize;
+  }
+
+  void set_full_size(const dim_t& size) {
+    _fullsize = size;
   }
 
   inline size_t count() const {
@@ -172,6 +201,7 @@ public:
     return data()[idx];
   }
 
+  // returning const proxy in order to avoid copy contructors
   const proxy<tensor_t> operator[](const std::pair<sequence<unsigned, dim>, sequence<unsigned, dim> >& pair) {
     return subrange(*this, pair.first, pair.second);
   }
@@ -269,9 +299,11 @@ struct is_expression<tensor<T, dim, device> > {
 // Include default headers
 
 #include <tbblas/proxy.hpp>
-#include <tbblas/plus2.hpp>
+#include <tbblas/plus.hpp>
 #include <tbblas/minus.hpp>
 #include <tbblas/multiplies.hpp>
 #include <tbblas/divides.hpp>
+#include <tbblas/arithmetic.hpp>
+#include <tbblas/comparisons.hpp>
 
 #endif /* TBBLAS_TENSOR_HPP_ */

@@ -8,62 +8,79 @@
 #ifndef TBBLAS_CONV_HPP_
 #define TBBLAS_CONV_HPP_
 
-#include <tbblas/tensor_base.hpp>
+#include <tbblas/tensor.hpp>
 
 #include <tbblas/fft.hpp>
-#include <thrust/transform.h>
-#include <cmath>
+#include <tbblas/zeros.hpp>
 
 namespace tbblas {
 
-template<class Tensor>
-struct tensor_convolution {
-  Tensor tensor1, tensor2;
-
-  tensor_convolution(const Tensor& tensor1, const Tensor& tensor2)
-   : tensor1(tensor1), tensor2(tensor2) { }
-};
-
-template<class T>
-struct complex_mult {
-  typedef typename complex_type<T>::type complex_t;
-
-  __host__ __device__
-  complex_t operator()(const complex_t& c1, const complex_t& c2) const {
-    return complex_type<T>::mult(c1, c2);
-  }
-};
-
-template<class Tensor>
-void apply_operation(Tensor& tensor, const tensor_convolution<Tensor>& op) {
-
-  // calculate the convolution and write the result to the tensor
-  // the fft vector is not reused by default
-  const Tensor &dt1 = op.tensor1, &dt2 = op.tensor2;
-
-  for (unsigned i = 0; i < Tensor::dimCount; ++i)
-    assert(tensor.size()[i] == abs((int)dt1.size()[i] - (int)dt2.size()[i]) + 1);
-
-  typename Tensor::dim_t ftsize;
-  unsigned ftcount = 1;
-  for (unsigned i = 0; i < Tensor::dimCount; ++i)
-    ftcount *= (ftsize[i] = std::max(dt1.size()[i], dt2.size()[i]));
-
-  typename Tensor::cdata_t cdata1(ftcount), cdata2(ftcount), cresult(ftcount);
-  tbblas::fft(dt1, ftsize, cdata1);
-  tbblas::fft(dt2, ftsize, cdata2);
-
-  thrust::transform(cdata1.begin(), cdata1.end(), cdata2.begin(),
-      cresult.begin(), complex_mult<typename Tensor::value_t>());
-
-  tbblas::ifft(cresult, ftsize, tensor);
-}
-
-template<class T, unsigned dim, bool device>
-tensor_convolution<tensor_base<T, dim, device> > conv(
-    const tensor_base<T, dim, device>& dt1, const tensor_base<T, dim, device>& dt2)
+template<class Expression1, class Expression2>
+struct conv_operation
 {
-  return tensor_convolution<tensor_base<T, dim, device> >(dt1, dt2);
+  typedef typename Expression1::dim_t dim_t;
+  typedef typename Expression1::value_t value_t;
+  typedef complex<value_t> complex_t;
+  static const int dimCount = Expression1::dimCount;
+
+  typedef tensor<value_t, dimCount, Expression1::cuda_enabled> tensor_t;
+  typedef tensor<complex_t, dimCount, Expression1::cuda_enabled> ctensor_t;
+  typedef fft_plan<dimCount> plan_t;
+
+  conv_operation(const Expression1& expr1, const Expression2& expr2) : expr1(expr1), expr2(expr2) {
+    _size = abs(expr1.size() - expr2.size()) + 1;
+    _paddedSize = max(expr1.size(), expr2.size());
+
+//    std::cout << "size1: " << expr1.size() << std::endl;
+//    std::cout << "size2: " << expr2.size() << std::endl;
+//    std::cout << "result: " << _size << std::endl;
+//    std::cout << "padded: " << _paddedSize << std::endl;
+  }
+
+  void apply(tensor_t& output) const {
+//    std::cout << "output: " << output.size() << std::endl;
+
+    tensor_t padded1 = zeros<value_t>(_paddedSize), padded2 = zeros<value_t>(_paddedSize);
+    padded1[sequence<int,dimCount>(0), expr1.size()] = expr1;
+    padded2[sequence<int,dimCount>(0), expr2.size()] = expr2;
+
+    plan_t plan;
+    ctensor_t ctens1 = fft(padded1, plan);
+    ctensor_t ctens2 = fft(padded2, plan);
+    ctens1 = ctens1 * ctens2;
+    padded1 = ifft(ctens1);
+    output = padded1[_paddedSize - _size, output.size()];
+  }
+
+  inline const dim_t& size() const {
+    return _size;
+  }
+
+private:
+  const Expression1& expr1;
+  const Expression2& expr2;
+  dim_t _size, _paddedSize;
+};
+
+template<class T1, class T2>
+struct is_operation<conv_operation<T1, T2> > {
+  static const bool value = true;
+};
+
+template<class Expression1, class Expression2>
+typename boost::enable_if<is_expression<Expression1>,
+  typename boost::enable_if<is_expression<Expression2>,
+    typename boost::enable_if_c<Expression1::cuda_enabled == true,
+      typename boost::enable_if_c<Expression1::dimCount == Expression2::dimCount,
+        typename boost::enable_if_c<Expression1::dimCount <= 3,
+          conv_operation<Expression1, Expression2>
+        >::type
+      >::type
+    >::type
+  >::type
+>::type
+conv(const Expression1& expr1, const Expression2& expr2) {
+  return conv_operation<Expression1, Expression2>(expr1, expr2);
 }
 
 }

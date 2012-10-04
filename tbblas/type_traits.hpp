@@ -56,6 +56,7 @@ struct vector_type<T, true> {
  * typedef ... value_t;
  * typedef ... const_iterator;
  * static const unsigned dimCount;
+ * static const bool cuda_enabled;
  *
  * inline const_iterator begin() const;
  * inline const_iterator end() const;

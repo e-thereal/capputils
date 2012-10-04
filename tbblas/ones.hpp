@@ -19,7 +19,7 @@ namespace tbblas {
 
 template<class T, unsigned dim>
 struct ones_expression {
-  typedef sequence<size_t, dim> dim_t;
+  typedef typename tensor<T, dim>::dim_t dim_t;
   typedef T value_t;
   static const unsigned dimCount = dim;
 
@@ -88,7 +88,7 @@ ones_expression<T, 4> ones(const size_t& x1, const size_t& x2, const size_t& x3,
 }
 
 template<class T, unsigned dim>
-ones_expression<T, dim> ones(const sequence<size_t, dim>& size) {
+ones_expression<T, dim> ones(const sequence<int, dim>& size) {
   return ones_expression<T, dim>(size);
 }
 

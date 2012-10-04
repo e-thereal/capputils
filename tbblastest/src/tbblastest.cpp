@@ -11,16 +11,15 @@
 #include <iostream>
 
 int main(int argc, char** argv) {
-  if (!argc) {
-    //helloworld();
-    //convtest();
-    //sumtest();
-    //entropytest();
-    //copytest();
-    //proxycopy();
-  }
-  //ffttest();
-  //fftbenchmarks();
-  helloworld();
+//  helloworld();
+//  convtest();
+//  sumtest();
+//  entropytest();
+//  copytest();
+//  proxycopy();
+  ffttest();
+//  fftbenchmarks();
+//  convtest2();
+//  scalarexpressions();
   return 0;
 }

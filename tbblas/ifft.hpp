@@ -52,21 +52,23 @@ struct ifft_operation
   typedef tensor<value_t, Tensor::dimCount, Tensor::cuda_enabled> tensor_t;
   typedef fft_plan<Tensor::dimCount> plan_t;
 
-  ifft_operation(Tensor& tensor, const plan_t& plan) : tensor(tensor), plan(plan) { }
+  ifft_operation(Tensor& tensor, const plan_t& plan) : _tensor(tensor), _plan(plan) { }
 
   void apply(tensor_t& output) const {
-    ifft_trait<value_t>::exec(plan.create(tensor.size(), ifft_trait<value_t>::type),
-        tensor.data().data().get(), output.data().data().get());
+    assert(cudaThreadSynchronize() == cudaSuccess);
+    assert(ifft_trait<value_t>::exec(_plan.create(_tensor.full_size(), ifft_trait<value_t>::type),
+        _tensor.data().data().get(), output.data().data().get()) == CUFFT_SUCCESS);
+    assert(cudaThreadSynchronize() == cudaSuccess);
     output = output / (value_t)output.count();
   }
 
   inline const dim_t& size() const {
-    return tensor.size();
+    return _tensor.full_size();
   }
 
 private:
-  Tensor& tensor;
-  plan_t plan;
+  Tensor& _tensor;
+  plan_t _plan;
 };
 
 template<class T>

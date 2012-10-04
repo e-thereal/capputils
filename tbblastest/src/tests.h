@@ -16,5 +16,7 @@ void copytest();
 void proxycopy();
 void ffttest();
 void fftbenchmarks();
+void convtest2();
+void scalarexpressions();
 
 #endif /* TESTS_H_ */

@@ -20,7 +20,7 @@ namespace tbblas {
 
 template<class T, unsigned dim>
 struct zeros_expression {
-  typedef sequence<size_t, dim> dim_t;
+  typedef typename tensor<T, dim>::dim_t dim_t;
   typedef T value_t;
   static const unsigned dimCount = dim;
 
@@ -52,6 +52,11 @@ struct zeros_expression {
 
 private:
   dim_t _size;
+};
+
+template<class T, unsigned dim>
+struct is_expression<zeros_expression<T, dim> > {
+  static const bool value = true;
 };
 
 template<class T>
@@ -89,14 +94,9 @@ zeros_expression<T, 4> zeros(const size_t& x1, const size_t& x2, const size_t& x
 }
 
 template<class T, unsigned dim>
-zeros_expression<T, dim> zeros(const sequence<size_t, dim>& size) {
+zeros_expression<T, dim> zeros(const sequence<int, dim>& size) {
   return zeros_expression<T, dim>(size);
 }
-
-template<class T, unsigned dim>
-struct is_expression<zeros_expression<T, dim> > {
-  static const bool value = true;
-};
 
 }
 

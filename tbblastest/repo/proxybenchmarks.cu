@@ -8,7 +8,7 @@
 #include <tbblas/tensor.hpp>
 #include <tbblas/random.hpp>
 #include <tbblas/zeros.hpp>
-#include <tbblas/io2.hpp>
+#include <tbblas/io.hpp>
 
 #include <boost/timer.hpp>
 

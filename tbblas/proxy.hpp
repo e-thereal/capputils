@@ -15,12 +15,6 @@
 
 #include <cassert>
 
-#ifndef __CUDACC__
-#define __global__
-#define __host__
-#define __device__
-#endif
-
 namespace tbblas {
 
 template<class T1, class T2, unsigned dim>
@@ -123,7 +117,7 @@ struct proxy {
     return count;
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return _size;
   }
 
@@ -202,6 +196,8 @@ proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
 }
 
 /*** CUDA IMPLEMENTATIONS ***/
+
+#ifdef TBBLAS_OLD_COPY
 
 template<class T>
 void copy(thrust::device_ptr<const T> src, sequence<unsigned, 1> srcStart, sequence<unsigned, 1> srcPitch, sequence<bool, 1> srcFlipped,
@@ -369,6 +365,8 @@ void copy(thrust::device_ptr<T> src, sequence<unsigned, 4> srcStart, sequence<un
   copy4D_kernel<<<gridDim, blockDim>>>(src.get(), srcStart, srcPitch, srcFlipped,
       dst.get(), dstStart, dstPitch, dstFlipped, size);
 }
+
+#endif
 
 }
 

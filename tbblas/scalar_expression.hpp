@@ -24,12 +24,14 @@ namespace tbblas {
 template<class T, class Operation>
 struct scalar_expression {
   typedef typename T::dim_t dim_t;
-  typedef typename T::value_t value_t;
+  typedef typename T::value_t input_t;
+  typedef typename Operation::value_t value_t;
   static const unsigned dimCount = T::dimCount;
+  static const bool cuda_enabled = T::cuda_enabled;
 
-  struct apply_operation : public thrust::unary_function<value_t, value_t> {
+  struct apply_operation : public thrust::unary_function<input_t, value_t> {
     __host__ __device__
-    inline value_t operator()(const value_t& value) const {
+    inline value_t operator()(const input_t& value) const {
       return op(value);
     }
 

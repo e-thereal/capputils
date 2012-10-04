@@ -9,26 +9,17 @@
 #include <tbblas/tensor.hpp>
 #include <thrust/copy.h>
 
-#include <tbblas/io2.hpp>
-#include <tbblas/plus2.hpp>
-#include <tbblas/minus.hpp>
-#include <tbblas/multiplies.hpp>
-#include <tbblas/divides.hpp>
+#include <tbblas/io.hpp>
 #include <tbblas/zeros.hpp>
 #include <tbblas/random.hpp>
 #include <iostream>
 
 #include <boost/timer.hpp>
 
-#include <tbblas/tensor_base.hpp>
-#include <tbblas/plus.hpp>
-
 #include <thrust/for_each.h>
 
 typedef tbblas::tensor<float, 2, true> matrix_t;
 typedef tbblas::tensor<float, 1, true> vector_t;
-
-typedef tbblas::tensor_base<float, 2, true> matrix2_t;
 
 typedef tbblas::random_tensor<float, 2, true, tbblas::uniform<float> > randu_t;
 typedef tbblas::random_tensor<float, 2, true, tbblas::normal<float> > randn_t;

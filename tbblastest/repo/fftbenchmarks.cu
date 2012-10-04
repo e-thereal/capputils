@@ -6,10 +6,10 @@
  */
 
 #include <tbblas/tensor.hpp>
-#include <tbblas/io2.hpp>
+#include <tbblas/io.hpp>
 #include <tbblas/random.hpp>
 #include <tbblas/complex.hpp>
-#include <tbblas/fft2.hpp>
+#include <tbblas/fft.hpp>
 
 #include <boost/timer.hpp>
 

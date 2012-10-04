@@ -52,14 +52,20 @@ public:
     this->type = type;
     this->hasPlan = true;
 
-    int n[dim];
-    for (unsigned i = 0; i < dim; ++i)
-      n[i] = size[dim - i - 1];
+    unsigned rank = dim;
+    for (; rank > 0; --rank) {
+      if (size[rank-1] > 1)
+        break;
+    }
 
-    assert(cufftPlanMany(&plan, dim, n,
+    int n[rank];
+    for (unsigned i = 0; i < rank; ++i)
+      n[i] = size[rank - i - 1];
+
+    assert(cufftPlanMany(&plan, rank, n,
         0, 0, 0,
         0, 0, 0,
-        type, 1) == 0);
+        type, 1) == CUFFT_SUCCESS);
 
     return plan;
   }

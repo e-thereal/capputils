@@ -11,6 +11,8 @@
 #include <utility>
 #include <iostream>
 
+#include <cmath>
+
 namespace tbblas {
 
 template<class T, unsigned size>
@@ -59,6 +61,38 @@ struct sequence {
     return _seq;
   }
 
+  /*** Binary arithmetic operators ***/
+
+  sequence_t operator+(const sequence_t& seq) const {
+    sequence_t result;
+    for (unsigned i = 0; i < size; ++i)
+      result[i] = _seq[i] + seq[i];
+    return result;
+  }
+
+  sequence_t operator-(const sequence_t& seq) const {
+    sequence_t result;
+    for (unsigned i = 0; i < size; ++i)
+      result[i] = _seq[i] - seq[i];
+    return result;
+  }
+
+  sequence_t operator*(const sequence_t& seq) const {
+    sequence_t result;
+    for (unsigned i = 0; i < size; ++i)
+      result[i] = _seq[i] * seq[i];
+    return result;
+  }
+
+  sequence_t operator/(const sequence_t& seq) const {
+    sequence_t result;
+    for (unsigned i = 0; i < size; ++i)
+      result[i] = _seq[i] / seq[i];
+    return result;
+  }
+
+  /*** Comparison operators ***/
+
   bool operator==(const sequence_t& seq) const {
     for (unsigned i = 0; i < size; ++i)
       if (_seq[i] != seq[i])
@@ -76,10 +110,6 @@ struct sequence {
 
 private:
   seq_t _seq;
-};
-
-struct POD_sequence {
-  unsigned data[20];
 };
 
 //template<class T, unsigned dim>
@@ -111,7 +141,28 @@ sequence<T, 4u> seq(T x1, T x2, T x3, T x4) {
   return sequence<T, 4u>(seq);
 }
 
+template<class T, unsigned size>
+tbblas::sequence<T, size> abs(const tbblas::sequence<T, size>& seq)
+{
+  tbblas::sequence<T, size> result;
+  for (unsigned i = 0; i < size; ++i)
+    result[i] = ::abs(seq[i]);
+  return result;
 }
+
+template<class T, unsigned size>
+tbblas::sequence<T, size> max(const tbblas::sequence<T, size>& seq1,
+    const tbblas::sequence<T, size>& seq2)
+{
+  tbblas::sequence<T, size> result;
+  for (unsigned i = 0; i < size; ++i)
+    result[i] = (seq1[i] > seq2[i] ? seq1[i] : seq2[i]);
+  return result;
+}
+
+}
+
+/*** Pair creation ***/
 
 template<class T, unsigned size>
 std::pair<tbblas::sequence<T, size>, tbblas::sequence<T, size> > operator,(const tbblas::sequence<T, size>& seq1,
@@ -119,6 +170,8 @@ std::pair<tbblas::sequence<T, size>, tbblas::sequence<T, size> > operator,(const
 {
   return std::pair<tbblas::sequence<T, size>, tbblas::sequence<T, size> >(seq1, seq2);
 }
+
+/*** Input/output ***/
 
 template<class T, unsigned size>
 std::ostream& operator<<(std::ostream& out, const tbblas::sequence<T, size>& seq) {
@@ -128,25 +181,7 @@ std::ostream& operator<<(std::ostream& out, const tbblas::sequence<T, size>& seq
   return out;
 }
 
-template<class T, unsigned size>
-tbblas::sequence<T, size> operator+(const tbblas::sequence<T, size>& seq1,
-    const tbblas::sequence<T, size>& seq2)
-{
-  tbblas::sequence<T, size> result;
-  for (unsigned i = 0; i < size; ++i)
-    result[i] = seq1[i] + seq2[i];
-  return result;
-}
-
-template<class T, unsigned size>
-tbblas::sequence<T, size> operator-(const tbblas::sequence<T, size>& seq1,
-    const tbblas::sequence<T, size>& seq2)
-{
-  tbblas::sequence<T, size> result;
-  for (unsigned i = 0; i < size; ++i)
-    result[i] = seq1[i] - seq2[i];
-  return result;
-}
+/*** scalar operations ***/
 
 template<class T, unsigned size>
 tbblas::sequence<T, size> operator+(const tbblas::sequence<T, size>& seq,
@@ -155,6 +190,26 @@ tbblas::sequence<T, size> operator+(const tbblas::sequence<T, size>& seq,
   tbblas::sequence<T, size> result;
   for (unsigned i = 0; i < size; ++i)
     result[i] = seq[i] + value;
+  return result;
+}
+
+template<class T, unsigned size>
+tbblas::sequence<T, size> operator-(const tbblas::sequence<T, size>& seq,
+    const T& value)
+{
+  tbblas::sequence<T, size> result;
+  for (unsigned i = 0; i < size; ++i)
+    result[i] = seq[i] - value;
+  return result;
+}
+
+template<class T, unsigned size>
+tbblas::sequence<T, size> operator*(const tbblas::sequence<T, size>& seq,
+    const T& value)
+{
+  tbblas::sequence<T, size> result;
+  for (unsigned i = 0; i < size; ++i)
+    result[i] = seq[i] * value;
   return result;
 }
 

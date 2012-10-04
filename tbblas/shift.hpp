@@ -13,13 +13,9 @@
 #include <tbblas/tensor.hpp>
 #include <boost/static_assert.hpp>
 
-#include <cassert>
+#include <boost/utility/enable_if.hpp>
 
-#ifndef __CUDACC__
-#define __global__
-#define __host__
-#define __device__
-#endif
+#include <cassert>
 
 namespace tbblas {
 
@@ -31,6 +27,7 @@ struct fftshift_expression {
   typedef typename Expression::dim_t dim_t;
 
   static const int dimCount = Expression::dimCount;
+  static const bool cuda_enabled = Expression::cuda_enabled;
 
   typedef int difference_type;
 
@@ -99,13 +96,19 @@ struct is_expression<fftshift_expression<T, inverse> > {
 };
 
 template<class Expression>
-fftshift_expression<Expression, false> fftshift(const Expression& expr)
+typename boost::enable_if<is_expression<Expression>,
+  fftshift_expression<Expression, false>
+>::type
+fftshift(const Expression& expr)
 {
   return fftshift_expression<Expression, false>(expr);
 }
 
 template<class Expression>
-fftshift_expression<Expression, true> ifftshift(const Expression& expr)
+typename boost::enable_if<is_expression<Expression>,
+  fftshift_expression<Expression, true>
+>::type
+ifftshift(const Expression& expr)
 {
   return fftshift_expression<Expression, true>(expr);
 }
