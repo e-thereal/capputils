@@ -24,6 +24,7 @@ struct binary_expression {
   typedef typename T1::dim_t dim_t;
   typedef typename T1::value_t value_t;
   static const unsigned dimCount = T1::dimCount;
+  static const bool cuda_enabled = T1::cuda_enabled;
 
   typedef thrust::tuple<value_t, value_t> tuple_t;
 

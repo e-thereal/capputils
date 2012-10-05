@@ -49,7 +49,7 @@ public:
 
 protected:
   boost::shared_ptr<data_t> _data;
-  dim_t _size, _fullsize;
+  dim_t _size /*, _fullsize*/; // fullsize is not used cause this member is not deligates consistently
 
 public:
   tensor(size_t x1 = 1, size_t x2 = 1, size_t x3 = 1, size_t x4 = 1) {
@@ -60,7 +60,7 @@ public:
       _size[i] = size[i];
       count *= size[i];
     }
-    _fullsize = _size;
+//    _fullsize = _size;
 
     _data = boost::shared_ptr<data_t>(new data_t(count));
   }
@@ -71,7 +71,7 @@ public:
       _size[i] = size[i];
       count *= size[i];
     }
-    _fullsize = _size;
+//    _fullsize = _size;
 
     _data = boost::shared_ptr<data_t>(new data_t(count));
   }
@@ -84,7 +84,7 @@ public:
       _size[i] = size[i];
       count *= size[i];
     }
-    _fullsize = _size;
+//    _fullsize = _size;
 
     _data = boost::shared_ptr<data_t>(new data_t(count));
     thrust::copy(tensor.begin(), tensor.end(), begin());
@@ -99,7 +99,7 @@ public:
       _size[i] = size[i];
       count *= size[i];
     }
-    _fullsize = _size;
+//    _fullsize = _size;
 
     _data = boost::shared_ptr<data_t>(new data_t(count));
     thrust::copy(tensor.begin(), tensor.end(), begin());
@@ -114,7 +114,7 @@ public:
     for (unsigned i = 0; i < dimCount; ++i) {
       _size[i] = size[i];
     }
-    _fullsize = _size;
+//    _fullsize = _size;
 
     _data = boost::shared_ptr<data_t>(new data_t(count()));
     op.apply(*this);
@@ -128,7 +128,7 @@ public:
     for (unsigned i = 0; i < dimCount; ++i) {
       _size[i] = size[i];
     }
-    _fullsize = _size;
+//    _fullsize = _size;
 
     _data = boost::shared_ptr<data_t>(new data_t(count()));
     thrust::copy(expr.begin(), expr.end(), begin());
@@ -142,12 +142,13 @@ public:
   }
 
   const dim_t& full_size() const {
-    return _fullsize;
+//    return _fullsize;
+    return _size;
   }
 
-  void set_full_size(const dim_t& size) {
-    _fullsize = size;
-  }
+//  void set_full_size(const dim_t& size) {
+//    _fullsize = size;
+//  }
 
   inline size_t count() const {
     size_t count = 1;

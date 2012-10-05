@@ -69,7 +69,7 @@ struct fftexpand_expression {
   fftexpand_expression(const Tensor& tensor) : tensor(tensor) { }
 
   inline const_iterator begin() const {
-    index_functor functor(tensor.full_size(), tensor.size()[0]);
+    index_functor functor(tensor.full_size(), tensor.size()[0] / 2 + 1);
     CountingIterator counting(0);
     TransformIterator transform(counting, functor);
     PermutationIterator permu(tensor.begin(), transform);

@@ -21,7 +21,7 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1862065465." name="/" resourcePath="">
 						<toolChain id="cuda.toolchain.exe.debug.1531561155" name="CUDA Toolchain" superClass="cuda.toolchain.exe.debug">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="cuda.toolchain.targetplatform.exe.debug.572824672" isAbstract="false" name="Linux Release Platform" osList="linux" superClass="cuda.toolchain.targetplatform.exe.debug"/>
-							<builder buildPath="${workspace_loc:/tbblastest/Debug}" enableAutoBuild="true" id="cuda.toolchain.builder.exe.debug.761162598" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cuda.toolchain.builder.exe.debug"/>
+							<builder buildPath="${workspace_loc:/tbblastest/Debug}" enableAutoBuild="true" id="cuda.toolchain.builder.exe.debug.761162598" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="3" superClass="cuda.toolchain.builder.exe.debug"/>
 							<tool id="cuda.toolchain.compiler.exe.debug.1511912667" name="NVIDIA CUDA Compiler" superClass="cuda.toolchain.compiler.exe.debug">
 								<option defaultValue="gnu.c.optimization.level.none" id="cuda.toolchain.compiler.option.optimization.level.547710651" name="Optimization Level" superClass="cuda.toolchain.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="cuda.toolchain.compiler.option.debugging.level.512750363" name="Debug Level" superClass="cuda.toolchain.compiler.option.debugging.level"/>

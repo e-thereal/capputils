@@ -26,6 +26,7 @@ struct scalar_minus_expression {
   typedef typename T::dim_t dim_t;
   typedef typename T::value_t value_t;
   static const unsigned dimCount = T::dimCount;
+  static const bool cuda_enabled = T::cuda_enabled;
 
   struct apply_minus : public thrust::unary_function<value_t, value_t> {
     __host__ __device__
@@ -77,73 +78,73 @@ struct is_expression<scalar_minus_expression<T> > {
 
 /*** Element-wise minus operations ***/
 
-template<class T1, class T2>
-struct minus_expression {
-  typedef typename T1::dim_t dim_t;
-  typedef typename T1::value_t value_t;
-  static const unsigned dimCount = T1::dimCount;
-
-  typedef thrust::tuple<value_t, value_t> tuple_t;
-
-  struct apply_minus : public thrust::unary_function<tuple_t, value_t> {
-    __host__ __device__
-    inline value_t operator()(const tuple_t& t) const {
-      return thrust::get<0>(t) - thrust::get<1>(t);
-    }
-  };
-
-  typedef thrust::zip_iterator<thrust::tuple<typename T1::const_iterator, typename T2::const_iterator> > zip_iterator_t;
-  typedef thrust::transform_iterator<apply_minus, zip_iterator_t> const_iterator;
-
-  minus_expression(const T1& expr1, const T2& expr2) : expr1(expr1), expr2(expr2) { }
-
-  inline const_iterator begin() const {
-    return thrust::make_transform_iterator(
-        thrust::make_zip_iterator(thrust::make_tuple(expr1.begin(), expr2.begin())),
-        apply_minus());
-  }
-
-  inline const_iterator end() const {
-    return thrust::make_transform_iterator(
-        thrust::make_zip_iterator(thrust::make_tuple(expr1.end(), expr2.end())),
-        apply_minus());
-  }
-
-  inline const dim_t& size() const {
-    return expr1.size();
-  }
-
-  inline size_t count() const {
-    return expr1.count();
-  }
-
-private:
-  const T1& expr1;
-  const T2& expr2;
-};
-
-template<class Expression1, class Expression2>
-inline typename boost::enable_if<
-  is_expression<Expression1>,
-  typename boost::enable_if<
-    is_expression<Expression2>,
-    typename boost::enable_if<
-      boost::is_same<typename Expression1::value_t, typename Expression2::value_t>,
-      typename boost::enable_if_c<
-        Expression1::dimCount == Expression2::dimCount,
-        minus_expression<Expression1, Expression2>
-      >::type
-    >::type
-  >::type
->::type
-operator-(const Expression1& expr1, const Expression2& expr2) {
-  return minus_expression<Expression1, Expression2>(expr1, expr2);
-}
-
-template<class T1, class T2>
-struct is_expression<minus_expression<T1, T2> > {
-  static const bool value = true;
-};
+//template<class T1, class T2>
+//struct minus_expression {
+//  typedef typename T1::dim_t dim_t;
+//  typedef typename T1::value_t value_t;
+//  static const unsigned dimCount = T1::dimCount;
+//
+//  typedef thrust::tuple<value_t, value_t> tuple_t;
+//
+//  struct apply_minus : public thrust::unary_function<tuple_t, value_t> {
+//    __host__ __device__
+//    inline value_t operator()(const tuple_t& t) const {
+//      return thrust::get<0>(t) - thrust::get<1>(t);
+//    }
+//  };
+//
+//  typedef thrust::zip_iterator<thrust::tuple<typename T1::const_iterator, typename T2::const_iterator> > zip_iterator_t;
+//  typedef thrust::transform_iterator<apply_minus, zip_iterator_t> const_iterator;
+//
+//  minus_expression(const T1& expr1, const T2& expr2) : expr1(expr1), expr2(expr2) { }
+//
+//  inline const_iterator begin() const {
+//    return thrust::make_transform_iterator(
+//        thrust::make_zip_iterator(thrust::make_tuple(expr1.begin(), expr2.begin())),
+//        apply_minus());
+//  }
+//
+//  inline const_iterator end() const {
+//    return thrust::make_transform_iterator(
+//        thrust::make_zip_iterator(thrust::make_tuple(expr1.end(), expr2.end())),
+//        apply_minus());
+//  }
+//
+//  inline const dim_t& size() const {
+//    return expr1.size();
+//  }
+//
+//  inline size_t count() const {
+//    return expr1.count();
+//  }
+//
+//private:
+//  const T1& expr1;
+//  const T2& expr2;
+//};
+//
+//template<class Expression1, class Expression2>
+//inline typename boost::enable_if<
+//  is_expression<Expression1>,
+//  typename boost::enable_if<
+//    is_expression<Expression2>,
+//    typename boost::enable_if<
+//      boost::is_same<typename Expression1::value_t, typename Expression2::value_t>,
+//      typename boost::enable_if_c<
+//        Expression1::dimCount == Expression2::dimCount,
+//        minus_expression<Expression1, Expression2>
+//      >::type
+//    >::type
+//  >::type
+//>::type
+//operator-(const Expression1& expr1, const Expression2& expr2) {
+//  return minus_expression<Expression1, Expression2>(expr1, expr2);
+//}
+//
+//template<class T1, class T2>
+//struct is_expression<minus_expression<T1, T2> > {
+//  static const bool value = true;
+//};
 
 }
 

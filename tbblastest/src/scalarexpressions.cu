@@ -9,7 +9,7 @@
 #include <tbblas/random.hpp>
 
 #include <tbblas/io.hpp>
-#include <tbblas/sqrt.hpp>
+#include <tbblas/math.hpp>
 #include <tbblas/sum.hpp>
 
 typedef tbblas::tensor<float, 2, true> matrix;

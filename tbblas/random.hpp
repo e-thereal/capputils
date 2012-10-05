@@ -29,6 +29,7 @@ struct random_tensor : boost::enable_if_c<device == true>
   typedef typename tensor<T, dim, device>::dim_t dim_t;
   typedef T value_t;
   static const unsigned dimCount = dim;
+  static const bool cuda_enabled = device;
 
   typedef curandState generator_t;
   typedef typename vector_type<generator_t, device>::vector_t generators_t;

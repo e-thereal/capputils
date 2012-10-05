@@ -34,7 +34,7 @@ struct fft_trait<float> {
 
   template<class dim_t>
   static dim_t output_size(dim_t inputSize) {
-    inputSize[0] = inputSize[0] / 2 + 1;
+//    inputSize[0] = inputSize[0] / 2 + 1;
     return inputSize;
   }
 
@@ -50,7 +50,7 @@ struct fft_trait<double> {
 
   template<class dim_t>
   static dim_t output_size(dim_t inputSize) {
-    inputSize[0] = inputSize[0] / 2 + 1;
+//    inputSize[0] = inputSize[0] / 2 + 1;
     return inputSize;
   }
 
@@ -116,7 +116,7 @@ struct fft_operation
 
     assert(cudaThreadSynchronize() == cudaSuccess);
 
-    output.set_full_size(_tensor.size());
+//    output.set_full_size(_tensor.size());
   }
 
   inline const dim_t& size() const {

@@ -49,7 +49,7 @@ void ffttest() {
   std::cout << "fft(A) = " << fftshift(abs(fftexpand(B))) << std::endl;
   std::cout << "fft(C) = " << fftshift(abs(D)) << std::endl;
 
-#if 0
+#if 1
   {
     typedef float value_t;
 
