@@ -13,6 +13,8 @@
 
 namespace tbblas {
 
+/*** SQRT ***/
+
 template<class T>
 struct sqrt_operation {
   typedef T value_t;
@@ -32,6 +34,8 @@ sqrt(const Expression& expr) {
       sqrt_operation<typename Expression::value_t>());
 }
 
+/*** LOG ***/
+
 template<class T>
 struct log_operation {
   typedef T value_t;
@@ -50,6 +54,29 @@ log(const Expression& expr) {
   return scalar_expression<Expression, log_operation<typename Expression::value_t> >(expr,
       log_operation<typename Expression::value_t>());
 }
+
+/*** floor ***/
+
+template<class T>
+struct floor_operation {
+  typedef T value_t;
+
+  __host__ __device__
+  T operator()(const T& value) const {
+    return ::floor(value);
+  }
+};
+
+template<class Expression>
+inline typename boost::enable_if<is_expression<Expression>,
+  scalar_expression<Expression, floor_operation<typename Expression::value_t> >
+>::type
+floor(const Expression& expr) {
+  return scalar_expression<Expression, floor_operation<typename Expression::value_t> >(expr,
+      floor_operation<typename Expression::value_t>());
+}
+
+/*** ABS ***/
 
 template<class T>
 struct abs_operation {

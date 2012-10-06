@@ -11,6 +11,8 @@
 #include <tbblas/sequence.hpp>
 
 #include <tbblas/tensor.hpp>
+#include <tbblas/fill.hpp>
+
 #include <boost/static_assert.hpp>
 
 #include <cassert>
@@ -142,6 +144,11 @@ struct proxy {
     }
     thrust::copy(expr.begin(), expr.end(), begin());
     return *this;
+  }
+
+  // todo: create a proxy that maps row,cols,depth,... to col,row,depth,...
+  proxy_filler<proxy_t> operator=(const value_t& value) const {
+    return proxy_filler<proxy_t>(*this), value;
   }
 
 #ifdef OLD_METHOD

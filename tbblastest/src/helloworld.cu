@@ -12,6 +12,8 @@
 #include <tbblas/io.hpp>
 #include <tbblas/zeros.hpp>
 #include <tbblas/random.hpp>
+#include <tbblas/math.hpp>
+#include <tbblas/fill.hpp>
 #include <iostream>
 
 #include <boost/timer.hpp>
@@ -45,18 +47,21 @@ void helloworld() {
   matrix_t C = ((2.f * A - B) * B) / 2.f;
   std::cout << "A + B = " << C << std::endl;
 
-  matrix_t D = randu_t(3, 3);
+  matrix_t D = floor(10 * randu_t(3, 3));
   std::cout << "D = " << D << std::endl;
 
   matrix_t E = zeros<float>(5, 5);
 
-  //subrange(E, seq(1u, 1u), seq(3u, 3u)) = D;
+  E[seq(2,2), seq(2,2)] = 2, 3,
+                          3, 5;
+  std::cout << "E = " << E << std::endl;
 
-  //std::cout << "E = " << E << std::endl;
+  matrix_t F(3,3);
+  F = 1, 2, 4,
+      4, 3, 2,
+      1, 1, 3;
 
-
-
-
+  std::cout << "F = " << F << std::endl;
 
   //thrust::transform(A.begin(), A.end(), B.begin(), D.begin(), ((2.f * _1 - _2) * _2) / 2.f);
 //  thrust::for_each(

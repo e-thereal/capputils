@@ -11,13 +11,13 @@
 #include <iostream>
 
 int main(int argc, char** argv) {
-//  helloworld();
+  helloworld();
 //  convtest();
 //  sumtest();
 //  entropytest();
 //  copytest();
 //  proxycopy();
-  ffttest();
+//  ffttest();
 //  fftbenchmarks();
 //  convtest2();
 //  scalarexpressions();
