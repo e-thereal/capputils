@@ -17,8 +17,14 @@
     <ClInclude Include="src\tests.h" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="src\convtest.cu" />
+    <CudaCompile Include="src\convtest2.cu" />
+    <CudaCompile Include="src\fftbenchmarks.cu" />
+    <CudaCompile Include="src\ffttest.cu" />
     <CudaCompile Include="src\helloworld.cu" />
     <CudaCompile Include="src\proxybenchmarks.cu" />
+    <CudaCompile Include="src\proxycopy.cu" />
+    <CudaCompile Include="src\scalarexpressions.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6C9621A3-AB6C-4846-A7AE-298517E991A7}</ProjectGuid>
@@ -39,7 +45,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 4.0.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 4.2.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -93,6 +99,6 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 4.0.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 4.2.targets" />
   </ImportGroup>
 </Project>

@@ -24,7 +24,13 @@ void fftbenchmarks() {
   double t1, t2;
   boost::timer timer;
 
-  matrix A = randu(1024, 1024);
+  std::cout << "Creating R ... " << std::flush;
+  randu R(2048, 1024);
+  std::cout << "DONE!" << std::endl;
+
+  std::cout << "Drawing random samples ... " << std::flush;
+  matrix A = R;
+  std::cout << "DONE!" << std::endl;
   cmatrix C = fft(A);
 
   cudaThreadSynchronize();

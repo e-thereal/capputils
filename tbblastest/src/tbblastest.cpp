@@ -12,14 +12,14 @@
 
 int main(int argc, char** argv) {
   helloworld();
-//  convtest();
+  convtest();
 //  sumtest();
 //  entropytest();
 //  copytest();
-//  proxycopy();
-//  ffttest();
-//  fftbenchmarks();
-//  convtest2();
-//  scalarexpressions();
+  proxycopy();
+  ffttest();
+  fftbenchmarks();
+  convtest2();
+  scalarexpressions();
   return 0;
 }
