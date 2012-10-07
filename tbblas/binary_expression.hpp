@@ -59,7 +59,7 @@ struct binary_expression {
         apply_operation(op));
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return expr1.size();
   }
 
@@ -70,7 +70,7 @@ struct binary_expression {
 private:
   const T1& expr1;
   const T2& expr2;
-  const Operation& op;
+  Operation op;
 };
 
 template<class T1, class T2, class Operation>

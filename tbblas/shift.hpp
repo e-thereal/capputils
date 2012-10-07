@@ -78,7 +78,7 @@ struct fftshift_expression {
     return begin() + count();
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return expr.size();
   }
 

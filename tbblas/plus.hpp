@@ -52,7 +52,7 @@ struct scalar_plus_expression {
     return thrust::make_transform_iterator(expr.end(), apply_plus(scalar));
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return expr.size();
   }
 

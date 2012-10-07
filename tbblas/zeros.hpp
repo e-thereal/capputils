@@ -40,7 +40,7 @@ struct zeros_expression {
     return thrust::constant_iterator<value_t>(0) + count();
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return _size;
   }
 

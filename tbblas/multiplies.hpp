@@ -52,7 +52,7 @@ struct scalar_multiplies_expression {
     return thrust::make_transform_iterator(expr.end(), apply_multiplies(scalar));
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return expr.size();
   }
 

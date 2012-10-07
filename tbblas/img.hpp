@@ -46,7 +46,7 @@ struct const_img_expression {
     return thrust::make_transform_iterator(expr.end(), get_img());
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return expr.size();
   }
 
@@ -95,7 +95,7 @@ struct img_expression {
     return thrust::make_transform_iterator(expr.end(), get_img());
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return expr.size();
   }
 

@@ -119,7 +119,7 @@ struct fft_operation
 //    output.set_full_size(_tensor.size());
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return _size;
   }
 

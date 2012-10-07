@@ -53,7 +53,7 @@ struct scalar_expression {
     return thrust::make_transform_iterator(expr.end(), apply_operation(op));
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return expr.size();
   }
 
@@ -63,7 +63,7 @@ struct scalar_expression {
 
 private:
   const T& expr;
-  const Operation& op;
+  Operation op;
 };
 
 template<class T, class Operation>

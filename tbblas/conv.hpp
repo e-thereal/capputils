@@ -52,7 +52,7 @@ struct conv_operation
     output = padded1[_paddedSize - _size, output.size()];
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return _size;
   }
 

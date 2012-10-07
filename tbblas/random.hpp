@@ -45,7 +45,7 @@ struct random_tensor : boost::enable_if_c<device == true>
     void operator()(Tuple t) {
       generator_t gen = thrust::get<1>(t);
       //curand_init (seed, thrust::get<0>(t), 0, &gen);
-      curand_init (thrust::get<0>(t) + seed, thrust::get<0>(t) & 0xFFFF, 0, &gen);
+      curand_init (thrust::get<0>(t) + seed, thrust::get<0>(t) & 0xFF, 0, &gen);
       thrust::get<1>(t) = gen;
     }
 
@@ -90,15 +90,23 @@ struct random_tensor : boost::enable_if_c<device == true>
   }
 
   void reset(unsigned seed = 0) {
-    thrust::for_each(
-        thrust::make_zip_iterator(thrust::make_tuple(
-            thrust::counting_iterator<unsigned>(0),
-            generators->begin())),
-        thrust::make_zip_iterator(thrust::make_tuple(
-            thrust::counting_iterator<unsigned>(count()),
-            generators->end())),
-        init_generator(seed)
-    );
+    const size_t maxCount = 0xFFFF;
+    size_t count = this->count(), first = 0, last = 0;
+
+    while (count) {
+      first = last;
+      last = first + min(count, maxCount);
+      count -= min(count, maxCount);
+      thrust::for_each(
+          thrust::make_zip_iterator(thrust::make_tuple(
+              thrust::counting_iterator<unsigned>(first),
+              generators->begin())),
+          thrust::make_zip_iterator(thrust::make_tuple(
+              thrust::counting_iterator<unsigned>(last),
+              generators->end())),
+          init_generator(seed)
+      );
+    }
   }
 
   inline const_iterator begin() const {
@@ -109,7 +117,7 @@ struct random_tensor : boost::enable_if_c<device == true>
     return thrust::make_transform_iterator(generators->end(), get_random());
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return _size;
   }
 

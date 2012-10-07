@@ -123,11 +123,7 @@ struct proxy {
     return _size;
   }
 
-  inline sequence<bool, dimCount>& flipped() {
-    return _flipped;
-  }
-
-  inline const sequence<bool, dimCount>& flipped() const {
+  inline sequence<bool, dimCount> flipped() const {
     return _flipped;
   }
 

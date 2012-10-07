@@ -58,7 +58,7 @@ public:
         break;
     }
 
-    int n[rank];
+    int n[dim]; // doesn't hurt to be a little bit bigger than necessary and MSVC complains about non constant rank
     for (unsigned i = 0; i < rank; ++i)
       n[i] = size[rank - i - 1];
 

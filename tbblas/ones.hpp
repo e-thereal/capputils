@@ -39,7 +39,7 @@ struct ones_expression {
     return thrust::constant_iterator<value_t>(1) + count();
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return _size;
   }
 

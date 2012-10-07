@@ -62,7 +62,7 @@ struct ifft_operation
     output = output / (value_t)output.count();
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return _tensor.full_size();
   }
 

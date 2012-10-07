@@ -81,7 +81,7 @@ struct fftexpand_expression {
     return begin() + count();
   }
 
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return tensor.full_size();
   }
 

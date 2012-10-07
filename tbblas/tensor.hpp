@@ -8,8 +8,6 @@
 #ifndef TBBLAS_TENSOR_HPP_
 #define TBBLAS_TENSOR_HPP_
 
-//#include <thrust/functional.h>
-
 #include <thrust/copy.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -138,11 +136,11 @@ public:
   virtual ~tensor() { }
 
 public:
-  inline const dim_t& size() const {
+  inline dim_t size() const {
     return _size;
   }
 
-  const dim_t& full_size() const {
+  inline dim_t full_size() const {
 //    return _fullsize;
     return _size;
   }
@@ -203,7 +201,7 @@ public:
     return data()[idx];
   }
 
-  // returning const proxy in order to avoid copy contructors
+  // returning const proxy in order to avoid copy contructors when assigning values to returned proxy
   const proxy<tensor_t> operator[](const std::pair<sequence<unsigned, dim>, sequence<unsigned, dim> >& pair) {
     return subrange(*this, pair.first, pair.second);
   }
@@ -268,7 +266,7 @@ public:
   >::type&
   operator=(const Expression& expr)
   {
-    const dim_t& size = expr.size();
+    dim_t size = expr.size();
     bool realloc = false;
     for (unsigned i = 0; i < dimCount; ++i) {
       if (size[i] != _size[i]) {

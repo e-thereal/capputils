@@ -24,11 +24,17 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="device_matrix_gpu.cu" />
-    <CudaCompile Include="device\fft.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="arithmetic.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="binary_expression.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="comparisons.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="complex.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -41,19 +47,13 @@
     <ClInclude Include="device_vector.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="disk_tensor.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="divides.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dot.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dot2.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="entropy.hpp">
+    <ClInclude Include="expand.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fft.hpp">
@@ -62,16 +62,7 @@
     <ClInclude Include="fft_plan.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fft2.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="flip.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="forward_reverse_iterator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="forward_reverse_iterator_base.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ifft.hpp">
@@ -83,7 +74,13 @@
     <ClInclude Include="io.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="io2.hpp">
+    <ClInclude Include="math.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="max.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="min.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="minus.hpp">
@@ -98,9 +95,6 @@
     <ClInclude Include="plus.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="plus2.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="proxy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -110,13 +104,13 @@
     <ClInclude Include="real.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="scalar_expression.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="sequence.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="subrange.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="subrange_proxy.hpp">
+    <ClInclude Include="shift.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sum.hpp">
@@ -128,16 +122,13 @@
     <ClInclude Include="tensor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tensor_base.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tensor_proxy.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="type_traits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zeros.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fill.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
