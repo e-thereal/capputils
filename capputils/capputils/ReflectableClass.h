@@ -252,7 +252,7 @@ std::istream& operator>> (std::istream& stream, capputils::reflection::Reflectab
 private: type _##name; \
 public: \
   type get##name() const { return _##name; } \
-  void set##name(type value) { static ::capputils::reflection::IClassProperty* property = findProperty(#name); ::capputils::attributes::AttributeExecuter::ExecuteBefore(*this, *property); _##name = value; ::capputils::attributes::AttributeExecuter::ExecuteAfter(*this, *property); } \
+  void set##name(type value) { static ::capputils::reflection::IClassProperty* property = findProperty(#name); if (property) ::capputils::attributes::AttributeExecuter::ExecuteBefore(*this, *property); _##name = value; if (property) ::capputils::attributes::AttributeExecuter::ExecuteAfter(*this, *property); } \
 protected: \
   static void set##name(::capputils::reflection::ReflectableClass& object, type value) { dynamic_cast<ClassType*>(&object)->set##name(value); } \
   static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); }
@@ -270,7 +270,7 @@ protected: \
   { \
     typedef TYPE_OF(name) Type; \
     const unsigned Id = properties.size(); \
-    properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, 0)); \
+    properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, NULL)); \
     CAPPUTILS_UNUSED(Id); \
   }
 
@@ -278,7 +278,7 @@ protected: \
 { \
   typedef TYPE_OF(name) Type; \
   const unsigned Id = properties.size(); \
-  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Reflectable<TYPE_OF(name)>(), 0)); \
+  properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Reflectable<Type>(), NULL)); \
   CAPPUTILS_UNUSED(Id); \
 }
 
@@ -288,14 +288,15 @@ protected: \
 { \
   typedef TYPE_OF(name) Type; \
   const unsigned Id = properties.size(); \
-  properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0)); \
+  properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, NULL)); \
   CAPPUTILS_UNUSED(Id); \
 }
 
 #define ReflectableProperty(name, arguments...) \
 { \
+  typedef TYPE_OF(name) Type; \
   const unsigned Id = properties.size(); \
-  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable<TYPE_OF(name)>(), 0)); \
+  properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable<Type>(), NULL)); \
   CAPPUTILS_UNUSED(Id); \
 }
 

@@ -9,6 +9,7 @@
 #define CAPPUTILS_ENUMERATORS_H_
 
 #include "Enumerator.h"
+#include "TypeTraits.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
@@ -71,7 +72,7 @@ public: \
   void operator=(const std::string& value) { \
     this->value = value; \
   }\
-}
+};
 
 #define ReflectableEnum(...) CapputilsEnumerator(__VA_ARGS__)
 #define DefineEnum(...)

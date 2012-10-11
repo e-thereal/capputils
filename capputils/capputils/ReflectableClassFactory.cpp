@@ -12,6 +12,8 @@
 
 #include "FactoryException.h"
 
+#define TRACE std::cout << __FILE__ << ": " << __LINE__ << std::endl;
+
 using namespace std;
 
 #ifdef _WIN32
@@ -28,16 +30,18 @@ managed_windows_shared_memory* ReflectableClassFactory::segment = 0;
 #endif
 
 ReflectableClassFactory::ReflectableClassFactory() {
+//  std::cout << "factory created." << std::endl;
 }
 
 ReflectableClassFactory::~ReflectableClassFactory() {
+//  std::cout << "factory destroyed." << std::endl;
 }
 
 ReflectableClass* ReflectableClassFactory::newInstance(const string& classname) {
   if (constructors.find(classname) != constructors.end()) {
     ReflectableClass* object = constructors[classname]();
-    if (object)
-      return object;
+    if (object) {
+      return object;}
   }
   throw exceptions::FactoryException(classname);
 }
@@ -53,26 +57,28 @@ void ReflectableClassFactory::deleteInstance(ReflectableClass* instance) {
 void ReflectableClassFactory::registerClass(const string& classname,
     ConstructorType constructor, DestructorType destructor)
 {
-  //cout << "Register: " << classname << "(" << this << ")" << endl;
+//  cout << "Register: " << classname << "(" << this << ")" << endl;
   constructors[classname] = constructor;
   destructors[classname] = destructor;
   classNames.push_back(classname);
 }
 
 void ReflectableClassFactory::freeClass(const std::string& classname) {
-  //cout << "Free constructor: " << classname << "(" << this << ")" << endl;
+//  cout << "Free class: " << classname << "(" << this << ")" << endl;
+
   constructors.erase(classname);
   destructors.erase(classname);
-  for (unsigned i = 0; i < classNames.size(); ++i)
+  for (unsigned i = 0; i < classNames.size(); ++i) {
     if (classNames[i].compare(classname) == 0) {
       classNames.erase(classNames.begin() + i);
       break;
     }
+  }
+//  std::cout << __FILE__ << ": " << __LINE__ << std::endl;
 }
 
 ReflectableClassFactory& ReflectableClassFactory::getInstance() {
   static ReflectableClassFactory* instance = 0;
-
 #ifdef _WIN32
   if (!instance) {
     try {
