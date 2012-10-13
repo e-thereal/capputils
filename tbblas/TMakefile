@@ -1,0 +1,7 @@
+module {cxx cuda resprog}
+
+set link::MAKE_SHLIB 0
+set link::MAKE_LIB 1
+
+lappend EXCLUDE *_template.cpp
+

@@ -95,8 +95,8 @@ struct random_tensor : boost::enable_if_c<device == true>
 
     while (count) {
       first = last;
-      last = first + min(count, maxCount);
-      count -= min(count, maxCount);
+      last = first + std::min(count, maxCount);
+      count -= std::min(count, maxCount);
       thrust::for_each(
           thrust::make_zip_iterator(thrust::make_tuple(
               thrust::counting_iterator<unsigned>(first),
