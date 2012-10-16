@@ -43,17 +43,17 @@ BeginPropertyDefinitions(Car)
   DefineProperty(HighSpeed, Observe(Id), TimeStamp(Id))
   DefineProperty(ModelName, NotEqual<std::string>("Audi"), Observe(Id))
   DefineProperty(Help, Flag(), Description("Show options"), Observe(Id))
-  ReflectableProperty(Engine, Observe(Id))
+  //ReflectableProperty(Engine, Observe(Id))
   DefineProperty(Owners, Enumerable<boost::shared_ptr<vector<boost::shared_ptr<Person> > >, true>())
   DefineProperty(SetOnCompilation, TimeStamp(Id), Volatile())
 
 EndPropertyDefinitions
 
-Car::Car() : _DoorCount(3), _HighSpeed(100), _ModelName("BMW"), _Help(0), _Engine(new EngineDescription()),
+Car::Car() : _DoorCount(3), _HighSpeed(100), _ModelName("BMW"), _Help(0),/* _Engine(new EngineDescription()),*/
   _Owners(new vector<boost::shared_ptr<Person> >()), _SetOnCompilation(0)
 {
-  TimeStampAttribute* timeStamp = findProperty("SetOnCompilation")->getAttribute<TimeStampAttribute>();
-  timeStamp->setTime(*this, __DATE__" "__TIME__);
+  //TimeStampAttribute* timeStamp = findProperty("SetOnCompilation")->getAttribute<TimeStampAttribute>();
+  //timeStamp->setTime(*this, __DATE__" "__TIME__);
 }
 
 Car::~Car() {

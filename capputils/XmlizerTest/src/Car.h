@@ -45,7 +45,7 @@ class Car : public capputils::reflection::ReflectableClass,
   Property(HighSpeed, float)
   Property(ModelName, std::string)
   Property(Help, bool)
-  Property(Engine, boost::shared_ptr<EngineDescription>)
+  //Property(Engine, boost::shared_ptr<EngineDescription>)
   Property(Owners, boost::shared_ptr<std::vector< boost::shared_ptr<Person> > >)
   Property(SetOnCompilation, int)
 
