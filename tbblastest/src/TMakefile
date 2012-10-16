@@ -1,0 +1,4 @@
+module {cxx cuda resprog}
+
+lappend link::SYSLIBS tbblas
+set link::MAKE_SHLIB 0

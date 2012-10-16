@@ -9,17 +9,24 @@
 #include "tests.h"
 
 #include <iostream>
+#include <cuda_runtime.h>
 
 int main(int argc, char** argv) {
+  float* mem = 0;
+  cudaMalloc((void**)&mem, sizeof(float) * 100);
+
   helloworld();
-  convtest();
+  //convtest();
 //  sumtest();
 //  entropytest();
 //  copytest();
-  proxycopy();
-  ffttest();
-  fftbenchmarks();
-  convtest2();
-  scalarexpressions();
+  //proxycopy();
+  //ffttest();
+  //fftbenchmarks();
+  //convtest2();
+  //scalarexpressions();
+
+  cudaDeviceReset();
+
   return 0;
 }
