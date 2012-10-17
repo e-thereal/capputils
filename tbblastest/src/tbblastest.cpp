@@ -12,21 +12,16 @@
 #include <cuda_runtime.h>
 
 int main(int argc, char** argv) {
-  float* mem = 0;
-  cudaMalloc((void**)&mem, sizeof(float) * 100);
-
   helloworld();
   //convtest();
 //  sumtest();
 //  entropytest();
 //  copytest();
-  //proxycopy();
-  //ffttest();
-  //fftbenchmarks();
-  //convtest2();
-  //scalarexpressions();
-
-  cudaDeviceReset();
+  proxycopy();
+  ffttest();
+  fftbenchmarks();
+  convtest2();
+  scalarexpressions();
 
   return 0;
 }
