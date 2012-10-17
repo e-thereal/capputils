@@ -100,32 +100,26 @@
 								<option defaultValue="gnu.c.optimization.level.most" id="cuda.toolchain.compiler.option.optimization.level.444023378" name="Optimization Level" superClass="cuda.toolchain.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="cuda.toolchain.compiler.option.debugging.level.512450053" name="Debug Level" superClass="cuda.toolchain.compiler.option.debugging.level" value="cuda.toolchain.compiler.option.debugging.level.none" valueType="enumerated"/>
 								<option id="cuda.toolchain.compiler.general.incpath.660239107" name="Include paths (-I)" superClass="cuda.toolchain.compiler.general.incpath" valueType="includePath">
-									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
-									<listOptionValue builtIn="false" value="/home/tombr/include"/>
-									<listOptionValue builtIn="false" value="/home/tombr/Projects"/>
-									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
+									<listOptionValue builtIn="false" value="&quot;${CUDA_INC_PATH}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${RESPROG_INC_PATH}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${CUDASDK_INC_PATH}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
 								</option>
 								<option id="cuda.toolchain.compiler.option.misc.other.20254432" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fmessage-length=0 -gencode=arch=compute_20,code=\&quot;sm_20,compute_20\&quot;" valueType="string"/>
 								<inputType id="cuda.toolchain.compiler.input.335200285" superClass="cuda.toolchain.compiler.input"/>
 							</tool>
 							<tool id="cuda.toolchain.gnu.cpp.compiler.222536617" name="GCC C++ Compiler" superClass="cuda.toolchain.gnu.cpp.compiler">
 								<option id="gnu.cpp.compiler.option.include.paths.1370981555" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
-									<listOptionValue builtIn="false" value="/home/tombr/include"/>
-									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${RESPROG_INC_PATH}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${CUDA_INC_PATH}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${CUDASDK_INC_PATH}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.optimization.level.1454627120" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.1525747665" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.358176020" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cuda.toolchain.gnu.c.compiler.1414622237" name="GCC C Compiler" superClass="cuda.toolchain.gnu.c.compiler">
-								<option id="gnu.c.compiler.option.include.paths.1077238503" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
-									<listOptionValue builtIn="false" value="/home/tombr/include"/>
-									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
-								</option>
+								<option id="gnu.c.compiler.option.include.paths.1077238503" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath"/>
 								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.365679079" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.1109797793" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.439638750" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
@@ -133,12 +127,7 @@
 							<tool id="cuda.toolchain.gnu.cpp.linker.1914894676" name="NVCC Linker" superClass="cuda.toolchain.gnu.cpp.linker"/>
 							<tool id="cuda.toolchain.gnu.c.linker.1910281434" name="NVCC LinkerC" superClass="cuda.toolchain.gnu.c.linker"/>
 							<tool id="cuda.toolchain.gnu.assembler.442390415" name="GCC Assembler" superClass="cuda.toolchain.gnu.assembler">
-								<option id="gnu.both.asm.option.include.paths.700601401" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
-									<listOptionValue builtIn="false" value="/home/tombr/include"/>
-									<listOptionValue builtIn="false" value="/res1/software/NVIDIA_GPU_Computing_SDK/C/common/inc"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
-								</option>
+								<option id="gnu.both.asm.option.include.paths.700601401" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath"/>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.493040210" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
 							<tool id="cuda.toolchain.gnu.archiver.1853297234" name="GCC Archiver" superClass="cuda.toolchain.gnu.archiver"/>
@@ -193,4 +182,5 @@
 		</scannerConfigBuildInfo>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>
