@@ -28,7 +28,7 @@ class empty_trait<T*> {
   typedef T* value_t;
 public:
   static bool is_empty(const value_t& value) {
-    return value->size() == 0;
+    return value && value->size() == 0;
   }
 };
 
@@ -37,7 +37,7 @@ class empty_trait<boost::shared_ptr<T> > {
   typedef boost::shared_ptr<T> value_t;
 public:
   static bool is_empty(const value_t& value) {
-    return value->size() == 0;
+    return value && value->size() == 0;
   }
 };
 
