@@ -16,6 +16,8 @@
 #include <capputils/ReuseAttribute.h>
 #include <capputils/TimeStampAttribute.h>
 #include <capputils/VolatileAttribute.h>
+#include <capputils/EnumeratorAttribute.h>
+#include <capputils/FilenameAttribute.h>
 
 #include <iostream>
 
@@ -42,10 +44,12 @@ BeginPropertyDefinitions(Car)
   DefineProperty(DoorCount, Description("Number of doors (default = 3)"), Observe(Id))
   DefineProperty(HighSpeed, Observe(Id), TimeStamp(Id))
   DefineProperty(ModelName, NotEqual<std::string>("Audi"), Observe(Id))
+  DefineProperty(LicenceFile, Filename(), Observe(Id))
   DefineProperty(Help, Flag(), Description("Show options"), Observe(Id))
-  //ReflectableProperty(Engine, Observe(Id))
+  DefineProperty(Engine, Enumerator<Type>(), Observe(Id))
   DefineProperty(Owners, Enumerable<boost::shared_ptr<vector<boost::shared_ptr<Person> > >, true>())
   DefineProperty(SetOnCompilation, TimeStamp(Id), Volatile())
+  DefineProperty(GenerateBashCompletion, Filename(), Observe(Id))
 
 EndPropertyDefinitions
 

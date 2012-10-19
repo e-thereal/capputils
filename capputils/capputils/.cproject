@@ -9,7 +9,7 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/capputils"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/capputils/Release"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="capputils" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="capputils"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -84,7 +84,7 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/capputils"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/capputils/Debug"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/capputils/Debug Shared"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="capputilsd" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="capputilsd"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>

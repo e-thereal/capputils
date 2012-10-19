@@ -17,6 +17,7 @@
 #include <capputils/IAttribute.h>
 #include <capputils/SerializeAttribute.h>
 #include <capputils/Serializer.h>
+#include <capputils/GenerateBashCompletion.h>
 
 #include <fstream>
 #include <sstream>
@@ -96,6 +97,10 @@ int main(int argc, char** argv) {
   cout << "Model Name: " << car.getModelName() << endl;
 //	cout << "Engine Type: " << car.getEngine() << endl;
   //Xmlizer::ToXml("car.xml", car);
+
+  if (car.getGenerateBashCompletion().size()) {
+    GenerateBashCompletion::Generate("XmlizerTest", car, car.getGenerateBashCompletion());
+  }
 
   return 0;
 }

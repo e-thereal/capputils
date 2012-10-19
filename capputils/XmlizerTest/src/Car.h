@@ -44,10 +44,12 @@ class Car : public capputils::reflection::ReflectableClass,
   Property(DoorCount, int)
   Property(HighSpeed, float)
   Property(ModelName, std::string)
+  Property(LicenceFile, std::string)
   Property(Help, bool)
-  //Property(Engine, boost::shared_ptr<EngineDescription>)
+  Property(Engine, EngineType)
   Property(Owners, boost::shared_ptr<std::vector< boost::shared_ptr<Person> > >)
   Property(SetOnCompilation, int)
+  Property(GenerateBashCompletion, std::string)
 
 public:
   Car();
