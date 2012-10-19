@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+<?fileVersion 4.0.0?>
+
+<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="cdt.managedbuild.config.gnu.exe.debug.1667844503">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.debug.1667844503" moduleId="org.eclipse.cdt.core.settings" name="Debug">
@@ -48,6 +50,7 @@
 									<listOptionValue builtIn="false" value="boost_regex"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="capputilsd"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="tinyxmld"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_signals"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1765874949" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -113,9 +116,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/capputils/Release}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${RESPROG_LIB_PATH}&quot;"/>
 								</option>
-								<option id="gnu.cpp.link.option.libs.1800522895" superClass="gnu.cpp.link.option.libs" valueType="libs">
+								<option id="gnu.cpp.link.option.libs.1800522895" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="tinyxml"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="capputils"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_signals"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.662364796" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

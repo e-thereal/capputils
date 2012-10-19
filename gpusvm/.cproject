@@ -9,7 +9,7 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/gpusvm"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/gpusvm/Debug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="gpusvmd"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="gpusvmd" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -27,7 +27,7 @@
 					<folderInfo id="cuda.toolchain.configuration.debug.1093419564." name="/" resourcePath="">
 						<toolChain id="cuda.toolchain.exe.debug.331601910" name="CUDA Toolchain" superClass="cuda.toolchain.exe.debug">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="cuda.toolchain.targetplatform.exe.debug.1198511191" isAbstract="false" name="Linux Release Platform" osList="linux" superClass="cuda.toolchain.targetplatform.exe.debug"/>
-							<builder buildPath="${workspace_loc:/gpusvm/Debug}" id="cuda.toolchain.builder.exe.debug.1772032818" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cuda.toolchain.builder.exe.debug"/>
+							<builder buildPath="${workspace_loc:/gpusvm/Debug}" id="cuda.toolchain.builder.exe.debug.1772032818" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="false" superClass="cuda.toolchain.builder.exe.debug"/>
 							<tool id="cuda.toolchain.compiler.exe.debug.796352546" name="NVIDIA CUDA Compiler" superClass="cuda.toolchain.compiler.exe.debug">
 								<option defaultValue="gnu.c.optimization.level.none" id="cuda.toolchain.compiler.option.optimization.level.671641801" name="Optimization Level" superClass="cuda.toolchain.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="cuda.toolchain.compiler.option.debugging.level.1396936013" name="Debug Level" superClass="cuda.toolchain.compiler.option.debugging.level"/>
@@ -35,7 +35,7 @@
 									<listOptionValue builtIn="false" value="&quot;${CUDASDK_INC_PATH}&quot;"/>
 								</option>
 								<option id="cuda.toolchain.compiler.option.debugging.other.1537852316" name="Other debugging flags" superClass="cuda.toolchain.compiler.option.debugging.other" value="" valueType="string"/>
-								<option id="cuda.toolchain.compiler.option.misc.other.1828400288" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fmessage-length=0 -gencode=arch=compute_20,code=\&quot;sm_20,compute_20\&quot;" valueType="string"/>
+								<option id="cuda.toolchain.compiler.option.misc.other.1828400288" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fmessage-length=0 -gencode=arch=compute_20,code=\&quot;sm_20,compute_20\&quot; -Xcompiler -fpic" valueType="string"/>
 								<inputType id="cuda.toolchain.compiler.input.841349379" superClass="cuda.toolchain.compiler.input"/>
 							</tool>
 							<tool id="cuda.toolchain.gnu.cpp.compiler.1624949728" name="GCC C++ Compiler" superClass="cuda.toolchain.gnu.cpp.compiler">
@@ -93,7 +93,7 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/gpusvm"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/gpusvm/Release"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="gpusvm"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="gpusvm" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -146,14 +146,14 @@
 								<option id="gnu.cpp.link.option.paths.cuda.1865429474" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths.cuda" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${CUDA_LIB_PATH}&quot;"/>
 								</option>
-								<option defaultValue="true" id="gnu.cpp.link.option.shared.1200211351" superClass="gnu.cpp.link.option.shared" valueType="boolean"/>
+								<option defaultValue="true" id="gnu.cpp.link.option.shared.1200211351" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2014028290" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
 							</tool>
 							<tool id="cuda.toolchain.gnu.c.linker.336821195" name="NVCC LinkerC" superClass="cuda.toolchain.gnu.c.linker">
-								<option defaultValue="true" id="gnu.cpp.link.option.shared.1522454709" superClass="gnu.cpp.link.option.shared" valueType="boolean"/>
+								<option defaultValue="true" id="gnu.cpp.link.option.shared.1522454709" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.401052031" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -194,8 +194,14 @@
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
 		</scannerConfigBuildInfo>
 	</storageModule>
-	<storageModule moduleId="refreshScope" versionNumber="1">
-		<resource resourceType="PROJECT" workspacePath="/gpusvm"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/gpusvm"/>
+		</configuration>
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/gpusvm"/>
+		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 </cproject>
