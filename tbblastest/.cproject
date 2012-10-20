@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+<?fileVersion 4.0.0?>
+
+<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="cdt.managedbuild.config.gnu.exe.debug.1862065465">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.debug.1862065465" moduleId="org.eclipse.cdt.core.settings" name="Debug">
@@ -54,7 +56,7 @@
 							</tool>
 							<tool id="cuda.toolchain.gnu.cpp.linker.1683949766" name="NVCC Linker" superClass="cuda.toolchain.gnu.cpp.linker">
 								<option id="gnu.cpp.link.option.libs.cuda.24015805" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs.cuda" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="tbblasd"/>
+									<listOptionValue builtIn="false" value="tbblasd"/>
 									<listOptionValue builtIn="false" value="cudart"/>
 									<listOptionValue builtIn="false" value="cublas"/>
 									<listOptionValue builtIn="false" value="cufft"/>
@@ -75,7 +77,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblas/Debug}&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1646689160" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="tbblasd"/>
+									<listOptionValue builtIn="false" value="tbblasd"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1195275156" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -101,7 +103,7 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tbblas"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tbblas/Debug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="tbblasd" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="tbblasd"/>
 					</externalSetting>
 				</externalSettings>
 			</storageModule>
@@ -197,7 +199,7 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tbblas"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tbblas/Release"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="tbblas" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="tbblas"/>
 					</externalSetting>
 				</externalSettings>
 			</storageModule>

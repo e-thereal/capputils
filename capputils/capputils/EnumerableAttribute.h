@@ -73,6 +73,7 @@ public:
   PropertyIterator(const ClassProperty<boost::shared_ptr<CollectionType> >* collectionProperty)
     : ClassProperty<ValueType>(collectionProperty->getName(), 0, 0, 0), i(0), collectionProperty(collectionProperty)
   {
+    assert(collectionProperty);
   }
   virtual ~PropertyIterator() { }
 
@@ -81,6 +82,7 @@ public:
   }
 
   virtual bool eof(const ReflectableClass& object) const {
+    assert(collectionProperty->getValue(object));
     return i >= (int)collectionProperty->getValue(object)->size();
   }
 
