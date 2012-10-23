@@ -123,6 +123,10 @@ struct proxy {
     return _size;
   }
 
+  inline void set_flipped(const sequence<bool, dimCount>& flipped) {
+    _flipped = flipped;
+  }
+
   inline sequence<bool, dimCount> flipped() const {
     return _flipped;
   }

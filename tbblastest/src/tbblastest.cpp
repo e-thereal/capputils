@@ -12,16 +12,16 @@
 #include <cuda_runtime.h>
 
 int main(int argc, char** argv) {
-  helloworld();
-  //convtest();
+//  helloworld();
+  convtest();
 //  sumtest();
 //  entropytest();
 //  copytest();
-  proxycopy();
-  ffttest();
-  fftbenchmarks();
-  convtest2();
-  scalarexpressions();
+//  proxycopy();
+//  ffttest();
+//  fftbenchmarks();
+//  convtest2();
+//  scalarexpressions();
 
   return 0;
 }

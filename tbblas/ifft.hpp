@@ -56,14 +56,14 @@ struct ifft_operation
 
   void apply(tensor_t& output) const {
     assert(cudaThreadSynchronize() == cudaSuccess);
-    assert(ifft_trait<value_t>::exec(_plan.create(_tensor.full_size(), ifft_trait<value_t>::type),
+    assert(ifft_trait<value_t>::exec(_plan.create(_tensor.size(), ifft_trait<value_t>::type),
         _tensor.data().data().get(), output.data().data().get()) == CUFFT_SUCCESS);
     assert(cudaThreadSynchronize() == cudaSuccess);
     output = output / (value_t)output.count();
   }
 
   inline dim_t size() const {
-    return _tensor.full_size();
+    return _tensor.size();
   }
 
 private:

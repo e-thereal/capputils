@@ -16,16 +16,20 @@ namespace tbblas {
 template<class T, unsigned dim, bool device>
 proxy<tensor<T, dim, device> > flip(const proxy<tensor<T, dim, device> >& p) {
   proxy<tensor<T, dim, device> > proxy = p;
+  sequence<bool, dim> flipped = proxy.flipped();
   for (unsigned i = 0; i < dim; ++i)
-    proxy.flipped()[i] = !proxy.flipped()[i];
+    flipped[i] = !flipped[i];
+  proxy.set_flipped(flipped);
   return proxy;
 }
 
 template<class T, unsigned dim, bool device>
 proxy<tensor<T, dim, device> > flip(tensor<T, dim, device>& t) {
   proxy<tensor<T, dim, device> > proxy(t);
+  sequence<bool, dim> flipped = proxy.flipped();
   for (unsigned i = 0; i < dim; ++i)
-    proxy.flipped()[i] = !proxy.flipped()[i];
+    flipped[i] = !flipped[i];
+  proxy.set_flipped(flipped);
   return proxy;
 }
 
@@ -34,7 +38,9 @@ proxy<tensor<T, dim, device> > flip(const proxy<tensor<T, dim, device> >& p, siz
   assert(idx < dim);
 
   proxy<tensor<T, dim, device> > proxy = p;
-  proxy.flipped()[idx] = !proxy.flipped()[idx];
+  sequence<bool, dim> flipped = proxy.flipped();
+  flipped[idx] = !flipped[idx];
+  proxy.set_flipped(flipped);
   return proxy;
 }
 
@@ -43,7 +49,9 @@ proxy<tensor<T, dim, device> > flip(tensor<T, dim, device>& t, size_t idx) {
   assert(idx < dim);
 
   proxy<tensor<T, dim, device> > proxy(t);
-  proxy.flipped()[idx] = !proxy.flipped()[idx];
+  sequence<bool, dim> flipped = proxy.flipped();
+  flipped[idx] = !flipped[idx];
+  proxy.set_flipped(flipped);
   return proxy;
 }
 

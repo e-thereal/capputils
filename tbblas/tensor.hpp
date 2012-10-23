@@ -48,7 +48,7 @@ public:
 
 protected:
   boost::shared_ptr<data_t> _data;
-  dim_t _size /*, _fullsize*/; // fullsize is not used cause this member is not deligates consistently
+  dim_t _size /*, _fullsize*/; // fullsize is not used because this member is not delegated consistently
 
 public:
   tensor(size_t x1 = 1, size_t x2 = 1, size_t x3 = 1, size_t x4 = 1) {
@@ -140,10 +140,10 @@ public:
     return _size;
   }
 
-  inline dim_t full_size() const {
+//  inline dim_t full_size() const {
 //    return _fullsize;
-    return _size;
-  }
+//    return _size;
+//  }
 
 //  void set_full_size(const dim_t& size) {
 //    _fullsize = size;

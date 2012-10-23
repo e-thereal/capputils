@@ -20,7 +20,7 @@ typedef tbblas::tensor<float, 2, true> tensor_t;
 void convtest() {
   using namespace tbblas;
   
-  const float values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+  const float values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13};
   const float kernel[] = {0.25, -0.25, 0.25, -0.25};
   
   tensor_t A(3, 4), F(2, 2), B(2, 3);
@@ -28,9 +28,10 @@ void convtest() {
   thrust::copy(values, values + A.count(), A.begin());
   thrust::copy(kernel, kernel + F.count(), F.begin());
   
-  B = conv(A, flip(F));
+  B = conv(A, F);
   
   std::cout << "A = " << A << std::endl;
   std::cout << "F = " << F << std::endl;
+  std::cout << "flip(F) = " << flip(F) << std::endl;
   std::cout << "conv(A, F) = " << B << std::endl;
 }
