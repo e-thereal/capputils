@@ -1,12 +1,12 @@
 /*
- * Enumerator.h
+ * AbstractEnumerator.h
  *
  *  Created on: Mar 8, 2011
  *      Author: tombr
  */
 
-#ifndef CAPPUTILS_ENUMERATOR_H_
-#define CAPPUTILS_ENUMERATOR_H_
+#ifndef CAPPUTILS_ABSTRACTENUMERATOR_H_
+#define CAPPUTILS_ABSTRACTENUMERATOR_H_
 
 #include "capputils.h"
 
@@ -17,13 +17,13 @@
 
 namespace capputils {
 
-class Enumerator {
+class AbstractEnumerator {
 protected:
   std::string value;
 
 public:
-  Enumerator();
-  virtual ~Enumerator();
+  AbstractEnumerator();
+  virtual ~AbstractEnumerator();
 
   virtual std::vector<std::string>& getValues() const = 0;
 
@@ -34,7 +34,7 @@ public:
 
 }
 
-std::ostream& operator<< (std::ostream& stream, const capputils::Enumerator& enumerator);
-std::istream& operator>> (std::istream& stream, capputils::Enumerator& enumerator);
+std::ostream& operator<< (std::ostream& stream, const capputils::AbstractEnumerator& enumerator);
+std::istream& operator>> (std::istream& stream, capputils::AbstractEnumerator& enumerator);
 
-#endif /* CAPPUTILS_ENUMERATOR_H_ */
+#endif /* CAPPUTILS_ABSTRACTENUMERATOR_H_ */

@@ -8,7 +8,7 @@
 #ifndef CAPPUTILS_ENUMERATORS_H_
 #define CAPPUTILS_ENUMERATORS_H_
 
-#include "Enumerator.h"
+#include "AbstractEnumerator.h"
 #include "TypeTraits.h"
 
 #include <boost/tokenizer.hpp>
@@ -19,7 +19,7 @@
 #include <vector>
 
 #define CapputilsEnumerator(name, ...) \
-class name : public capputils::Enumerator { \
+class name : public capputils::AbstractEnumerator { \
 public: \
   enum enum_type {__VA_ARGS__}; \
 \

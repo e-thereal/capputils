@@ -43,7 +43,7 @@ void GenerateBashCompletion::Generate(const std::string& programName, const refl
         out <<
 "          COMPREPLY=( $(compgen -f ${cur}) )\n";
       } else if ((enumAttr = properties[i]->getAttribute<IEnumeratorAttribute>())) {
-        boost::shared_ptr<Enumerator> enumerator = enumAttr->getEnumerator(object, properties[i]);
+        boost::shared_ptr<AbstractEnumerator> enumerator = enumAttr->getEnumerator(object, properties[i]);
         std::vector<std::string>& values = enumerator->getValues();
         out <<
 "          COMPREPLY=( $(compgen -W \"";
