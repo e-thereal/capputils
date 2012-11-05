@@ -29,7 +29,8 @@ public:
   }
 
   static void readFromFile(T& value, std::istream& file) {
-    file.read((char*)&value, sizeof(T));
+    if (!file.eof())
+      file.read((char*)&value, sizeof(T));
   }
 };
 
@@ -46,8 +47,10 @@ public:
     capputils::reflection::ClassProperty<T>* typedProperty = dynamic_cast<capputils::reflection::ClassProperty<T>* >(prop);
     assert(typedProperty);
     T value;
-    serialize_trait<T>::readFromFile(value, file);
-    typedProperty->setValue(object, value);
+    if (!file.eof()) {
+      serialize_trait<T>::readFromFile(value, file);
+      typedProperty->setValue(object, value);
+    }
   }
 };
 

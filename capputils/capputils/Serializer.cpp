@@ -49,7 +49,7 @@ void Serializer::ReadFromFile(capputils::reflection::ReflectableClass& object,
     capputils::reflection::IClassProperty* prop, std::istream& file)
 {
   capputils::attributes::ISerializeAttribute* serialize = prop->getAttribute<ISerializeAttribute>();
-  if (serialize)
+  if (serialize && !file.eof())
     serialize->readFromFile(prop, object, file);
 }
 

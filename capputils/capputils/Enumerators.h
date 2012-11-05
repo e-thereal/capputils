@@ -10,6 +10,7 @@
 
 #include "AbstractEnumerator.h"
 #include "TypeTraits.h"
+#include <capputils/SerializeAttribute.h>
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
@@ -73,6 +74,26 @@ public: \
     this->value = value; \
   }\
 };
+
+#define DefineEnumeratorSerializeTrait(name) \
+namespace capputils { namespace attributes { \
+template<> \
+class serialize_trait<name> { \
+public: \
+  static void writeToFile(const name& value, std::ostream& file) { \
+    std::cout << "Writing enumerator: " << #name << std::endl; \
+    int i = value; \
+    serialize_trait<int>::writeToFile(i, file); \
+  } \
+  static void readFromFile(name& value, std::istream& file) { \
+    std::cout << "Reading enumerator: " << #name << std::endl; \
+    int i = 0; \
+    serialize_trait<int>::readFromFile(i, file); \
+    value = (name::enum_type)i; \
+  } \
+}; \
+}\
+}
 
 #define ReflectableEnum(...) CapputilsEnumerator(__VA_ARGS__)
 #define DefineEnum(...)

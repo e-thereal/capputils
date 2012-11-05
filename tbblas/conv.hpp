@@ -27,13 +27,29 @@ struct conv_operation
   typedef tensor<complex_t, dimCount, Expression1::cuda_enabled> ctensor_t;
   typedef fft_plan<dimCount> plan_t;
 
+private:
+  unsigned int upper_power_of_two(unsigned int v) {
+    v--;
+    v |= v >> 1;
+    v |= v >> 2;
+    v |= v >> 4;
+    v |= v >> 8;
+    v |= v >> 16;
+    v++;
+    return v;
+  }
+
+public:
   conv_operation(const Expression1& expr1, const Expression2& expr2) : expr1(expr1), expr2(expr2) {
     _size = abs(expr1.size() - expr2.size()) + 1;
-    _paddedSize = max(expr1.size(), expr2.size());
+    _maxSize = max(expr1.size(), expr2.size());
 
 //    std::cout << "size1: " << expr1.size() << std::endl;
 //    std::cout << "size2: " << expr2.size() << std::endl;
 //    std::cout << "result: " << _size << std::endl;
+//    std::cout << "padded: " << _maxSize << std::endl;
+    for (size_t i = 0; i < dimCount; ++i)
+      _paddedSize[i] = upper_power_of_two(_maxSize[i]);
 //    std::cout << "padded: " << _paddedSize << std::endl;
   }
 
@@ -49,7 +65,7 @@ struct conv_operation
     ctensor_t ctens2 = fft(padded2, plan);
     ctens1 = ctens1 * ctens2;
     padded1 = ifft(ctens1);
-    output = padded1[_paddedSize - _size, output.size()];
+    output = padded1[_maxSize - _size, output.size()];
   }
 
   inline dim_t size() const {
@@ -59,7 +75,7 @@ struct conv_operation
 private:
   const Expression1& expr1;
   const Expression2& expr2;
-  dim_t _size, _paddedSize;
+  dim_t _size, _paddedSize, _maxSize;
 };
 
 template<class T1, class T2>
