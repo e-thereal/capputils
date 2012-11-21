@@ -285,7 +285,8 @@ public:
 
   // todo: create a proxy that maps row,cols,depth,... to col,row,depth,...
   proxy_filler<proxy<tensor_t> > operator=(const value_t& value) {
-    return proxy_filler<proxy<tensor_t> >(subrange(*this, dim_t(0), size())), value;
+    //return proxy_filler<proxy<tensor_t> >(subrange(*this, dim_t(0), size())), value;
+    return subrange(*this, dim_t(0), size()) = value;
   }
 };
 

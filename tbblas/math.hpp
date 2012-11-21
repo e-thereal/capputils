@@ -34,6 +34,27 @@ sqrt(const Expression& expr) {
       sqrt_operation<typename Expression::value_t>());
 }
 
+/*** SIGMOID ***/
+
+template<class T>
+struct sigm_operation {
+  typedef T value_t;
+
+  __host__ __device__
+  T operator()(const T& value) const {
+    return T(1)/ (T(1) + ::exp(-value));
+  }
+};
+
+template<class Expression>
+inline typename boost::enable_if<is_expression<Expression>,
+  scalar_expression<Expression, sigm_operation<typename Expression::value_t> >
+>::type
+sigm(const Expression& expr) {
+  return scalar_expression<Expression, sigm_operation<typename Expression::value_t> >(expr,
+      sigm_operation<typename Expression::value_t>());
+}
+
 /*** LOG ***/
 
 template<class T>

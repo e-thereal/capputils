@@ -12,11 +12,11 @@ void helloworld();
 void convtest();
 void sumtest();
 void entropytest();
-void copytest();
 void proxycopy();
 void ffttest();
 void fftbenchmarks();
 void convtest2();
 void scalarexpressions();
+void proxytests();
 
 #endif /* TESTS_H_ */

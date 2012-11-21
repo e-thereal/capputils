@@ -9,19 +9,18 @@
 #include "tests.h"
 
 #include <iostream>
-#include <cuda_runtime.h>
 
 int main(int argc, char** argv) {
-//  helloworld();
+  helloworld();
   convtest();
-//  sumtest();
-//  entropytest();
-//  copytest();
-//  proxycopy();
-//  ffttest();
-//  fftbenchmarks();
-//  convtest2();
-//  scalarexpressions();
+  sumtest();
+  entropytest();
+  proxycopy();
+  ffttest();
+  fftbenchmarks();
+  convtest2();
+  scalarexpressions();
+  proxytests();
 
   return 0;
 }

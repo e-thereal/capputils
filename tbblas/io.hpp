@@ -99,4 +99,6 @@ operator<<(std::ostream& os, const Expression& expr) {
 //  return os;
 //}
 
+#define tbblas_print(a) std::cout << #a" = " << a << std::endl
+
 #endif /* TBBLAS_IO_HPP_ */

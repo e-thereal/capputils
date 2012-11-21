@@ -8,7 +8,7 @@
 #ifndef TBBLAS_ENTROPY_HPP_
 #define TBBLAS_ENTROPY_HPP_
 
-#include <tbblas/tensor_base.hpp>
+#include <tbblas/tensor.hpp>
 #include <thrust/transform_reduce.h>
 #include <thrust/functional.h>
 
@@ -67,7 +67,7 @@ private:
 };
 
 template<unsigned dim, bool device>
-float entropy(const tensor_base<float, dim, device>& tensor, float totalSum = 1.f) {
+float entropy(const tensor<float, dim, device>& tensor, float totalSum = 1.f) {
   if (totalSum == 1.f) {
     return -thrust::transform_reduce(tensor.begin(), tensor.end(),
         entropy_float(), 0.f, thrust::plus<float>());
@@ -78,7 +78,7 @@ float entropy(const tensor_base<float, dim, device>& tensor, float totalSum = 1.
 }
 
 template<unsigned dim, bool device>
-double entropy(const tensor_base<double, dim, device>& tensor, double totalSum = 1.0) {
+double entropy(const tensor<double, dim, device>& tensor, double totalSum = 1.0) {
   if (totalSum == 1.0) {
     return -thrust::transform_reduce(tensor.begin(), tensor.end(),
         entropy_double(), 0.0, thrust::plus<double>());

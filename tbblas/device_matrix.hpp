@@ -30,6 +30,9 @@
 
 #include "device_vector.hpp"
 
+#include <tbblas/type_traits.hpp>
+#include <tbblas/sequence.hpp>
+
 namespace tbblas {
 
 template<class T>
@@ -112,11 +115,31 @@ void tbblas_geaxpy(int m, int n, float alpha, const float* A, int lda,
 //       Can also be used with vectors to create a matrix
 //       by repeatedly copying a column or row vector
 
+/**
+ * An expression must define the following interface:
+ *
+ * typedef ... dim_t;
+ * typedef ... value_t;
+ * typedef ... const_iterator;
+ * static const unsigned dimCount;
+ * static const bool cuda_enabled;
+ *
+ * inline const_iterator begin() const;
+ * inline const_iterator end() const;
+ * inline const dim_t& size() const;
+ * inline size_t count() const;
+ */
+
 template<class T>
 class device_matrix {
   friend class device_vector<T>;
 
 public:
+  typedef sequence<int, 2> dim_t;
+  typedef T value_t;
+  static const unsigned dimCount = 2;
+  static const bool cuda_enabled = true;
+
   typedef typename thrust::device_vector<T>::iterator Iterator;
   typedef typename thrust::device_vector<T>::const_iterator const_Iterator;
 
@@ -203,6 +226,14 @@ public:
 
   const_iterator end(void) const {
       return begin() + _rowCount * _columnCount;
+  }
+
+  dim_t size() const {
+    return seq(size1(), size2());
+  }
+
+  size_t count() const {
+    return rowCount() * columnCount();
   }
 
   /**
@@ -448,6 +479,11 @@ public:
   operator boost::numeric::ublas::matrix<T, boost::numeric::ublas::column_major>() {
     return ublasColumnMajor();
   }
+};
+
+template<class T>
+struct is_expression<device_matrix<T> > {
+  static const bool value = true;
 };
 
 template<class T>

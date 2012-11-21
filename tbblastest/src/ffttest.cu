@@ -44,9 +44,9 @@ void ffttest() {
 
   std::cout << "A = " << A << std::endl;
   std::cout << "fft(A) = " << abs(B) << std::endl;
-  std::cout << "fft(A) = " << abs(fftexpand(B)) << std::endl;
+//  std::cout << "fft(A) = " << abs(fftexpand(B)) << std::endl;
   std::cout << "fft(C) = " << abs(D) << std::endl;
-  std::cout << "fft(A) = " << fftshift(abs(fftexpand(B))) << std::endl;
+//  std::cout << "fft(A) = " << fftshift(abs(fftexpand(B))) << std::endl;
   std::cout << "fft(C) = " << fftshift(abs(D)) << std::endl;
 
 #if 1

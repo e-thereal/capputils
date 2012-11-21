@@ -103,7 +103,9 @@ struct is_expression<fftexpand_expression<T> > {
 
 template<class Tensor>
 typename boost::enable_if<is_tensor<Tensor>,
-  fftexpand_expression<Tensor>
+  typename boost::enable_if_c<false,
+    fftexpand_expression<Tensor>
+  >::type
 >::type
 fftexpand(const Tensor& tensor)
 {

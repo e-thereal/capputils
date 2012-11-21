@@ -19,6 +19,7 @@
 
 namespace tbblas {
 
+#if 0
 template<class T1, class T2, unsigned dim>
 void copy(T1 src, sequence<unsigned, dim> srcStart, sequence<unsigned, dim> srcPitch, sequence<bool, dim> srcFlipped,
     T2 dst, sequence<unsigned, dim> dstStart, sequence<unsigned, dim> dstPitch, sequence<bool, dim> dstFlipped,
@@ -27,6 +28,7 @@ void copy(T1 src, sequence<unsigned, dim> srcStart, sequence<unsigned, dim> srcP
   //BOOST_STATIC_ASSERT(0);
   assert(0);
 }
+#endif
 
 template<class Tensor>
 struct proxy {
@@ -53,18 +55,17 @@ struct proxy {
     size_t _first;
     flipped_t _flipped;
 
-    index_functor(const dim_t& start, const dim_t& size, const dim_t& pitch, const flipped_t& flipped) {
+    index_functor(const dim_t& start, const dim_t& size, const dim_t& pitch, const flipped_t& flipped, const dim_t& order) {
       for (int i = 0; i < dimCount; ++i) {
         _size[i] = size[i];
-        _pitch[i] = pitch[i];
         _flipped[i] = flipped[i];
       }
 
-      _first = start[0];
-      _pitch[0] = 1;
+      _pitch[order[0]] = 1;
+      _first = _pitch[order[0]] * start[0];   // first is calculated using the old order
       for (int k = 1; k < dimCount; ++k) {
-        _pitch[k] = _pitch[k-1] * pitch[k-1];
-        _first += _pitch[k] * start[k];
+        _pitch[order[k]] = _pitch[order[k-1]] * pitch[k-1];
+        _first += _pitch[order[k]] * start[k];
       }
     }
 
@@ -88,7 +89,10 @@ struct proxy {
 
   proxy(Tensor& tensor)
    : _data(tensor.shared_data()), _size(tensor.size()), _pitch(tensor.size()), _flipped(false)
-  { }
+  {
+    for (unsigned i = 0; i < dimCount; ++i)
+      _order[i] = i;
+  }
 
   proxy(Tensor& tensor, const sequence<unsigned, dimCount>& start,
       const sequence<unsigned, dimCount>& size)
@@ -96,11 +100,12 @@ struct proxy {
   {
     for (unsigned i = 0; i < dimCount; ++i) {
       assert(_start[i] + _size[i] <= _pitch[i]);
+      _order[i] = i;
     }
   }
 
   inline iterator begin() const {
-    index_functor functor(_start, _size, _pitch, _flipped);
+    index_functor functor(_start, _size, _pitch, _flipped, _order);
     CountingIterator counting(0);
     TransformIterator transform(counting, functor);
     PermutationIterator permu(_data->begin(), transform);
@@ -131,6 +136,31 @@ struct proxy {
     return _flipped;
   }
 
+  inline void reorder(const dim_t& order) {
+    dim_t oldOrder = _order;
+    dim_t oldSize = _size;
+    for (unsigned i = 0; i < dimCount; ++i) {
+      _order[i] = oldOrder[order[i]];
+      _size[i] = oldSize[order[i]];
+    }
+  }
+
+  inline dim_t start() const {
+    return _start;
+  }
+
+  inline dim_t pitch() const {
+    return _pitch;
+  }
+
+  inline dim_t order() const {
+    return _order;
+  }
+
+  inline const data_t& data() const {
+    return *_data;
+  }
+
   template<class Expression>
   inline const typename boost::enable_if<is_expression<Expression>,
     typename boost::enable_if_c<Expression::dimCount == dimCount,
@@ -148,7 +178,16 @@ struct proxy {
 
   // todo: create a proxy that maps row,cols,depth,... to col,row,depth,...
   proxy_filler<proxy_t> operator=(const value_t& value) const {
-    return proxy_filler<proxy_t>(*this), value;
+    proxy_t p = *this;
+    dim_t order;
+    for (int i = 0; i < dimCount; ++i) {
+      if (i < 2)
+        order[i] = !i;
+      else
+        order[i] = i;
+    }
+    p.reorder(order);
+    return proxy_filler<proxy_t>(p), value;
   }
 
 #ifdef OLD_METHOD
@@ -174,7 +213,7 @@ struct proxy {
 
 private:
   boost::shared_ptr<data_t> _data;
-  sequence<unsigned, dimCount> _start, _size, _pitch;
+  dim_t _start, _size, _pitch, _order;
   sequence<bool, dimCount> _flipped;
 };
 
