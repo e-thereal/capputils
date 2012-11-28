@@ -22,6 +22,7 @@
 #include <cstdarg>
 #include <ostream>
 #include <istream>
+#include <map>
 
 #include <boost/config.hpp>
 
@@ -271,6 +272,7 @@ protected: \
     typedef TYPE_OF(name) Type; \
     const unsigned Id = properties.size(); \
     properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, NULL)); \
+    addressbook[#name] = (char*)&_##name - (char*)this; \
     CAPPUTILS_UNUSED(Id); \
   }
 
@@ -279,6 +281,7 @@ protected: \
   typedef TYPE_OF(name) Type; \
   const unsigned Id = properties.size(); \
   properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Reflectable<Type>(), NULL)); \
+  addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
 
@@ -289,6 +292,7 @@ protected: \
   typedef TYPE_OF(name) Type; \
   const unsigned Id = properties.size(); \
   properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, NULL)); \
+  addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
 
@@ -297,6 +301,7 @@ protected: \
   typedef TYPE_OF(name) Type; \
   const unsigned Id = properties.size(); \
   properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable<Type>(), NULL)); \
+  addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
 
@@ -330,6 +335,7 @@ protected: \
 { \
   const unsigned Id = properties.size(); \
   properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, 0)); \
+  addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
 
@@ -337,6 +343,7 @@ protected: \
 { \
   const unsigned Id = properties.size(); \
   properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Reflectable<TYPE_OF(name)>(), 0)); \
+  addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
 
@@ -346,6 +353,7 @@ protected: \
 { \
   const unsigned Id = properties.size(); \
   properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0)); \
+  addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
 
@@ -353,6 +361,7 @@ protected: \
 { \
   const unsigned Id = properties.size(); \
   properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable<TYPE_OF(name)>(), 0)); \
+  addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
 
@@ -364,6 +373,7 @@ protected: \
   typedef name ClassType;                         \
   protected: static std::vector< ::capputils::reflection::IClassProperty*> properties;                \
   protected: static std::vector< ::capputils::attributes::IAttribute*> attributes;                \
+  protected: static std::map<std::string, size_t> addressbook; \
   public: virtual std::vector< ::capputils::reflection::IClassProperty*>& getProperties() const {  \
     initializeClass();                            \
     return properties;                            \
@@ -383,6 +393,7 @@ protected: \
   typedef name ClassType;                         \
   protected: static std::vector< ::capputils::reflection::IClassProperty*> properties;                \
   protected: static std::vector< ::capputils::attributes::IAttribute*> attributes;                \
+  protected: static std::map<std::string, size_t> addressbook; \
   public: virtual std::vector< ::capputils::reflection::IClassProperty*>& getProperties() const {  \
     initializeClass();                         \
     return properties;                              \
@@ -405,6 +416,7 @@ protected: \
     std::vector<capputils::attributes::IAttribute*>& baseAttributes = BaseClass::getAttributes(); \
     for (unsigned i = 0; i < baseAttributes.size(); ++i) \
       attributes.push_back(baseAttributes[i]); \
+    addressbook.insert(BaseClass::addressbook.begin(), BaseClass::addressbook.end()); \
   }
 
 #if defined(_MSC_VER)
@@ -412,6 +424,7 @@ protected: \
 #define BeginPropertyDefinitions(cname, ...)   \
   std::vector< ::capputils::reflection::IClassProperty*> cname :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> cname :: attributes;     \
+  std::map<std::string, size_t> cname :: addressbook; \
   const std::string cname :: ClassName = capputils::reflection::trimTypeName(typeid(cname).name());  \
   capputils::reflection::RegisterClass cname::_registration(capputils::reflection::trimTypeName(typeid(cname).name()), cname::newInstance, cname::deleteInstance); \
   void cname::initializeClass() const { \
@@ -422,6 +435,7 @@ protected: \
 #define BeginAbstractPropertyDefinitions(cname, ...)   \
   std::vector< ::capputils::reflection::IClassProperty*> cname :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> cname :: attributes;     \
+  std::map<std::string, size_t> cname :: addressbook; \
   const std::string cname :: ClassName = capputils::reflection::trimTypeName(typeid(cname).name());  \
   void cname::initializeClass() const { \
     static bool initialized = false; \
@@ -433,6 +447,7 @@ protected: \
 #define BeginPropertyDefinitions(cname, args...)   \
   std::vector< ::capputils::reflection::IClassProperty*> cname :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> cname :: attributes;     \
+  std::map<std::string, size_t> cname :: addressbook; \
   const std::string cname :: ClassName = capputils::reflection::trimTypeName(typeid(cname).name());  \
   capputils::reflection::RegisterClass cname::_registration(capputils::reflection::trimTypeName(typeid(cname).name()), cname::newInstance, cname::deleteInstance); \
   void cname::initializeClass() const { \
@@ -443,6 +458,7 @@ protected: \
 #define BeginAbstractPropertyDefinitions(cname, args...)   \
   std::vector< ::capputils::reflection::IClassProperty*> cname :: properties;     \
   std::vector< ::capputils::attributes::IAttribute*> cname :: attributes;     \
+  std::map<std::string, size_t> cname :: addressbook; \
   const std::string cname :: ClassName = capputils::reflection::trimTypeName(typeid(cname).name());  \
   void cname::initializeClass() const { \
     static bool initialized = false; \
@@ -452,5 +468,11 @@ protected: \
 #endif /* defined(_MSC_VER) */
 
 #define EndPropertyDefinitions initialized = true; }
+
+#define PRINT_MEMORY_LAYOUT_CHECK(a) std::cout << #a << ": " << addressbook[#a] << " == " << (char*)&_##a - (char*)this << "?" << std::endl;
+#define PRINT_MEMORY_LAYOUT_CHECK2(a, b) std::cout << #a << ": " << b.addressbook[#a] << " == " << (char*)&b._##a - (char*)&b << "?" << std::endl;
+
+#define CHECK_MEMORY_LAYOUT(a) assert(addressbook[#a] == (char*)&_##a - (char*)this);
+#define CHECK_MEMORY_LAYOUT2(a, b) assert(b.addressbook[#a] == (char*)&b._##a - (char*)&b);
 
 #endif /* CAPPUTILS_REFLECTABLECLASS_H_ */
