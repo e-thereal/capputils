@@ -50,6 +50,10 @@ struct const_img_expression {
     return expr.size();
   }
 
+  inline dim_t fullsize() const {
+    return expr.fullsize();
+  }
+
   inline size_t count() const {
     return expr.count();
   }
@@ -65,6 +69,7 @@ struct img_expression {
   typedef typename T::value_t complex_t;
   typedef typename complex_t::value_t value_t;
   static const unsigned dimCount = T::dimCount;
+  static const bool cuda_enabled = T::cuda_enabled;
 
   struct get_img : public thrust::unary_function<complex_t, value_t> {
     __host__ __device__
@@ -97,6 +102,10 @@ struct img_expression {
 
   inline dim_t size() const {
     return expr.size();
+  }
+
+  inline size_t fullsize() const {
+    return expr.fullsize();
   }
 
   inline size_t count() const {

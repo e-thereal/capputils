@@ -48,7 +48,7 @@ public:
 
 protected:
   boost::shared_ptr<data_t> _data;
-  dim_t _size /*, _fullsize*/; // fullsize is not used because this member is not delegated consistently
+  dim_t _size , _fullsize; // fullsize is not used because this member is not delegated consistently
 
 public:
   tensor(size_t x1 = 1, size_t x2 = 1, size_t x3 = 1, size_t x4 = 1) {
@@ -59,7 +59,7 @@ public:
       _size[i] = size[i];
       count *= size[i];
     }
-//    _fullsize = _size;
+    _fullsize = _size;
 
     _data = boost::shared_ptr<data_t>(new data_t(count));
   }
@@ -70,7 +70,7 @@ public:
       _size[i] = size[i];
       count *= size[i];
     }
-//    _fullsize = _size;
+    _fullsize = _size;
 
     _data = boost::shared_ptr<data_t>(new data_t(count));
   }
@@ -83,7 +83,7 @@ public:
       _size[i] = size[i];
       count *= size[i];
     }
-//    _fullsize = _size;
+    _fullsize = tensor.fullsize();
 
     _data = boost::shared_ptr<data_t>(new data_t(count));
     thrust::copy(tensor.begin(), tensor.end(), begin());
@@ -98,7 +98,7 @@ public:
       _size[i] = size[i];
       count *= size[i];
     }
-//    _fullsize = _size;
+    _fullsize = tensor.fullsize();
 
     _data = boost::shared_ptr<data_t>(new data_t(count));
     thrust::copy(tensor.begin(), tensor.end(), begin());
@@ -113,7 +113,7 @@ public:
     for (unsigned i = 0; i < dimCount; ++i) {
       _size[i] = size[i];
     }
-//    _fullsize = _size;
+    _fullsize = op.fullsize();
 
     _data = boost::shared_ptr<data_t>(new data_t(count()));
     op.apply(*this);
@@ -127,7 +127,7 @@ public:
     for (unsigned i = 0; i < dimCount; ++i) {
       _size[i] = size[i];
     }
-//    _fullsize = _size;
+    _fullsize = expr.fullsize();
 
     _data = boost::shared_ptr<data_t>(new data_t(count()));
     thrust::copy(expr.begin(), expr.end(), begin());
@@ -140,14 +140,29 @@ public:
     return _size;
   }
 
-//  inline dim_t full_size() const {
-//    return _fullsize;
-//    return _size;
-//  }
+  inline void resize(const dim_t& size, const dim_t fullsize) {
+    bool realloc = false;
 
-//  void set_full_size(const dim_t& size) {
-//    _fullsize = size;
-//  }
+    for (unsigned i = 0; i < dim; ++i) {
+      if (size[i] != _size[i]) {
+        realloc = true;
+        _size[i] = size[i];
+      }
+    }
+    _fullsize = fullsize;
+
+    if (realloc) {
+      _data = boost::shared_ptr<data_t>(new data_t(count()));
+    }
+  }
+
+  inline dim_t fullsize() const {
+    return _fullsize;
+  }
+
+  void set_fullsize(const dim_t& size) {
+    _fullsize = size;
+  }
 
   inline size_t count() const {
     size_t count = 1;
@@ -214,21 +229,8 @@ public:
 
   template<class T2, bool device2>
   inline tensor_t& operator=(const tensor<T2, dim, device2>& tensor) {
-    const dim_t& size = tensor.size();
-    bool realloc = false;
-
-    for (unsigned i = 0; i < dim; ++i) {
-      if (size[i] != _size[i]) {
-        realloc = true;
-        _size[i] = size[i];
-      }
-    }
-
-    if (realloc) {
-      _data = boost::shared_ptr<data_t>(new data_t(count()));
-    }
+    resize(tensor.size(), tensor.fullsize());
     thrust::copy(tensor.begin(), tensor.end(), begin());
-
     return *this;
   }
 
@@ -238,20 +240,8 @@ public:
       tensor_t
     >::type
   >::type&
-  operator=(const Operation& op)
-  {
-    const dim_t& size = op.size();
-    bool realloc = false;
-    for (unsigned i = 0; i < dimCount; ++i) {
-      if (size[i] != _size[i]) {
-        realloc = true;
-        _size[i] = size[i];
-      }
-    }
-
-    if (realloc) {
-      _data = boost::shared_ptr<data_t>(new data_t(count()));
-    }
+  operator=(const Operation& op) {
+    resize(op.size(), op.fullsize());
     op.apply(*this);
     return *this;
   }
@@ -264,28 +254,13 @@ public:
       >::type
     >::type
   >::type&
-  operator=(const Expression& expr)
-  {
-    dim_t size = expr.size();
-    bool realloc = false;
-    for (unsigned i = 0; i < dimCount; ++i) {
-      if (size[i] != _size[i]) {
-        realloc = true;
-        _size[i] = size[i];
-      }
-    }
-
-    if (realloc) {
-      _data = boost::shared_ptr<data_t>(new data_t(count()));
-    }
+  operator=(const Expression& expr) {
+    resize(expr.size(), expr.fullsize());
     thrust::copy(expr.begin(), expr.end(), begin());
-
     return *this;
   }
 
-  // todo: create a proxy that maps row,cols,depth,... to col,row,depth,...
   proxy_filler<proxy<tensor_t> > operator=(const value_t& value) {
-    //return proxy_filler<proxy<tensor_t> >(subrange(*this, dim_t(0), size())), value;
     return subrange(*this, dim_t(0), size()) = value;
   }
 };

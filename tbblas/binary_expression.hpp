@@ -63,6 +63,10 @@ struct binary_expression {
     return expr1.size();
   }
 
+  inline dim_t fullsize() const {
+    return expr1.fullsize();
+  }
+
   inline size_t count() const {
     return expr1.count();
   }

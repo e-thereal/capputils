@@ -56,6 +56,10 @@ struct scalar_plus_expression {
     return expr.size();
   }
 
+  inline dim_t fullsize() const {
+    return expr.fullsize();
+  }
+
   inline size_t count() const {
     return expr.count();
   }

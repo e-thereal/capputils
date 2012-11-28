@@ -44,6 +44,10 @@ struct zeros_expression {
     return _size;
   }
 
+  inline dim_t fullsize() const {
+    return _size;
+  }
+
   inline size_t count() const {
     size_t count = 1;
     for (unsigned i = 0; i < dimCount; ++i)

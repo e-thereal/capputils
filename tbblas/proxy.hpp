@@ -41,7 +41,7 @@ struct proxy {
   typedef typename Tensor::dim_t dim_t;
   typedef typename Tensor::data_t data_t;
 
-  static const int dimCount = Tensor::dimCount;
+  static const unsigned dimCount = Tensor::dimCount;
   static const bool cuda_enabled = Tensor::cuda_enabled;
 
   typedef int difference_type;
@@ -54,18 +54,25 @@ struct proxy {
     dim_t _pitch;
     size_t _first;
     flipped_t _flipped;
+//    size_t _count;
 
     index_functor(const dim_t& start, const dim_t& size, const dim_t& pitch, const flipped_t& flipped, const dim_t& order) {
-      for (int i = 0; i < dimCount; ++i) {
+//      _count = 1;
+      for (unsigned i = 0; i < dimCount; ++i) {
         _size[i] = size[i];
         _flipped[i] = flipped[i];
+//        _count *= pitch[i];
       }
 
-      _pitch[order[0]] = 1;
-      _first = _pitch[order[0]] * start[0];   // first is calculated using the old order
-      for (int k = 1; k < dimCount; ++k) {
-        _pitch[order[k]] = _pitch[order[k-1]] * pitch[k-1];
-        _first += _pitch[order[k]] * start[k];
+      dim_t originalPitch;
+      originalPitch[0] = 1;
+      for (unsigned k = 1; k < dimCount; ++k)
+        originalPitch[k] = originalPitch[k-1] * pitch[k-1];
+
+      _first = 0;
+      for (unsigned k = 0; k < dimCount; ++k) {
+        _pitch[k] = originalPitch[order[k]];
+        _first += _pitch[k] * start[k];
       }
     }
 
@@ -74,9 +81,10 @@ struct proxy {
     {
       difference_type index;
       index = (_flipped[0] ? _size[0] - (i % _size[0]) - 1 : i % _size[0]) * _pitch[0];
-      for (int k = 1; k < dimCount; ++k) {
+      for (unsigned k = 1; k < dimCount; ++k) {
         index += (_flipped[k] ? _size[k] - ((i /=  _size[k-1]) % _size[k]) - 1 : (i /= _size[k-1]) % _size[k]) * _pitch[k];
       }
+//      assert(index + _first < _count);
       return index + _first;
     }
   };
@@ -88,7 +96,14 @@ struct proxy {
   typedef iterator const_iterator;
 
   proxy(Tensor& tensor)
-   : _data(tensor.shared_data()), _size(tensor.size()), _pitch(tensor.size()), _flipped(false)
+   : _data(tensor.shared_data()), _size(tensor.size()), _fullsize(tensor.fullsize()), _pitch(tensor.size()), _flipped(false)
+  {
+    for (unsigned i = 0; i < dimCount; ++i)
+      _order[i] = i;
+  }
+
+  proxy(Tensor& tensor, const dim_t& size)
+   : _data(tensor.shared_data()), _size(size), _fullsize(size), _pitch(size), _flipped(false)
   {
     for (unsigned i = 0; i < dimCount; ++i)
       _order[i] = i;
@@ -96,7 +111,7 @@ struct proxy {
 
   proxy(Tensor& tensor, const sequence<unsigned, dimCount>& start,
       const sequence<unsigned, dimCount>& size)
-   : _data(tensor.shared_data()), _start(start), _size(size), _pitch(tensor.size()), _flipped(false)
+   : _data(tensor.shared_data()), _start(start), _size(size), _fullsize(size), _pitch(tensor.size()), _flipped(false)
   {
     for (unsigned i = 0; i < dimCount; ++i) {
       assert(_start[i] + _size[i] <= _pitch[i]);
@@ -119,13 +134,17 @@ struct proxy {
 
   inline size_t count() const {
     size_t count = 1;
-    for (int i = 0; i < dimCount; ++i)
+    for (unsigned i = 0; i < dimCount; ++i)
       count *= _size[i];
     return count;
   }
 
   inline dim_t size() const {
     return _size;
+  }
+
+  inline dim_t fullsize() const {
+    return _fullsize;
   }
 
   inline void set_flipped(const sequence<bool, dimCount>& flipped) {
@@ -139,9 +158,14 @@ struct proxy {
   inline void reorder(const dim_t& order) {
     dim_t oldOrder = _order;
     dim_t oldSize = _size;
+    dim_t oldFullsize = _fullsize;
+    dim_t oldStart = _start;
+
     for (unsigned i = 0; i < dimCount; ++i) {
       _order[i] = oldOrder[order[i]];
       _size[i] = oldSize[order[i]];
+      _fullsize[i] = oldFullsize[order[i]];
+      _start[i] = oldStart[order[i]];
     }
   }
 
@@ -179,14 +203,16 @@ struct proxy {
   // todo: create a proxy that maps row,cols,depth,... to col,row,depth,...
   proxy_filler<proxy_t> operator=(const value_t& value) const {
     proxy_t p = *this;
-    dim_t order;
-    for (int i = 0; i < dimCount; ++i) {
-      if (i < 2)
-        order[i] = !i;
-      else
-        order[i] = i;
+    if (dimCount > 1) {
+      dim_t order;
+      for (unsigned i = 0; i < dimCount; ++i) {
+        if (i < 2)
+          order[i] = !i;
+        else
+          order[i] = i;
+      }
+      p.reorder(order);
     }
-    p.reorder(order);
     return proxy_filler<proxy_t>(p), value;
   }
 
@@ -213,7 +239,7 @@ struct proxy {
 
 private:
   boost::shared_ptr<data_t> _data;
-  dim_t _start, _size, _pitch, _order;
+  dim_t _start, _size, _fullsize, _pitch, _order;
   sequence<bool, dimCount> _flipped;
 };
 

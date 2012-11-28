@@ -28,6 +28,7 @@ private:
   cufftHandle plan;
   cufftType_t type;
   dim_t size;
+  unsigned dimension;
   bool hasPlan;
 
 public:
@@ -41,8 +42,8 @@ public:
   }
 
 public:
-  cufftHandle create(const dim_t& size, cufftType_t type) {
-    if (hasPlan && this->size == size && this->type == type)
+  cufftHandle create(const dim_t& size, cufftType_t type, unsigned dimension) {
+    if (hasPlan && this->size == size && this->type == type && this->dimension == dimension)
       return plan;
 
     if (hasPlan)
@@ -50,13 +51,18 @@ public:
 
     this->size = size;
     this->type = type;
+    this->dimension = dimension;
     this->hasPlan = true;
 
-    unsigned rank = dim;
+    unsigned rank = dimension;
     for (; rank > 0; --rank) {
       if (size[rank-1] > 1)
         break;
     }
+
+    int batch = 1;
+    for (unsigned i = dimension; i < dim; ++i)
+      batch *= size[i];
 
     int n[dim]; // doesn't hurt to be a little bit bigger than necessary and MSVC complains about non constant rank
     for (unsigned i = 0; i < rank; ++i)
@@ -65,7 +71,7 @@ public:
     assert(cufftPlanMany(&plan, rank, n,
         0, 0, 0,
         0, 0, 0,
-        type, 1) == CUFFT_SUCCESS);
+        type, batch) == CUFFT_SUCCESS);
 
     return plan;
   }
@@ -82,8 +88,8 @@ private:
 public:
   fft_plan() : handle(new fft_plan_handle<dim>()) { }
 
-  cufftHandle create(const dim_t& size, cufftType_t type) const {
-    return handle->create(size, type);
+  cufftHandle create(const dim_t& size, cufftType_t type, unsigned dimension) const {
+    return handle->create(size, type, dimension);
   }
 };
 

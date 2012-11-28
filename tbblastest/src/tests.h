@@ -18,5 +18,8 @@ void fftbenchmarks();
 void convtest2();
 void scalarexpressions();
 void proxytests();
+void convrbmtests();
+void partialffttest();
+void fftflip();
 
 #endif /* TESTS_H_ */

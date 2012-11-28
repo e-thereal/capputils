@@ -60,7 +60,8 @@ struct vector_type<T, true> {
  *
  * inline const_iterator begin() const;
  * inline const_iterator end() const;
- * inline const dim_t& size() const;
+ * inline dim_t size() const;
+ * inline dim_t fullsize() const;
  * inline size_t count() const;
  */
 template<class T>
@@ -89,7 +90,8 @@ struct is_proxy {
  * typedef ... tensor_t; // type of the tensor to which the operation will be applied
  *
  * void apply(tensor_t& t) const;
- * inline const dim_t& size() const;
+ * inline dim_t size() const;
+ * inline dim_t fullsize() const;
  *
  * \remark
  * - is_tensor and is_operation are mutually exclusive

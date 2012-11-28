@@ -21,18 +21,20 @@
 #include <curand_kernel.h>
 #include <boost/static_assert.hpp>
 
+#include <thrust/random.h>
+
 namespace tbblas {
 
 template<class T, unsigned dim, bool device, class Distribution>
-struct random_tensor : boost::enable_if_c<device == true>
+struct random_tensor
 {
-  typedef typename tensor<T, dim, device>::dim_t dim_t;
   typedef T value_t;
   static const unsigned dimCount = dim;
   static const bool cuda_enabled = device;
+  typedef typename tensor<value_t, dimCount, cuda_enabled>::dim_t dim_t;
 
   typedef curandState generator_t;
-  typedef typename vector_type<generator_t, device>::vector_t generators_t;
+  typedef typename vector_type<generator_t, cuda_enabled>::vector_t generators_t;
 
   typedef thrust::tuple<unsigned, generator_t> init_tuple_t;
 
@@ -121,6 +123,10 @@ struct random_tensor : boost::enable_if_c<device == true>
     return _size;
   }
 
+  inline dim_t fullsize() const {
+    return _size;
+  }
+
   inline size_t count() const {
     return generators->size();
   }
@@ -128,6 +134,75 @@ struct random_tensor : boost::enable_if_c<device == true>
 private:
   dim_t _size;
   boost::shared_ptr<generators_t> generators;
+};
+
+template<class T, unsigned dim, class Distribution>
+struct random_tensor<T, dim, false, Distribution>
+{
+  typedef T value_t;
+  static const unsigned dimCount = dim;
+  static const bool cuda_enabled = false;
+  typedef typename tensor<value_t, dimCount, cuda_enabled>::dim_t dim_t;
+
+  typedef thrust::random::default_random_engine generator_t;
+
+  struct get_random : thrust::unary_function<const generator_t*, value_t> {
+
+    __host__
+    value_t operator()(const generator_t* gen) const {
+      return Distribution::rand(const_cast<generator_t*>(gen));
+    }
+  };
+
+  typedef thrust::transform_iterator<get_random, thrust::constant_iterator<const generator_t*> > const_iterator;
+
+  random_tensor(size_t x1 = 1, size_t x2 = 1, size_t x3 = 1, size_t x4 = 1, size_t x5 = 1) {
+    BOOST_STATIC_ASSERT(dimCount < 5);
+
+    size_t size[] = {x1, x2, x3, x4, x5};
+
+    for (unsigned i = 0; i < dimCount; ++i) {
+      _size[i] = size[i];
+    }
+    reset(size[dimCount]);
+  }
+
+  random_tensor(const dim_t& size, unsigned seed = 0) : _size(size) {
+    reset(seed);
+  }
+
+  void reset(unsigned seed = 0) {
+    srand(seed);
+  }
+
+  inline const_iterator begin() const {
+    return thrust::make_transform_iterator(
+        thrust::make_constant_iterator(&generator), get_random());
+  }
+
+  inline const_iterator end() const {
+    return begin() + count();
+  }
+
+  inline dim_t size() const {
+    return _size;
+  }
+
+  inline dim_t fullsize() const {
+    return _size;
+  }
+
+  inline size_t count() const {
+    size_t count = 1;
+    for (unsigned i = 0; i < dimCount; ++i) {
+      count *= _size[i];
+    }
+    return count;
+  }
+
+private:
+  dim_t _size;
+  generator_t generator;
 };
 
 template<class T, unsigned dim, bool device, class Distribution>
@@ -142,17 +217,33 @@ struct uniform { };
 
 template<>
 struct uniform<float> {
+  typedef thrust::random::default_random_engine generator_t;
+
   __device__
   static inline float rand(curandState* state) {
     return curand_uniform(state);
+  }
+
+  __host__
+  static inline float rand(generator_t* gen) {
+    thrust::random::uniform_real_distribution<float> dist;
+    return dist(*gen);
   }
 };
 
 template<>
 struct uniform<double> {
+  typedef thrust::random::default_random_engine generator_t;
+
   __device__
   static inline double rand(curandState* state) {
     return curand_uniform_double(state);
+  }
+
+  __host__
+  static inline double rand(generator_t* gen) {
+    thrust::random::uniform_real_distribution<double> dist;
+    return dist(*gen);
   }
 };
 
@@ -161,17 +252,34 @@ struct normal { };
 
 template<>
 struct normal<float> {
+
+  typedef thrust::random::default_random_engine generator_t;
+
   __device__
   static inline float rand(curandState* state) {
     return curand_normal(state);
+  }
+
+  __host__
+  static inline float rand(generator_t* gen) {
+    thrust::random::experimental::normal_distribution<float> dist;
+    return dist(*gen);
   }
 };
 
 template<>
 struct normal<double> {
+  typedef thrust::random::default_random_engine generator_t;
+
   __device__
   static inline double rand(curandState* state) {
     return curand_normal_double(state);
+  }
+
+  __host__
+  static inline double rand(generator_t* gen) {
+    thrust::random::experimental::normal_distribution<double> dist;
+    return dist(*gen);
   }
 };
 

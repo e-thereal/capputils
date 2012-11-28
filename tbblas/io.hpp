@@ -76,6 +76,52 @@ void print(const tbblas::tensor<T, 2u, device>& tensor, int precision = 5,
   }
 }
 
+// generic solution
+template <class T>
+int numDigits(T number) {
+  if (number == 0)
+    return 1;
+  int digits = 0;
+  while (number) {
+      number /= 10;
+      digits++;
+  }
+  return digits;
+}
+
+template<class T, bool device>
+void print(const tbblas::tensor<T, 3u, device>& tensor, int precision = 5,
+    std::ostream& out = std::cout)
+{
+  const size_t rowCount = tensor.size()[0], columnCount = tensor.size()[1], depth = tensor.size()[2];
+  const size_t count = rowCount * columnCount * depth, sliceCount = rowCount * columnCount;
+
+  std::vector<T> data(count);
+  thrust::copy(tensor.begin(), tensor.end(), data.begin());
+  out << "[" << rowCount << " x " << columnCount << " x " << depth << "]" << std::endl;
+
+  int indent = numDigits(depth) + 4;
+
+  for (size_t k = 0; k < depth; ++k) {
+    out << "[" << k << "]";
+    for (size_t i = 0; i < rowCount; ++i) {
+      if (i == 0) {
+        for (int iIndent = 0; iIndent < indent - numDigits(k) - 2; ++iIndent)
+          out << " ";
+      } else {
+        for (int iIndent = 0; iIndent < indent; ++iIndent)
+          out << " ";
+      }
+      for (size_t j = 0; j < columnCount; ++j) {
+        out << std::setprecision(precision) << std::setw(precision + 5) << data[i + j * rowCount + k * sliceCount];
+      }
+      out << std::endl;
+    }
+    if (k < depth - 1)
+      out << std::endl;
+  }
+}
+
 }
 
 template<class Expression>

@@ -126,7 +126,8 @@ void tbblas_geaxpy(int m, int n, float alpha, const float* A, int lda,
  *
  * inline const_iterator begin() const;
  * inline const_iterator end() const;
- * inline const dim_t& size() const;
+ * inline dim_t size() const;
+ * inline dim_t fullsize() const;
  * inline size_t count() const;
  */
 
@@ -230,6 +231,10 @@ public:
 
   dim_t size() const {
     return seq(size1(), size2());
+  }
+
+  dim_t fullsize() const {
+    return size();
   }
 
   size_t count() const {

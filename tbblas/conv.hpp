@@ -42,6 +42,7 @@ private:
 public:
   conv_operation(const Expression1& expr1, const Expression2& expr2) : expr1(expr1), expr2(expr2) {
     _size = abs(expr1.size() - expr2.size()) + 1;
+    _fullsize = abs(expr1.fullsize() - expr2.fullsize()) + 1;
     _maxSize = max(expr1.size(), expr2.size());
 
 //    std::cout << "size1: " << expr1.size() << std::endl;
@@ -72,10 +73,14 @@ public:
     return _size;
   }
 
+  inline dim_t fullsize() const {
+    return _fullsize;
+  }
+
 private:
   const Expression1& expr1;
   const Expression2& expr2;
-  dim_t _size, _paddedSize, _maxSize;
+  dim_t _size, _fullsize, _paddedSize, _maxSize;
 };
 
 template<class T1, class T2>

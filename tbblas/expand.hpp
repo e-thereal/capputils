@@ -69,7 +69,8 @@ struct fftexpand_expression {
   fftexpand_expression(const Tensor& tensor) : tensor(tensor) { }
 
   inline const_iterator begin() const {
-    index_functor functor(tensor.full_size(), tensor.size()[0] / 2 + 1);
+//    index_functor functor(tensor.size(), tensor.size()[0] / 2 + 1);
+    index_functor functor(tensor.fullsize(), tensor.size()[0]);
     CountingIterator counting(0);
     TransformIterator transform(counting, functor);
     PermutationIterator permu(tensor.begin(), transform);
@@ -82,13 +83,17 @@ struct fftexpand_expression {
   }
 
   inline dim_t size() const {
-    return tensor.full_size();
+    return tensor.fullsize();
+  }
+
+  inline dim_t fullsize() const {
+    return tensor.fullsize();
   }
 
   inline size_t count() const {
     size_t count = 1;
     for (unsigned i = 0; i < dimCount; ++i)
-      count *= tensor.full_size()[i];
+      count *= tensor.fullsize()[i];
     return count;
   }
 
@@ -103,9 +108,9 @@ struct is_expression<fftexpand_expression<T> > {
 
 template<class Tensor>
 typename boost::enable_if<is_tensor<Tensor>,
-  typename boost::enable_if_c<false,
+//  typename boost::enable_if_c<false,
     fftexpand_expression<Tensor>
-  >::type
+//  >::type
 >::type
 fftexpand(const Tensor& tensor)
 {

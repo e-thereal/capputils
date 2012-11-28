@@ -34,7 +34,7 @@ struct fft_trait<float> {
 
   template<class dim_t>
   static dim_t output_size(dim_t inputSize) {
-//    inputSize[0] = inputSize[0] / 2 + 1;
+    inputSize[0] = inputSize[0] / 2 + 1;
     return inputSize;
   }
 
@@ -50,7 +50,7 @@ struct fft_trait<double> {
 
   template<class dim_t>
   static dim_t output_size(dim_t inputSize) {
-//    inputSize[0] = inputSize[0] / 2 + 1;
+    inputSize[0] = inputSize[0] / 2 + 1;
     return inputSize;
   }
 
@@ -99,7 +99,15 @@ struct fft_operation
   typedef fft_plan<Tensor::dimCount> plan_t;
 
   fft_operation(Tensor& tensor, const plan_t& plan)
-   : _tensor(tensor), _plan(plan), _size(fft_trait<input_t>::output_size(tensor.size()))
+   : _tensor(tensor), _dimension(Tensor::dimCount), _plan(plan),
+     _size(fft_trait<input_t>::output_size(tensor.size())),
+     _fullsize(tensor.size())
+  { }
+
+  fft_operation(Tensor& tensor, unsigned dimension, const plan_t& plan)
+   : _tensor(tensor), _dimension(dimension), _plan(plan),
+     _size(fft_trait<input_t>::output_size(tensor.size())),
+     _fullsize(tensor.size())
   { }
 
   void apply(tensor_t& output) const {
@@ -107,7 +115,7 @@ struct fft_operation
 
     assert(cudaThreadSynchronize() == cudaSuccess);
 
-    if((result = fft_trait<input_t>::exec(_plan.create(_tensor.size(), fft_trait<input_t>::type),
+    if((result = fft_trait<input_t>::exec(_plan.create(_tensor.size(), fft_trait<input_t>::type, _dimension),
             _tensor.data().data().get(), output.data().data().get())) != CUFFT_SUCCESS)
     {
       std::cout << result << std::endl;
@@ -115,18 +123,22 @@ struct fft_operation
     }
 
     assert(cudaThreadSynchronize() == cudaSuccess);
-
-//    output.set_full_size(_tensor.size());
   }
 
   inline dim_t size() const {
     return _size;
   }
 
+  inline dim_t fullsize() const {
+    return _fullsize;
+  }
+
 private:
   Tensor& _tensor;
+  unsigned _dimension;    ///< dimension of the fft (default is tensor dimension, if specified, multiple ffts are processed)
   plan_t _plan;
   dim_t _size;
+  dim_t _fullsize;
 };
 
 template<class T>
@@ -144,6 +156,18 @@ typename boost::enable_if<is_tensor<Tensor>,
 >::type
 fft(Tensor& tensor, const fft_plan<Tensor::dimCount>& plan = fft_plan<Tensor::dimCount>()) {
   return fft_operation<Tensor>(tensor, plan);
+}
+
+template<class Tensor>
+typename boost::enable_if<is_tensor<Tensor>,
+  typename boost::enable_if_c<Tensor::cuda_enabled == true,
+    fft_operation<Tensor>
+  >::type
+>::type
+fft(Tensor& tensor, unsigned dimension, const fft_plan<Tensor::dimCount>& plan = fft_plan<Tensor::dimCount>()) {
+  assert(dimension <= Tensor::dimCount);
+  assert(dimension <= 3);
+  return fft_operation<Tensor>(tensor, dimension, plan);
 }
 
 }

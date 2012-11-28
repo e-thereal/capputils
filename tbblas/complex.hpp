@@ -14,7 +14,7 @@
 namespace tbblas {
 
 template<class T>
-struct complex {
+struct __builtin_align__(16) complex {
   typedef typename complex_type<T>::type complex_t;
   typedef T value_t;
 
@@ -30,7 +30,10 @@ struct complex {
   complex(const complex_t& value) : value(value) { }
 
   __host__ __device__
-  complex(float real, float img) : real(real), img(img) { }
+  complex(value_t real) : real(real), img(0) { }
+
+  __host__ __device__
+  complex(value_t real, value_t img) : real(real), img(img) { }
 
   __host__ __device__
   operator complex_t() {
@@ -40,6 +43,14 @@ struct complex {
   __host__ __device__
   complex<T> operator*(const complex<T>& x) const {
     return complex<T>(tbblas::complex_type<T>::mult(x.value, value));
+  }
+
+  __host__ __device__
+  complex<T> operator+(const complex<T>& x) const {
+    complex<T> ret;
+    ret.real = real + x.real;
+    ret.img = img + x.img;
+    return ret;
   }
 };
 

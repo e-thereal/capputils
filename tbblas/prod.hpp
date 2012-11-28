@@ -49,6 +49,9 @@ struct prod_operation {
   prod_operation(const Proxy& proxy1, const Proxy& proxy2)
    : _proxy1(proxy1), _proxy2(proxy2)
   {
+    assert(proxy1.size() == proxy1.fullsize());
+    assert(proxy2.size() == proxy2.fullsize());
+
     _size[0] = proxy1.size()[0];
     _size[1] = proxy2.size()[1];
   }
@@ -68,6 +71,10 @@ struct prod_operation {
   }
 
   inline dim_t size() const {
+    return _size;
+  }
+
+  inline dim_t fullsize() const {
     return _size;
   }
 

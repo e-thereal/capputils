@@ -52,22 +52,34 @@ struct ifft_operation
   typedef tensor<value_t, Tensor::dimCount, Tensor::cuda_enabled> tensor_t;
   typedef fft_plan<Tensor::dimCount> plan_t;
 
-  ifft_operation(Tensor& tensor, const plan_t& plan) : _tensor(tensor), _plan(plan) { }
+  ifft_operation(Tensor& tensor, const plan_t& plan)
+   : _tensor(tensor), _dimension(Tensor::dimCount), _plan(plan) { }
+
+  ifft_operation(Tensor& tensor, unsigned dimension, const plan_t& plan)
+   : _tensor(tensor), _dimension(dimension), _plan(plan) { }
 
   void apply(tensor_t& output) const {
+    size_t count = 1;
+    for (unsigned i = 0; i < _dimension; ++i)
+      count *= output.size()[i];
     assert(cudaThreadSynchronize() == cudaSuccess);
-    assert(ifft_trait<value_t>::exec(_plan.create(_tensor.size(), ifft_trait<value_t>::type),
+    assert(ifft_trait<value_t>::exec(_plan.create(_tensor.fullsize(), ifft_trait<value_t>::type, _dimension),
         _tensor.data().data().get(), output.data().data().get()) == CUFFT_SUCCESS);
     assert(cudaThreadSynchronize() == cudaSuccess);
-    output = output / (value_t)output.count();
+    output = output / (value_t)count;
   }
 
   inline dim_t size() const {
-    return _tensor.size();
+    return _tensor.fullsize();
+  }
+
+  inline dim_t fullsize() const {
+    return _tensor.fullsize();
   }
 
 private:
   Tensor& _tensor;
+  unsigned _dimension;
   plan_t _plan;
 };
 
@@ -88,6 +100,18 @@ typename boost::enable_if<is_tensor<Tensor>,
 >::type
 ifft(Tensor& tensor, const fft_plan<Tensor::dimCount>& plan = fft_plan<Tensor::dimCount>()) {
   return ifft_operation<Tensor>(tensor, plan);
+}
+
+template<class Tensor>
+typename boost::enable_if<is_tensor<Tensor>,
+  typename boost::enable_if_c<Tensor::cuda_enabled == true,
+    typename boost::enable_if<is_complex<typename Tensor::value_t>,
+      ifft_operation<Tensor>
+    >::type
+  >::type
+>::type
+ifft(Tensor& tensor, unsigned dimension, const fft_plan<Tensor::dimCount>& plan = fft_plan<Tensor::dimCount>()) {
+  return ifft_operation<Tensor>(tensor, dimension, plan);
 }
 
 }

@@ -10,6 +10,9 @@
 
 #include <tbblas/scalar_expression.hpp>
 #include <tbblas/complex.hpp>
+#include <tbblas/sum.hpp>
+#include <tbblas/conv.hpp>
+#include <tbblas/flip.hpp>
 
 namespace tbblas {
 
@@ -126,6 +129,35 @@ inline typename boost::enable_if<is_expression<Expression>,
 abs(const Expression& expr) {
   return scalar_expression<Expression, abs_operation<typename Expression::value_t> >(expr,
       abs_operation<typename Expression::value_t>());
+}
+
+template<class T>
+struct phase_operation {
+  typedef T value_t;
+
+  __host__ __device__
+  T operator()(const T& value) const {
+    return 0;
+  }
+};
+
+template<class T>
+struct phase_operation<complex<T> > {
+  typedef T value_t;
+
+  __host__ __device__
+  T operator()(const T& value) const {
+    return 0;
+  }
+};
+
+template<class Expression>
+inline typename boost::enable_if<is_expression<Expression>,
+  scalar_expression<Expression, phase_operation<typename Expression::value_t> >
+>::type
+phase(const Expression& expr) {
+  return scalar_expression<Expression, phase_operation<typename Expression::value_t> >(expr,
+      phase_operation<typename Expression::value_t>());
 }
 
 }
