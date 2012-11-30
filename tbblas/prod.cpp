@@ -8,7 +8,9 @@
 #include <tbblas/prod.hpp>
 
 #include <cublas.h>
+#ifdef TBBLAS_HAVE_CBLAS
 #include <cblas.h>
+#endif
 
 namespace tbblas {
 
@@ -32,6 +34,7 @@ void gemm(bool transa, bool transb, int m, int n, int k, double alpha, thrust::d
   cublasDgemm(ctransa, ctransb, m, n, k, alpha, A.get(), lda, B.get(), ldb, beta, C.get(), ldc);
 }
 
+#ifdef TBBLAS_HAVE_CBLAS
 template<>
 void gemm(bool transa, bool transb, int m, int n, int k, float alpha, const float* A, int lda,
     const float* B, int ldb, float beta, float* C, int ldc)
@@ -51,5 +54,6 @@ void gemm(bool transa, bool transb, int m, int n, int k, double alpha, const dou
 
   cblas_dgemm(CblasColMajor, ctransa, ctransb, m, n, k, alpha, A, lda, B, ldb, beta, C, ldc);
 }
+#endif
 
 }
