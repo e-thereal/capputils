@@ -10,6 +10,7 @@
 
 #include <tbblas/type_traits.hpp>
 #include <tbblas/proxy.hpp>
+#include <tbblas/complex.hpp>
 
 #include <thrust/reduce.h>
 #include <thrust/iterator/counting_iterator.h>
@@ -138,6 +139,10 @@ sum(Tensor& tensor, unsigned dimIdx) {
 /*** special implementations ***/
 
 template<class T>
+void sumLast(const proxy<tensor<T, 3, true> >& input, tensor<T, 3, true>& output);
+
+#ifdef __CUDACC__
+template<class T>
 __global__ void tbblas_sumLast(T* output, const T* input, int width, int height, int depth) {
   int x = threadIdx.x + blockDim.x * blockIdx.x;
   int y = threadIdx.y + blockDim.y * blockIdx.y;
@@ -172,6 +177,7 @@ void sumLast(const proxy<tensor<complex<T>, 3, true> >& input, tensor<complex<T>
   dim3 gridSize((2 * input.size()[0] + 31) / 32, (input.size()[1] + 31) / 32);
   tbblas_sumLast<<<gridSize, blockSize>>>((T*)output.data().data().get(), (T*)input.data().data().get(), 2 * input.size()[0], input.size()[1], input.size()[2]);
 }
+#endif
 
 template<class T>
 struct sum_operation<tensor<T, 3, true> > {
@@ -213,9 +219,6 @@ struct sum_operation<tensor<T, 3, true> > {
 
   void apply(tensor_t& output) const {
     if (_dimIdx == dimCount - 1) {
-//      dim3 blockSize(32, 32);
-//      dim3 gridSize((_proxy.size()[0] + 31) / 32, (_proxy.size()[1] + 31) / 32);
-//      tbblas_sumLast<<<gridSize, blockSize>>>(output.data().data().get(), _proxy.data().data().get(), _proxy.size()[0], _proxy.size()[1], _proxy.size()[2]);
       sumLast(_proxy, output);
     } else {
       thrust::reduce_by_key(

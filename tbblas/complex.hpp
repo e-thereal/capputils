@@ -52,6 +52,14 @@ struct __builtin_align__(16) complex {
     ret.img = img + x.img;
     return ret;
   }
+
+  __host__ __device__
+  complex<T> operator-(const complex<T>& x) const {
+    complex<T> ret;
+    ret.real = real - x.real;
+    ret.img = img - x.img;
+    return ret;
+  }
 };
 
 template<class T>

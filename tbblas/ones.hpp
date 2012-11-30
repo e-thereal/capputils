@@ -26,10 +26,7 @@ struct ones_expression {
 
   typedef thrust::constant_iterator<value_t> const_iterator;
 
-  ones_expression(const dim_t& size) {
-    for (unsigned i = 0; i < dimCount; ++i)
-      _size[i] = size[i];
-  }
+  ones_expression(const dim_t& size, const dim_t& fullsize) : _size(size), _fullsize(fullsize) { }
 
   inline const_iterator begin() const {
     return thrust::constant_iterator<value_t>(1);
@@ -44,7 +41,7 @@ struct ones_expression {
   }
 
   inline dim_t fullsize() const {
-    return _size;
+    return _fullsize;
   }
 
   inline size_t count() const {
@@ -55,14 +52,19 @@ struct ones_expression {
   }
 
 private:
-  dim_t _size;
+  dim_t _size, _fullsize;
+};
+
+template<class T, unsigned dim>
+struct is_expression<ones_expression<T, dim> > {
+  static const bool value = true;
 };
 
 template<class T>
 ones_expression<T, 1> ones(const size_t& x1) {
   typename ones_expression<T, 1>::dim_t size;
   size[0] = x1;
-  return ones_expression<T,1>(size);
+  return ones_expression<T,1>(size, size);
 }
 
 template<class T>
@@ -70,7 +72,7 @@ ones_expression<T, 2> ones(const size_t& x1, const size_t& x2) {
   typename ones_expression<T, 2>::dim_t size;
   size[0] = x1;
   size[1] = x2;
-  return ones_expression<T,2>(size);
+  return ones_expression<T,2>(size, size);
 }
 
 template<class T>
@@ -79,7 +81,7 @@ ones_expression<T, 3> ones(const size_t& x1, const size_t& x2, const size_t& x3)
   size[0] = x1;
   size[1] = x2;
   size[2] = x3;
-  return ones_expression<T,3>(size);
+  return ones_expression<T,3>(size, size);
 }
 
 template<class T>
@@ -89,18 +91,18 @@ ones_expression<T, 4> ones(const size_t& x1, const size_t& x2, const size_t& x3,
   size[1] = x2;
   size[2] = x3;
   size[3] = x4;
-  return ones_expression<T,4>(size);
+  return ones_expression<T,4>(size, size);
 }
 
 template<class T, unsigned dim>
 ones_expression<T, dim> ones(const sequence<int, dim>& size) {
-  return ones_expression<T, dim>(size);
+  return ones_expression<T, dim>(size, size);
 }
 
 template<class T, unsigned dim>
-struct is_expression<ones_expression<T, dim> > {
-  static const bool value = true;
-};
+ones_expression<T, dim> ones(const sequence<int, dim>& size, const sequence<int, dim>& fullsize) {
+  return ones_expression<T, dim>(size, fullsize);
+}
 
 }
 

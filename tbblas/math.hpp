@@ -131,33 +131,62 @@ abs(const Expression& expr) {
       abs_operation<typename Expression::value_t>());
 }
 
+//template<class T>
+//struct phase_operation {
+//  typedef T value_t;
+//
+//  __host__ __device__
+//  T operator()(const T& value) const {
+//    return 0;
+//  }
+//};
+//
+//template<class T>
+//struct phase_operation<complex<T> > {
+//  typedef T value_t;
+//
+//  __host__ __device__
+//  T operator()(const T& value) const {
+//    return 0;
+//  }
+//};
+//
+//template<class Expression>
+//inline typename boost::enable_if<is_expression<Expression>,
+//  scalar_expression<Expression, phase_operation<typename Expression::value_t> >
+//>::type
+//phase(const Expression& expr) {
+//  return scalar_expression<Expression, phase_operation<typename Expression::value_t> >(expr,
+//      phase_operation<typename Expression::value_t>());
+//}
+
 template<class T>
-struct phase_operation {
+struct conjugate_operation {
   typedef T value_t;
 
   __host__ __device__
   T operator()(const T& value) const {
-    return 0;
+    return value;
   }
 };
 
 template<class T>
-struct phase_operation<complex<T> > {
-  typedef T value_t;
+struct conjugate_operation<complex<T> > {
+  typedef complex<T> value_t;
 
   __host__ __device__
-  T operator()(const T& value) const {
-    return 0;
+  value_t operator()(const value_t& value) const {
+    return value_t(value.real, -value.img);
   }
 };
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  scalar_expression<Expression, phase_operation<typename Expression::value_t> >
+  scalar_expression<Expression, conjugate_operation<typename Expression::value_t> >
 >::type
-phase(const Expression& expr) {
-  return scalar_expression<Expression, phase_operation<typename Expression::value_t> >(expr,
-      phase_operation<typename Expression::value_t>());
+conj(const Expression& expr) {
+  return scalar_expression<Expression, conjugate_operation<typename Expression::value_t> >(expr,
+      conjugate_operation<typename Expression::value_t>());
 }
 
 }

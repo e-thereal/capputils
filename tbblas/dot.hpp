@@ -30,7 +30,8 @@ typename boost::enable_if<is_expression<Expression1>,
   >::type
 >::type
 dot(const Expression1& expr1, const Expression2& expr2) {
-  assert(expr1.count() == expr2.count());
+  assert(expr1.size() == expr2.size());
+  assert(expr1.fullsize() == expr2.fullsize());
   return thrust::inner_product(expr1.begin(), expr1.end(), expr2.begin(), typename Expression1::value_t());
 }
 

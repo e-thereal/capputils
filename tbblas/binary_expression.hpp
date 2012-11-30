@@ -17,6 +17,8 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
 
+#include <cassert>
+
 namespace tbblas {
 
 template<class T1, class T2, class Operation>
@@ -45,7 +47,11 @@ struct binary_expression {
   typedef thrust::transform_iterator<apply_operation, zip_iterator_t> const_iterator;
 
   binary_expression(const T1& expr1, const T2& expr2, const Operation& op)
-   : expr1(expr1), expr2(expr2), op(op) { }
+   : expr1(expr1), expr2(expr2), op(op)
+  {
+    assert(expr1.size() == expr2.size());
+    assert(expr1.fullsize() == expr2.fullsize());
+  }
 
   inline const_iterator begin() const {
     return thrust::make_transform_iterator(

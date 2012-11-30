@@ -19,6 +19,8 @@
 
 namespace tbblas {
 
+// TODO: use complex conjugate for symmetric values
+
 template<class Tensor>
 struct fftexpand_expression {
 

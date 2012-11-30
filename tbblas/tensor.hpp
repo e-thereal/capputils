@@ -13,9 +13,12 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
 
+#include <tbblas/tbblas.hpp>
 #include <tbblas/type_traits.hpp>
 #include <tbblas/sequence.hpp>
 #include <tbblas/fill.hpp>
+
+#include <iostream>
 
 namespace tbblas {
 
@@ -52,6 +55,8 @@ protected:
 
 public:
   tensor(size_t x1 = 1, size_t x2 = 1, size_t x3 = 1, size_t x4 = 1) {
+    TBBLAS_ALLOC_WARNING
+
     const size_t size[] = {x1, x2, x3, x4};
     size_t count = 1;
 
@@ -65,6 +70,8 @@ public:
   }
 
   tensor(const dim_t& size) {
+    TBBLAS_ALLOC_WARNING
+
     size_t count = 1;
     for (unsigned i = 0; i < dim; ++i) {
       _size[i] = size[i];
@@ -76,6 +83,8 @@ public:
   }
 
   tensor(const tensor_t& tensor) {
+    TBBLAS_ALLOC_WARNING
+
     const dim_t& size = tensor.size();
 
     size_t count = 1;
@@ -91,6 +100,8 @@ public:
 
   template<class T2, bool device2>
   tensor(const tensor<T2, dim, device2>& tensor) {
+    TBBLAS_ALLOC_WARNING
+
     const dim_t& size = tensor.size();
 
     size_t count = 1;
@@ -109,6 +120,7 @@ public:
   tensor(const Operation& op, typename boost::enable_if<is_operation<Operation>,
       typename boost::enable_if<boost::is_same<typename Operation::tensor_t, tensor_t>, int>::type>::type = 0)
   {
+    TBBLAS_ALLOC_WARNING
     const dim_t& size = op.size();
     for (unsigned i = 0; i < dimCount; ++i) {
       _size[i] = size[i];
@@ -123,6 +135,8 @@ public:
   tensor(const Expression& expr, typename boost::enable_if<is_expression<Expression>,
       typename boost::enable_if_c<Expression::dimCount == dimCount, int>::type>::type = 0)
   {
+    TBBLAS_ALLOC_WARNING
+
     const dim_t& size = expr.size();
     for (unsigned i = 0; i < dimCount; ++i) {
       _size[i] = size[i];
@@ -152,6 +166,7 @@ public:
     _fullsize = fullsize;
 
     if (realloc) {
+      TBBLAS_ALLOC_WARNING
       _data = boost::shared_ptr<data_t>(new data_t(count()));
     }
   }

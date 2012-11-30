@@ -7,41 +7,38 @@
 
 #include "tests.h"
 
+//#define TBBLAS_ALLOC_WARNING_ENABLED
+
 #include <tbblas/tensor.hpp>
-#include <tbblas/fft.hpp>
-#include <tbblas/expand.hpp>
-#include <tbblas/shift.hpp>
 #include <tbblas/io.hpp>
-#include <tbblas/flip.hpp>
-#include <tbblas/real.hpp>
-#include <tbblas/img.hpp>
-#include <tbblas/random.hpp>
+#include <tbblas/gaussian.hpp>
+#include <tbblas/ones.hpp>
+#include <tbblas/sum.hpp>
+#include <tbblas/fft.hpp>
+#include <tbblas/serialize.hpp>
 #include <tbblas/math.hpp>
+#include <tbblas/random.hpp>
 
 void fftflip() {
-
   using namespace tbblas;
 
-  tensor<double, 1, true> A(5), B;
-  tensor<complex<double>, 1, true> cA, cB;
-  random_tensor<double, 1, true, uniform<double> > urand(5);
+  typedef double value_t;
 
-  A = 1, 5, 3, 2, 6;
-//  A = urand;
-  tbblas_print(A);
-
-//  B = flip(A);
-  B = 1, 6, 2, 3, 5;
-  tbblas_print(B);
-
-  cA = fft(A);
-  cB = fft(B);
-
-  tbblas_print(abs(cA));
-  tbblas_print(abs(cB));
-
-//  tbblas_print(abs(fftexpand(cA)));
-//  tbblas_print(abs(fftexpand(cB)));
-//  tbblas_print(abs(fftshift(fftexpand(cA))));
-//  tbblas_print(abs(fftshift(fftexpand(cB))));
+  for (int i = 2; i <= 1024; i *= 2) {
+    for (int j = 2; j <= 1024; j *= 2) {
+      random_tensor<value_t, 3, true, uniform<value_t> > randu(i, j, 1);
+      tensor<value_t, 3, true> v = randu;
+      tensor<complex<value_t>, 3, true> cv;
+      value_t check = sum(v);
+      cv = fft(v);
+      if (sum(v) != check) {
+        std::cout << "v error at " << i << ", " << j << std::endl;
+      }
+      check = sum(abs(cv));
+      v = ifft(cv);
+      if (sum(abs(cv)) != check) {
+        std::cout << "cv error at " << i << ", " << j << std::endl;
+      }
+    }
+  }
 }
