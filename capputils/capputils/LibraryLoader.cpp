@@ -167,7 +167,7 @@ void LibraryLoader::loadLibrary(const string& filename) {
   if (iter == libraryTable.end()) {
     LibraryData* data = new LibraryData(filename.c_str());
     libraryTable[filename] = data;
-    cout << filename << " library loaded." << endl;
+//    cout << filename << " library loaded." << endl;
   } else {
     iter->second->loadCount = iter->second->loadCount + 1;
     //cout << filename << " library counter incremented (" << iter->second->loadCount << ")." << endl;
