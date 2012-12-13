@@ -1,21 +1,21 @@
 /*
- * gaussian.hpp
+ * mask.hpp
  *
- *  Created on: Nov 28, 2012
+ *  Created on: Nov 30, 2012
  *      Author: tombr
  */
 
-#ifndef TBBLAS_GAUSSIAN_HPP_
-#define TBBLAS_GAUSSIAN_HPP_
+#ifndef TBBLAS_MASK_HPP_
+#define TBBLAS_MASK_HPP_
 
 #include <tbblas/tensor.hpp>
 
 namespace tbblas {
 
 template<class T, unsigned dim>
-struct gaussian_expression {
+struct mask_expression {
 
-  typedef gaussian_expression<T, dim> expression_t;
+  typedef mask_expression<T, dim> expression_t;
   typedef typename tensor<T, dim>::dim_t dim_t;
   typedef T value_t;
   static const unsigned dimCount = dim;
@@ -25,22 +25,17 @@ struct gaussian_expression {
 
   struct index_functor : public thrust::unary_function<difference_type,value_t> {
 
-    dim_t size;
-    double sigma;
-    const value_t factor;
+    dim_t size, maskSize;
 
-    index_functor(dim_t size, double sigma)
-     : size(size), sigma(sigma), factor(1.0 / sigma / ::sqrt(2.0 * M_PI)) { }
+    index_functor(dim_t size, dim_t maskSize)
+     : size(size), maskSize(maskSize) { }
 
     __host__ __device__
     value_t operator()(difference_type idx) const {
       value_t result = 1;
-      const value_t x = ((idx % size[0]) + size[0] / 2) % size[0] - size[0] / 2;
-      result *= factor * ::exp(-x * x / (2.0 * sigma * sigma));
-      for (unsigned k = 1; k < dimCount; ++k) {
-        const value_t y = (((idx /= size[k-1]) % size[k]) + size[k] / 2) % size[k] - size[k] / 2;
-        result *= factor * ::exp(-y * y / (2.0 * sigma * sigma));
-      }
+      result = result * (((idx + maskSize[0] / 2) % size[0]) < maskSize[0]);
+      for (unsigned k = 1; k < dimCount; ++k)
+        result = result * ((((idx /= size[k-1]) + maskSize[k] / 2) % size[k]) < maskSize[k]);
       return result;
     }
   };
@@ -49,11 +44,11 @@ struct gaussian_expression {
   typedef thrust::transform_iterator<index_functor, CountingIterator> TransformIterator;
   typedef TransformIterator const_iterator;
 
-  gaussian_expression(const dim_t& size, const dim_t& fullsize, double sigma)
-   : _size(size), _fullsize(fullsize), _sigma(sigma) { }
+  mask_expression(const dim_t& size, const dim_t& fullsize, const dim_t& maskSize)
+   : _size(size), _fullsize(fullsize), _maskSize(maskSize) { }
 
   inline const_iterator begin() const {
-    index_functor functor(_size, _sigma);
+    index_functor functor(_size, _maskSize);
     CountingIterator counting(0);
     TransformIterator transform(counting, functor);
     return transform;
@@ -79,25 +74,26 @@ struct gaussian_expression {
   }
 
 private:
-  dim_t _size, _fullsize;
-  double _sigma;
+  dim_t _size, _fullsize, _maskSize;
 };
 
 template<class T, unsigned dim>
-struct is_expression<gaussian_expression<T, dim> > {
+struct is_expression<mask_expression<T, dim> > {
   static const bool value = true;
 };
 
 template<class T, unsigned dim>
-gaussian_expression<T, dim> gaussian(const sequence<int, dim>& size, double sigma) {
-  return gaussian_expression<T, dim>(size, size, sigma);
+mask_expression<T, dim> mask(const sequence<int, dim>& size, const sequence<int, dim>& maskSize) {
+  return mask_expression<T, dim>(size, size, maskSize);
 }
 
 template<class T, unsigned dim>
-gaussian_expression<T, dim> gaussian(const sequence<int, dim>& size, const sequence<int, dim>& fullsize, double sigma) {
-  return gaussian_expression<T, dim>(size, fullsize, sigma);
+mask_expression<T, dim> mask(const sequence<int, dim>& size,
+    const sequence<int, dim>& fullsize, const sequence<int, dim>& maskSize)
+{
+  return mask_expression<T, dim>(size, fullsize, maskSize);
 }
 
 }
 
-#endif /* GAUSSIAN_HPP_ */
+#endif /* TBBLAS_MASK_HPP_ */

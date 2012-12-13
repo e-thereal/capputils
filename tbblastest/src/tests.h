@@ -21,5 +21,6 @@ void proxytests();
 void convrbmtests();
 void partialffttest();
 void fftflip();
+void maskstest();
 
 #endif /* TESTS_H_ */

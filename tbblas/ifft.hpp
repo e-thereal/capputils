@@ -10,7 +10,6 @@
 
 #include <tbblas/type_traits.hpp>
 #include <tbblas/complex.hpp>
-#include <tbblas/divides.hpp>
 
 #include <boost/utility/enable_if.hpp>
 

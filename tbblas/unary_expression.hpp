@@ -5,8 +5,8 @@
  *      Author: tombr
  */
 
-#ifndef TBBLAS_SCALAR_EXPRESSION_HPP_
-#define TBBLAS_SCALAR_EXPRESSION_HPP_
+#ifndef TBBLAS_UNARY_EXPRESSION_HPP_
+#define TBBLAS_UNARY_EXPRESSION_HPP_
 
 #include <thrust/iterator/transform_iterator.h>
 #include <thrust/iterator/zip_iterator.h>
@@ -22,7 +22,7 @@
 namespace tbblas {
 
 template<class T, class Operation>
-struct scalar_expression {
+struct unary_expression {
   typedef typename T::dim_t dim_t;
   typedef typename T::value_t input_t;
   typedef typename Operation::value_t value_t;
@@ -38,12 +38,12 @@ struct scalar_expression {
     apply_operation(const Operation& op) : op(op) { }
 
   private:
-    const Operation& op;
+    Operation op;
   };
 
   typedef thrust::transform_iterator<apply_operation, typename T::const_iterator> const_iterator;
 
-  scalar_expression(const T& expr, const Operation& op) : expr(expr), op(op) { }
+  unary_expression(const T& expr, const Operation& op) : expr(expr), op(op) { }
 
   inline const_iterator begin() const {
     return thrust::make_transform_iterator(expr.begin(), apply_operation(op));
@@ -71,8 +71,24 @@ private:
 };
 
 template<class T, class Operation>
-struct is_expression<scalar_expression<T, Operation> > {
+struct is_expression<unary_expression<T, Operation> > {
   static const bool value = true;
+};
+
+template<class T, class Operation>
+struct scalar_operation {
+  typedef T value_t;
+
+  scalar_operation(const T& scalar, const Operation& op) : scalar(scalar), op(op) { }
+
+  __host__ __device__
+  T operator()(const T& x) const {
+    return op(x, scalar);
+  }
+
+private:
+  T scalar;
+  Operation op;
 };
 
 }

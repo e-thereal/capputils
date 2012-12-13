@@ -2,6 +2,15 @@
 #define TBBLAS_HPP
 
 #include <iostream>
+#include <thrust/version.h>
+
+#if THRUST_DEVICE_SYSTEM != THRUST_DEVICE_SYSTEM_CUDA
+#error "Is is assumed that CUDA is used as the device backend. For parallelized CPU code, change the host backend instead."
+#endif
+
+#if THRUST_VERSION < 100600
+#error "At least thrust version 1.6 is required."
+#endif
 
 #ifdef _WIN32
 #ifndef TBBLAS_EXPORTS

@@ -8,6 +8,7 @@
 #ifndef TBBLAS_FFT_PLAN_HPP_
 #define TBBLAS_FFT_PLAN_HPP_
 
+#include <tbblas/tbblas.hpp>
 #include <tbblas/sequence.hpp>
 
 #include <boost/shared_ptr.hpp>
@@ -45,6 +46,8 @@ public:
   cufftHandle create(const dim_t& size, cufftType_t type, unsigned dimension) {
     if (hasPlan && this->size == size && this->type == type && this->dimension == dimension)
       return plan;
+
+    TBBLAS_ALLOC_WARNING
 
     if (hasPlan)
       cufftDestroy(plan);

@@ -23,7 +23,8 @@ int main(int argc, char** argv) {
 //  proxytests();
 //  convrbmtests();
 //  partialffttest();
-  fftflip();
+//  fftflip();
+  maskstest();
 
   return 0;
 }

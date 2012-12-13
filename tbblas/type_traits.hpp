@@ -13,6 +13,8 @@
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 
+#include <tbblas/tbblas.hpp>
+
 namespace tbblas {
 
 template<class T>

@@ -295,10 +295,6 @@ struct is_expression<tensor<T, dim, device> > {
 // Include default headers
 
 #include <tbblas/proxy.hpp>
-#include <tbblas/plus.hpp>
-#include <tbblas/minus.hpp>
-#include <tbblas/multiplies.hpp>
-#include <tbblas/divides.hpp>
 #include <tbblas/arithmetic.hpp>
 #include <tbblas/comparisons.hpp>
 

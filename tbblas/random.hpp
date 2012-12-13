@@ -8,6 +8,7 @@
 #ifndef TBBLAS_RANDOM_HPP_
 #define TBBLAS_RANDOM_HPP_
 
+
 #include <tbblas/tensor.hpp>
 #include <tbblas/type_traits.hpp>
 
@@ -20,6 +21,13 @@
 
 #include <curand_kernel.h>
 #include <boost/static_assert.hpp>
+
+#ifndef __CUDACC__
+#include <boost/math/special_functions/erf.hpp>
+double erfcinv(double x) {
+  return boost::math::erfc_inv(x);
+}
+#endif
 
 #include <thrust/random.h>
 

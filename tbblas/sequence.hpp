@@ -181,6 +181,16 @@ std::ostream& operator<<(std::ostream& out, const tbblas::sequence<T, size>& seq
   return out;
 }
 
+template<class T, unsigned size>
+std::istream& operator>>(std::istream& in, tbblas::sequence<T, size>& seq) {
+  in >> seq[0];
+  for (unsigned i = 1; i < size; ++i) {
+    in.ignore(2);
+    in >> seq[i];
+  }
+  return in;
+}
+
 /*** scalar operations ***/
 
 template<class T, unsigned size>
