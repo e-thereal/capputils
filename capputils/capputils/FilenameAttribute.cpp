@@ -46,6 +46,10 @@ const std::string& FilenameAttribute::getPattern() const {
   return pattern;
 }
 
+void FilenameAttribute::setPattern(const std::string& pattern) {
+  this->pattern = pattern;
+}
+
 AttributeWrapper* Filename(const string& pattern, bool multipleSelection) {
   return new AttributeWrapper(new FilenameAttribute(pattern, multipleSelection));
 }

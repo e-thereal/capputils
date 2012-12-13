@@ -31,6 +31,7 @@ public:
 
   bool getMultipleSelection() const;
   const std::string& getPattern() const;
+  void setPattern(const std::string& pattern);
 };
 
 AttributeWrapper* Filename(const std::string& pattern = "All (*)",
