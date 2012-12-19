@@ -113,7 +113,7 @@ struct fft_operation
   void apply(tensor_t& output) const {
     cufftResult result;
 
-    assert(cudaThreadSynchronize() == cudaSuccess);
+//    assert(cudaThreadSynchronize() == cudaSuccess);
 
     if((result = fft_trait<input_t>::exec(_plan.create(_tensor.size(), fft_trait<input_t>::type, _dimension),
             _tensor.data().data().get(), output.data().data().get())) != CUFFT_SUCCESS)
@@ -122,7 +122,7 @@ struct fft_operation
       assert(0);
     }
 
-    assert(cudaThreadSynchronize() == cudaSuccess);
+//    assert(cudaThreadSynchronize() == cudaSuccess);
   }
 
   inline dim_t size() const {

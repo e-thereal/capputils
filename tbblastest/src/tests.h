@@ -22,5 +22,6 @@ void convrbmtests();
 void partialffttest();
 void fftflip();
 void maskstest();
+void multigpu();
 
 #endif /* TESTS_H_ */

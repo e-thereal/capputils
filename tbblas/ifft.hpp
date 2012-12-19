@@ -62,14 +62,14 @@ struct ifft_operation
     cufftResult result = CUFFT_SUCCESS;
     for (unsigned i = 0; i < _dimension; ++i)
       count *= output.size()[i];
-    assert(cudaThreadSynchronize() == cudaSuccess);
+//    assert(cudaThreadSynchronize() == cudaSuccess);
     if ((result = ifft_trait<value_t>::exec(_plan.create(_tensor.fullsize(), ifft_trait<value_t>::type, _dimension),
         _tensor.data().data().get(), output.data().data().get())) != CUFFT_SUCCESS)
     {
       std::cout << result << std::endl;
       assert(0);
     }
-    assert(cudaThreadSynchronize() == cudaSuccess);
+//    assert(cudaThreadSynchronize() == cudaSuccess);
     output = output / (value_t)count;
   }
 
