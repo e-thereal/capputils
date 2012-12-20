@@ -36,6 +36,15 @@ operator+(const typename Expression::value_t& scalar, const Expression& expr) {
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
+  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::multiplies<typename Expression::value_t> > >
+>::type
+operator-(const Expression& expr) {
+  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::multiplies<typename Expression::value_t> > >(
+      expr, scalar_operation<typename Expression::value_t, thrust::multiplies<typename Expression::value_t> >(-1, thrust::multiplies<typename Expression::value_t>()));
+}
+
+template<class Expression>
+inline typename boost::enable_if<is_expression<Expression>,
   unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::minus<typename Expression::value_t> > >
 >::type
 operator-(const Expression& expr, const typename Expression::value_t& scalar) {
@@ -43,23 +52,14 @@ operator-(const Expression& expr, const typename Expression::value_t& scalar) {
       expr, scalar_operation<typename Expression::value_t, thrust::minus<typename Expression::value_t> >(scalar, thrust::minus<typename Expression::value_t>()));
 }
 
-template<class Expression>
-inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::minus<typename Expression::value_t> > >
->::type
-operator-(const typename Expression::value_t& scalar, const Expression& expr) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::minus<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::minus<typename Expression::value_t> >(scalar, thrust::minus<typename Expression::value_t>()));
-}
-
-template<class Expression>
-inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::multiplies<typename Expression::value_t> > >
->::type
-operator-(const Expression& expr) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::multiplies<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::multiplies<typename Expression::value_t> >(-1, thrust::multiplies<typename Expression::value_t>()));
-}
+//template<class Expression>
+//inline typename boost::enable_if<is_expression<Expression>,
+//  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::minus<typename Expression::value_t> > >
+//>::type
+//operator-(const typename Expression::value_t& scalar, const Expression& expr) {
+//  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::minus<typename Expression::value_t> > >(
+//      expr, scalar_operation<typename Expression::value_t, thrust::minus<typename Expression::value_t> >(scalar, thrust::minus<typename Expression::value_t>()));
+//}
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
@@ -88,14 +88,14 @@ operator/(const Expression& expr, const typename Expression::value_t& scalar) {
       expr, scalar_operation<typename Expression::value_t, thrust::divides<typename Expression::value_t> >(scalar, thrust::divides<typename Expression::value_t>()));
 }
 
-template<class Expression>
-inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::divides<typename Expression::value_t> > >
->::type
-operator/(const typename Expression::value_t& scalar, const Expression& expr) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::divides<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::divides<typename Expression::value_t> >(scalar, thrust::divides<typename Expression::value_t>()));
-}
+//template<class Expression>
+//inline typename boost::enable_if<is_expression<Expression>,
+//  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::divides<typename Expression::value_t> > >
+//>::type
+//operator/(const typename Expression::value_t& scalar, const Expression& expr) {
+//  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::divides<typename Expression::value_t> > >(
+//      expr, scalar_operation<typename Expression::value_t, thrust::divides<typename Expression::value_t> >(scalar, thrust::divides<typename Expression::value_t>()));
+//}
 
 /*** binary operations ***/
 

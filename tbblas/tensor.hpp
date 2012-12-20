@@ -52,6 +52,7 @@ public:
 protected:
   boost::shared_ptr<data_t> _data;
   dim_t _size , _fullsize; // fullsize is not used because this member is not delegated consistently
+  std::string name;
 
 public:
   tensor(size_t x1 = 1, size_t x2 = 1, size_t x3 = 1, size_t x4 = 1) {
@@ -147,9 +148,15 @@ public:
     thrust::copy(expr.begin(), expr.end(), begin());
   }
 
-  virtual ~tensor() { }
+  virtual ~tensor() {
+//    std::cout << "Destructing '" << name << "' ..." << std::endl;
+  }
 
 public:
+  void set_name(const std::string& name) {
+    this->name = name;
+  }
+
   inline dim_t size() const {
     return _size;
   }
