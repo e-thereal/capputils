@@ -32,7 +32,7 @@ template<class T, unsigned dim, bool device>
 proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
     const sequence<unsigned, dim>& start, const sequence<unsigned, dim>& size);
 
-template<class T, unsigned dim, bool device = true>
+template<class T, unsigned dim, bool device = false>
 class tensor {
 public:
 
@@ -248,6 +248,12 @@ public:
   }
 
   /*** apply operations ***/
+
+  inline tensor_t& operator=(const tensor_t& tensor) {
+    resize(tensor.size(), tensor.fullsize());
+    thrust::copy(tensor.begin(), tensor.end(), begin());
+    return *this;
+  }
 
   template<class T2, bool device2>
   inline tensor_t& operator=(const tensor<T2, dim, device2>& tensor) {

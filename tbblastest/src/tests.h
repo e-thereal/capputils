@@ -23,5 +23,6 @@ void partialffttest();
 void fftflip();
 void maskstest();
 void multigpu();
+void copytest();
 
 #endif /* TESTS_H_ */

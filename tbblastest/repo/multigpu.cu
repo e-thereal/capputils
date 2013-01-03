@@ -14,8 +14,12 @@
 
 using namespace tbblas;
 
+__global__ void kernel() { }
+
 void multigpu() {
   typedef float value_t;
+
+  kernel<<<1,1>>>();
 
   const int gpuCount = 2;
 

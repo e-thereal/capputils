@@ -25,7 +25,8 @@ int main(int argc, char** argv) {
 //  partialffttest();
 //  fftflip();
 //  maskstest();
-  multigpu();
+//  multigpu();
+  copytest();
 
   return 0;
 }
