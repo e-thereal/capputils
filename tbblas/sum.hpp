@@ -113,7 +113,7 @@ sum(const Proxy& proxy, unsigned dimIdx) {
 template<class Tensor>
 typename boost::enable_if<is_tensor<Tensor>,
     typename boost::enable_if_c<Tensor::dimCount >= 1,
-      typename boost::disable_if_c<Tensor::dimCount == 3,
+      typename boost::disable_if_c<Tensor::dimCount == 3 && Tensor::cuda_enabled == true,
         sum_operation<proxy<Tensor> >
       >::type
     >::type
@@ -123,18 +123,18 @@ sum(Tensor& tensor, unsigned dimIdx) {
   return sum(proxy<Tensor>(tensor), dimIdx);
 }
 
-template<class Tensor>
-typename boost::enable_if<is_tensor<Tensor>,
-    typename boost::enable_if_c<Tensor::dimCount >= 1,
-      typename boost::disable_if_c<Tensor::cuda_enabled == true,
-        sum_operation<proxy<Tensor> >
-      >::type
-    >::type
->::type
-sum(Tensor& tensor, unsigned dimIdx) {
-  assert(dimIdx < Tensor::dimCount);
-  return sum(proxy<Tensor>(tensor), dimIdx);
-}
+//template<class Tensor>
+//typename boost::enable_if<is_tensor<Tensor>,
+//    typename boost::enable_if_c<Tensor::dimCount >= 1,
+//      typename boost::disable_if_c<Tensor::cuda_enabled == true,
+//        sum_operation<proxy<Tensor> >
+//      >::type
+//    >::type
+//>::type
+//sum(Tensor& tensor, unsigned dimIdx) {
+//  assert(dimIdx < Tensor::dimCount);
+//  return sum(proxy<Tensor>(tensor), dimIdx);
+//}
 
 /*** special implementations ***/
 

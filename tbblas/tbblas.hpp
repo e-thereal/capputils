@@ -28,4 +28,10 @@
 #define TBBLAS_ALLOC_WARNING
 #endif
 
+#ifdef i386
+#define TBBLAS_HAVE_CBLAS
+#endif
+
+#define TBBLAS_HAVE_CUBLAS
+
 #endif
