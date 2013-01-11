@@ -13,7 +13,7 @@
 int main(int argc, char** argv) {
 //  helloworld();
 //  convtest();
-//  sumtest();
+  sumtest();
 //  entropytest();
 //  proxycopy();
 //  ffttest();
@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 //  fftflip();
 //  maskstest();
 //  multigpu();
-  copytest();
+//  copytest();
 
   return 0;
 }
