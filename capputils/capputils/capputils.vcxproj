@@ -62,11 +62,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;XMLIZER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(BOOST_INC_PATH)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -79,91 +80,101 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AbstractEnumerator.h" />
     <ClInclude Include="AbstractLogbookModel.h" />
+    <ClInclude Include="ArgumentsParser.h" />
+    <ClInclude Include="AttributeExecuter.h" />
     <ClInclude Include="capputils.h" />
+    <ClInclude Include="ClassProperty.h" />
+    <ClInclude Include="Converter.h" />
     <ClInclude Include="DeprecatedAttribute.h" />
+    <ClInclude Include="DescriptionAttribute.h" />
+    <ClInclude Include="EnumerableAttribute.h" />
+    <ClInclude Include="EnumeratorAttribute.h" />
+    <ClInclude Include="Enumerators.h" />
     <ClInclude Include="EventHandler.h" />
     <ClInclude Include="Executer.h" />
     <ClInclude Include="FactoryException.h" />
-    <ClInclude Include="FromEnumerableAttribute.h" />
-    <ClInclude Include="InputAttribute.h" />
-    <ClInclude Include="EnumeratorAttribute.h" />
-    <ClInclude Include="IXmlableAttribute.h" />
-    <ClInclude Include="LibraryException.h" />
-    <ClInclude Include="LibraryLoader.h" />
-    <ClInclude Include="Logbook.h" />
-    <ClInclude Include="NoParameterAttribute.h" />
-    <ClInclude Include="OutputAttribute.h" />
-    <ClInclude Include="PropertyMap.h" />
-    <ClInclude Include="ReflectionException.h" />
-    <ClInclude Include="RegisterClass.h" />
-    <ClInclude Include="ReuseAttribute.h" />
-    <ClInclude Include="ScalarAttribute.h" />
-    <ClInclude Include="ArgumentsParser.h" />
-    <ClInclude Include="AttributeExecuter.h" />
-    <ClInclude Include="ClassProperty.h" />
-    <ClInclude Include="DescriptionAttribute.h" />
-    <ClInclude Include="EnumerableAttribute.h" />
-    <ClInclude Include="Enumerator.h" />
-    <ClInclude Include="Enumerators.h" />
     <ClInclude Include="FileExists.h" />
+    <ClInclude Include="FileExistsAttribute.h" />
     <ClInclude Include="FilenameAttribute.h" />
     <ClInclude Include="FlagAttribute.h" />
+    <ClInclude Include="FromEnumerableAttribute.h" />
+    <ClInclude Include="GenerateBashCompletion.h" />
     <ClInclude Include="IAssertionAttribute.h" />
     <ClInclude Include="IAttribute.h" />
     <ClInclude Include="IClassProperty.h" />
     <ClInclude Include="IEnumerableAttribute.h" />
     <ClInclude Include="IExecutableAttribute.h" />
+    <ClInclude Include="InputAttribute.h" />
     <ClInclude Include="IPropertyIterator.h" />
     <ClInclude Include="IReflectableAttribute.h" />
+    <ClInclude Include="IXmlableAttribute.h" />
+    <ClInclude Include="LibraryException.h" />
+    <ClInclude Include="LibraryLoader.h" />
+    <ClInclude Include="Logbook.h" />
+    <ClInclude Include="NoParameterAttribute.h" />
+    <ClInclude Include="NotEmptyAttribute.h" />
     <ClInclude Include="NotEqualAssertion.h" />
+    <ClInclude Include="NotEqualAttribute.h" />
+    <ClInclude Include="NotNullAttribute.h" />
     <ClInclude Include="ObservableClass.h" />
     <ClInclude Include="ObserveAttribute.h" />
+    <ClInclude Include="OutputAttribute.h" />
+    <ClInclude Include="PropertyMap.h" />
     <ClInclude Include="ReflectableAttribute.h" />
     <ClInclude Include="ReflectableClass.h" />
     <ClInclude Include="ReflectableClassFactory.h" />
+    <ClInclude Include="ReflectionException.h" />
+    <ClInclude Include="RegisterClass.h" />
+    <ClInclude Include="ReuseAttribute.h" />
+    <ClInclude Include="ScalarAttribute.h" />
     <ClInclude Include="SerializeAttribute.h" />
     <ClInclude Include="Serializer.h" />
     <ClInclude Include="ShortNameAttribute.h" />
     <ClInclude Include="TimedClass.h" />
     <ClInclude Include="TimeStampAttribute.h" />
     <ClInclude Include="ToEnumerableAttribute.h" />
+    <ClInclude Include="TypeTraits.h" />
     <ClInclude Include="Variant.h" />
     <ClInclude Include="Verifier.h" />
     <ClInclude Include="VolatileAttribute.h" />
-    <ClInclude Include="xmlizer.h" />
+    <ClInclude Include="Xmlizer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AbstractEnumerator.cpp" />
     <ClCompile Include="AbstractLogbookModel.cpp" />
+    <ClCompile Include="ArgumentsParser.cpp" />
+    <ClCompile Include="AttributeExecuter.cpp" />
+    <ClCompile Include="ClassProperty.cpp" />
     <ClCompile Include="DeprecatedAttribute.cpp" />
+    <ClCompile Include="DescriptionAttribute.cpp" />
     <ClCompile Include="EventHandler.cpp" />
     <ClCompile Include="Executer.cpp" />
     <ClCompile Include="FactoryException.cpp" />
     <ClCompile Include="FileExistsAttribute.cpp" />
+    <ClCompile Include="FilenameAttribute.cpp" />
+    <ClCompile Include="FlagAttribute.cpp" />
     <ClCompile Include="FromEnumerableAttribute.cpp" />
+    <ClCompile Include="GenerateBashCompletion.cpp" />
+    <ClCompile Include="IAttribute.cpp" />
     <ClCompile Include="InputAttribute.cpp" />
+    <ClCompile Include="IsEnumeratorAttribute.cpp" />
     <ClCompile Include="LibraryException.cpp" />
     <ClCompile Include="LibraryLoader.cpp" />
     <ClCompile Include="Logbook.cpp" />
     <ClCompile Include="NoParameterAttribute.cpp" />
+    <ClCompile Include="ObservableClass.cpp" />
+    <ClCompile Include="ObserveAttribute.cpp" />
     <ClCompile Include="OutputAttribute.cpp" />
+    <ClCompile Include="PropertyMap.cpp" />
+    <ClCompile Include="ReflectableAttribute.cpp" />
+    <ClCompile Include="ReflectableClass.cpp" />
+    <ClCompile Include="ReflectableClassFactory.cpp" />
     <ClCompile Include="ReflectionException.cpp" />
     <ClCompile Include="RegisterClass.cpp" />
     <ClCompile Include="ReuseAttribute.cpp" />
     <ClCompile Include="ScalarAttribute.cpp" />
-    <ClCompile Include="ArgumentsParser.cpp" />
-    <ClCompile Include="AttributeExecuter.cpp" />
-    <ClCompile Include="ClassProperty.cpp" />
-    <ClCompile Include="DescriptionAttribute.cpp" />
-    <ClCompile Include="Enumerator.cpp" />
-    <ClCompile Include="FilenameAttribute.cpp" />
-    <ClCompile Include="FlagAttribute.cpp" />
-    <ClCompile Include="IAttribute.cpp" />
-    <ClCompile Include="ObservableClass.cpp" />
-    <ClCompile Include="ObserveAttribute.cpp" />
-    <ClCompile Include="ReflectableAttribute.cpp" />
-    <ClCompile Include="ReflectableClass.cpp" />
-    <ClCompile Include="ReflectableClassFactory.cpp" />
     <ClCompile Include="SerializeAttribute.cpp" />
     <ClCompile Include="Serializer.cpp" />
     <ClCompile Include="ShortNameAttribute.cpp" />
@@ -173,7 +184,7 @@
     <ClCompile Include="Variant.cpp" />
     <ClCompile Include="Verifier.cpp" />
     <ClCompile Include="VolatileAttribute.cpp" />
-    <ClCompile Include="xmlizer.cpp" />
+    <ClCompile Include="Xmlizer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
