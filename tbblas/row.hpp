@@ -17,7 +17,7 @@ namespace tbblas {
 template<class Tensor>
 typename boost::enable_if<is_tensor<Tensor>,
   typename boost::enable_if_c<Tensor::dimCount == 2,
-    proxy<Tensor>
+    const proxy<Tensor>
   >::type
 >::type
 row(Tensor& tensor, unsigned rowIdx) {
