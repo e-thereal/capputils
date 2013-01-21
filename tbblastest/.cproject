@@ -156,6 +156,7 @@
 									<listOptionValue builtIn="false" value="curand"/>
 									<listOptionValue builtIn="false" value="cublas"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gomp"/>
+									<listOptionValue builtIn="false" value=":libgslcblas.so.0"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1987775841" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

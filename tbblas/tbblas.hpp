@@ -28,7 +28,7 @@
 #define TBBLAS_ALLOC_WARNING
 #endif
 
-#ifdef i386
+#if defined(i386) && !defined(TBBLAS_DISABLE_CBLAS)
 #define TBBLAS_HAVE_CBLAS
 #endif
 
