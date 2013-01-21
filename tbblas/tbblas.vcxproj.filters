@@ -21,6 +21,9 @@
     <ClCompile Include="device_vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="device_matrix_gpu.cu" />
@@ -30,6 +33,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="binary_expression.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="column.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="comparisons.hpp">
@@ -47,10 +53,10 @@
     <ClInclude Include="device_vector.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="divides.hpp">
+    <ClInclude Include="dot.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dot.hpp">
+    <ClInclude Include="entropy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="expand.hpp">
@@ -62,7 +68,13 @@
     <ClInclude Include="fft_plan.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fill.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="flip.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gaussian.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ifft.hpp">
@@ -74,6 +86,12 @@
     <ClInclude Include="io.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="linalg.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mask.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="math.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -83,16 +101,10 @@
     <ClInclude Include="min.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="minus.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="multiplies.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ones.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="plus.hpp">
+    <ClInclude Include="prod.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="proxy.hpp">
@@ -104,10 +116,19 @@
     <ClInclude Include="real.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="scalar_expression.hpp">
+    <ClInclude Include="repeat.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="reshape.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="row.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="sequence.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="serialize.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="shift.hpp">
@@ -122,13 +143,16 @@
     <ClInclude Include="tensor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="trans.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="type_traits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zeros.hpp">
+    <ClInclude Include="unary_expression.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fill.hpp">
+    <ClInclude Include="zeros.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

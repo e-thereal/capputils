@@ -29,7 +29,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 4.2.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 5.0.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -83,6 +83,7 @@
   <ItemGroup>
     <ClCompile Include="device_matrix.cpp" />
     <ClCompile Include="device_vector.cpp" />
+    <ClCompile Include="math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="device_matrix_gpu.cu" />
@@ -90,42 +91,49 @@
   <ItemGroup>
     <ClInclude Include="arithmetic.hpp" />
     <ClInclude Include="binary_expression.hpp" />
+    <ClInclude Include="column.hpp" />
     <ClInclude Include="comparisons.hpp" />
     <ClInclude Include="complex.hpp" />
     <ClInclude Include="conv.hpp" />
     <ClInclude Include="device_matrix.hpp" />
     <ClInclude Include="device_vector.hpp" />
-    <ClInclude Include="divides.hpp" />
     <ClInclude Include="dot.hpp" />
+    <ClInclude Include="entropy.hpp" />
     <ClInclude Include="expand.hpp" />
     <ClInclude Include="fft.hpp" />
     <ClInclude Include="fft_plan.hpp" />
     <ClInclude Include="fill.hpp" />
     <ClInclude Include="flip.hpp" />
+    <ClInclude Include="gaussian.hpp" />
     <ClInclude Include="ifft.hpp" />
     <ClInclude Include="img.hpp" />
     <ClInclude Include="io.hpp" />
+    <ClInclude Include="linalg.hpp" />
+    <ClInclude Include="mask.hpp" />
     <ClInclude Include="math.hpp" />
     <ClInclude Include="max.hpp" />
     <ClInclude Include="min.hpp" />
-    <ClInclude Include="minus.hpp" />
-    <ClInclude Include="multiplies.hpp" />
     <ClInclude Include="ones.hpp" />
-    <ClInclude Include="plus.hpp" />
+    <ClInclude Include="prod.hpp" />
     <ClInclude Include="proxy.hpp" />
     <ClInclude Include="random.hpp" />
     <ClInclude Include="real.hpp" />
-    <ClInclude Include="scalar_expression.hpp" />
+    <ClInclude Include="repeat.hpp" />
+    <ClInclude Include="reshape.hpp" />
+    <ClInclude Include="row.hpp" />
     <ClInclude Include="sequence.hpp" />
+    <ClInclude Include="serialize.hpp" />
     <ClInclude Include="shift.hpp" />
     <ClInclude Include="sum.hpp" />
     <ClInclude Include="tbblas.hpp" />
     <ClInclude Include="tensor.hpp" />
+    <ClInclude Include="trans.hpp" />
     <ClInclude Include="type_traits.hpp" />
+    <ClInclude Include="unary_expression.hpp" />
     <ClInclude Include="zeros.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 4.2.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 5.0.targets" />
   </ImportGroup>
 </Project>

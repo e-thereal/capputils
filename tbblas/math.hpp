@@ -17,6 +17,9 @@
 
 namespace tbblas {
 
+// wrapper around the boost version
+double binomial(int n, int k);
+
 template<class T>
 struct p_norm_operation {
   typedef T value_t;
@@ -36,8 +39,34 @@ p_norm(const Expression& expr) {
       p_norm_operation<typename Expression::value_t>());
 }
 
-/*** ERFC ***/
+template<class T>
+struct bernstein_operation {
+  typedef T value_t;
 
+  T coefficient, e1, e2;
+
+  bernstein_operation(int k, int n) {
+    e1 = k;
+    e2 = n - k;
+    coefficient = binomial(n, k);
+  }
+
+  __host__ __device__
+  T operator()(const T& x) const {
+    return coefficient * pow(x, e1) * pow(1.f - x, e2);
+  }
+};
+
+template<class Expression>
+inline typename boost::enable_if<is_expression<Expression>,
+  unary_expression<Expression, bernstein_operation<typename Expression::value_t> >
+>::type
+bernstein(const Expression& expr, int k, int n) {
+  return unary_expression<Expression, bernstein_operation<typename Expression::value_t> >(expr,
+      bernstein_operation<typename Expression::value_t>(k, n));
+}
+
+/*** ERFC ***/
 
 template<class T>
 struct erfc_operation {
