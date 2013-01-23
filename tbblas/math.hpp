@@ -66,6 +66,29 @@ bernstein(const Expression& expr, int k, int n) {
       bernstein_operation<typename Expression::value_t>(k, n));
 }
 
+template<class T>
+struct pow_operation {
+  typedef T value_t;
+
+  T e;
+
+  pow_operation(const T& e) : e (e) { }
+
+  __host__ __device__
+  T operator()(const T& x) const {
+    return ::pow(x, e);
+  }
+};
+
+template<class Expression>
+inline typename boost::enable_if<is_expression<Expression>,
+  unary_expression<Expression, pow_operation<typename Expression::value_t> >
+>::type
+pow(const Expression& expr, const typename Expression::value_t& exponent) {
+  return unary_expression<Expression, pow_operation<typename Expression::value_t> >(expr,
+      pow_operation<typename Expression::value_t>(exponent));
+}
+
 /*** ERFC ***/
 
 template<class T>
