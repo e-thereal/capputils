@@ -14,7 +14,7 @@ namespace capputils {
 
 namespace attributes {
 
-class DummyAttribute : public IAttribute {
+class DummyAttribute : public virtual IAttribute {
 public:
   DummyAttribute(int);
 };
