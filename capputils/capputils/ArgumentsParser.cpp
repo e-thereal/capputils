@@ -13,6 +13,7 @@
 
 #include "FlagAttribute.h"
 #include "DescriptionAttribute.h"
+#include "HideAttribute.h"
 
 using namespace std;
 
@@ -40,10 +41,15 @@ void ArgumentsParser::PrintUsage(const string& header, const reflection::Reflect
   vector<IClassProperty*>& properties = object.getProperties();
 
   size_t columnWidth = 0;
-  for (unsigned i = 0; i < properties.size(); ++i)
+  for (unsigned i = 0; i < properties.size(); ++i) {
+    if (properties[i]->getAttribute<HideAttribute>())
+      continue;
     columnWidth = max(columnWidth, strlen(properties[i]->getName().c_str()));
+  }
 
   for (unsigned i = 0; i < properties.size(); ++i) {
+    if (properties[i]->getAttribute<HideAttribute>())
+      continue;
     cout << "  --" << properties[i]->getName();
     for (unsigned j = 0; j < columnWidth - strlen(properties[i]->getName().c_str()); ++j)
       cout << " ";
