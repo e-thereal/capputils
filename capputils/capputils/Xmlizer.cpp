@@ -67,15 +67,14 @@ void populatePropertyElement(TiXmlElement* propertyElement, const ReflectableCla
     }
   } else if (enumerableAttribute) {
     TiXmlElement* collectionElement = new TiXmlElement("Collection");
-    IPropertyIterator* iter = enumerableAttribute->getPropertyIterator(property);
+    boost::shared_ptr<IPropertyIterator> iter = enumerableAttribute->getPropertyIterator(property);
     while (!iter->eof(object)) {
       TiXmlElement* itemElement = new TiXmlElement("Item");
-      populatePropertyElement(itemElement, object, iter);
+      populatePropertyElement(itemElement, object, iter.get());
       collectionElement->LinkEndChild(itemElement);
       iter->next();
     }
     propertyElement->LinkEndChild(collectionElement);
-    delete iter;
   } else {
     propertyElement->SetAttribute("value", property->getStringValue(object));
   }
@@ -203,15 +202,14 @@ void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClass
       }
     } else if (enumerableAttribute) {
       const TiXmlNode* collectionElement = element->FirstChild("Collection");
-      IPropertyIterator* iter = enumerableAttribute->getPropertyIterator(property);
+      boost::shared_ptr<IPropertyIterator> iter = enumerableAttribute->getPropertyIterator(property);
       for (const TiXmlNode* node = collectionElement->FirstChild("Item"); node; node = node->NextSibling("Item")) {
         if (node->Type() == TiXmlNode::TINYXML_ELEMENT) {
           const TiXmlElement* itemElement = dynamic_cast<const TiXmlElement*>(node);
-          setValueOfProperty(object, iter, itemElement);
+          setValueOfProperty(object, iter.get(), itemElement);
           iter->next();
         }
       }
-      delete iter;
     }
   }
   //attributes = property->getAttributes();

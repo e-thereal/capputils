@@ -6,21 +6,111 @@
 #include "IEnumerableAttribute.h"
 #include "ClassProperty.h"
 #include "ReflectableAttribute.h"
+#include <vector>
+#include <boost/make_shared.hpp>
 
 namespace capputils {
 
 namespace reflection {
 
-template<class CollectionType, class ValueType>
-class PropertyIterator : public virtual IPropertyIterator, public ClassProperty<ValueType> {
+template<class T>
+struct collection_trait {
+  typedef typename T::value_type value_t;
+
+  static size_t size(const T& collection) {
+    return collection.size();
+  }
+
+  static value_t at(const T& collection, size_t i) {
+    return collection.at(i);
+  }
+
+  static void setAt(T& collection, size_t i, value_t value) {
+    collection.at(i) = value;
+  }
+
+  static void push_back(T& collection, const value_t& value) {
+    collection.push_back(value);
+  }
+
+  static void clear(T& collection) {
+    collection.clear();
+  }
+};
+
+template<class T>
+struct collection_trait<T*> {
+  typedef typename T::value_type value_t;
+
+  static size_t size(T* collection) {
+    assert(collection);
+    return collection->size();
+  }
+
+  static value_t at(T* collection, size_t i) {
+    assert(collection);
+    return collection->at(i);
+  }
+
+  static void setAt(T* collection, size_t i, value_t value) {
+    assert(collection);
+    collection->at(i) = value;
+  }
+
+  static void push_back(T* collection, const value_t& value) {
+    assert(collection);
+    collection->push_back(value);
+  }
+
+  static void clear(T* collection) {
+    assert(collection);
+    collection->clear();
+  }
+};
+
+template<class T>
+struct collection_trait<boost::shared_ptr<T> > {
+  typedef typename T::value_type value_t;
+
+  static size_t size(boost::shared_ptr<T> collection) {
+    assert(collection);
+    return collection->size();
+  }
+
+  static value_t at(const boost::shared_ptr<T>& collection, size_t i) {
+    assert(collection);
+    return collection->at(i);
+  }
+
+  static void setAt(boost::shared_ptr<T>& collection, size_t i, value_t value) {
+    assert(collection);
+    collection->at(i) = value;
+  }
+
+  static void push_back(boost::shared_ptr<T>& collection, const value_t& value) {
+    assert(collection);
+    collection->push_back(value);
+  }
+
+  static void clear(boost::shared_ptr<T>& collection) {
+    assert(collection);
+    collection->clear();
+  }
+};
+
+template<class CollectionType>
+class PropertyIterator : public virtual IPropertyIterator,
+                         public ClassProperty<typename collection_trait<CollectionType>::value_t>
+{
 
 private:
   int i;
   const ClassProperty<CollectionType>* collectionProperty;
+  typedef typename collection_trait<CollectionType>::value_t value_t;
 
 public:
   PropertyIterator(const ClassProperty<CollectionType>* collectionProperty)
-    : ClassProperty<ValueType>(collectionProperty->getName(), 0, 0, 0), i(0), collectionProperty(collectionProperty)
+    : ClassProperty<value_t>(collectionProperty->getName(), 0, 0, 0), i(0), collectionProperty(collectionProperty)
   {
   }
   virtual ~PropertyIterator() { }
@@ -30,7 +120,7 @@ public:
   }
 
   virtual bool eof(const ReflectableClass& object) const {
-    return i >= (int)collectionProperty->getValue(object).size();
+    return i >= (int)collection_trait<CollectionType>::size(collectionProperty->getValue(object));
   }
 
   virtual void next() {
@@ -42,126 +132,28 @@ public:
       --i;
   }
 
-  virtual ValueType getValue(const ReflectableClass& object) const {
-    assert(i >= 0);
-    assert(i < (int)collectionProperty->getValue(object).size());
-    return collectionProperty->getValue(object)[i];
-  }
-
-  virtual void setValue(ReflectableClass& object, ValueType value) const {
+  virtual void clear(ReflectableClass& object) {
     CollectionType collection = collectionProperty->getValue(object);
-    if (i < 0)
-      throw "invalid iterator position! (negative)";
-    else if (i < (int)collection.size())
-      collection[i] = value;
-    else if (i == (int)collection.size())
-      collection.push_back(value);
-    else
-      throw "invalid iterator position!";
+    collection_trait<CollectionType>::clear(collection);
     collectionProperty->setValue(object, collection);
   }
-};
 
-template<class CollectionType, class ValueType>
-class PropertyIterator<boost::shared_ptr<CollectionType>, ValueType> : public virtual IPropertyIterator, public ClassProperty<ValueType> {
-
-private:
-  int i;
-  const ClassProperty<boost::shared_ptr<CollectionType> >* collectionProperty;
-
-public:
-  PropertyIterator(const ClassProperty<boost::shared_ptr<CollectionType> >* collectionProperty)
-    : ClassProperty<ValueType>(collectionProperty->getName(), 0, 0, 0), i(0), collectionProperty(collectionProperty)
-  {
-    assert(collectionProperty);
-  }
-  virtual ~PropertyIterator() { }
-
-  virtual void reset() {
-    i = 0;
-  }
-
-  virtual bool eof(const ReflectableClass& object) const {
-    assert(collectionProperty->getValue(object));
-    return i >= (int)collectionProperty->getValue(object)->size();
-  }
-
-  virtual void next() {
-    ++i;
-  }
-
-  virtual void prev() {
-    if (i > 0)
-      --i;
-  }
-
-  virtual ValueType getValue(const ReflectableClass& object) const {
+  virtual value_t getValue(const ReflectableClass& object) const {
     assert(i >= 0);
-    assert(i < (int)collectionProperty->getValue(object)->size());
-    return collectionProperty->getValue(object)->at(i);
+    assert(i < (int)collection_trait<CollectionType>::size(collectionProperty->getValue(object)));
+    return collection_trait<CollectionType>::at(collectionProperty->getValue(object), i);
   }
 
-  virtual void setValue(ReflectableClass& object, ValueType value) const {
-    boost::shared_ptr<CollectionType> collection = collectionProperty->getValue(object);
-    if (i < 0)
-      throw "invalid iterator position! (negative)";
-    else if (i < (int)collection->size())
-      (*collection)[i] = value;
-    else if (i == (int)collection->size())
-      collection->push_back(value);
-    else
-      throw "invalid iterator position!";
-    collectionProperty->setValue(object, collection);
-  }
-};
-
-template<class CollectionType, class ValueType>
-class PropertyIterator<CollectionType*, ValueType> : public virtual IPropertyIterator, public ClassProperty<ValueType> {
-
-private:
-  int i;
-  const ClassProperty<CollectionType*>* collectionProperty;
-
-public:
-  PropertyIterator(const ClassProperty<CollectionType*>* collectionProperty)
-    : ClassProperty<ValueType>(collectionProperty->getName(), 0, 0, 0), i(0), collectionProperty(collectionProperty)
-  {
-  }
-  virtual ~PropertyIterator() { }
-
-  virtual void reset() {
-    i = 0;
-  }
-
-  virtual bool eof(const ReflectableClass& object) const {
-    return i >= (int)collectionProperty->getValue(object)->size();
-  }
-
-  virtual void next() {
-    ++i;
-  }
-
-  virtual void prev() {
-    if (i > 0)
-      --i;
-  }
-
-  virtual ValueType getValue(const ReflectableClass& object) const {
+  virtual void setValue(ReflectableClass& object, value_t value) const {
+    CollectionType collection = collectionProperty->getValue(object);
     assert(i >= 0);
-    assert(i < (int)collectionProperty->getValue(object)->size());
-    return collectionProperty->getValue(object)->at(i);
-  }
+    assert(i <= (int)collection_trait<CollectionType>::size(collection));
 
-  virtual void setValue(ReflectableClass& object, ValueType value) const {
-    CollectionType* collection = collectionProperty->getValue(object);
-    if (i < 0)
-      throw "invalid iterator position! (negative)";
-    else if (i < (int)collection->size())
-      (*collection)[i] = value;
-    else if (i == (int)collection->size())
-      collection->push_back(value);
+    if (i < (int)collection_trait<CollectionType>::size(collection))
+      collection_trait<CollectionType>::setAt(collection, i, value);
     else
-      throw "invalid iterator position!";
+      collection_trait<CollectionType>::push_back(collection, value);
+
     collectionProperty->setValue(object, collection);
   }
 };
@@ -170,147 +162,49 @@ public:
 
 namespace attributes {
 
-template<class T, bool reflectable>
+template<class T, bool reflectable = false>
 class EnumerableAttribute : public virtual IEnumerableAttribute {
 public:
   typedef T CollectionType;
-  typedef typename T::value_type ValueType;
 
 public:
-  virtual reflection::IPropertyIterator* getPropertyIterator(const reflection::IClassProperty* property) {
+  virtual boost::shared_ptr<reflection::IPropertyIterator> getPropertyIterator(const reflection::IClassProperty* property) {
     using namespace reflection;
 
     const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
-    if (!typedProperty)
-      throw "unexpected error.";
-    IPropertyIterator* iter = new reflection::PropertyIterator<CollectionType, ValueType>(typedProperty);
-    return iter;
+    assert(typedProperty);
+    return boost::make_shared<PropertyIterator<CollectionType> >(typedProperty);
   }
 
-  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
-    using namespace reflection;
-    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
-    typedProperty->setValue(object, CollectionType());
-  }
+//  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
+//    using namespace reflection;
+//    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
+//    typedProperty->setValue(object, CollectionType());
+//  }
 };
 
 template<class T>
 class EnumerableAttribute<T, true> : public virtual IEnumerableAttribute {
 public:
   typedef T CollectionType;
-  typedef typename T::value_type ValueType;
 
 public:
-  virtual reflection::IPropertyIterator* getPropertyIterator(const reflection::IClassProperty* property) {
+  virtual boost::shared_ptr<reflection::IPropertyIterator> getPropertyIterator(const reflection::IClassProperty* property) {
     using namespace reflection;
 
     const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
-    if (!typedProperty)
-      throw "unexpected error.";
-    IPropertyIterator* iter = new reflection::PropertyIterator<CollectionType, ValueType>(typedProperty);
-    iter->addAttribute(new ReflectableAttribute<ValueType>());
+    assert(typedProperty);
+
+    boost::shared_ptr<IPropertyIterator> iter(new reflection::PropertyIterator<CollectionType>(typedProperty));
+    iter->addAttribute(new ReflectableAttribute<typename reflection::collection_trait<CollectionType>::value_t>());
     return iter;
   }
 
-  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
-    using namespace reflection;
-    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
-    typedProperty->setValue(object, CollectionType());
-  }
-};
-
-template<class T>
-class EnumerableAttribute<boost::shared_ptr<T>, false> : public virtual IEnumerableAttribute {
-public:
-  typedef boost::shared_ptr<T> CollectionType;
-  typedef typename T::value_type ValueType;
-
-  virtual reflection::IPropertyIterator* getPropertyIterator(const reflection::IClassProperty* property) {
-    using namespace reflection;
-
-    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
-    if (!typedProperty)
-      throw "unexpected error.";
-    IPropertyIterator* iter = new reflection::PropertyIterator<CollectionType, ValueType>(typedProperty);
-    return iter;
-  }
-
-  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
-    using namespace reflection;
-    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
-    typedProperty->getValue(object)->clear();
-  }
-};
-
-template<class T>
-class EnumerableAttribute<boost::shared_ptr<T>, true> : public virtual IEnumerableAttribute {
-public:
-  typedef boost::shared_ptr<T> CollectionType;
-  typedef typename T::value_type ValueType;
-
-  virtual reflection::IPropertyIterator* getPropertyIterator(const reflection::IClassProperty* property) {
-    using namespace reflection;
-
-    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
-    if (!typedProperty)
-      throw "unexpected error.";
-    IPropertyIterator* iter = new reflection::PropertyIterator<CollectionType, ValueType>(typedProperty);
-    iter->addAttribute(new ReflectableAttribute<ValueType>());
-    return iter;
-  }
-
-  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
-    using namespace reflection;
-    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
-    typedProperty->getValue(object)->clear();
-  }
-};
-
-template<class T>
-class EnumerableAttribute<T*, false> : public virtual IEnumerableAttribute {
-public:
-  typedef T* CollectionType;
-  typedef typename T::value_type ValueType;
-
-  virtual reflection::IPropertyIterator* getPropertyIterator(const reflection::IClassProperty* property) {
-    using namespace reflection;
-
-    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
-    if (!typedProperty)
-      throw "unexpected error.";
-    IPropertyIterator* iter = new reflection::PropertyIterator<CollectionType, ValueType>(typedProperty);
-    return iter;
-  }
-
-  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
-    using namespace reflection;
-    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
-    typedProperty->getValue(object)->clear();
-  }
-};
-
-template<class T>
-class EnumerableAttribute<T*, true> : public virtual IEnumerableAttribute {
-public:
-  typedef T* CollectionType;
-  typedef typename T::value_type ValueType;
-
-  virtual reflection::IPropertyIterator* getPropertyIterator(const reflection::IClassProperty* property) {
-    using namespace reflection;
-
-    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
-    if (!typedProperty)
-      throw "unexpected error.";
-    IPropertyIterator* iter = new reflection::PropertyIterator<CollectionType, ValueType>(typedProperty);
-    iter->addAttribute(new ReflectableAttribute<ValueType>());
-    return iter;
-  }
-
-  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
-    using namespace reflection;
-    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
-    typedProperty->getValue(object)->clear();
-  }
+//  virtual void clear(const reflection::IClassProperty* property, reflection::ReflectableClass& object) {
+//    using namespace reflection;
+//    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
+//    typedProperty->setValue(object, CollectionType());
+//  }
 };
 
 template<class T, bool reflectable>
