@@ -12,6 +12,8 @@
 #include <map>
 
 #include <boost/signals.hpp>
+#include <boost/shared_ptr.hpp>
+
 #include "EventHandler.h"
 
 namespace capputils {
@@ -31,13 +33,15 @@ struct LibraryData {
   void* handle;
 #endif
   LibraryData(const char* filename);
+  void unload();
   virtual ~LibraryData();
 };
 
 class LibraryLoader {
 private:
   static LibraryLoader* instance;
-  std::map<std::string, LibraryData*> libraryTable;
+  std::map<std::string, boost::shared_ptr<LibraryData> > libraryTable;
+  bool autoUnload;
 
 protected:
   LibraryLoader();
@@ -47,8 +51,11 @@ public:
 
   static LibraryLoader& getInstance();
 
+  void setAutoUnload(bool autoUnload);
+  bool getAutoUnload() const;
+
   void loadLibrary(const std::string& filename);
-  void freeLibrary(const std::string& filename);
+  void unloadLibrary(const std::string& filename);
   bool librariesUpdated();
 
   // Returns the library name that defines the given class

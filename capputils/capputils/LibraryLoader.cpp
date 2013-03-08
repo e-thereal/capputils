@@ -92,7 +92,9 @@ LibraryData::LibraryData(const char* filename) {
   }
 }
 
-LibraryData::~LibraryData() {
+LibraryData::~LibraryData() { }
+
+void LibraryData::unload() {
   // TODO: Error handling: why can't free.
   if (!FreeLibrary(handleWrapper->handle)) {
     delete handleWrapper;
@@ -132,7 +134,9 @@ LibraryData::LibraryData(const char* filename) {
   }
 }
 
-LibraryData::~LibraryData() {
+LibraryData::~LibraryData() { }
+
+void LibraryData::unload() {
 //  cout << "Unloading library: " << filename << endl;
   if (dlclose(handle))
     throw exceptions::LibraryException(filename, dlerror());
@@ -142,17 +146,16 @@ LibraryData::~LibraryData() {
 
 LibraryLoader* LibraryLoader::instance = 0;
 
-LibraryLoader::LibraryLoader() {
-}
+LibraryLoader::LibraryLoader() : autoUnload(true) { }
 
 LibraryLoader::~LibraryLoader() {
-  for (map<string, LibraryData*>::iterator iter = libraryTable.begin();
-      iter != libraryTable.end(); ++iter)
-  {
-    LibraryData* data = iter->second;
-    delete data;
+  if (autoUnload) {
+    for (map<string, boost::shared_ptr<LibraryData> >::iterator iter = libraryTable.begin();
+        iter != libraryTable.end(); ++iter)
+    {
+      iter->second->unload();
+    }
   }
-  libraryTable.clear();
 }
 
 LibraryLoader& LibraryLoader::getInstance() {
@@ -161,11 +164,19 @@ LibraryLoader& LibraryLoader::getInstance() {
   return *instance;
 }
 
+void LibraryLoader::setAutoUnload(bool autoUnload) {
+  this->autoUnload = autoUnload;
+}
+
+bool LibraryLoader::getAutoUnload() const {
+  return autoUnload;
+}
+
 void LibraryLoader::loadLibrary(const string& filename) {
   // If loaded, increase counter, else load
-  map<string, LibraryData*>::iterator iter = libraryTable.find(filename);
+  map<string, boost::shared_ptr<LibraryData> >::iterator iter = libraryTable.find(filename);
   if (iter == libraryTable.end()) {
-    LibraryData* data = new LibraryData(filename.c_str());
+    boost::shared_ptr<LibraryData> data(new LibraryData(filename.c_str()));
     libraryTable[filename] = data;
 //    cout << filename << " library loaded." << endl;
   } else {
@@ -174,16 +185,16 @@ void LibraryLoader::loadLibrary(const string& filename) {
   }
 }
 
-void LibraryLoader::freeLibrary(const string& filename) {
+void LibraryLoader::unloadLibrary(const string& filename) {
 //  cout << "Try to free library " << filename << endl;
-  map<string, LibraryData*>::iterator iter = libraryTable.find(filename);
+  map<string, boost::shared_ptr<LibraryData> >::iterator iter = libraryTable.find(filename);
   if (iter != libraryTable.end()) {
-    LibraryData* data = iter->second;
+    boost::shared_ptr<LibraryData> data = iter->second;
     data->loadCount = data->loadCount - 1;
 //    cout << filename << " library counter decremented (" << data->loadCount << ")." << endl;
     if (!data->loadCount) {
+      data->unload();
       libraryTable.erase(filename);
-      delete data;
 //      cout << "Library freed." << endl;
     }
   }
@@ -192,10 +203,10 @@ void LibraryLoader::freeLibrary(const string& filename) {
 bool LibraryLoader::librariesUpdated() {
   bool updated = false;
   time_t lastModified = 0;
-  for (map<string, LibraryData*>::iterator iter = libraryTable.begin();
+  for (map<string, boost::shared_ptr<LibraryData> >::iterator iter = libraryTable.begin();
       iter != libraryTable.end(); ++iter)
   {
-    LibraryData* data = iter->second;
+    boost::shared_ptr<LibraryData> data = iter->second;
     try {
       lastModified = last_write_time(data->filename);
     } catch(...) {
@@ -210,11 +221,11 @@ bool LibraryLoader::librariesUpdated() {
 }
 
 string LibraryLoader::classDefinedIn(const string& classname) {
-  for (map<string, LibraryData*>::iterator iter = libraryTable.begin();
+  for (map<string, boost::shared_ptr<LibraryData> >::iterator iter = libraryTable.begin();
         iter != libraryTable.end(); ++iter)
   {
-    LibraryData* data = iter->second;
-    for (unsigned i = 0; i < data->classnames.size(); ++i) {
+    boost::shared_ptr<LibraryData> data = iter->second;
+    for (size_t i = 0; i < data->classnames.size(); ++i) {
       if (data->classnames[i].compare(classname) == 0)
         return iter->first;
     }
