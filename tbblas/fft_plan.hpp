@@ -23,7 +23,7 @@ namespace tbblas {
 template<unsigned dim>
 class fft_plan_handle : boost::noncopyable {
 
-  typedef sequence<unsigned, dim> dim_t;
+  typedef sequence<int, dim> dim_t;
 
 private:
   cufftHandle plan;
@@ -83,7 +83,7 @@ public:
 template<unsigned dim>
 class fft_plan {
 
-  typedef sequence<unsigned, dim> dim_t;
+  typedef sequence<int, dim> dim_t;
 
 private:
   boost::shared_ptr<fft_plan_handle<dim> > handle;

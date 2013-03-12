@@ -19,7 +19,7 @@ struct repeat_expression {
   typedef typename Expression::value_t value_t;
   typedef typename Expression::dim_t dim_t;
 
-  static const int dimCount = Expression::dimCount;
+  static const unsigned dimCount = Expression::dimCount;
   static const bool cuda_enabled = Expression::cuda_enabled;
 
   typedef int difference_type;
@@ -31,7 +31,7 @@ struct repeat_expression {
 
     index_functor(dim_t inSize, dim_t outSize) : inSize(inSize), outSize(outSize) {
       pitch[0] = 1;
-      for (int i = 1; i < dimCount; ++i)
+      for (unsigned i = 1; i < dimCount; ++i)
         pitch[i] = pitch[i - 1] * inSize[i - 1];
     }
 
@@ -43,7 +43,7 @@ struct repeat_expression {
 
       difference_type index;
       index = (idx % inSize[0]) * pitch[0];
-      for (int k = 1; k < dimCount; ++k) {
+      for (unsigned k = 1; k < dimCount; ++k) {
         index += ((idx /= outSize[k-1]) % inSize[k]) * pitch[k];
 
       }
@@ -81,7 +81,7 @@ struct repeat_expression {
 
   inline size_t count() const {
     size_t count = 1;
-    for (int i = 0; i < dimCount; ++i)
+    for (unsigned i = 0; i < dimCount; ++i)
       count *= outSize[i];
     return count;
   }

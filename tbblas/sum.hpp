@@ -62,8 +62,8 @@ struct sum_operation {
   {
     typename Proxy::dim_t order;
     order[0] = dimIdx;
-    for (int i = 1; i < Proxy::dimCount; ++i) {
-      order[i] = i - (i <= dimIdx);
+    for (unsigned i = 1; i < Proxy::dimCount; ++i) {
+      order[i] = (int)i - (i <= dimIdx);
     }
     _proxy.reorder(order);
     _size[dimIdx] = 1;

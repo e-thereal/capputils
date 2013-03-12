@@ -156,7 +156,7 @@ struct random_tensor<T, dim, false, Distribution>
 
   struct get_random : thrust::unary_function<const generator_t*, value_t> {
 
-    __host__
+//    __host__
     value_t operator()(const generator_t* gen) const {
       return Distribution::rand(const_cast<generator_t*>(gen));
     }
@@ -232,7 +232,7 @@ struct uniform<float> {
     return curand_uniform(state);
   }
 
-  __host__
+//  __host__
   static inline float rand(generator_t* gen) {
     thrust::random::uniform_real_distribution<float> dist;
     return dist(*gen);
@@ -248,7 +248,7 @@ struct uniform<double> {
     return curand_uniform_double(state);
   }
 
-  __host__
+//  __host__
   static inline double rand(generator_t* gen) {
     thrust::random::uniform_real_distribution<double> dist;
     return dist(*gen);
@@ -268,7 +268,7 @@ struct normal<float> {
     return curand_normal(state);
   }
 
-  __host__
+//  __host__
   static inline float rand(generator_t* gen) {
     thrust::random::experimental::normal_distribution<float> dist;
     return dist(*gen);
@@ -284,7 +284,7 @@ struct normal<double> {
     return curand_normal_double(state);
   }
 
-  __host__
+//  __host__
   static inline double rand(generator_t* gen) {
     thrust::random::experimental::normal_distribution<double> dist;
     return dist(*gen);

@@ -78,7 +78,7 @@ struct is_expression {
  * typedef typename ... dim_t;
  * typedef typename ... data_t;
  *
- * static const int dimCount;
+ * static const unsigned dimCount;
  * static const bool cuda_enabled;
  */
 template<class T>

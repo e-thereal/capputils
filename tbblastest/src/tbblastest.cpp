@@ -11,9 +11,12 @@
 #include <iostream>
 
 int main(int argc, char** argv) {
+
+  ompsegfault();
+
 //  helloworld();
 //  convtest();
-  sumtest();
+//  sumtest();
 //  entropytest();
 //  proxycopy();
 //  ffttest();

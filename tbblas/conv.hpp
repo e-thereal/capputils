@@ -21,7 +21,7 @@ struct conv_operation
   typedef typename Expression1::dim_t dim_t;
   typedef typename Expression1::value_t value_t;
   typedef complex<value_t> complex_t;
-  static const int dimCount = Expression1::dimCount;
+  static const unsigned dimCount = Expression1::dimCount;
 
   typedef tensor<value_t, dimCount, Expression1::cuda_enabled> tensor_t;
   typedef tensor<complex_t, dimCount, Expression1::cuda_enabled> ctensor_t;
@@ -49,7 +49,7 @@ public:
 //    std::cout << "size2: " << expr2.size() << std::endl;
 //    std::cout << "result: " << _size << std::endl;
 //    std::cout << "padded: " << _maxSize << std::endl;
-    for (size_t i = 0; i < dimCount; ++i)
+    for (unsigned i = 0; i < dimCount; ++i)
       _paddedSize[i] = upper_power_of_two(_maxSize[i]);
 //    std::cout << "padded: " << _paddedSize << std::endl;
   }

@@ -21,7 +21,7 @@ typename boost::enable_if<is_tensor<Tensor>,
   >::type
 >::type
 column(Tensor& tensor, unsigned columnIdx) {
-  assert(columnIdx < tensor.size()[1]);
+  assert((int)columnIdx < tensor.size()[1]);
   return tensor[seq(0, (int)columnIdx), seq(tensor.size()[0], 1)];
 }
 

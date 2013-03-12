@@ -24,5 +24,6 @@ void fftflip();
 void maskstest();
 void multigpu();
 void copytest();
+void ompsegfault();
 
 #endif /* TESTS_H_ */

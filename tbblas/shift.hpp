@@ -26,7 +26,7 @@ struct fftshift_expression {
   typedef typename Expression::value_t value_t;
   typedef typename Expression::dim_t dim_t;
 
-  static const int dimCount = Expression::dimCount;
+  static const unsigned dimCount = Expression::dimCount;
   static const bool cuda_enabled = Expression::cuda_enabled;
 
   typedef int difference_type;
@@ -37,7 +37,7 @@ struct fftshift_expression {
     dim_t _pitch;
 
     index_functor(const dim_t& size) {
-      for (int i = 0; i < dimCount; ++i) {
+      for (int i = 0; i < (int)dimCount; ++i) {
         _size[i] = size[i];
         if (i == 0)
           _pitch[0] = 1;
@@ -51,7 +51,7 @@ struct fftshift_expression {
     {
       difference_type index;
       index = ((i + (_size[0]+(!inverse)) / 2) % _size[0]) * _pitch[0];
-      for (int k = 1; k < dimCount; ++k) {
+      for (int k = 1; k < (int)dimCount; ++k) {
         index += (((i /= _size[k-1]) + (_size[k]+!inverse) / 2) % _size[k]) * _pitch[k];
       }
       return index;

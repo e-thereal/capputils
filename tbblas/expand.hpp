@@ -28,7 +28,7 @@ struct fftexpand_expression {
   typedef typename Tensor::value_t value_t;
   typedef typename Tensor::dim_t dim_t;
 
-  static const int dimCount = Tensor::dimCount;
+  static const unsigned dimCount = Tensor::dimCount;
   static const bool cuda_enabled = Tensor::cuda_enabled;
 
   typedef int difference_type;
