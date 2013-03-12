@@ -67,8 +67,8 @@ void populatePropertyElement(TiXmlElement* propertyElement, const ReflectableCla
     }
   } else if (enumerableAttribute) {
     TiXmlElement* collectionElement = new TiXmlElement("Collection");
-    boost::shared_ptr<IPropertyIterator> iter = enumerableAttribute->getPropertyIterator(property);
-    while (!iter->eof(object)) {
+    boost::shared_ptr<IPropertyIterator> iter = enumerableAttribute->getPropertyIterator(object, property);
+    while (!iter->eof()) {
       TiXmlElement* itemElement = new TiXmlElement("Item");
       populatePropertyElement(itemElement, object, iter.get());
       collectionElement->LinkEndChild(itemElement);
@@ -202,7 +202,7 @@ void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClass
       }
     } else if (enumerableAttribute) {
       const TiXmlNode* collectionElement = element->FirstChild("Collection");
-      boost::shared_ptr<IPropertyIterator> iter = enumerableAttribute->getPropertyIterator(property);
+      boost::shared_ptr<IPropertyIterator> iter = enumerableAttribute->getPropertyIterator(object, property);
       for (const TiXmlNode* node = collectionElement->FirstChild("Item"); node; node = node->NextSibling("Item")) {
         if (node->Type() == TiXmlNode::TINYXML_ELEMENT) {
           const TiXmlElement* itemElement = dynamic_cast<const TiXmlElement*>(node);

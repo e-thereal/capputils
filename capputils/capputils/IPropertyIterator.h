@@ -12,7 +12,7 @@ namespace reflection {
 class IPropertyIterator : public virtual IClassProperty {
 public:
   virtual void reset() = 0;
-  virtual bool eof(const ReflectableClass& object) const = 0;
+  virtual bool eof() const = 0;
   virtual void next() = 0;
   virtual void prev() = 0;
   virtual void clear(ReflectableClass& object) = 0;

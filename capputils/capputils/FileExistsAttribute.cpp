@@ -45,8 +45,8 @@ bool FileExistsAttribute::valid(const IClassProperty& property,
   } else {
     IEnumerableAttribute* enumerable = property.getAttribute<IEnumerableAttribute>();
     if (enumerable) {
-      boost::shared_ptr<IPropertyIterator> iter = enumerable->getPropertyIterator(&property);
-      for (iter->reset(); !iter->eof(object); iter->next()) {
+      boost::shared_ptr<IPropertyIterator> iter = enumerable->getPropertyIterator(object, &property);
+      for (iter->reset(); !iter->eof(); iter->next()) {
         const string& filename = iter->getStringValue(object);
 
         if (!exists(filename)) {

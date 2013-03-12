@@ -35,7 +35,7 @@ struct merge_trait<boost::shared_ptr<std::vector<T> > > {
   }
 
   static void setValueAt(const collection_t& collection, int position, const value_t& value) {
-    if (collection->size() <= position)
+    if ((int)collection->size() <= position)
       collection->resize(position + 1);
     collection->at(position) = value;
   }
