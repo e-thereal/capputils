@@ -37,7 +37,7 @@ struct collection_trait {
     collection.clear();
   }
 
-  static bool valid(const T& collection) {
+  static bool valid(const T& /*collection*/) {
     return true;
   }
 };
