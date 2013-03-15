@@ -110,6 +110,7 @@ struct fft_operation
      _fullsize(tensor.size())
   { }
 
+  // TODO: copy memory to output buffer and perform FFT in-place
   void apply(tensor_t& output) const {
     cufftResult result;
 

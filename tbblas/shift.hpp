@@ -35,8 +35,9 @@ struct fftshift_expression {
 
     dim_t _size;
     dim_t _pitch;
+    const unsigned dimension;
 
-    index_functor(const dim_t& size) {
+    index_functor(const dim_t& size, unsigned dimension) : dimension(dimension) {
       for (int i = 0; i < (int)dimCount; ++i) {
         _size[i] = size[i];
         if (i == 0)
@@ -52,7 +53,10 @@ struct fftshift_expression {
       difference_type index;
       index = ((i + (_size[0]+(!inverse)) / 2) % _size[0]) * _pitch[0];
       for (int k = 1; k < (int)dimCount; ++k) {
-        index += (((i /= _size[k-1]) + (_size[k]+!inverse) / 2) % _size[k]) * _pitch[k];
+        if (k < (int)dimension)
+          index += (((i /= _size[k-1]) + (_size[k]+!inverse) / 2) % _size[k]) * _pitch[k];
+        else
+          index += (i /= _size[k-1]) * _pitch[k];
       }
       return index;
     }
@@ -63,10 +67,10 @@ struct fftshift_expression {
   typedef thrust::permutation_iterator<typename Expression::const_iterator,TransformIterator> PermutationIterator;
   typedef PermutationIterator const_iterator;
 
-  fftshift_expression(const Expression& expr) : expr(expr) { }
+  fftshift_expression(const Expression& expr, unsigned dimension) : expr(expr), dimension(dimension) { }
 
   inline const_iterator begin() const {
-    index_functor functor(size());
+    index_functor functor(size(), dimension);
     CountingIterator counting(0);
     TransformIterator transform(counting, functor);
     PermutationIterator permu(expr.begin(), transform);
@@ -92,6 +96,7 @@ struct fftshift_expression {
 
 private:
   const Expression& expr;
+  const unsigned dimension;
 };
 
 template<class T, bool inverse>
@@ -103,18 +108,18 @@ template<class Expression>
 typename boost::enable_if<is_expression<Expression>,
   fftshift_expression<Expression, false>
 >::type
-fftshift(const Expression& expr)
+fftshift(const Expression& expr, unsigned dimension = Expression::dimCount)
 {
-  return fftshift_expression<Expression, false>(expr);
+  return fftshift_expression<Expression, false>(expr, dimension);
 }
 
 template<class Expression>
 typename boost::enable_if<is_expression<Expression>,
   fftshift_expression<Expression, true>
 >::type
-ifftshift(const Expression& expr)
+ifftshift(const Expression& expr, unsigned dimension = Expression::dimCount)
 {
-  return fftshift_expression<Expression, true>(expr);
+  return fftshift_expression<Expression, true>(expr, dimension);
 }
 
 }
