@@ -12,8 +12,7 @@
 
 int main(int argc, char** argv) {
 
-  ompsegfault();
-
+//  ompsegfault();
 //  helloworld();
 //  convtest();
 //  sumtest();
@@ -30,6 +29,7 @@ int main(int argc, char** argv) {
 //  maskstest();
 //  multigpu();
 //  copytest();
+  benchmarks();
 
   return 0;
 }

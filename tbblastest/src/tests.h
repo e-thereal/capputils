@@ -25,5 +25,6 @@ void maskstest();
 void multigpu();
 void copytest();
 void ompsegfault();
+void benchmarks();
 
 #endif /* TESTS_H_ */

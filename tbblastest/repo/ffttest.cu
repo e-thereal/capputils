@@ -17,6 +17,8 @@
 #include <tbblas/expand.hpp>
 #include <tbblas/shift.hpp>
 #include <tbblas/real.hpp>
+#include <tbblas/gaussian.hpp>
+#include <tbblas/filter.hpp>
 
 #include <thrust/sequence.h>
 
@@ -29,27 +31,50 @@ typedef tbblas::random_tensor<float, 2, true, tbblas::uniform<float> > randu;
 void ffttest() {
   using namespace tbblas;
 
-  const int M = 34;
-  const int N = 30;
+//  const int M = 34;
+//  const int N = 30;
+//
+//  matrix A = floor(100 * gaussian<float>(seq(8,8), 1));
+//  tbblas_print(A);
+//  matrix B = fftshift(A);
+//  tbblas_print(B);
+//  matrix C = fftshift(A, 1);
+//  tbblas_print(C);
+//
+//  matrix::dim_t size = seq(5,5);
+//  matrix::dim_t topleft = (B.size() - size + 1) / 2;
+//
+//  tbblas_print(B[topleft, size]);
 
-  matrix A = randu(20,15);
+  {
+    tensor<double, 1, true> A(6), B(6), C, D;
+    A = 1, 2, 3, 4, 5, 6;
+    B = 1, 6, 5, 4, 3, 2;
+    C = filter(A, B);
+    D = filter(A, B, seq(3));
+    tbblas_print(C);
+    tbblas_print(D);
+  }
+
+//  matrix A = randu(20,15);
   //A[seq(0, 0), seq(2,3)] = ones<float>(2,3);
 //  matrix A(5,5);
 //  thrust::sequence(A.begin(), A.end());
-  cmatrix B = fft(A);
+//  cmatrix B = fft(A);
 
-  cmatrix C(A.size());
-  real(C) = A;
-  cmatrix D = fft(C);
+//  cmatrix C(A.size());
+//  real(C) = A;
+//  cmatrix D = fft(C);
 
-  std::cout << "A = " << A << std::endl;
-  std::cout << "fft(A) = " << abs(B) << std::endl;
+
+//  std::cout << "A = " << A << std::endl;
+//  std::cout << "fft(A) = " << abs(B) << std::endl;
 //  std::cout << "fft(A) = " << abs(fftexpand(B)) << std::endl;
-  std::cout << "fft(C) = " << abs(D) << std::endl;
+//  std::cout << "fft(C) = " << abs(D) << std::endl;
 //  std::cout << "fft(A) = " << fftshift(abs(fftexpand(B))) << std::endl;
-  std::cout << "fft(C) = " << fftshift(abs(D)) << std::endl;
+//  std::cout << "fft(C) = " << fftshift(abs(D)) << std::endl;
 
-#if 1
+#if 0
   {
     typedef float value_t;
 
