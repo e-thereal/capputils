@@ -14,6 +14,8 @@
 
 #include <boost/timer.hpp>
 
+#include "math.hpp"
+
 typedef double value_t;
 typedef tbblas::complex<value_t> complex_t;
 typedef tbblas::tensor<value_t, 4, true> tensor_t;
@@ -32,10 +34,10 @@ void benchmarks() {
 
   boost::timer _timer;
 
-  randu_t randu(32, 32, 32, 64);
+  randu_t randu(32, 32, 32, 64), randKernel(5, 5, 5, 64);
 
-  tensor_t A = randu, B = randu, C = randu;
-  ctensor_t cA = fft(A, 3), cB = fft(B, 3), cC = fft(C, 3);
+  tensor_t A = randu, B = randu, C = randu, S, kernel = randKernel, T;
+  ctensor_t cA = fft(A, 3), cB = fft(B, 3), cC = fft(C, 3), cS, cT;
   STOP("Init")
 
   // Addition
@@ -62,10 +64,28 @@ void benchmarks() {
   STOP("FFT")
   TIMER_LOOP(1000) cA = fft(A, 3, plan);
   STOP("FFT")
+  TIMER_LOOP(1000) A = ifft(cA, 3);
+  STOP("iFFT")
+  TIMER_LOOP(1000) A = ifft(cA, 3, plan);
+  STOP("iFFT")
+
+  // Sum
+  TIMER_LOOP(1000) cS = sum(cA, 3);
+  STOP("sum")
 
   // fft, ifft of a 'slice'
-  // nrelu_mean
+  TIMER_LOOP(1000) S = ifft(cS, 3);
+  STOP("iFFT(slice)")
+  TIMER_LOOP(1000) S = ifft(cS, 3, plan);
+  STOP("iFFT(slice)")
+  TIMER_LOOP(1000) cS = fft(S, 3);
+  STOP("FFT(slice)")
+  TIMER_LOOP(1000) cS = fft(S, 3, plan);
+  STOP("FFT(slice)")
 
+  // nrelu_mean
+  TIMER_LOOP(1000) T = S = nrelu_mean(S);
+  STOP("nrelu_mean")
 
 }
 
