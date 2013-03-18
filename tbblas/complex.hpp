@@ -15,11 +15,11 @@ namespace tbblas {
 
 template<class T>
 struct __builtin_align__(16) complex {
-  typedef typename complex_type<T>::type complex_t;
   typedef T value_t;
+  typedef typename complex_type<value_t>::type complex_t;
 
   union {
-    struct { T real, img; };
+    struct { value_t real, img; };
     complex_t value;
   };
 
@@ -41,21 +41,70 @@ struct __builtin_align__(16) complex {
   }
 
   __host__ __device__
-  complex<T> operator*(const complex<T>& x) const {
-    return complex<T>(tbblas::complex_type<T>::mult(x.value, value));
+  complex<value_t> operator*(const complex<value_t>& x) const {
+    return complex<value_t>(tbblas::complex_type<value_t>::mult(x.value, value));
   }
 
   __host__ __device__
-  complex<T> operator+(const complex<T>& x) const {
-    complex<T> ret;
+  complex<value_t> operator+(const complex<value_t>& x) const {
+    complex<value_t> ret;
     ret.real = real + x.real;
     ret.img = img + x.img;
     return ret;
   }
 
   __host__ __device__
-  complex<T> operator-(const complex<T>& x) const {
-    complex<T> ret;
+  complex<value_t> operator-(const complex<value_t>& x) const {
+    complex<value_t> ret;
+    ret.real = real - x.real;
+    ret.img = img - x.img;
+    return ret;
+  }
+};
+
+template<>
+struct __builtin_align__(8) complex<float> {
+  typedef float value_t;
+  typedef complex_type<value_t>::type complex_t;
+
+  union {
+    struct { value_t real, img; };
+    complex_t value;
+  };
+
+  __host__ __device__
+  complex() : real(0), img(0) { }
+
+  __host__ __device__
+  complex(const complex_t& value) : value(value) { }
+
+  __host__ __device__
+  complex(value_t real) : real(real), img(0) { }
+
+  __host__ __device__
+  complex(value_t real, value_t img) : real(real), img(img) { }
+
+  __host__ __device__
+  operator complex_t() {
+    return value;
+  }
+
+  __host__ __device__
+  complex<value_t> operator*(const complex<value_t>& x) const {
+    return complex<value_t>(tbblas::complex_type<value_t>::mult(x.value, value));
+  }
+
+  __host__ __device__
+  complex<value_t> operator+(const complex<value_t>& x) const {
+    complex<value_t> ret;
+    ret.real = real + x.real;
+    ret.img = img + x.img;
+    return ret;
+  }
+
+  __host__ __device__
+  complex<value_t> operator-(const complex<value_t>& x) const {
+    complex<value_t> ret;
     ret.real = real - x.real;
     ret.img = img - x.img;
     return ret;

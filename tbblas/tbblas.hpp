@@ -22,10 +22,14 @@
 #define TBBLAS_UNUSED(a) (void)a
 #endif
 
+//#define TBBLAS_ALLOC_WARNING_ENABLED
+
 #ifdef TBBLAS_ALLOC_WARNING_ENABLED
 #define TBBLAS_ALLOC_WARNING std::cerr << "[Warning] Allocating memory at " << __FILE__ << ":" << __LINE__ << std::endl;
+#define TBBLAS_FREE_MESSAGE std::cerr << "[Message] Freeing memory at " << __FILE__ << ":" << __LINE__ << std::endl;
 #else
 #define TBBLAS_ALLOC_WARNING
+#define TBBLAS_FREE_MESSAGE
 #endif
 
 #if defined(i386) && !defined(TBBLAS_DISABLE_CBLAS)

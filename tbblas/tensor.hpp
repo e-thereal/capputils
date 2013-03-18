@@ -149,6 +149,7 @@ public:
   }
 
   virtual ~tensor() {
+    TBBLAS_FREE_MESSAGE
 //    std::cout << "Destructing '" << name << "' ..." << std::endl;
   }
 
