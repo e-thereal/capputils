@@ -39,7 +39,7 @@ void print(const tbblas::tensor<T, 0u, device>& tensor, int precision = 5,
     std::ostream& out = std::cout)
 {
   out << "[1 x 1]" << std::endl;
-  out << std::setprecision(precision) << std::setw(precision + 5) << tensor.data()[0] << std::endl;
+  out << std::setprecision(precision) << std::setw(precision + 6) << tensor.data()[0] << std::endl;
 }
 
 template<class T, bool device>
@@ -53,7 +53,7 @@ void print(const tbblas::tensor<T, 1u, device>& tensor, int precision = 5,
   out << "[" << count << "]" << std::endl;
 
   for (size_t i = 0; i < count; ++i) {
-    out << std::setprecision(precision) << std::setw(precision + 5) << data[i] << " ";
+    out << std::setprecision(precision) << std::setw(precision + 6) << data[i] << " ";
   }
   out << std::endl;
 }
@@ -71,7 +71,7 @@ void print(const tbblas::tensor<T, 2u, device>& tensor, int precision = 5,
 
   for (size_t i = 0; i < rowCount; ++i) {
     for (size_t j = 0; j < columnCount; ++j) {
-      out << std::setprecision(precision) << std::setw(precision + 5) << data[i + j * rowCount] << " ";
+      out << std::setprecision(precision) << std::setw(precision + 6) << data[i + j * rowCount] << " ";
     }
     out << std::endl;
   }
@@ -114,7 +114,7 @@ void print(const tbblas::tensor<T, 3u, device>& tensor, int precision = 5,
           out << " ";
       }
       for (size_t j = 0; j < columnCount; ++j) {
-        out << std::setprecision(precision) << std::setw(precision + 5) << data[i + j * rowCount + k * sliceCount] << " ";
+        out << std::setprecision(precision) << std::setw(precision + 6) << data[i + j * rowCount + k * sliceCount] << " ";
       }
       out << std::endl;
     }

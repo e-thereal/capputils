@@ -10,10 +10,15 @@
 
 #include <utility>
 #include <iostream>
+#include <boost/utility/enable_if.hpp>
 
 #include <cmath>
 
 namespace tbblas {
+
+template<class T, unsigned size>
+struct dim_type_trait {
+};
 
 template<class T, unsigned size>
 struct sequence {
@@ -100,6 +105,10 @@ struct sequence {
     return true;
   }
 
+  operator typename boost::enable_if_c<size <= 4, dim3>::type() const {
+    return dim_type_trait<T, size>::convert(*this);
+  }
+
 //  template<class T2>
 //  operator sequence<T2, size>() const {
 //    typename sequence<T2, size>::seq_t seq;
@@ -110,6 +119,34 @@ struct sequence {
 
 private:
   seq_t _seq;
+};
+
+template<class T>
+struct dim_type_trait<T, 1> {
+  static dim3 convert(const sequence<T, 1>& s) {
+    return dim3(s[0]);
+  }
+};
+
+template<class T>
+struct dim_type_trait<T, 2> {
+  static dim3 convert(const sequence<T, 2>& s) {
+    return dim3(s[0], s[1]);
+  }
+};
+
+template<class T>
+struct dim_type_trait<T, 3> {
+  static dim3 convert(const sequence<T, 3>& s) {
+    return dim3(s[0], s[1], s[2]);
+  }
+};
+
+template<class T>
+struct dim_type_trait<T, 4> {
+  static dim3 convert(const sequence<T, 4>& s) {
+    return dim3(s[0], s[1], s[2]);
+  }
 };
 
 //template<class T, unsigned dim>

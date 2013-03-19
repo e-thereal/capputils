@@ -11,12 +11,15 @@
 #include <tbblas/fft.hpp>
 #include <tbblas/math.hpp>
 #include <tbblas/random.hpp>
+#include <tbblas/filter.hpp>
+#include <tbblas/filter2.hpp>
+#include <tbblas/io.hpp>
 
 #include <boost/timer.hpp>
 
 #include "math.hpp"
 
-typedef double value_t;
+typedef float value_t;
 typedef tbblas::complex<value_t> complex_t;
 typedef tbblas::tensor<value_t, 4, true> tensor_t;
 typedef tbblas::tensor<complex_t, 4, true> ctensor_t;
@@ -34,6 +37,31 @@ void benchmarks() {
 
   boost::timer _timer;
 
+#if 0
+  tensor<value_t, 3, true> A(4, 4, 1), A2 = zeros<value_t>(6, 6, 3), B, C, kernel(3, 3, 1);
+  A = 1, 2, 3, 4,
+      5, 4, 3, 2,
+      1, 2, 5, 6,
+      1, 6, 8, 3;
+
+  A2[seq(1,1,1), A.size()] = A;
+
+  kernel =
+      -1, 2, -1,
+      -2, 4, -2,
+      -1, 2, -1;
+
+  B = filter3d(A, kernel);
+  C = filter(A2, flip(kernel));
+
+  tbblas_print(A);
+  tbblas_print(kernel);
+  tbblas_print(B);
+  tbblas_print(C);
+//  tbblas_print(C[seq(1,1,1), B.size()]);
+#endif
+
+#if 1
   randu_t randu(32, 32, 32, 64), randKernel(5, 5, 5, 64);
 
   tensor_t A = randu, B = randu, C = randu, S, kernel = randKernel, T;
@@ -87,5 +115,10 @@ void benchmarks() {
   TIMER_LOOP(1000) T = S = nrelu_mean(S);
   STOP("nrelu_mean")
 
+  // filtering
+  TIMER_LOOP(1000) C = filter(A, kernel, 3);
+  STOP("filter")
+  TIMER_LOOP(1000) C = filter3d(A, kernel);
+  STOP("filter")
+#endif
 }
-
