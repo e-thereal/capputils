@@ -289,6 +289,19 @@ public:
     return *this;
   }
 
+  template<class Expression>
+  inline typename boost::enable_if<is_expression<Expression>,
+    typename boost::enable_if_c<Expression::dimCount == dimCount,
+      typename boost::disable_if<is_operation<Expression>,
+        tensor_t
+      >::type
+    >::type
+  >::type&
+  operator+=(const Expression& expr) {
+    *this = *this + expr;
+    return *this;
+  }
+
   proxy_filler<proxy<tensor_t> > operator=(const value_t& value) {
     return subrange(*this, dim_t(0), size()) = value;
   }

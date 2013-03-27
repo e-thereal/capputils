@@ -16,8 +16,17 @@
 
 namespace tbblas {
 
-template<class T>
-__global__ void filter3d_kernel(const T* input, dim3 size, const T* kernel, dim3 kernelSize, T* output, unsigned batches) {
+struct optimized {};
+struct naive {};
+
+const int granularity = 8;
+
+template<class T, class T2>
+__global__ void filter3d_kernel(T2, const T* input, dim3 size, const T* kernel, dim3 kernelSize,
+    T* output, dim3 outSize, unsigned batches)
+{
+  //dim_t outputTopleft = input.size() / 2 - output.size() / 2;
+
   const int x = threadIdx.x + blockIdx.x * blockDim.x;
   const int y = threadIdx.y + blockIdx.y * blockDim.y;
   const int z = threadIdx.z + blockIdx.z * blockDim.z;
@@ -25,9 +34,10 @@ __global__ void filter3d_kernel(const T* input, dim3 size, const T* kernel, dim3
   if (x >= size.x || y >= size.y || z >= size.z)
     return;
 
-  const int count = size.x * size.y * size.z;
+  const int imageCount = size.x * size.y * size.z;
+  const int kernelCount = kernelSize.x * kernelSize.y * kernelSize.z;
 
-  for (int offset = 0; offset < batches * count; offset += count) {
+  for (int iBatch = 0; iBatch < batches; ++iBatch) {
     T sum = 0;
     for (int kz = 0, i = 0; kz < kernelSize.z; ++kz) {
       for (int ky = 0; ky < kernelSize.y; ++ky) {
@@ -38,16 +48,94 @@ __global__ void filter3d_kernel(const T* input, dim3 size, const T* kernel, dim3
           const int iz = z + kz - kernelSize.z / 2;
 
           if (ix >= 0 && iy >= 0 && iz >= 0 && ix < size.x && iy < size.y && iz < size.z)
-            sum += input[offset + ix + size.x * (iy + size.y * iz)] * kernel[offset + i];
+            sum += input[iBatch * imageCount + ix + size.x * (iy + size.y * iz)] * kernel[iBatch * kernelCount + i];
         }
       }
     }
 
-    output[offset + x + size.x * (y + size.y * z)] = sum;
+    output[iBatch * imageCount + x + size.x * (y + size.y * z)] = sum;
   }
 }
 
-template<class Tensor>
+template<class T>
+__global__ void filter3d_kernel(optimized, const T* input, dim3 size, const T* kernel, dim3 kernelSize,
+    T* output, dim3 outSize, unsigned batches)
+{
+  //dim_t outputTopleft = input.size() / 2 - output.size() / 2;
+
+  const int xOffset = blockIdx.x * blockDim.x;
+  const int yOffset = blockIdx.y * blockDim.y;
+  const int zOffset = blockIdx.z * blockDim.z;
+  const int x = threadIdx.x + xOffset;
+  const int y = threadIdx.y + yOffset;
+  const int z = threadIdx.z + zOffset;
+
+  const int imageCount = size.x * size.y * size.z;
+  const int kernelCount = kernelSize.x * kernelSize.y * kernelSize.z;
+
+  extern __shared__ T sharedBuffer[];
+
+  // Read image data to shared memory
+  const int haloSizeX = kernelSize.x / 2;
+  const int haloSizeY = kernelSize.y / 2;
+  const int haloSizeZ = kernelSize.z / 2;
+  const int paddedHaloSizeX = ((haloSizeX + granularity - 1) / granularity) * granularity;
+  const int readingWidth  = 2 * paddedHaloSizeX + blockDim.x;
+  const int readingHeight = 2 * haloSizeY + blockDim.y;
+  const int readingDepth  = 2 * haloSizeZ + blockDim.z;
+
+  T* imageBuffer = &sharedBuffer[0];
+  T* kernelBuffer = &sharedBuffer[readingWidth * readingHeight * readingDepth];
+
+  for (int iBatch = 0; iBatch < batches; ++iBatch) {
+
+    for (int bz = threadIdx.z; bz < readingDepth; bz += blockDim.z) {
+      for (int by = threadIdx.y; by < readingHeight; by += blockDim.y) {
+        for (int bx = threadIdx.x; bx < readingWidth; bx += blockDim.x) {
+          const int ix = bx + xOffset - paddedHaloSizeX;
+          const int iy = by + yOffset - haloSizeY;
+          const int iz = bz + zOffset - haloSizeZ;
+
+          if (ix >= 0 && ix < size.x && iy >= 0 && iy < size.y && iz >= 0 && iz < size.z)
+            imageBuffer[bx + readingWidth * (by + readingHeight * bz)] = input[iBatch * imageCount + ix + size.x * (iy + size.y * iz)];
+          else
+            imageBuffer[bx + readingWidth * (by + readingHeight * bz)] = 0;
+        }
+      }
+    }
+
+    for (int kz = threadIdx.z; kz < kernelSize.z; kz += blockDim.z) {
+      for (int ky = threadIdx.y; ky < kernelSize.y; ky += blockDim.y) {
+        for (int kx = threadIdx.x; kx < kernelSize.x; kx += blockDim.x) {
+          kernelBuffer[kx + kernelSize.x * (ky + kernelSize.y * kz)] = kernel[iBatch * kernelCount + kx + kernelSize.x * (ky + kernelSize.y * kz)];
+        }
+      }
+    }
+
+    __syncthreads();
+
+    if (x < size.x && y < size.y && z < size.z) {
+
+      T sum = 0;
+      for (int kz = 0, i = 0; kz < kernelSize.z; ++kz) {
+        for (int ky = 0; ky < kernelSize.y; ++ky) {
+          for (int kx = 0; kx < kernelSize.x; ++kx, ++i) {
+            const int bx = threadIdx.x + kx - haloSizeX + paddedHaloSizeX;
+            const int by = threadIdx.y + ky;
+            const int bz = threadIdx.z + kz;
+            sum += imageBuffer[bx + readingWidth * (by + readingHeight * bz)] * kernelBuffer[i];
+          }
+        }
+      }
+
+      output[iBatch * imageCount + x + size.x * (y + size.y * z)] = sum;
+    }
+
+    __syncthreads();
+  }
+}
+
+template<class Tensor, class T>
 struct filter3d_operation
 {
   typedef typename Tensor::dim_t dim_t;
@@ -68,13 +156,34 @@ public:
 
   void apply(tensor_t& output) const {
     dim_t blockDim(1);
-    blockDim[0] = 32;
-    blockDim[1] = 32;
-    blockDim[2] = 1;
-    filter3d_kernel<<<(_size + blockDim - 1) / blockDim, blockDim>>>(
-        input.data().data().get(), input.size(),
-        kernel.data().data().get(), kernel.size(),
-        output.data().data().get(), _batches);
+    blockDim[0] = 16;
+    blockDim[1] = 4;
+    blockDim[2] = 4;
+
+    assert(kernel.size()[0] % 2 == 1);
+    assert(kernel.size()[1] % 2 == 1);
+    assert(kernel.size()[2] % 2 == 1);
+
+    const int haloSizeX = kernel.size()[0] / 2;
+    const int haloSizeY = kernel.size()[1] / 2;
+    const int haloSizeZ = kernel.size()[2] / 2;
+    const int paddedHaloSizeX = (haloSizeX + granularity - 1) / granularity * granularity;
+    const int readingWidth = 2 * paddedHaloSizeX + blockDim[0];
+    const int readingHeight = 2 * haloSizeY + blockDim[1];
+    const int readingDepth = 2 * haloSizeZ + blockDim[2];
+
+    const int sharedMemorySize = (readingWidth * readingHeight * readingDepth + kernel.size()[0] * kernel.size()[1] * kernel.size()[2]) * sizeof(value_t);
+//    tbblas_print(haloSizeX);
+//    tbblas_print(paddedHaloSizeX);
+//    tbblas_print(sharedMemorySize);
+
+    filter3d_kernel<<<(_size + blockDim - 1) / blockDim, blockDim, sharedMemorySize>>>(
+            T(),
+            input.data().data().get(), input.size(),
+            kernel.data().data().get(), kernel.size(),
+            output.data().data().get(), output.size(),
+            _batches
+    );
   }
 
   inline dim_t size() const {
@@ -92,34 +201,34 @@ private:
   unsigned _batches;
 };
 
-template<class T1>
-struct is_operation<filter3d_operation<T1> > {
+template<class T1, class T2>
+struct is_operation<filter3d_operation<T1, T2> > {
   static const bool value = true;
 };
 
-template<class Tensor>
+template<class Tensor, class T>
 typename boost::enable_if<is_tensor<Tensor>,
   typename boost::enable_if_c<Tensor::cuda_enabled == true,
     typename boost::enable_if_c<Tensor::dimCount == 3,
-      filter3d_operation<Tensor>
+      filter3d_operation<Tensor, T>
     >::type
   >::type
 >::type
-filter3d(const Tensor& input, const Tensor& kernel) {
-  return filter3d_operation<Tensor>(input, kernel, 1);
+filter3d(const Tensor& input, const Tensor& kernel, T) {
+  return filter3d_operation<Tensor, T>(input, kernel, 1);
 }
 
-template<class Tensor>
+template<class Tensor, class T>
 typename boost::enable_if<is_tensor<Tensor>,
   typename boost::enable_if_c<Tensor::cuda_enabled == true,
     typename boost::enable_if_c<Tensor::dimCount == 4,
-      filter3d_operation<Tensor>
+      filter3d_operation<Tensor, T>
     >::type
   >::type
 >::type
-filter3d(const Tensor& input, const Tensor& kernel) {
+filter3d(const Tensor& input, const Tensor& kernel, T) {
   assert(input.size()[3] == kernel.size()[3]);
-  return filter3d_operation<Tensor>(input, kernel, input.size()[3]);
+  return filter3d_operation<Tensor, T>(input, kernel, input.size()[3]);
 }
 
 }

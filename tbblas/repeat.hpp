@@ -28,11 +28,32 @@ struct repeat_expression {
   struct index_functor : public thrust::unary_function<difference_type,difference_type> {
 
     dim_t inSize, outSize, pitch;
+    bool optimized;
+    unsigned mask;
 
-    index_functor(dim_t inSize, dim_t outSize) : inSize(inSize), outSize(outSize) {
+    unsigned int upper_power_of_two(unsigned int v) {
+      v--;
+      v |= v >> 1;
+      v |= v >> 2;
+      v |= v >> 4;
+      v |= v >> 8;
+      v |= v >> 16;
+      v++;
+      return v;
+    }
+
+    index_functor(dim_t inSize, dim_t outSize) : inSize(inSize), outSize(outSize), optimized(true) {
       pitch[0] = 1;
-      for (unsigned i = 1; i < dimCount; ++i)
+      mask = inSize[0];
+      for (unsigned i = 1; i < dimCount; ++i) {
         pitch[i] = pitch[i - 1] * inSize[i - 1];
+        if (inSize[i - 1] != outSize[i - 1])
+          optimized = false;
+        mask *= inSize[i];
+      }
+      if (upper_power_of_two(mask) != mask)
+        optimized = false;
+      --mask;
     }
 
     __host__ __device__
@@ -41,12 +62,15 @@ struct repeat_expression {
       // calculate % inSize[i]
       // calculate new index
 
+      if (optimized)
+        return idx & mask;
+
       difference_type index;
       index = (idx % inSize[0]) * pitch[0];
-      for (unsigned k = 1; k < dimCount; ++k) {
+      #pragma unroll
+      for (unsigned k = 1; k < dimCount; ++k)
         index += ((idx /= outSize[k-1]) % inSize[k]) * pitch[k];
 
-      }
       return index;
     }
   };
