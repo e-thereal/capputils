@@ -58,12 +58,12 @@ InitReflectableClass(Person)
 Property(FirstName, std::string)
 Property(Name, std::string)
 Property(Age, int)
-Property(Address, Address*)
+Property(Address, boost::shared_ptr<Address>)
 Property(Gender, Gender)
 
 public:
   Person(void);
-  ~Person(void);
+  virtual ~Person(void);
 };
 
 #endif

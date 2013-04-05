@@ -30,16 +30,15 @@ DefineProperty(Name,
 DefineProperty(Age,
   Description("Age in years."), Observe(Id), TimeStamp(Id))
 
-ReflectableProperty(Address,
+DefineProperty(Address, Reflectable<Type>(),
   Description("Address with everything."), Observe(Id))
 
 DefineProperty(Gender, Enumerator<Gender>(), Observe(Id))
 
 EndPropertyDefinitions
 
-Person::Person(void) : _FirstName("Tom"), _Name("Brosch"), _Age(27), _Address(0), _Gender(Gender::Male)
+Person::Person(void) : _FirstName("Tom"), _Name("Brosch"), _Age(27), _Address(new Address()), _Gender(Gender::Male)
 {
-  setAddress(new Address());
 }
 
 Person::~Person(void)

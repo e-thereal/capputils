@@ -56,7 +56,7 @@ void benchmarks() {
   tbblas_print(dot(C2 - C3, C2 - C3));
 #endif
 
-#if 0
+#if 1
   tensor<value_t, 3, true> A(4, 4, 1), A2 = zeros<value_t>(6, 6, 3), B, C, C2, kernel(3, 3, 1);
   A = 1, 2, 3, 4,
       5, 4, 3, 2,
@@ -83,7 +83,7 @@ void benchmarks() {
   tbblas_print(repeat(A, seq(1,1,2)));
 #endif
 
-#if 1
+#if 0
   boost::timer _timer;
 
   const int iterations = 1000;
