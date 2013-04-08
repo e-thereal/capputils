@@ -63,7 +63,11 @@ struct __builtin_align__(16) complex {
 };
 
 template<>
-struct __builtin_align__(8) complex<float> {
+struct
+#if !defined(_WIN32) || defined(_WIN64)
+  __builtin_align__(8)
+#endif
+  complex<float> {
   typedef float value_t;
   typedef complex_type<value_t>::type complex_t;
 

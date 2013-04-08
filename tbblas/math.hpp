@@ -53,7 +53,7 @@ struct bernstein_operation {
 
   __host__ __device__
   T operator()(const T& x) const {
-    return coefficient * pow(x, e1) * pow(1.f - x, e2);
+    return coefficient * ::pow(x, e1) * ::pow(1.f - x, e2);
   }
 };
 

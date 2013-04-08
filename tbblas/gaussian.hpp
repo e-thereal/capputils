@@ -10,6 +10,8 @@
 
 #include <tbblas/tensor.hpp>
 
+#include <cmath>
+
 namespace tbblas {
 
 template<class T, unsigned dim>

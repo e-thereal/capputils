@@ -4,6 +4,10 @@
 #include <iostream>
 #include <thrust/version.h>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #if THRUST_DEVICE_SYSTEM != THRUST_DEVICE_SYSTEM_CUDA
 #error "Is is assumed that CUDA is used as the device backend. For parallelized CPU code, change the host backend instead."
 #endif
