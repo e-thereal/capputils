@@ -254,8 +254,10 @@ private: type _##name; \
 public: \
   type get##name() const { return _##name; } \
   void set##name(type value) { static ::capputils::reflection::IClassProperty* property = findProperty(#name); if (property) ::capputils::attributes::AttributeExecuter::ExecuteBefore(*this, *property); _##name = value; if (property) ::capputils::attributes::AttributeExecuter::ExecuteAfter(*this, *property); } \
+  void reset##name(type value) { _##name = value; } \
 protected: \
   static void set##name(::capputils::reflection::ReflectableClass& object, type value) { dynamic_cast<ClassType*>(&object)->set##name(value); } \
+  static void reset##name(::capputils::reflection::ReflectableClass& object, type value) { dynamic_cast<ClassType*>(&object)->reset##name(value); } \
   static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); }
 
 #define VirtualProperty(name,type) \
@@ -271,7 +273,7 @@ protected: \
   { \
     typedef TYPE_OF(name) Type; \
     const unsigned Id = properties.size(); \
-    properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, NULL)); \
+    properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, _##name, ClassType ::get##name, ClassType ::set##name, ClassType ::reset##name, __VA_ARGS__, NULL)); \
     addressbook[#name] = (char*)&_##name - (char*)this; \
     CAPPUTILS_UNUSED(Id); \
   }
@@ -280,7 +282,7 @@ protected: \
 { \
   typedef TYPE_OF(name) Type; \
   const unsigned Id = properties.size(); \
-  properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Reflectable<Type>(), NULL)); \
+  properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, _##name, ClassType ::get##name, ClassType ::set##name, ClassType ::reset##name, __VA_ARGS__, capputils::attributes::Reflectable<Type>(), NULL)); \
   addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }

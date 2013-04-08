@@ -29,6 +29,66 @@ namespace reflection {
 
 class ReflectableClass;
 
+template<class T>
+class ClassProperty;
+
+template<class T>
+struct string_value_trait {
+  typedef T value_t;
+
+  static void setValue(const ClassProperty<value_t>* const property, ReflectableClass& object, const std::string& value) {
+    property->setValue(object, Converter<T>::fromString(value));
+  }
+
+  static std::string getValue(const ClassProperty<value_t>* const property, const ReflectableClass& object) {
+    return Converter<value_t>::toString(property->getValue(object));
+  }
+};
+
+// Set value is not supported for pointer types 
+
+template<class T>
+struct string_value_trait<boost::shared_ptr<T> > {
+  typedef boost::shared_ptr<T> value_t;
+
+  static void setValue(const ClassProperty<value_t>* const property, ReflectableClass& object, const std::string& value) {
+    throw capputils::exceptions::ReflectionException("setting shared pointer values from a string is not supported");
+  }
+
+  static std::string getValue(const ClassProperty<value_t>* const property, const ReflectableClass& object) {
+    return Converter<value_t>::toString(property->getValue(object));
+  }
+};
+
+template<class T>
+struct string_value_trait<boost::weak_ptr<T> > {
+  typedef boost::weak_ptr<T> value_t;
+
+  static void setValue(const ClassProperty<value_t>* const property, ReflectableClass& object, const std::string& value) {
+    throw capputils::exceptions::ReflectionException("setting weak pointer values from a string is not supported");
+  }
+
+  static std::string getValue(const ClassProperty<value_t>* const property, const ReflectableClass& object) {
+    boost::shared_ptr<T> temp = property->getValue(object).lock();
+    return Converter<T*, false>::toString(temp.get());
+  }
+};
+
+template<class T>
+struct string_value_trait<T*> {
+  typedef T* value_t;
+
+  static void setValue(const ClassProperty<value_t>* const property, ReflectableClass& object, const std::string& value) {
+    throw capputils::exceptions::ReflectionException("setting pointer values from a string is not supported");
+  }
+
+  static std::string getValue(const ClassProperty<value_t>* const property, const ReflectableClass& object) {
+    return Converter<value_t>::toString(property->getValue(object));
+  }
+};
+  
+// TODO: simplify implementation using type traits
+
 /**
  * \brief Models the property concept of a class
  *
@@ -50,10 +110,12 @@ public:
 
 private:
   std::string name;                                             ///< Name of the property
+  value_t defaultValue;                                         ///< Default value of the property
   std::vector<attributes::IAttribute*> attributes;              ///< Vector with property attributes
 
   value_t (*getValueFunc) (const ReflectableClass& object);           ///< Pointer to the static getter method.
   void (*setValueFunc) (ReflectableClass& object, value_t value);     ///< Pointer to the static setter method.
+  void (*resetValueFunc) (ReflectableClass& object, value_t value);     ///< Pointer to the static resetter method.
 
   //mutable T value;
 
@@ -74,11 +136,12 @@ public:
    * Hence the type of the arguments must be known. That is the reason why every
    * attribute is wrapped in an instance of \c AttributeWrapper.
    */
-  ClassProperty(const std::string& name,
+  ClassProperty(const std::string& name, const value_t& defaultValue,
       value_t (*getValue) (const ReflectableClass& object),
       void (*setValue) (ReflectableClass& object, value_t value),
+      void (*resetValue) (ReflectableClass& object, value_t value),
       ...)
-      : name(name), getValueFunc(getValue), setValueFunc(setValue)
+      : name(name), defaultValue(defaultValue), getValueFunc(getValue), setValueFunc(setValue), resetValueFunc(resetValue)
   {
     va_list args;
     va_start(args, setValue);
@@ -89,6 +152,11 @@ public:
     }
   }
 
+  virtual ~ClassProperty() {
+    for (unsigned i = 0; i < attributes.size(); ++i)
+      delete attributes[i];
+  }
+
   virtual const std::vector<attributes::IAttribute*>& getAttributes() const { return attributes; }
   virtual const std::string& getName() const { return name; }
   virtual void addAttribute(attributes::IAttribute* attribute) {
@@ -96,11 +164,14 @@ public:
   }
 
   virtual std::string getStringValue(const ReflectableClass& object) const {
-    return Converter<value_t>::toString(getValue(object));
+    return string_value_trait<value_t>::getValue(this, object);
+    //return Converter<value_t>::toString(getValue(object));
   }
 
   virtual void setStringValue(ReflectableClass& object, const std::string& value) const {
-    setValue(object, Converter<value_t>::fromString(value));
+    // this->setValue(object, Converter<value_t>::fromString(value));
+    string_value_trait<value_t>::setValue(this, object, value);
+    // boost::shared_ptr case: throw capputils::exceptions::ReflectionException("setting smart pointer values from a string is not supported");
   }
 
   virtual const std::type_info& getType() const {
@@ -134,7 +205,13 @@ public:
     if (typedProperty)
       setValue(object, typedProperty->getValue(fromObject));
   }
+
+  virtual void resetValue(ReflectableClass& object) {
+    resetValueFunc(object, defaultValue);
+  }
 };
+
+#if 0
 
 template<class T>
 class ClassProperty<boost::shared_ptr<T> > : public virtual IClassProperty
@@ -396,6 +473,8 @@ public:
     }
   }
 };
+
+#endif
 
 }
 

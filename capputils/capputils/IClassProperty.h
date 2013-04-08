@@ -110,6 +110,13 @@ public:
   virtual void setValue(ReflectableClass& object, const ReflectableClass& fromObject, const IClassProperty* fromProperty) = 0;
 
   /**
+   *  \brief Resets the value of a property to its default value.
+   *
+   *  \param[out] object  Object whose property will be reset.
+   */
+  virtual void resetValue(ReflectableClass& object) = 0;
+
+  /**
    * \brief Returns the type of the property value.
    * \returns The type of the property value as a \c type_info object.
    */

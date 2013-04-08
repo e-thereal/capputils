@@ -124,7 +124,7 @@ private:
 
 public:
   PropertyIterator(const ReflectableClass& object, const ClassProperty<CollectionType>* collectionProperty)
-    : ClassProperty<value_t>(collectionProperty->getName(), 0, 0, 0),
+    : ClassProperty<value_t>(collectionProperty->getName(), value_t(), 0, 0, 0, 0),
       object(object), collectionProperty(collectionProperty), i(0) { }
   virtual ~PropertyIterator() { }
 
@@ -176,6 +176,11 @@ public:
   virtual void setValue(ReflectableClass& object, const ReflectableClass& fromObject, const IClassProperty* fromProperty) {
     assert(&this->object == &object);
     ClassProperty<value_t>::setValue(object, fromObject, fromProperty);
+  }
+
+  virtual void resetValue(ReflectableClass& object) {
+    assert(&this->object == &object);
+    ClassProperty<value_t>::resetValue(object);
   }
 };
 

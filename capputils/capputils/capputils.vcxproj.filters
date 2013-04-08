@@ -198,6 +198,15 @@
     <ClInclude Include="Xmlizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DummyAttribute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MergeAttribute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HideAttribute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AbstractEnumerator.cpp">
@@ -249,9 +258,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InputAttribute.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IsEnumeratorAttribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LibraryException.cpp">
@@ -327,6 +333,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Xmlizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DummyAttribute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HideAttribute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
