@@ -124,7 +124,7 @@ private:
 
 public:
   PropertyIterator(const ReflectableClass& object, const ClassProperty<CollectionType>* collectionProperty)
-    : ClassProperty<value_t>(collectionProperty->getName(), value_t(), 0, 0, 0, 0),
+    : ClassProperty<value_t>(collectionProperty->getName(), value_t(), 0, 0, 0, NULL),
       object(object), collectionProperty(collectionProperty), i(0) { }
   virtual ~PropertyIterator() { }
 
