@@ -51,7 +51,7 @@ template<class T>
 struct string_value_trait<boost::shared_ptr<T> > {
   typedef boost::shared_ptr<T> value_t;
 
-  static void setValue(const ClassProperty<value_t>* const property, ReflectableClass& object, const std::string& value) {
+  static void setValue(const ClassProperty<value_t>* const /*property*/, ReflectableClass& /*object*/, const std::string& /*value*/) {
     throw capputils::exceptions::ReflectionException("setting shared pointer values from a string is not supported");
   }
 
@@ -64,7 +64,7 @@ template<class T>
 struct string_value_trait<boost::weak_ptr<T> > {
   typedef boost::weak_ptr<T> value_t;
 
-  static void setValue(const ClassProperty<value_t>* const property, ReflectableClass& object, const std::string& value) {
+  static void setValue(const ClassProperty<value_t>* const /*property*/, ReflectableClass& /*object*/, const std::string& /*value*/) {
     throw capputils::exceptions::ReflectionException("setting weak pointer values from a string is not supported");
   }
 
@@ -78,7 +78,7 @@ template<class T>
 struct string_value_trait<T*> {
   typedef T* value_t;
 
-  static void setValue(const ClassProperty<value_t>* const property, ReflectableClass& object, const std::string& value) {
+  static void setValue(const ClassProperty<value_t>* const /*property*/, ReflectableClass& /*object*/, const std::string& /*value*/) {
     throw capputils::exceptions::ReflectionException("setting pointer values from a string is not supported");
   }
 
@@ -144,7 +144,7 @@ public:
       : name(name), defaultValue(defaultValue), getValueFunc(getValue), setValueFunc(setValue), resetValueFunc(resetValue)
   {
     va_list args;
-    va_start(args, setValue);
+    va_start(args, resetValue);
 
     for (attributes::AttributeWrapper* attrWrap = va_arg(args, attributes::AttributeWrapper*); attrWrap; attrWrap = va_arg(args, attributes::AttributeWrapper*)) {
       attributes.push_back(attrWrap->attribute);

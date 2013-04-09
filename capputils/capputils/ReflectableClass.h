@@ -293,7 +293,7 @@ protected: \
 { \
   typedef TYPE_OF(name) Type; \
   const unsigned Id = properties.size(); \
-  properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, NULL)); \
+  properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, _##name, ClassType ::get##name, ClassType ::set##name, ClassType ::reset##name, ##arguments, NULL)); \
   addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
@@ -302,7 +302,7 @@ protected: \
 { \
   typedef TYPE_OF(name) Type; \
   const unsigned Id = properties.size(); \
-  properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable<Type>(), NULL)); \
+  properties.push_back(new ::capputils::reflection::ClassProperty<Type>(#name, _##name, ClassType ::get##name, ClassType ::set##name, ClassType ::reset##name, ##arguments, capputils::attributes::Reflectable<Type>(), NULL)); \
   addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
@@ -318,9 +318,11 @@ private: type _##name; \
 public: \
   type get##name() const { return _##name; } \
   void set##name(const type& value) { static ::capputils::reflection::IClassProperty* property = findProperty(#name); ::capputils::attributes::AttributeExecuter::ExecuteBefore(*this, *property); _##name = value; ::capputils::attributes::AttributeExecuter::ExecuteAfter(*this, *property); } \
+  void reset##name(type value) { _##name = value; } \
 protected: \
-  static void set##name(::capputils::reflection::ReflectableClass& object, const type& value) { dynamic_cast<ClassType*>(&object)->set##name(value); } \
   static type get##name(const ::capputils::reflection::ReflectableClass& object) { return dynamic_cast<const ClassType*>(&object)->get##name(); } \
+  static void set##name(::capputils::reflection::ReflectableClass& object, const type& value) { dynamic_cast<ClassType*>(&object)->set##name(value); } \
+  static void reset##name(::capputils::reflection::ReflectableClass& object, type value) { dynamic_cast<ClassType*>(&object)->reset##name(value); } \
   typedef type name##Type;
 
 #define VirtualProperty(name,type) \
@@ -336,7 +338,7 @@ protected: \
 #define DefineProperty(name, ...) \
 { \
   const unsigned Id = properties.size(); \
-  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, 0)); \
+  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, _##name, ClassType ::get##name, ClassType ::set##name, ClassType ::reset##name, __VA_ARGS__, 0)); \
   addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
@@ -344,7 +346,7 @@ protected: \
 #define ReflectableProperty(name, ...) \
 { \
   const unsigned Id = properties.size(); \
-  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, __VA_ARGS__, capputils::attributes::Reflectable<TYPE_OF(name)>(), 0)); \
+  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, _##name, ClassType ::get##name, ClassType ::set##name, ClassType ::reset##name, __VA_ARGS__, capputils::attributes::Reflectable<TYPE_OF(name)>(), 0)); \
   addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
@@ -354,7 +356,7 @@ protected: \
 #define DefineProperty(name, arguments...) \
 { \
   const unsigned Id = properties.size(); \
-  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, 0)); \
+  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, _##name, ClassType ::get##name, ClassType ::set##name, ClassType ::reset##name, ##arguments, 0)); \
   addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
@@ -362,7 +364,7 @@ protected: \
 #define ReflectableProperty(name, arguments...) \
 { \
   const unsigned Id = properties.size(); \
-  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, ClassType ::get##name, ClassType ::set##name, ##arguments, capputils::attributes::Reflectable<TYPE_OF(name)>(), 0)); \
+  properties.push_back(new ::capputils::reflection::ClassProperty<TYPE_OF(name)>(#name, _##name, ClassType ::get##name, ClassType ::set##name, ClassType ::reset##name, ##arguments, capputils::attributes::Reflectable<TYPE_OF(name)>(), 0)); \
   addressbook[#name] = (char*)&_##name - (char*)this; \
   CAPPUTILS_UNUSED(Id); \
 }
