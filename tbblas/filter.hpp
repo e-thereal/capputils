@@ -58,9 +58,7 @@ public:
     tensor_t padded = zeros<value_t>(input.size());
 
     padded[topleft, kernel.size()] = kernel;
-//    tbblas_print(padded);
     tensor_t shiftedKernel = ifftshift(padded, dimension);
-//    tbblas_print(shiftedKernel);
     padded = input;
 
     plan_t plan;
