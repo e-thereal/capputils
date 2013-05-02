@@ -110,6 +110,19 @@ public:
   virtual void setValue(ReflectableClass& object, const ReflectableClass& fromObject, const IClassProperty* fromProperty) = 0;
 
   /**
+   * \brief Compares the value of two properties
+   *
+   * \param[out]  object        Object whose property will be compared
+   * \param[in]   fromObject    Reference to a \c ReflectableClass whose property will be compared to.
+   * \param[in]   fromProperty  Reference to the property that will be compared to.
+   *
+   * \remarks
+   * - The values are only compared, if both properties have exactly the same type.
+   *   No casts are performed. Not even implicit casts. Also no down or up casts through a class hierarchy.
+   */
+  virtual int compare(ReflectableClass& object, const ReflectableClass& fromObject, const IClassProperty* fromProperty) = 0;
+
+  /**
    *  \brief Resets the value of a property to its default value.
    *
    *  \param[out] object  Object whose property will be reset.

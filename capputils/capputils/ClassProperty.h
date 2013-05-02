@@ -86,6 +86,38 @@ struct string_value_trait<T*> {
     return Converter<value_t>::toString(property->getValue(object));
   }
 };
+
+template<class T>
+struct compare_trait {
+  typedef T value_t;
+
+  static int compare(const value_t& x, const value_t& y) {
+    if (x == y)
+      return 0;
+    else if (x < y)
+      return -1;
+    else
+      return 1;
+  }
+};
+
+template<class T>
+struct compare_trait<boost::shared_ptr<T> > {
+  typedef boost::shared_ptr<T> value_t;
+
+  static int compare(const value_t& x, const value_t& y) {
+    return compare_trait<T*>::compare(x.get(), y.get());
+  }
+};
+
+template<class T>
+struct compare_trait<boost::weak_ptr<T> > {
+  typedef boost::weak_ptr<T> value_t;
+
+  static int compare(const value_t& x, const value_t& y) {
+    return compare_trait<boost::shared_ptr<T> >::compare(x.lock(), y.lock());
+  }
+};
   
 // TODO: simplify implementation using type traits
 
@@ -204,6 +236,13 @@ public:
     const ClassProperty<value_t>* typedProperty = dynamic_cast<const ClassProperty<value_t>*>(fromProperty);
     if (typedProperty)
       setValue(object, typedProperty->getValue(fromObject));
+  }
+
+  virtual int compare(ReflectableClass& object, const ReflectableClass& fromObject, const IClassProperty* fromProperty) {
+    const ClassProperty<value_t>* typedProperty = dynamic_cast<const ClassProperty<value_t>*>(fromProperty);
+    assert(typedProperty);
+
+    return compare_trait<value_t>::compare(getValue(object), typedProperty->getValue(fromObject));
   }
 
   virtual void resetValue(ReflectableClass& object) {

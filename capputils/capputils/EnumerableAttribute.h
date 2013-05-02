@@ -178,6 +178,13 @@ public:
     ClassProperty<value_t>::setValue(object, fromObject, fromProperty);
   }
 
+  virtual int compare(ReflectableClass& object, const ReflectableClass& fromObject, const IClassProperty* fromProperty) {
+    const ClassProperty<value_t>* typedProperty = dynamic_cast<const ClassProperty<value_t>*>(fromProperty);
+    assert(typedProperty);
+
+    return compare_trait<value_t>::compare(getValue(object), typedProperty->getValue(fromObject));
+  }
+
   virtual void resetValue(ReflectableClass& object) {
     assert(&this->object == &object);
     ClassProperty<value_t>::resetValue(object);
