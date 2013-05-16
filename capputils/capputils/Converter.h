@@ -15,6 +15,14 @@
 #include <vector>
 
 #include <boost/weak_ptr.hpp>
+#include <boost/type_traits.hpp>
+#include <boost/utility/enable_if.hpp>
+
+#include "exprtk.hpp"
+
+#ifdef RegisterClass
+#undef RegisterClass
+#endif
 
 namespace capputils {
 
@@ -27,7 +35,7 @@ namespace reflection {
  * of a property to a string and vice versa. The \c fromString() method need not to exists.
  * This is handled by the template value parameter \c fromMethod which defaults to \c true.
  */
-template<class T, bool fromMethod = true>
+template<class T, bool fromMethod = true, class Enable = void>
 class Converter {
 public:
   /**
@@ -247,6 +255,39 @@ public:
       s << "\"" << value[0] << "\"";
     for (unsigned i = 1; i < value.size(); ++i)
       s << " \"" << value[i] << "\"";
+    return s.str();
+  }
+};
+
+template<class T>
+struct is_bool {
+  static const bool value = false;
+};
+
+template<>
+struct is_bool<bool> {
+  static const bool value = true;
+};
+
+template<class T>
+class Converter<T, true, typename boost::enable_if<boost::is_arithmetic<T>, typename boost::disable_if<is_bool<T>, T>::type >::type> {
+public:
+  static T fromString(const std::string& value) {
+    exprtk::symbol_table<T> symbol_table;
+    symbol_table.add_constants();
+
+    exprtk::expression<T> expression;
+    expression.register_symbol_table(symbol_table);
+
+    exprtk::parser<T> parser;
+    parser.compile(value, expression);
+
+    return expression.value();
+  }
+
+  static std::string toString(const T& value) {
+    std::stringstream s;
+    s << value;
     return s.str();
   }
 };

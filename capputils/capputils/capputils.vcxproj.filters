@@ -207,6 +207,9 @@
     <ClInclude Include="HideAttribute.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="exprtk.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AbstractEnumerator.cpp">
@@ -219,9 +222,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AttributeExecuter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ClassProperty.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DeprecatedAttribute.cpp">

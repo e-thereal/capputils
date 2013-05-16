@@ -159,6 +159,7 @@
     <ClInclude Include="Enumerators.h" />
     <ClInclude Include="EventHandler.h" />
     <ClInclude Include="Executer.h" />
+    <ClInclude Include="exprtk.hpp" />
     <ClInclude Include="FactoryException.h" />
     <ClInclude Include="FileExists.h" />
     <ClInclude Include="FileExistsAttribute.h" />
@@ -213,7 +214,6 @@
     <ClCompile Include="AbstractLogbookModel.cpp" />
     <ClCompile Include="ArgumentsParser.cpp" />
     <ClCompile Include="AttributeExecuter.cpp" />
-    <ClCompile Include="ClassProperty.cpp" />
     <ClCompile Include="DeprecatedAttribute.cpp" />
     <ClCompile Include="DescriptionAttribute.cpp" />
     <ClCompile Include="DummyAttribute.cpp" />
