@@ -54,7 +54,7 @@ struct random_tensor
     __device__
     void operator()(Tuple t) {
       generator_t gen = thrust::get<1>(t);
-      //curand_init (seed, thrust::get<0>(t), 0, &gen);
+//      curand_init (seed, thrust::get<0>(t), 0, &gen);
       curand_init (thrust::get<0>(t) + seed, thrust::get<0>(t) & 0xFF, 0, &gen);
       thrust::get<1>(t) = gen;
     }
@@ -100,20 +100,20 @@ struct random_tensor
   }
 
   void reset(unsigned seed = 0) {
-    const size_t maxCount = 0xFFFF;
-    size_t count = this->count(), first = 0, last = 0;
+    const int maxCount = 0xFFFF;
+    int count = this->count(), first = 0, last = 0;
 
-    while (count) {
+    while (count > 0) {
       first = last;
       last = first + std::min(count, maxCount);
       count -= std::min(count, maxCount);
       thrust::for_each(
           thrust::make_zip_iterator(thrust::make_tuple(
               thrust::counting_iterator<unsigned>(first),
-              generators->begin())),
+              generators->begin() + first)),
           thrust::make_zip_iterator(thrust::make_tuple(
               thrust::counting_iterator<unsigned>(last),
-              generators->end())),
+              generators->begin() + last)),
           init_generator(seed)
       );
     }

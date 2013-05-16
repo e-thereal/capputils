@@ -98,6 +98,24 @@ struct sequence {
 
   /*** Comparison operators ***/
 
+  bool operator<(const sequence_t& seq) const {
+    for (unsigned i = 0; i < size; ++i)
+      if (_seq[i] < seq[i])
+        return true;
+      else if (_seq[i] > seq[i])
+        return false;
+    return false;
+  }
+
+  bool operator>(const sequence_t& seq) const {
+    for (unsigned i = 0; i < size; ++i)
+      if (_seq[i] > seq[i])
+        return true;
+      else if (_seq[i] < seq[i])
+        return false;
+    return false;
+  }
+
   bool operator==(const sequence_t& seq) const {
     for (unsigned i = 0; i < size; ++i)
       if (_seq[i] != seq[i])
