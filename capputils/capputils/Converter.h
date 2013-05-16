@@ -270,16 +270,16 @@ struct is_bool<bool> {
 };
 
 template<class T>
-class Converter<T, true, typename boost::enable_if<boost::is_arithmetic<T>, typename boost::disable_if<is_bool<T>, T>::type >::type> {
+class Converter<T, true, typename boost::enable_if<boost::is_arithmetic<T> >::type> {
 public:
   static T fromString(const std::string& value) {
-    exprtk::symbol_table<T> symbol_table;
+    exprtk::symbol_table<double> symbol_table;
     symbol_table.add_constants();
 
-    exprtk::expression<T> expression;
+    exprtk::expression<double> expression;
     expression.register_symbol_table(symbol_table);
 
-    exprtk::parser<T> parser;
+    exprtk::parser<double> parser;
     parser.compile(value, expression);
 
     return expression.value();

@@ -77,6 +77,9 @@ public:
 std::vector<int> LeakTest::ints;
 
 int main(int argc, char** argv) {
+  std::cout << capputils::reflection::Converter<unsigned short>::fromString("3+5") << std::endl;
+
+  return 0;
 
   Days day = Monday;
   Tage tag = Tage::Montag; // tag = 0; tag = "Montag";
@@ -85,6 +88,7 @@ int main(int argc, char** argv) {
   car.Changed.connect(changeHandler);
 
   std::cout << car << std::endl;
+
 
   ReflectableClassFactory& factory = ReflectableClassFactory::getInstance();
   vector<string>& classNames = factory.getClassNames();
