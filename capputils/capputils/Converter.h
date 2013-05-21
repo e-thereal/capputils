@@ -18,11 +18,7 @@
 #include <boost/type_traits.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#include "exprtk.hpp"
-
-#ifdef RegisterClass
-#undef RegisterClass
-#endif
+#include "arithmetic_expression.h"
 
 namespace capputils {
 
@@ -260,29 +256,10 @@ public:
 };
 
 template<class T>
-struct is_bool {
-  static const bool value = false;
-};
-
-template<>
-struct is_bool<bool> {
-  static const bool value = true;
-};
-
-template<class T>
 class Converter<T, true, typename boost::enable_if<boost::is_arithmetic<T> >::type> {
 public:
   static T fromString(const std::string& value) {
-    exprtk::symbol_table<double> symbol_table;
-    symbol_table.add_constants();
-
-    exprtk::expression<double> expression;
-    expression.register_symbol_table(symbol_table);
-
-    exprtk::parser<double> parser;
-    parser.compile(value, expression);
-
-    return expression.value();
+    return util::eval_expression(value);
   }
 
   static std::string toString(const T& value) {
