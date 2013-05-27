@@ -9,7 +9,7 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tinyxml"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tinyxml/Debug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="tinyxmld"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="tinyxmld" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -68,7 +68,7 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tinyxml"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tinyxml/Release"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="tinyxml"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="tinyxml" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -122,8 +122,13 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="tinyxml.cdt.managedbuild.target.gnu.so.418347992" name="Shared Library" projectType="cdt.managedbuild.target.gnu.so"/>
 	</storageModule>
-	<storageModule moduleId="refreshScope" versionNumber="1">
-		<resource resourceType="PROJECT" workspacePath="/tinyxml"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/tinyxml"/>
+		</configuration>
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/tinyxml"/>
+		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="scannerConfiguration">

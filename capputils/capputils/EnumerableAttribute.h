@@ -40,6 +40,10 @@ struct collection_trait {
   static bool valid(const T& /*collection*/) {
     return true;
   }
+
+  static T newInstance() {
+    return T();
+  }
 };
 
 template<class T>
@@ -74,6 +78,11 @@ struct collection_trait<T*> {
   static bool valid(const T* collection) {
     return collection;
   }
+
+  static T* newInstance() {
+    assert(0); // Possible memory leak.
+    return new T();
+  }
 };
 
 template<class T>
@@ -107,6 +116,10 @@ struct collection_trait<boost::shared_ptr<T> > {
 
   static bool valid(const boost::shared_ptr<T>& collection) {
     return collection;
+  }
+
+  static boost::shared_ptr<T> newInstance() {
+    return boost::make_shared<T>();
   }
 };
 
@@ -211,6 +224,15 @@ public:
     else
       return boost::shared_ptr<PropertyIterator<CollectionType> >();
   }
+
+  virtual void renewCollection(reflection::ReflectableClass& object, const reflection::IClassProperty* property) {
+    using namespace reflection;
+
+    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
+    assert(typedProperty);
+
+    typedProperty->setValue(object, collection_trait<CollectionType>::newInstance());
+  }
 };
 
 template<class T>
@@ -232,6 +254,15 @@ public:
     } else {
       return boost::shared_ptr<PropertyIterator<CollectionType> >();
     }
+  }
+
+  virtual void renewCollection(reflection::ReflectableClass& object, const reflection::IClassProperty* property) {
+    using namespace reflection;
+
+    const ClassProperty<CollectionType>* typedProperty = dynamic_cast<const ClassProperty<CollectionType>*>(property);
+    assert(typedProperty);
+
+    typedProperty->setValue(object, collection_trait<CollectionType>::newInstance());
   }
 };
 
