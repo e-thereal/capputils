@@ -9,7 +9,7 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tinyxml"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tinyxml/Debug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="tinyxmld" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="tinyxmld"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -68,7 +68,7 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tinyxml"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tinyxml/Release"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="tinyxml" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="tinyxml"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
