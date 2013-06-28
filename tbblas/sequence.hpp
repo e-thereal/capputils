@@ -123,6 +123,13 @@ struct sequence {
     return true;
   }
 
+  bool operator!=(const sequence_t& seq) const {
+    for (unsigned i = 0; i < size; ++i)
+      if (_seq[i] != seq[i])
+        return true;
+    return false;
+  }
+
   operator typename boost::enable_if_c<size <= 4, dim3>::type() const {
     return dim_type_trait<T, size>::convert(*this);
   }
