@@ -35,10 +35,24 @@ struct merge_trait<boost::shared_ptr<std::vector<T> > > {
       collection = boost::make_shared<std::vector<value_t> >();
   }
 
-  static void setValueAt(const collection_t& collection, int position, const value_t& value) {
+  static void setValueAt(collection_t& collection, int position, const value_t& value) {
     if ((int)collection->size() <= position)
       collection->resize(position + 1);
     collection->at(position) = value;
+  }
+};
+
+template<class T>
+struct merge_trait<std::vector<T> > {
+  typedef std::vector<T> collection_t;
+  typedef T value_t;
+
+  static void allocate(collection_t& /*collection*/) { }
+
+  static void setValueAt(collection_t& collection, int position, const value_t& value) {
+    if ((int)collection.size() <= position)
+      collection.resize(position + 1);
+    collection.at(position) = value;
   }
 };
 
