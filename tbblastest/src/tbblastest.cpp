@@ -29,7 +29,8 @@ int main(int argc, char** argv) {
 //  maskstest();
 //  multigpu();
 //  copytest();
-  benchmarks();
+//  benchmarks();
+  rearrangetest();
 
   return 0;
 }

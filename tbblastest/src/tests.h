@@ -26,5 +26,6 @@ void multigpu();
 void copytest();
 void ompsegfault();
 void benchmarks();
+void rearrangetest();
 
 #endif /* TESTS_H_ */

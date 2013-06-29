@@ -67,7 +67,6 @@ struct repeat_expression {
 
       difference_type index;
       index = (idx % inSize[0]) * pitch[0];
-      #pragma unroll
       for (unsigned k = 1; k < dimCount; ++k)
         index += ((idx /= outSize[k-1]) % inSize[k]) * pitch[k];
 
