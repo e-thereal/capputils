@@ -22,6 +22,7 @@ struct dim_type_trait {
 
 template<class T, unsigned size>
 struct sequence {
+  typedef T value_t;
   typedef T seq_t[size];
   typedef sequence<T, size> sequence_t;
 
@@ -64,6 +65,15 @@ struct sequence {
   __host__ __device__
   const seq_t& operator()() const {
     return _seq;
+  }
+
+  /*** Scalar arithmetic operators ***/
+
+  sequence_t operator*(const value_t& x) const {
+    sequence_t result;
+    for (unsigned i = 0; i < size; ++i)
+      result[i] = _seq[i] * x;
+    return result;
   }
 
   /*** Binary arithmetic operators ***/
