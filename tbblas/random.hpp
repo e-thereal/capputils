@@ -88,8 +88,11 @@ struct random_tensor
     reset(size[dimCount]);
   }
 
-  random_tensor(const dim_t& size, unsigned seed = 0)
-  {
+  random_tensor(const dim_t& size, unsigned seed = 0) {
+    resize(size, seed);
+  }
+
+  void resize(const dim_t& size, unsigned seed = 0) {
     size_t count = 1;
     for (unsigned i = 0; i < dimCount; ++i) {
       _size[i] = size[i];

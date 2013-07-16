@@ -10,6 +10,17 @@
 
 #include <iostream>
 
+class TestClass {
+public:
+  TestClass() {
+    std::cout << "Constructed." << std::endl;
+  }
+
+  virtual ~TestClass() {
+    std::cout << "Destructed." << std::endl;
+  }
+};
+
 int main(int argc, char** argv) {
 
 //  ompsegfault();
@@ -30,7 +41,17 @@ int main(int argc, char** argv) {
 //  multigpu();
 //  copytest();
 //  benchmarks();
-  rearrangetest();
+//  rearrangetest();
+
+  std::cout << "Start test." << std::endl;
+
+  int i = 3;
+
+  {
+    TestClass test[i];
+  }
+
+  std::cout << "End test." << std::endl;
 
   return 0;
 }

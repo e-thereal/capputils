@@ -64,8 +64,8 @@
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1144166779" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cuda.toolchain.gnu.cpp.linker.1683949766" name="NVCC Linker" superClass="cuda.toolchain.gnu.cpp.linker">
-								<option id="gnu.cpp.link.option.libs.cuda.24015805" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs.cuda" valueType="libs"/>
-								<option id="gnu.cpp.link.option.paths.cuda.2029110645" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths.cuda" valueType="libPaths"/>
+								<option id="gnu.cpp.link.option.libs.cuda.24015805" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs.cuda"/>
+								<option id="gnu.cpp.link.option.paths.cuda.2029110645" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths.cuda"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2120836102" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -73,7 +73,7 @@
 							</tool>
 							<tool id="cuda.toolchain.gnu.c.linker.945448563" name="NVCC LinkerC" superClass="cuda.toolchain.gnu.c.linker">
 								<option id="gnu.cpp.link.option.paths.933466280" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
-								<option id="gnu.cpp.link.option.libs.1646689160" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs"/>
+								<option id="gnu.cpp.link.option.libs.1646689160" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1195275156" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
