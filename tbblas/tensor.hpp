@@ -225,7 +225,7 @@ public:
 
   typename data_t::reference operator[](const sequence<unsigned, dim>& index) {
     size_t idx = index[dim-1];
-    for (int i = dim - 2; i >= 0; --i) {
+    for (int i = (int)dim - 2; i >= 0; --i) {
       idx = idx * _size[i] + index[i];
     }
     return data()[idx];
@@ -233,7 +233,7 @@ public:
 
   typename data_t::reference operator[](const sequence<int, dim>& index) {
     size_t idx = index[dim-1];
-    for (int i = dim - 2; i >= 0; --i) {
+    for (int i = (int)dim - 2; i >= 0; --i) {
       idx = idx * _size[i] + index[i];
     }
     return data()[idx];

@@ -45,10 +45,10 @@ int main(int argc, char** argv) {
 
   std::cout << "Start test." << std::endl;
 
-  int i = 3;
+  int i = 3, j = 2;
 
   {
-    TestClass test[i];
+    TestClass test[i][j];
   }
 
   std::cout << "End test." << std::endl;

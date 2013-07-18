@@ -9,7 +9,7 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tbblas"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tbblas/Debug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="tbblasd" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="tbblasd"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -89,7 +89,7 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/tbblas"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/tbblas/Release"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="tbblas" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="tbblas"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
