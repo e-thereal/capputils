@@ -67,6 +67,14 @@ struct sequence {
     return _seq;
   }
 
+  __host__ __device__
+  T count() const {
+    T result = 1;
+    for (unsigned i = 0; i < size; ++i)
+      result *= _seq[i];
+    return result;
+  }
+
   /*** Scalar arithmetic operators ***/
 
   sequence_t operator*(const value_t& x) const {
