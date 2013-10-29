@@ -9,17 +9,9 @@
 #include "tests.h"
 
 #include <iostream>
+#include <cstdlib>
 
-class TestClass {
-public:
-  TestClass() {
-    std::cout << "Constructed." << std::endl;
-  }
-
-  virtual ~TestClass() {
-    std::cout << "Destructed." << std::endl;
-  }
-};
+int i = 1;
 
 int main(int argc, char** argv) {
 
@@ -43,15 +35,12 @@ int main(int argc, char** argv) {
 //  benchmarks();
 //  rearrangetest();
 
-  std::cout << "Start test." << std::endl;
-
-  int i = 3, j = 2;
-
-  {
-    TestClass test[i][j];
+  if (argc != 5) {
+    std::cout << "Usage: " << argv[0] << " <filterCount> <channelCount> <reps> <convnetreps>" << std::endl;
+    return 1;
   }
 
-  std::cout << "End test." << std::endl;
+  trainertests(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
 
   return 0;
 }
