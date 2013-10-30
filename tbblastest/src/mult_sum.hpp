@@ -18,7 +18,7 @@
 namespace tbblas {
 
 template<class T>
-__global__ void tbblas_mult_sum(complex<T>* input, complex<T>* filters, complex<T>* output, size_t layerVoxelCount, size_t channelCount, size_t filterCount) {
+__global__ void tbblas_conj_mult_sum(complex<T>* input, complex<T>* filters, complex<T>* output, size_t layerVoxelCount, size_t channelCount, size_t filterCount) {
   // threadidx.x + blockIdx.x * blockDim.x goes over pixels of the image
   // TODO: blockIdx.y goes over 16 filters
   // TODO: each thread loops over all channels and calculates a batch of 16 filters
@@ -40,14 +40,14 @@ __global__ void tbblas_mult_sum(complex<T>* input, complex<T>* filters, complex<
 }
 
 template<class Tensor>
-struct mult_sum_operation {
+struct conj_mult_sum_operation {
   typedef Tensor tensor_t;
   typedef typename Tensor::value_t value_t;
   typedef typename Tensor::dim_t dim_t;
 
   static const unsigned dimCount = Tensor::dimCount;
 
-  mult_sum_operation(Tensor& tensor, Tensor& filters)
+  conj_mult_sum_operation(Tensor& tensor, Tensor& filters)
    : _tensor(tensor), _filters(filters), _size(tensor.size()), _fullsize(tensor.fullsize())
   {
     channelCount = tensor.size()[3];
@@ -67,7 +67,7 @@ struct mult_sum_operation {
 
     dim3 blockSize(threadCount);
     dim3 gridSize((layerVoxelCount + threadCount - 1) / threadCount, filterCount);
-    tbblas_mult_sum<<<gridSize, blockSize>>>(_tensor.data().data().get(), _filters.data().data().get(), output.data().data().get(),
+    tbblas_conj_mult_sum<<<gridSize, blockSize>>>(_tensor.data().data().get(), _filters.data().data().get(), output.data().data().get(),
         layerVoxelCount, channelCount, filterCount);
   }
 
@@ -87,16 +87,16 @@ private:
 };
 
 template<class T>
-struct is_operation<mult_sum_operation<T> > {
+struct is_operation<conj_mult_sum_operation<T> > {
   static const bool value = true;
 };
 
 template<class T>
-mult_sum_operation<tensor<tbblas::complex<T>, 4, true> >
-mult_sum(tensor<tbblas::complex<T>, 4, true>& image, tensor<tbblas::complex<T>, 4, true>& filters) {
+conj_mult_sum_operation<tensor<tbblas::complex<T>, 4, true> >
+conj_mult_sum(tensor<tbblas::complex<T>, 4, true>& image, tensor<tbblas::complex<T>, 4, true>& filters) {
   typedef tensor<tbblas::complex<T>, 4, true> Tensor;
   assert(filters.size()[3] % image.size()[3] == 0);
-  return mult_sum_operation<Tensor>(image, filters);
+  return conj_mult_sum_operation<Tensor>(image, filters);
 }
 
 }

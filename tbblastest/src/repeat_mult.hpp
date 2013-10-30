@@ -18,7 +18,7 @@
 namespace tbblas {
 
 template<class T>
-__global__ void tbblas_repeat_mult(complex<T>* visibles, complex<T>* hiddens, complex<T>* filters,
+__global__ void tbblas_conj_repeat_mult(complex<T>* visibles, complex<T>* hiddens, complex<T>* filters,
     size_t layerVoxelCount, size_t channelCount, size_t filterCount, T eps)
 {
   // threadidx.x + blockIdx.x * blockDim.x goes over pixels of the image
@@ -41,7 +41,7 @@ __global__ void tbblas_repeat_mult(complex<T>* visibles, complex<T>* hiddens, co
 }
 
 template<class T>
-__global__ void tbblas_repeat_mult_inc(complex<T>* visibles, complex<T>* hiddens, complex<T>* filters,
+__global__ void tbblas_conj_repeat_mult_inc(complex<T>* visibles, complex<T>* hiddens, complex<T>* filters,
     size_t layerVoxelCount, size_t channelCount, size_t filterCount, T eps)
 {
   // threadidx.x + blockIdx.x * blockDim.x goes over pixels of the image
@@ -64,7 +64,7 @@ __global__ void tbblas_repeat_mult_inc(complex<T>* visibles, complex<T>* hiddens
 }
 
 template<class Tensor>
-struct repeat_mult_operation {
+struct conj_repeat_mult_operation {
   typedef Tensor tensor_t;
   typedef typename Tensor::value_t value_t;
   typedef typename value_t::value_t real_value_t;
@@ -72,7 +72,7 @@ struct repeat_mult_operation {
 
   static const unsigned dimCount = Tensor::dimCount;
 
-  repeat_mult_operation(Tensor& visibles, Tensor& hiddens, real_value_t eps)
+  conj_repeat_mult_operation(Tensor& visibles, Tensor& hiddens, real_value_t eps)
    : _visibles(visibles), _hiddens(hiddens), _eps(eps), _size(visibles.size()), _fullsize(visibles.fullsize())
   {
     _size[3] = visibles.size()[3] * hiddens.size()[3];
@@ -87,7 +87,7 @@ struct repeat_mult_operation {
 
     dim3 blockSize(threadCount);
     dim3 gridSize((layerVoxelCount + threadCount - 1) / threadCount, channelCount);
-    tbblas_repeat_mult<<<gridSize, blockSize>>>(_visibles.data().data().get(), _hiddens.data().data().get(), filters.data().data().get(),
+    tbblas_conj_repeat_mult<<<gridSize, blockSize>>>(_visibles.data().data().get(), _hiddens.data().data().get(), filters.data().data().get(),
         layerVoxelCount, channelCount, filterCount, _eps);
   }
 
@@ -99,7 +99,7 @@ struct repeat_mult_operation {
 
     dim3 blockSize(threadCount);
     dim3 gridSize((layerVoxelCount + threadCount - 1) / threadCount, channelCount);
-    tbblas_repeat_mult_inc<<<gridSize, blockSize>>>(_visibles.data().data().get(), _hiddens.data().data().get(), filters.data().data().get(),
+    tbblas_conj_repeat_mult_inc<<<gridSize, blockSize>>>(_visibles.data().data().get(), _hiddens.data().data().get(), filters.data().data().get(),
         layerVoxelCount, channelCount, filterCount, _eps);
   }
 
@@ -119,41 +119,21 @@ private:
 };
 
 template<class T>
-struct is_operation<repeat_mult_operation<T> > {
+struct is_operation<conj_repeat_mult_operation<T> > {
   static const bool value = true;
 };
 
 template<class T>
-struct is_inc_operation<repeat_mult_operation<T> > {
+struct is_inc_operation<conj_repeat_mult_operation<T> > {
   static const bool value = true;
 };
 
 template<class T>
-repeat_mult_operation<tensor<tbblas::complex<T>, 4, true> >
-repeat_mult(tensor<tbblas::complex<T>, 4, true>& visibles, tensor<tbblas::complex<T>, 4, true>& hiddens, T eps) {
+conj_repeat_mult_operation<tensor<tbblas::complex<T>, 4, true> >
+conj_repeat_mult(tensor<tbblas::complex<T>, 4, true>& visibles, tensor<tbblas::complex<T>, 4, true>& hiddens, T eps) {
   typedef tensor<tbblas::complex<T>, 4, true> Tensor;
   assert(visibles.count() / visibles.size()[3] == hiddens.count() / hiddens.size()[3]);
-  return repeat_mult_operation<Tensor>(visibles, hiddens, eps);
-}
-
-template<class T>
-void repeat_mult_inc(tensor<tbblas::complex<T>, 4, true>& visibles, tensor<tbblas::complex<T>, 4, true>& hiddens,
-    tensor<tbblas::complex<T>, 4, true>& filters, T eps)
-{
-  typedef tensor<tbblas::complex<T>, 4, true> Tensor;
-  assert(visibles.count() / visibles.size()[3] == hiddens.count() / hiddens.size()[3]);
-  assert(visibles.count() / visibles.size()[3] == filters.count() / filters.size()[3]);
-  assert(filters.size()[3] == visibles.size()[3] * hiddens.size()[3]);
-
-  const int threadCount = 1024;
-  const int channelCount = visibles.size()[3];
-  const int layerVoxelCount = visibles.count() / channelCount;
-  const int filterCount = hiddens.size()[3];
-
-  dim3 blockSize(threadCount);
-  dim3 gridSize((layerVoxelCount + threadCount - 1) / threadCount, channelCount);
-  tbblas_repeat_mult_inc<<<gridSize, blockSize>>>(visibles.data().data().get(), hiddens.data().data().get(), filters.data().data().get(),
-      layerVoxelCount, channelCount, filterCount, eps);
+  return conj_repeat_mult_operation<Tensor>(visibles, hiddens, eps);
 }
 
 }

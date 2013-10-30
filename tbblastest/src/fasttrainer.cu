@@ -32,17 +32,17 @@ typedef tbblas::random_tensor<float, 4, true, normal<float> > randn_t;
 typedef fft_plan<4> plan_t;
 
 void fasttrainer(int size, int channelCount, int filterCount, int reps) {
-  const int filterBatchSize = 1;
+  const int filterBatchSize = 4;
   assert(filterCount % filterBatchSize == 0);
 
   randn_t randv(size, size, size, channelCount);
 
-  tensor_t v = floor(10 * randv);
+  tensor_t v = floor(10 * randv) / 10;
   tensor_t F(size, size, size, channelCount * filterCount), f;
   float epsilonw = 0.001;
 
   for (int i = 0; i < (int)filterCount; ++i) {
-    f = floor(10 * randv);
+    f = floor(10 * randv) / 10;
     F[seq(0,0,0,i * channelCount), f.size()] = f;
   }
 
@@ -61,8 +61,8 @@ void fasttrainer(int size, int channelCount, int filterCount, int reps) {
   }
 
   for (int iRep = 0; iRep < reps; ++iRep) {
-    cH = mult_sum(cv, cF2);
-    cFinc2 += repeat_mult(cv, cH, epsilonw);
+    cH = conj_mult_sum(cv, cF2);
+    cFinc2 += conj_repeat_mult(cv, cH, epsilonw);
     cvneg2 = repeat_mult_sum(cH, cF2);
   }
 
@@ -72,10 +72,10 @@ void fasttrainer(int size, int channelCount, int filterCount, int reps) {
     for (int iFilter = 0; iFilter < cF.size(); ++iFilter) {
 //      ch_full = conj(cF[iFilter]) * cv;
 //      ch = sum(ch_full, 3);
-      ch = mult_sum(cv, cF[iFilter]);
+      ch = conj_mult_sum(cv, cF[iFilter]);
 
 //      cFinc[iFilter] = cFinc[iFilter] + epsilonw * repeat(conj(ch), cv.size() / ch.size()) * cv;
-      cFinc[iFilter] += repeat_mult(cv, ch, epsilonw);
+      cFinc[iFilter] += conj_repeat_mult(cv, ch, epsilonw);
 //      cvneg = cvneg + cF[iFilter] * repeat(ch, cF[iFilter].size() / ch.size());
       cvneg += repeat_mult_sum(ch, cF[iFilter]);
 
@@ -87,11 +87,17 @@ void fasttrainer(int size, int channelCount, int filterCount, int reps) {
         cf = cFinc2[seq(0,0,0,iFilter * channelCount * filterBatchSize), cFinc[iFilter].size()];
         cf.set_fullsize(cFinc[iFilter].fullsize());
         tbblas_print(dot(cFinc[iFilter] - cf, cFinc[iFilter] - cf));
+
+//        tbblas_print(cvneg[seq(0,0,2,4),seq(size/2+1,size,1,1)]);
       }
     }
 
     if (reps == 1) {
-      tbblas_print(dot(cvneg - cvneg2, cvneg - cvneg2));
+      tbblas_print(sqrt(abs(dot(cvneg - cvneg2, cvneg - cvneg2)) / cvneg.count()));
+//      tbblas_print(cvneg2[seq(0,0,2,4),seq(size/2+1,size,1,1)]);
+      tbblas_print(max(abs(cvneg - cvneg2)));
+      tbblas_print(max((max(abs(cvneg - cvneg2)) == abs(cvneg - cvneg2)) * abs(cvneg)));
+      tbblas_print(max((max(abs(cvneg - cvneg2)) == abs(cvneg - cvneg2)) * abs(cvneg2)));
     }
   }
 }
