@@ -28,5 +28,6 @@ void ompsegfault();
 void benchmarks();
 void rearrangetest();
 void trainertests(int filterCount, int channelCount, int reps, int convnetReps);
+void fasttrainer(int size, int channelCount, int filterCount, int reps);
 
 #endif /* TESTS_H_ */
