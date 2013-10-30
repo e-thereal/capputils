@@ -275,6 +275,21 @@ public:
     return *this;
   }
 
+  template<class Operation>
+  inline typename boost::enable_if<is_inc_operation<Operation>,
+    typename boost::enable_if<boost::is_same<typename Operation::tensor_t, tensor_t>,
+      tensor_t
+    >::type
+  >::type&
+  operator+=(const Operation& op) {
+    for (int i = 0; i < dimCount; ++i) {
+      assert(op.size()[i] == size()[i]);
+      assert(op.fullsize()[i] == fullsize()[i]);
+    }
+    op.apply_inc(*this);
+    return *this;
+  }
+
   template<class Expression>
   inline typename boost::enable_if<is_expression<Expression>,
     typename boost::enable_if_c<Expression::dimCount == dimCount,

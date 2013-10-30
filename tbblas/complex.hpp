@@ -60,6 +60,13 @@ struct __builtin_align__(16) complex {
     ret.img = img - x.img;
     return ret;
   }
+
+  __host__ __device__
+  complex<value_t> operator+=(const complex<value_t>& x) {
+    real += x.real;
+    img += x.img;
+    return *this;
+  }
 };
 
 template<>
@@ -112,6 +119,13 @@ struct
     ret.real = real - x.real;
     ret.img = img - x.img;
     return ret;
+  }
+
+  __host__ __device__
+  complex<value_t> operator+=(const complex<value_t>& x) {
+    real += x.real;
+    img += x.img;
+    return *this;
   }
 };
 

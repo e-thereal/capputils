@@ -156,9 +156,16 @@ public:
 
   void apply(tensor_t& output) const {
     dim_t blockDim(1);
-    blockDim[0] = 16;
-    blockDim[1] = 4;
-    blockDim[2] = 4;
+
+    if (output.size()[2] == 1) {
+      blockDim[0] = 32;
+      blockDim[1] = 32;
+      blockDim[2] = 1;
+    } else {
+      blockDim[0] = 16;
+      blockDim[1] = 4;
+      blockDim[2] = 4;
+    }
 
     assert(kernel.size()[0] % 2 == 1);
     assert(kernel.size()[1] % 2 == 1);

@@ -104,6 +104,23 @@ struct is_operation {
 };
 
 /**
+ * An increment operation must define the following interface:
+ *
+ * typedef ... tensor_t; // type of the tensor to which the operation will be applied
+ *
+ * void apply_inc(tensor_t& t) const;
+ * inline dim_t size() const;
+ * inline dim_t fullsize() const;
+ *
+ * \remark
+ * - is_tensor and is_inc_operation are mutually exclusive
+ */
+template<class T>
+struct is_inc_operation {
+  static const bool value = false;
+};
+
+/**
  * A tensor must be of type tbblas::tensor<class T, unsigned dim, bool device>
  *
  * \remark
