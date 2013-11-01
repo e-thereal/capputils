@@ -134,6 +134,12 @@ struct is_complex<complex<T> > {
   static const bool value = true;
 };
 
+template<class T>
+__host__ __device__
+T abs(const complex<T>& x) {
+  return ::sqrt(x.real * x.real + x.img * x.img);
+}
+
 }
 
 template<class T>

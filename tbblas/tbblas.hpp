@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <thrust/version.h>
+#include <csignal>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -28,7 +29,10 @@
 
 //#define TBBLAS_ALLOC_WARNING_ENABLED
 
-#ifdef TBBLAS_ALLOC_WARNING_ENABLED
+#if defined(TBBLAS_INTERRUPT_ALLOC_ENABLED)
+#define TBBLAS_ALLOC_WARNING std::cerr << "[Warning] Allocating memory at " << __FILE__ << ":" << __LINE__ << std::endl; raise(SIGINT);
+#define TBBLAS_FREE_MESSAGE std::cerr << "[Message] Freeing memory at " << __FILE__ << ":" << __LINE__ << std::endl; raise(SIGINT);
+#elif defined(TBBLAS_ALLOC_WARNING_ENABLED)
 #define TBBLAS_ALLOC_WARNING std::cerr << "[Warning] Allocating memory at " << __FILE__ << ":" << __LINE__ << std::endl;
 #define TBBLAS_FREE_MESSAGE std::cerr << "[Message] Freeing memory at " << __FILE__ << ":" << __LINE__ << std::endl;
 #else
