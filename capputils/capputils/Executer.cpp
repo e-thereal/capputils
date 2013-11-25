@@ -36,12 +36,10 @@ int Executer::execute() {
       if (verbose)
         std::cout << (char)ch;
     }
-    pclose(stream);
+    return pclose(stream) / 256;
   } else {
-    return 1;
+    return -1;
   }
-
-  return 0;
 }
 
 std::string Executer::getCommandString() const {
