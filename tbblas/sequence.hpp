@@ -294,8 +294,7 @@ tbblas::sequence<T, size> operator-(const tbblas::sequence<T, size>& seq,
 }
 
 template<class T, unsigned size>
-tbblas::sequence<T, size> operator*(const tbblas::sequence<T, size>& seq,
-    const T& value)
+tbblas::sequence<T, size> operator*(const T& value, const tbblas::sequence<T, size>& seq)
 {
   tbblas::sequence<T, size> result;
   for (unsigned i = 0; i < size; ++i)
