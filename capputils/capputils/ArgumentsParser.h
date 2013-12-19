@@ -29,7 +29,7 @@ public:
    * \param[in]   argc    Number of command line arguments. The first argument is the program name itself
    * \param[in]   argv    Array of \c char* containing the command line arguments
    */
-  static void Parse(reflection::ReflectableClass& object, int argc, char** argv);
+  static void Parse(reflection::ReflectableClass& object, int argc, char** argv, bool parseOnlyParameter = false);
 
   /**
    * \brief Prints a usage message to standard output using a user specified header.
@@ -40,7 +40,7 @@ public:
    * The \c DescriptionAttribute of a property is used to provide a meaningful description of
    * the according parameter.
    */
-  static void PrintUsage(const std::string& header, const reflection::ReflectableClass& object);
+  static void PrintUsage(const std::string& header, const reflection::ReflectableClass& object, bool showOnlyParameters = false);
 
   /**
    * \brief Prints a usage message to standard output with a default header.
@@ -51,7 +51,7 @@ public:
    * The \c DescriptionAttribute of a property is used to provide a meaningful description of
    * the according parameter.
    */
-  static void PrintDefaultUsage(const std::string& programName, const reflection::ReflectableClass& object);
+  static void PrintDefaultUsage(const std::string& programName, const reflection::ReflectableClass& object, bool showOnlyParameters = false);
 };
 
 }

@@ -15,8 +15,8 @@ namespace capputils {
 
 class GenerateBashCompletion {
 public:
-  static void Generate(const std::string& programName, const reflection::ReflectableClass& object, std::ostream& out);
-  static void Generate(const std::string& programName, const reflection::ReflectableClass& object, const std::string& filename);
+  static void Generate(const std::string& programName, const reflection::ReflectableClass& object, std::ostream& out, bool parseOnlyParameters = false);
+  static void Generate(const std::string& programName, const reflection::ReflectableClass& object, const std::string& filename, bool parseOnlyParameters = false);
 };
 
 } /* namespace capputils */
