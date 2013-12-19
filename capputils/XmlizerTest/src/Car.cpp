@@ -43,11 +43,11 @@ BeginPropertyDefinitions(Car)
 
   DefineProperty(DoorCount, Description("Number of doors (default = 3)"), Observe(Id))
   DefineProperty(HighSpeed, Observe(Id), TimeStamp(Id))
-  DefineProperty(ModelName, NotEqual<std::string>("Audi"), Observe(Id))
+  DefineProperty(ModelName, NotEqual<Type>("Audi"), Observe(Id))
   DefineProperty(LicenceFile, Filename(), Observe(Id))
   DefineProperty(Help, Flag(), Description("Show options"), Observe(Id))
   DefineProperty(Engine, Enumerator<Type>(), Observe(Id))
-  DefineProperty(Owners, Enumerable<boost::shared_ptr<vector<boost::shared_ptr<Person> > >, true>())
+  DefineProperty(Owners, Enumerable<Type, true>())
   DefineProperty(SetOnCompilation, TimeStamp(Id), Volatile())
   DefineProperty(GenerateBashCompletion, Filename(), Observe(Id))
 
