@@ -21,7 +21,7 @@ namespace tbblas {
 template<class T, unsigned dim, bool device>
 void print(const tbblas::tensor<T, dim, device>& tensor, int precision = 5,
     std::ostream& out = std::cout) {
-  out << "Cannot print tensors of dimension > 2." << std::endl;
+  out << "Cannot print tensors of dimension > 3." << std::endl;
 }
 
 template<class Expression>
