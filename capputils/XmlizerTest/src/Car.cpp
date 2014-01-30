@@ -18,6 +18,7 @@
 #include <capputils/VolatileAttribute.h>
 #include <capputils/EnumeratorAttribute.h>
 #include <capputils/FilenameAttribute.h>
+#include <capputils/ParameterAttribute.h>
 
 #include <iostream>
 
@@ -41,11 +42,12 @@ EngineDescription::~EngineDescription() {
 
 BeginPropertyDefinitions(Car)
 
-  DefineProperty(DoorCount, Description("Number of doors (default = 3)"), Observe(Id))
-  DefineProperty(HighSpeed, Observe(Id), TimeStamp(Id))
+  DefineProperty(DoorCount, Description("Number of doors (default = 3)"), Observe(Id), Parameter("", "d"))
+  DefineProperty(HighSpeed, Observe(Id), TimeStamp(Id), Parameter("speed", "s"), Description("High speed."))
   DefineProperty(ModelName, NotEqual<Type>("Audi"), Observe(Id))
+  DefineProperty(Nicknames, Observe(Id), Parameter("names", "n"), Enumerable<Type, false>(), Description("List of nicknames."))
   DefineProperty(LicenceFile, Filename(), Observe(Id))
-  DefineProperty(Help, Flag(), Description("Show options"), Observe(Id))
+  DefineProperty(Help, Flag(), Description("Show options"), Observe(Id), Parameter("help", "h"))
   DefineProperty(Engine, Enumerator<Type>(), Observe(Id))
   DefineProperty(Owners, Enumerable<Type, true>())
   DefineProperty(SetOnCompilation, TimeStamp(Id), Volatile())

@@ -15,6 +15,7 @@
 #include "DescriptionAttribute.h"
 #include "HideAttribute.h"
 #include "ParameterAttribute.h"
+#include "EnumerableAttribute.h"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ using namespace attributes;
 void ArgumentsParser::Parse(ReflectableClass& object, int argc, char** argv, bool parseOnlyParameter) {
   std::vector<IClassProperty*>& properties = object.getProperties();
   ParameterAttribute* parameter = NULL;
+  IEnumerableAttribute* enumerable = NULL;
 
   for (int iArg = 0; iArg < argc; ++iArg) {
 
@@ -41,10 +43,16 @@ void ArgumentsParser::Parse(ReflectableClass& object, int argc, char** argv, boo
         if ((parameter && parameter->getLongName().compare(argv[iArg] + 2) == 0) ||
             (!parameter && properties[iProp]->getName().compare(argv[iArg] + 2) == 0))
         {
-          if (properties[iProp]->getAttribute<FlagAttribute>())
+          if (properties[iProp]->getAttribute<FlagAttribute>()) {
             properties[iProp]->setStringValue(object, "1");
-          else if (iArg < argc - 1)
+          } else if ((enumerable = properties[iProp]->getAttribute<IEnumerableAttribute>())) {
+            enumerable->renewCollection(object, properties[iProp]);
+            boost::shared_ptr<reflection::IPropertyIterator> iter = enumerable->getPropertyIterator(object, properties[iProp]);
+            for (iter->reset(); iArg < argc - 1 && argv[iArg + 1][0] != '-'; iter->next())
+              iter->setStringValue(object, argv[++iArg]);
+          } else if (iArg < argc - 1) {
             properties[iProp]->setStringValue(object, argv[++iArg]);
+          }
           break;
         }
       }
@@ -58,10 +66,16 @@ void ArgumentsParser::Parse(ReflectableClass& object, int argc, char** argv, boo
           continue;
 
         if (parameter->getShortName().compare(argv[iArg] + 1) == 0) {
-          if (properties[iProp]->getAttribute<FlagAttribute>())
+          if (properties[iProp]->getAttribute<FlagAttribute>()) {
             properties[iProp]->setStringValue(object, "1");
-          else if (iArg < argc - 1)
+          } else if ((enumerable = properties[iProp]->getAttribute<IEnumerableAttribute>())) {
+            enumerable->renewCollection(object, properties[iProp]);
+            boost::shared_ptr<reflection::IPropertyIterator> iter = enumerable->getPropertyIterator(object, properties[iProp]);
+            for (iter->reset(); iArg < argc - 1 && argv[iArg + 1][0] != '-'; iter->next())
+              iter->setStringValue(object, argv[++iArg]);
+          } else if (iArg < argc - 1) {
             properties[iProp]->setStringValue(object, argv[++iArg]);
+          }
           break;
         }
       }
