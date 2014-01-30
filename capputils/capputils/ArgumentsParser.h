@@ -14,6 +14,17 @@
 
 namespace capputils {
 
+struct ParameterDescription {
+  reflection::ReflectableClass* object;
+  reflection::IClassProperty* property;
+  std::string longName, shortName, description;
+
+  ParameterDescription();
+
+  ParameterDescription(reflection::ReflectableClass* object, reflection::IClassProperty* property,
+      const std::string& longName, const std::string& shortName, const std::string& description);
+};
+
 /** \brief This class contains static methods in order to parse command line arguments and to show a usage message
  *
  *  Command line arguments have the form \c --PropertyName PropertyValue or just \c --FlagName if the
@@ -32,15 +43,32 @@ public:
   static void Parse(reflection::ReflectableClass& object, int argc, char** argv, bool parseOnlyParameter = false);
 
   /**
+   * \brief Parses command line arguments and sets the properties of a class accordingly
+   *
+   * \param[out]  parameters  List of parameters, for which a summary should be printed.
+   * \param[in]   argc        Number of command line arguments. The first argument is the program name itself
+   * \param[in]   argv        Array of \c char* containing the command line arguments
+   */
+  static void Parse(std::vector<ParameterDescription>& parameters, int argc, char** argv, bool parseOnlyParameter = false);
+
+  /**
    * \brief Prints a usage message to standard output using a user specified header.
    *
-   * \param[in] header  First list of the usage method.
+   * \param[in] header  First line of the usage method.
    * \param[in] object  All properties of that object are printed with according descriptions
    *
    * The \c DescriptionAttribute of a property is used to provide a meaningful description of
    * the according parameter.
    */
-  static void PrintUsage(const std::string& header, const reflection::ReflectableClass& object, bool showOnlyParameters = false);
+  static void PrintUsage(const std::string& header, reflection::ReflectableClass& object, bool showOnlyParameters = false);
+
+  /**
+   * \brief Prints a usage message to standard output using a user specified header.
+   *
+   * \param[in] header      First line of the usage method.
+   * \param[in] parameters  List of parameters, for which a summary should be printed.
+   */
+  static void PrintUsage(const std::string& header, std::vector<ParameterDescription>& parameters);
 
   /**
    * \brief Prints a usage message to standard output with a default header.
@@ -51,7 +79,17 @@ public:
    * The \c DescriptionAttribute of a property is used to provide a meaningful description of
    * the according parameter.
    */
-  static void PrintDefaultUsage(const std::string& programName, const reflection::ReflectableClass& object, bool showOnlyParameters = false);
+  static void PrintDefaultUsage(const std::string& programName, reflection::ReflectableClass& object, bool showOnlyParameters = false);
+
+  /**
+   * \brief Prints a usage message to standard output with a default header.
+   *
+   * \param[in] programName The name of the program. Used as part of the first line of the usage message.
+   * \param[in] parameters  List of parameters, for which a summary should be printed.
+   */
+  static void PrintDefaultUsage(const std::string& programName, std::vector<ParameterDescription>& parameters);
+
+  static void CreateParameterList(reflection::ReflectableClass& object, bool includeOnlyParameters, std::vector<ParameterDescription>& parameters);
 };
 
 }
