@@ -19,6 +19,7 @@
 #include <capputils/EnumeratorAttribute.h>
 #include <capputils/FilenameAttribute.h>
 #include <capputils/ParameterAttribute.h>
+#include <capputils/OperandAttribute.h>
 
 #include <iostream>
 
@@ -44,11 +45,12 @@ BeginPropertyDefinitions(Car)
 
   DefineProperty(DoorCount, Description("Number of doors (default = 3)"), Observe(Id), Parameter("", "d"))
   DefineProperty(HighSpeed, Observe(Id), TimeStamp(Id), Parameter("speed", "s"), Description("High speed."))
-  DefineProperty(ModelName, NotEqual<Type>("Audi"), Observe(Id))
+  DefineProperty(ModelName, NotEqual<Type>("Audi"), Observe(Id), Parameter("model"))
   DefineProperty(Nicknames, Observe(Id), Parameter("names", "n"), Enumerable<Type, false>(), Description("List of nicknames."))
+//  DefineProperty(Nicknames, Observe(Id), Operand("names"), Enumerable<Type, false>(), Description("List of nicknames."))
   DefineProperty(LicenceFile, Filename(), Observe(Id))
   DefineProperty(Help, Flag(), Description("Show options"), Observe(Id), Parameter("help", "h"))
-  DefineProperty(Engine, Enumerator<Type>(), Observe(Id), Parameter("engine", "e"), Description("The type of the engine."))
+  DefineProperty(Engine, Enumerator<Type>(), Observe(Id), Operand("engine"), Description("The type of the engine."))
   DefineProperty(Owners, Enumerable<Type, true>())
   DefineProperty(SetOnCompilation, TimeStamp(Id), Volatile())
   DefineProperty(GenerateBashCompletion, Filename(), Observe(Id))

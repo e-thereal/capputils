@@ -25,6 +25,11 @@ struct ParameterDescription {
       const std::string& longName, const std::string& shortName, const std::string& description);
 };
 
+struct ParameterDescriptions {
+  std::vector<ParameterDescription> parameters;
+  boost::shared_ptr<ParameterDescription> operands;
+};
+
 /** \brief This class contains static methods in order to parse command line arguments and to show a usage message
  *
  *  Command line arguments have the form \c --PropertyName PropertyValue or just \c --FlagName if the
@@ -40,7 +45,7 @@ public:
    * \param[in]   argc    Number of command line arguments. The first argument is the program name itself
    * \param[in]   argv    Array of \c char* containing the command line arguments
    */
-  static void Parse(reflection::ReflectableClass& object, int argc, char** argv, bool parseOnlyParameter = false);
+  static boost::shared_ptr<std::vector<std::string> > Parse(reflection::ReflectableClass& object, int argc, char** argv, bool parseOnlyParameter = false);
 
   /**
    * \brief Parses command line arguments and sets the properties of a class accordingly
@@ -49,7 +54,7 @@ public:
    * \param[in]   argc        Number of command line arguments. The first argument is the program name itself
    * \param[in]   argv        Array of \c char* containing the command line arguments
    */
-  static void Parse(std::vector<ParameterDescription>& parameters, int argc, char** argv, bool parseOnlyParameter = false);
+  static boost::shared_ptr<std::vector<std::string> > Parse(ParameterDescriptions& parameters, int argc, char** argv, bool parseOnlyParameter = false);
 
   /**
    * \brief Prints a usage message to standard output using a user specified header.
@@ -68,7 +73,7 @@ public:
    * \param[in] header      First line of the usage method.
    * \param[in] parameters  List of parameters, for which a summary should be printed.
    */
-  static void PrintUsage(const std::string& header, std::vector<ParameterDescription>& parameters);
+  static void PrintUsage(const std::string& header, ParameterDescriptions& parameters);
 
   /**
    * \brief Prints a usage message to standard output with a default header.
@@ -87,9 +92,9 @@ public:
    * \param[in] programName The name of the program. Used as part of the first line of the usage message.
    * \param[in] parameters  List of parameters, for which a summary should be printed.
    */
-  static void PrintDefaultUsage(const std::string& programName, std::vector<ParameterDescription>& parameters);
+  static void PrintDefaultUsage(const std::string& programName, ParameterDescriptions& parameters);
 
-  static void CreateParameterList(reflection::ReflectableClass& object, bool includeOnlyParameters, std::vector<ParameterDescription>& parameters);
+  static void CreateParameterDescriptions(reflection::ReflectableClass& object, bool includeOnlyParameters, ParameterDescriptions& parameters);
 };
 
 }

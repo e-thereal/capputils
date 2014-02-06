@@ -108,10 +108,21 @@ int main(int argc, char** argv) {
 //  }
 
   Xmlizer::FromXml(car, "car2.xml");
-  ArgumentsParser::Parse(car, argc, argv, true);
+  boost::shared_ptr<std::vector<std::string> > unhandled = ArgumentsParser::Parse(car, argc, argv, true);
+
+  if (unhandled->size()) {
+    std::cout << "Found unknown arguments: ";
+    for (size_t i = 0; i < unhandled->size(); ++i) {
+      std::cout << (i ? ", " : "") << unhandled->at(i);
+    }
+    std::cout << std::endl;
+    ArgumentsParser::PrintDefaultUsage(argv[0], car, true);
+    return EXIT_FAILURE;
+  }
+
   if (car.getHelp() || !Verifier::Valid(car)) {
-    ArgumentsParser::PrintUsage(string("\nUsage: ") + argv[0] + " [switches], where switches are:", car, true);
-    return 0;
+    ArgumentsParser::PrintDefaultUsage(argv[0], car, true);
+    return EXIT_SUCCESS;
   }
   boost::shared_ptr<vector<boost::shared_ptr<Person> > > owners = car.getOwners();
   owners->push_back(boost::shared_ptr<Person>(new Person()));
@@ -121,6 +132,7 @@ int main(int argc, char** argv) {
   cout << "Doors: " << car.getProperty("DoorCount") << endl;
   cout << "High Speed: " << car.getHighSpeed() << endl;
   cout << "Model Name: " << car.getModelName() << endl;
+  cout << "Engine: " << car.getEngine() << endl;
 
   if (car.getNicknames()) {
     std::cout << "Nicknames:" << std::endl;
@@ -138,5 +150,5 @@ int main(int argc, char** argv) {
 
   std::cout << "Good bye." << std::endl;
 
-  return 0;
+  return EXIT_SUCCESS;
 }
