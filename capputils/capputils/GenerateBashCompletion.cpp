@@ -11,6 +11,7 @@
 #include <capputils/FilenameAttribute.h>
 #include <capputils/EnumeratorAttribute.h>
 #include <capputils/ParameterAttribute.h>
+#include <capputils/OperandAttribute.h>
 #include <capputils/HideAttribute.h>
 
 #include <fstream>
@@ -21,7 +22,17 @@ namespace capputils {
 
 void GenerateBashCompletion::Generate(const std::string& programName, const reflection::ReflectableClass& object, std::ostream& out, bool parseOnlyParameters) {
   ParameterAttribute* parameter = NULL;
+  OperandAttribute* operand = NULL;
   bool addWhiteSpace = false;
+  bool hasFilenameOperand = false;
+
+  std::vector<reflection::IClassProperty*>& properties = object.getProperties();
+  for (size_t i = 0; i < properties.size(); ++i) {
+    if (properties[i]->getAttribute<OperandAttribute>() && properties[i]->getAttribute<FilenameAttribute>()) {
+      hasFilenameOperand = true;
+      break;
+    }
+  }
 
   out << "_" << programName << "()\n"
 "  {\n"
@@ -30,11 +41,12 @@ void GenerateBashCompletion::Generate(const std::string& programName, const refl
 "      cur=\"${COMP_WORDS[COMP_CWORD]}\"\n"
 "      prev=\"${COMP_WORDS[COMP_CWORD-1]}\"\n"
 "      opts=\"";
-  std::vector<reflection::IClassProperty*>& properties = object.getProperties();
+
   for (size_t i = 0; i < properties.size(); ++i) {
     parameter = properties[i]->getAttribute<ParameterAttribute>();
+    operand = properties[i]->getAttribute<OperandAttribute>();
 
-    if (properties[i]->getAttribute<HideAttribute>() || (parseOnlyParameters && !parameter))
+    if (properties[i]->getAttribute<HideAttribute>() || (parseOnlyParameters && !parameter) || operand)
       continue;
 
     if (addWhiteSpace)
@@ -60,8 +72,9 @@ void GenerateBashCompletion::Generate(const std::string& programName, const refl
 "      case \"${prev}\" in\n";
   for (size_t i = 0; i < properties.size(); ++i) {
     parameter = properties[i]->getAttribute<ParameterAttribute>();
+    operand = properties[i]->getAttribute<OperandAttribute>();
 
-    if (properties[i]->getAttribute<HideAttribute>() || (parseOnlyParameters && !parameter))
+    if (properties[i]->getAttribute<HideAttribute>() || (parseOnlyParameters && !parameter) || operand)
       continue;
 
     if (!properties[i]->getAttribute<FlagAttribute>()) {
@@ -152,8 +165,15 @@ void GenerateBashCompletion::Generate(const std::string& programName, const refl
 "          ;;\n"
 "      esac\n"
 "      \n"
-"  #    if [[ ${cur} == -* ]] ; then\n"
-"          COMPREPLY=( $(compgen -W \"${opts}\" -- ${cur}) )\n"
+"  #    if [[ ${cur} == -* ]] ; then\n";
+  if (hasFilenameOperand) {
+    out <<
+"          COMPREPLY=( $(compgen -W \"${opts}\" -- ${cur}) $(compgen -f ${cur}) )\n";
+  } else {
+    out <<
+"          COMPREPLY=( $(compgen -W \"${opts}\" -- ${cur}) )\n";
+  }
+  out <<
 "          return 0\n"
 "  #    fi\n"
 "  }\n"
