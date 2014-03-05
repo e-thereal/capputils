@@ -164,18 +164,22 @@ void GenerateBashCompletion::Generate(const std::string& programName, const refl
 "        *)\n"
 "          ;;\n"
 "      esac\n"
-"      \n"
-"  #    if [[ ${cur} == -* ]] ; then\n";
+"      \n";
   if (hasFilenameOperand) {
     out <<
-"          COMPREPLY=( $(compgen -W \"${opts}\" -- ${cur}) $(compgen -f ${cur}) )\n";
+"      if [[ ${cur} == -* ]] ; then\n"
+"          COMPREPLY=( $(compgen -W \"${opts}\" -- ${cur}) )\n"
+"          return 0\n"
+"      else\n"
+"          COMPREPLY=( $(compgen -f ${cur}) )\n"
+"          return 0\n"
+"      fi\n";
   } else {
     out <<
-"          COMPREPLY=( $(compgen -W \"${opts}\" -- ${cur}) )\n";
+"      COMPREPLY=( $(compgen -W \"${opts}\" -- ${cur}) )\n"
+"      return 0\n";
   }
   out <<
-"          return 0\n"
-"  #    fi\n"
 "  }\n"
 "  complete -F _" << programName << " " << programName << std::endl;
 }
