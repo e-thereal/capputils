@@ -5,19 +5,19 @@
  *      Author: tombr
  */
 
-#include "ArgumentsParser.h"
+#include <capputils/ArgumentsParser.h>
 
 #include <cstring>
 #include <iostream>
 #include <cmath>
 
-#include "FlagAttribute.h"
-#include "DescriptionAttribute.h"
-#include "HideAttribute.h"
-#include "ParameterAttribute.h"
-#include "OperandAttribute.h"
-#include "EnumerableAttribute.h"
-#include "EnumeratorAttribute.h"
+#include <capputils/attributes/FlagAttribute.h>
+#include <capputils/attributes/DescriptionAttribute.h>
+#include <capputils/attributes/HideAttribute.h>
+#include <capputils/attributes/ParameterAttribute.h>
+#include <capputils/attributes/OperandAttribute.h>
+#include <capputils/attributes/EnumerableAttribute.h>
+#include <capputils/attributes/EnumeratorAttribute.h>
 
 #include <stdexcept>
 

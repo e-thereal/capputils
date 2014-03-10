@@ -14,7 +14,7 @@
 #include <boost/signals.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "EventHandler.h"
+#include <capputils/EventHandler.h>
 
 namespace capputils {
 

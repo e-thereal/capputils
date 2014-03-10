@@ -5,19 +5,19 @@
  *      Author: tombr
  */
 
-#include "Verifier.h"
+#include <capputils/Verifier.h>
 
-#include "IAssertionAttribute.h"
-#include "FilenameAttribute.h"
-#include "InputAttribute.h"
-#include "OutputAttribute.h"
-#include "TimeStampAttribute.h"
+#include <capputils/attributes/IAssertionAttribute.h>
+#include <capputils/attributes/FilenameAttribute.h>
+#include <capputils/attributes/InputAttribute.h>
+#include <capputils/attributes/OutputAttribute.h>
+#include <capputils/attributes/TimeStampAttribute.h>
 
 #include <boost/filesystem.hpp>
 #include <cmath>
 #include <iostream>
 
-#include "Logbook.h"
+#include <capputils/Logbook.h>
 
 using namespace std;
 using namespace capputils::reflection;

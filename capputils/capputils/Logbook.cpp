@@ -5,7 +5,7 @@
  *      Author: tombr
  */
 
-#include "Logbook.h"
+#include <capputils/Logbook.h>
 
 #include <cassert>
 #include <iostream>

@@ -8,7 +8,7 @@
 #ifndef CAPPUTILS_ARITHMETIC_EXPRESSION_H_
 #define CAPPUTILS_ARITHMETIC_EXPRESSION_H_
 
-#include "capputils.h"
+#include <capputils/capputils.h>
 
 #include <string>
 

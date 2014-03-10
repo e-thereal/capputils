@@ -5,7 +5,7 @@
  *      Author: tombr
  */
 
-#include "ObservableClass.h"
+#include <capputils/ObservableClass.h>
 
 #include <iostream>
 

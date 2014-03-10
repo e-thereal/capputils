@@ -5,16 +5,15 @@
  *      Author: tombr
  */
 
-#include "AttributeExecuter.h"
+#include <capputils/AttributeExecuter.h>
 
-#include "IExecutableAttribute.h"
+#include <capputils/attributes/IExecutableAttribute.h>
 
 using namespace capputils::reflection;
+using namespace capputils::attributes;
 using namespace std;
 
 namespace capputils {
-
-namespace attributes {
 
 void AttributeExecuter::ExecuteBefore(ReflectableClass& object, const IClassProperty& property) {
   const vector<IAttribute*>& attributes = property.getAttributes();
@@ -34,8 +33,6 @@ void AttributeExecuter::ExecuteAfter(ReflectableClass& object, const IClassPrope
       executable->executeAfter(object, property);
     }
   }
-}
-
 }
 
 }

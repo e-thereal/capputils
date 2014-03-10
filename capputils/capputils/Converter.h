@@ -8,7 +8,7 @@
 #ifndef CAPPUTILS_CONVERTER_H_
 #define CAPPUTILS_CONVERTER_H_
 
-#include "capputils.h"
+#include <capputils/capputils.h>
 
 #include <string>
 #include <sstream>
@@ -18,7 +18,7 @@
 #include <boost/type_traits.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#include "arithmetic_expression.h"
+#include <capputils/arithmetic_expression.h>
 
 namespace capputils {
 

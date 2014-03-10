@@ -9,7 +9,7 @@
 #define CAPPUTILS_OBSERVABLECLASS_H_
 
 #include <boost/signal.hpp>
-#include "IClassProperty.h"
+#include <capputils/reflection/IClassProperty.h>
 
 #include <set>
 

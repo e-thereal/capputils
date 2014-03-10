@@ -8,12 +8,12 @@
 #ifndef CAPPUTILS_ABSTRACTLOGBOOK_H_
 #define CAPPUTILS_ABSTRACTLOGBOOK_H_
 
-#include "capputils.h"
+#include <capputils/capputils.h>
 
 #include <boost/shared_ptr.hpp>
 #include <sstream>
 
-#include "Enumerators.h"
+#include <capputils/Enumerators.h>
 
 namespace capputils {
 

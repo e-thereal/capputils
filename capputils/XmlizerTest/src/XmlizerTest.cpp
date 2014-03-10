@@ -8,16 +8,16 @@
 
 #include <iostream>
 
-#include <capputils/Enumerators.h>
-#include <capputils/Xmlizer.h>
 #include <capputils/ArgumentsParser.h>
-#include <capputils/Verifier.h>
-#include <capputils/ReflectableClassFactory.h>
-#include <capputils/ClassProperty.h>
-#include <capputils/IAttribute.h>
-#include <capputils/SerializeAttribute.h>
-#include <capputils/Serializer.h>
+#include <capputils/Enumerators.h>
 #include <capputils/GenerateBashCompletion.h>
+#include <capputils/Serializer.h>
+#include <capputils/Verifier.h>
+#include <capputils/Xmlizer.h>
+#include <capputils/attributes/IAttribute.h>
+#include <capputils/attributes/SerializeAttribute.h>
+#include <capputils/reflection/ClassProperty.h>
+#include <capputils/reflection/ReflectableClassFactory.h>
 
 #include <fstream>
 #include <sstream>

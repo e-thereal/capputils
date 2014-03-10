@@ -8,7 +8,7 @@
 #ifndef CAPPUTILS_LOGBOOK_H_
 #define CAPPUTILS_LOGBOOK_H_
 
-#include "AbstractLogbookModel.h"
+#include <capputils/AbstractLogbookModel.h>
 
 namespace capputils {
 

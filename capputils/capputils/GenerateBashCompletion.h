@@ -8,7 +8,7 @@
 #ifndef CAPPUTILS_GENERATEBASHCOMPLETION_H_
 #define CAPPUTILS_GENERATEBASHCOMPLETION_H_
 
-#include <capputils/ReflectableClass.h>
+#include <capputils/reflection/ReflectableClass.h>
 #include <iostream>
 
 namespace capputils {

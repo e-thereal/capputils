@@ -3,7 +3,7 @@
 #ifndef _PERSON_H_
 #define _PERSON_H_
 
-#include <capputils/ReflectableClass.h>
+#include <capputils/reflection/ReflectableClass.h>
 #include <string>
 #include <istream>
 #include <ostream>

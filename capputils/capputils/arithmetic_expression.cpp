@@ -5,9 +5,9 @@
  *      Author: tombr
  */
 
-#include "arithmetic_expression.h"
+#include <capputils/arithmetic_expression.h>
 
-#include "exprtk.hpp"
+#include <capputils/exprtk.hpp>
 
 namespace capputils {
 

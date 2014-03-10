@@ -8,7 +8,7 @@
 #ifndef VERIFIER_H_
 #define VERIFIER_H_
 
-#include "ReflectableClass.h"
+#include <capputils/reflection/ReflectableClass.h>
 
 #include <ostream>
 #include <iostream>

@@ -8,9 +8,9 @@
 #ifndef CAPPUTILS_ENUMERATORS_H_
 #define CAPPUTILS_ENUMERATORS_H_
 
-#include "AbstractEnumerator.h"
-#include "TypeTraits.h"
-#include <capputils/SerializeAttribute.h>
+#include <capputils/AbstractEnumerator.h>
+#include <capputils/TypeTraits.h>
+#include <capputils/attributes/SerializeAttribute.h>
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>

@@ -5,9 +5,9 @@
  *      Author: tombr
  */
 
-#include "PropertyMap.h"
+#include <capputils/PropertyMap.h>
 
-#include "ReflectableClass.h"
+#include <capputils/reflection/ReflectableClass.h>
 
 namespace capputils {
 

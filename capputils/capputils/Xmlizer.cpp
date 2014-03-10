@@ -5,16 +5,17 @@
  *      Author: tombr
  */
 
-#include "Xmlizer.h"
+#include <capputils/Xmlizer.h>
 
-#include "DescriptionAttribute.h"
-#include "IReflectableAttribute.h"
-#include "IEnumerableAttribute.h"
-#include "ScalarAttribute.h"
-#include "ReflectableClassFactory.h"
-#include "ReuseAttribute.h"
-#include "VolatileAttribute.h"
-#include "IXmlableAttribute.h"
+#include <capputils/attributes/DescriptionAttribute.h>
+#include <capputils/attributes/IReflectableAttribute.h>
+#include <capputils/attributes/IEnumerableAttribute.h>
+#include <capputils/attributes/ScalarAttribute.h>
+#include <capputils/attributes/ReuseAttribute.h>
+#include <capputils/attributes/VolatileAttribute.h>
+#include <capputils/attributes/IXmlableAttribute.h>
+
+#include <capputils/reflection/ReflectableClassFactory.h>
 
 #include <iostream>
 

@@ -9,12 +9,11 @@
 #ifndef CAPPUTILS_ATTRIBUTEEXECUTER_H_
 #define CAPPUTILS_ATTRIBUTEEXECUTER_H_
 
-#include "capputils.h"
-#include "ReflectableClass.h"
+#include <capputils/capputils.h>
+#include <capputils/reflection/ReflectableClass.h>
+#include <capputils/reflection/IClassProperty.h>
 
 namespace capputils {
-
-namespace attributes {
 
 /**
  * \brief Used internally in conjunction with the \c ExecutableAttribute
@@ -43,8 +42,6 @@ public:
   static void ExecuteAfter(reflection::ReflectableClass& object,
         const reflection::IClassProperty& property);
 };
-
-}
 
 }
 

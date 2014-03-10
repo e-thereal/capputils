@@ -5,14 +5,14 @@
  *      Author: tombr
  */
 
-#ifndef XMLIZER_H_
-#define XMLIZER_H_
+#ifndef CAPPUTILS_XMLIZER_H_
+#define CAPPUTILS_XMLIZER_H_
 
 #include <tinyxml/tinyxml.h>
 #include <iostream>
 #include <string>
 
-#include "ReflectableClass.h"
+#include <capputils/reflection/ReflectableClass.h>
 
 namespace capputils {
 

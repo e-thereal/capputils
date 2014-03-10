@@ -5,7 +5,9 @@
  *      Author: tombr
  */
 
-#include "AbstractEnumerator.h"
+#include <capputils/AbstractEnumerator.h>
+
+#include <stdexcept>
 
 namespace capputils {
 
@@ -19,8 +21,13 @@ void AbstractEnumerator::toStream(std::ostream& stream) const {
   stream << value;
 }
 void AbstractEnumerator::fromStream(std::istream& stream) {
-  // TODO: check if values contains value
+  std::vector<std::string>& values = getValues();
   stream >> value;
+  for (size_t i = 0; i < values.size(); ++i) {
+    if (values[i] == value)
+      return;
+  }
+  throw std::runtime_error("invalid enumerator value");
 }
 
 }

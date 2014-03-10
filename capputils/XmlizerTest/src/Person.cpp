@@ -1,10 +1,10 @@
 #include "Person.h"
 
-#include <capputils/DescriptionAttribute.h>
-#include <capputils/EnumeratorAttribute.h>
-#include <capputils/ScalarAttribute.h>
-#include <capputils/ObserveAttribute.h>
-#include <capputils/TimeStampAttribute.h>
+#include <capputils/attributes/DescriptionAttribute.h>
+#include <capputils/attributes/EnumeratorAttribute.h>
+#include <capputils/attributes/ScalarAttribute.h>
+#include <capputils/attributes/ObserveAttribute.h>
+#include <capputils/attributes/TimeStampAttribute.h>
 
 using namespace capputils::attributes;
 

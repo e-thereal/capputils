@@ -5,14 +5,14 @@
  *      Author: tombr
  */
 
-#include "GenerateBashCompletion.h"
+#include <capputils/GenerateBashCompletion.h>
 
-#include <capputils/FlagAttribute.h>
-#include <capputils/FilenameAttribute.h>
-#include <capputils/EnumeratorAttribute.h>
-#include <capputils/ParameterAttribute.h>
-#include <capputils/OperandAttribute.h>
-#include <capputils/HideAttribute.h>
+#include <capputils/attributes/FlagAttribute.h>
+#include <capputils/attributes/FilenameAttribute.h>
+#include <capputils/attributes/EnumeratorAttribute.h>
+#include <capputils/attributes/ParameterAttribute.h>
+#include <capputils/attributes/OperandAttribute.h>
+#include <capputils/attributes/HideAttribute.h>
 
 #include <fstream>
 
@@ -20,16 +20,59 @@ using namespace capputils::attributes;
 
 namespace capputils {
 
+void addBashCompletionEntry(const std::string& parameterName, const reflection::ReflectableClass& object, reflection::IClassProperty* property, std::ostream& out) {
+  FilenameAttribute* filename = NULL;
+  IEnumeratorAttribute* enumAttr = NULL;
+
+  if (parameterName.size()) {
+    out <<
+"        " << parameterName << ")\n";
+  }
+  if ((filename = property->getAttribute<FilenameAttribute>())) {
+    if (filename->getPattern().size())
+      out <<
+"          files=( $(compgen -f -X \"!" << filename->getMatchPattern() << "\" ${cur}) )\n";
+    else
+      out <<
+"          files=( $(compgen -f ${cur}) )\n";
+    out <<
+"          directories=( $(compgen -d -S / ${cur}) )\n"
+"          COMPREPLY=( \"${files[@]/%/ }\" \"${directories[@]}\" )\n";
+  } else if ((enumAttr = property->getAttribute<IEnumeratorAttribute>())) {
+    boost::shared_ptr<AbstractEnumerator> enumerator = enumAttr->getEnumerator(object, property);
+    std::vector<std::string>& values = enumerator->getValues();
+    out <<
+"          options=( $(compgen -W \"";
+    for (size_t j = 0; j < values.size(); ++j) {
+      if (j > 0)
+        out << " ";
+      out << values[j];
+    }
+    out << "\" -- ${cur}) )\n"
+"          COMPREPLY=( \"${options[@]/%/ }\" )\n";
+  } else {
+    out <<
+"          COMPREPLY=()\n";
+  }
+  out <<
+"          return 0\n";
+  if (parameterName.size()) {
+    out <<
+"          ;;\n";
+  }
+}
+
 void GenerateBashCompletion::Generate(const std::string& programName, const reflection::ReflectableClass& object, std::ostream& out, bool parseOnlyParameters) {
   ParameterAttribute* parameter = NULL;
   OperandAttribute* operand = NULL;
   bool addWhiteSpace = false;
-  bool hasFilenameOperand = false;
+
+  reflection::IClassProperty* operandProperty = NULL;
 
   std::vector<reflection::IClassProperty*>& properties = object.getProperties();
   for (size_t i = 0; i < properties.size(); ++i) {
-    if (properties[i]->getAttribute<OperandAttribute>() && properties[i]->getAttribute<FilenameAttribute>()) {
-      hasFilenameOperand = true;
+    if (properties[i]->getAttribute<OperandAttribute>()) {
+      operandProperty = properties[i];
       break;
     }
   }
@@ -78,85 +121,16 @@ void GenerateBashCompletion::Generate(const std::string& programName, const refl
       continue;
 
     if (!properties[i]->getAttribute<FlagAttribute>()) {
-      IEnumeratorAttribute* enumAttr;
-
       if (parameter) {
         if (parameter->getLongName().size()) {
-          out <<
-    "        --" << parameter->getLongName() << ")\n";
-          if (properties[i]->getAttribute<FilenameAttribute>()) {
-            out <<
-    "          COMPREPLY=( $(compgen -f ${cur}) )\n";
-          } else if ((enumAttr = properties[i]->getAttribute<IEnumeratorAttribute>())) {
-            boost::shared_ptr<AbstractEnumerator> enumerator = enumAttr->getEnumerator(object, properties[i]);
-            std::vector<std::string>& values = enumerator->getValues();
-            out <<
-    "          COMPREPLY=( $(compgen -W \"";
-            for (size_t j = 0; j < values.size(); ++j) {
-              if (j > 0)
-                out << " ";
-              out << values[j];
-            }
-            out << "\" -- ${cur}) )\n";
-          } else {
-            out <<
-    "          COMPREPLY=()\n";
-          }
-          out <<
-    "          return 0\n"
-    "          ;;\n";
+          addBashCompletionEntry(std::string("--") + parameter->getLongName(), object, properties[i], out);
         }
 
         if (parameter->getShortName().size()) {
-          out <<
-    "        -" << parameter->getShortName() << ")\n";
-          if (properties[i]->getAttribute<FilenameAttribute>()) {
-            out <<
-    "          COMPREPLY=( $(compgen -f ${cur}) )\n";
-          } else if ((enumAttr = properties[i]->getAttribute<IEnumeratorAttribute>())) {
-            boost::shared_ptr<AbstractEnumerator> enumerator = enumAttr->getEnumerator(object, properties[i]);
-            std::vector<std::string>& values = enumerator->getValues();
-            out <<
-    "          COMPREPLY=( $(compgen -W \"";
-            for (size_t j = 0; j < values.size(); ++j) {
-              if (j > 0)
-                out << " ";
-              out << values[j];
-            }
-            out << "\" -- ${cur}) )\n";
-          } else {
-            out <<
-    "          COMPREPLY=()\n";
-          }
-          out <<
-    "          return 0\n"
-    "          ;;\n";
+          addBashCompletionEntry(std::string("-") + parameter->getShortName(), object, properties[i], out);
         }
       } else {
-
-        out <<
-  "        --" << properties[i]->getName() << ")\n";
-        if (properties[i]->getAttribute<FilenameAttribute>()) {
-          out <<
-  "          COMPREPLY=( $(compgen -f ${cur}) )\n";
-        } else if ((enumAttr = properties[i]->getAttribute<IEnumeratorAttribute>())) {
-          boost::shared_ptr<AbstractEnumerator> enumerator = enumAttr->getEnumerator(object, properties[i]);
-          std::vector<std::string>& values = enumerator->getValues();
-          out <<
-  "          COMPREPLY=( $(compgen -W \"";
-          for (size_t j = 0; j < values.size(); ++j) {
-            if (j > 0)
-              out << " ";
-            out << values[j];
-          }
-          out << "\" -- ${cur}) )\n";
-        } else {
-          out <<
-  "          COMPREPLY=()\n";
-        }
-        out <<
-  "          return 0\n"
-  "          ;;\n";
+        addBashCompletionEntry(std::string("--") + properties[i]->getName(), object, properties[i], out);
       }
     }
   }
@@ -165,23 +139,25 @@ void GenerateBashCompletion::Generate(const std::string& programName, const refl
 "          ;;\n"
 "      esac\n"
 "      \n";
-  if (hasFilenameOperand) {
+  if (operandProperty) {
     out <<
 "      if [[ ${cur} == -* ]] ; then\n"
-"          COMPREPLY=( $(compgen -W \"${opts}\" -- ${cur}) )\n"
+"          options=( $(compgen -W \"${opts}\" -- ${cur}) )\n"
+"          COMPREPLY=( \"${options[@]/%/ }\" )\n"
 "          return 0\n"
-"      else\n"
-"          COMPREPLY=( $(compgen -f ${cur}) )\n"
-"          return 0\n"
+"      else\n";
+    addBashCompletionEntry("", object, operandProperty, out);
+    out <<
 "      fi\n";
   } else {
     out <<
-"      COMPREPLY=( $(compgen -W \"${opts}\" -- ${cur}) )\n"
+"      options=( $(compgen -W \"${opts}\" -- ${cur}) )\n"
+"      COMPREPLY=( \"${options[@]/%/ }\" )\n"
 "      return 0\n";
   }
   out <<
 "  }\n"
-"  complete -F _" << programName << " " << programName << std::endl;
+"  complete -o nospace -F _" << programName << " " << programName << std::endl;
 }
 
 void GenerateBashCompletion::Generate(const std::string& programName, const reflection::ReflectableClass& object, const std::string& filename, bool parseOnlyParameters) {

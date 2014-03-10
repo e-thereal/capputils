@@ -2,13 +2,13 @@
 #ifndef CAPPUTILS_PROPERTYMAP_H_
 #define CAPPUTILS_PROPERTYMAP_H_
 
-#include "capputils.h"
+#include <capputils/capputils.h>
 
 #include <map>
 #include <string>
 
-#include "Variant.h"
-#include "ReflectionException.h"
+#include <capputils/Variant.h>
+#include <capputils/exceptions/ReflectionException.h>
 
 namespace capputils {
 

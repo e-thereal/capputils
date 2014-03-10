@@ -9,8 +9,8 @@
 #ifndef CAPPUTILS_ARGUMENTSPARSER_H_
 #define CAPPUTILS_ARGUMENTSPARSER_H_
 
-#include "capputils.h"
-#include "ReflectableClass.h"
+#include <capputils/capputils.h>
+#include <capputils/reflection/ReflectableClass.h>
 
 namespace capputils {
 

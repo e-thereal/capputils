@@ -5,7 +5,7 @@
  *      Author: tombr
  */
 
-#include "TimedClass.h"
+#include <capputils/TimedClass.h>
 
 namespace capputils {
 

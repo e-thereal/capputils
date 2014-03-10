@@ -8,7 +8,7 @@
 #ifndef CAPPUTILS_ABSTRACTENUMERATOR_H_
 #define CAPPUTILS_ABSTRACTENUMERATOR_H_
 
-#include "capputils.h"
+#include <capputils/capputils.h>
 
 #include <vector>
 #include <string>

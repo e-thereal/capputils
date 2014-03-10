@@ -2,7 +2,7 @@
 #ifndef CAPPUTILS_VARIANT_H_
 #define CAPPUTILS_VARIANT_H_
 
-#include "capputils.h"
+#include <capputils/capputils.h>
 
 #include <typeinfo>
 

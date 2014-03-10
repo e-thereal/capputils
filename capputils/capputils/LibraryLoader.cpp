@@ -5,7 +5,7 @@
  *      Author: tombr
  */
 
-#include "LibraryLoader.h"
+#include <capputils/LibraryLoader.h>
 
 #include <set>
 
@@ -18,8 +18,8 @@
 #endif
 #include <iostream>
 #include <boost/filesystem.hpp>
-#include "LibraryException.h"
-#include "ReflectableClassFactory.h"
+#include <capputils/exceptions/LibraryException.h>
+#include <capputils/reflection/ReflectableClassFactory.h>
 
 using namespace std;
 using namespace boost::filesystem;

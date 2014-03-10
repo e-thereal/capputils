@@ -1,8 +1,8 @@
 #ifndef _CAPPUTILS_SERIALIZER_H_
 #define _CAPPUTILS_SERIALIZER_H_
 
-#include "ReflectableClass.h"
-#include "ClassProperty.h"
+#include <capputils/reflection/ReflectableClass.h>
+#include <capputils/reflection/ClassProperty.h>
 
 #include <iostream>
 

@@ -9,7 +9,6 @@
 #define CAR_H_
 
 #include <capputils/Enumerators.h>
-#include <capputils/ReflectableClass.h>
 #include <capputils/ObservableClass.h>
 #include <vector>
 #include <string>
@@ -17,6 +16,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include <capputils/Enumerators.h>
+
+#include <capputils/reflection/ReflectableClass.h>
 
 #include "Person.h"
 
@@ -42,10 +43,10 @@ class Car : public capputils::reflection::ReflectableClass,
   InitReflectableClass(Car)
 
   Property(DoorCount, int)
-  Property(HighSpeed, float)
+  Property(HighSpeed, double)
   Property(ModelName, std::string)
   Property(Nicknames, boost::shared_ptr<std::vector<std::string> >)
-  Property(LicenceFile, std::string)
+  Property(LicenseFile, std::string)
   Property(Help, bool)
   Property(Engine, EngineType)
   Property(Owners, boost::shared_ptr<std::vector< boost::shared_ptr<Person> > >)

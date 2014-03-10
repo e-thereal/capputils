@@ -5,7 +5,7 @@
  *      Author: tombr
  */
 
-#include "AbstractLogbookModel.h"
+#include <capputils/AbstractLogbookModel.h>
 
 #include <cassert>
 

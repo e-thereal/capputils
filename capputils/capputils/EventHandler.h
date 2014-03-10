@@ -2,7 +2,7 @@
 #ifndef _CAPPUTILS_EVENTHANDLER_H_
 #define _CAPPUTILS_EVENTHANDLER_H_
 
-#include "ObservableClass.h"
+#include <capputils/ObservableClass.h>
 
 namespace capputils {
 
