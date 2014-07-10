@@ -26,9 +26,9 @@ struct sequence {
   typedef T seq_t[size];
   typedef sequence<T, size> sequence_t;
 
-  sequence(const T& value = 0) {
+  sequence() {
     for (unsigned i = 0; i < size; ++i)
-      _seq[i] = value;
+      _seq[i] = 0;
   }
 
   sequence(const seq_t& seq) {
@@ -197,6 +197,14 @@ struct dim_type_trait<T, 4> {
 //  return sequence<T, dim>(seq);
 //}
 
+template<unsigned dims, class T>
+sequence<T, dims> seq(const T& x) {
+  sequence<T, dims> s;
+  for (unsigned i = 0; i < dims; ++i)
+    s[i] = x;
+  return s;
+}
+
 template<class T>
 sequence<T, 1u> seq(T x1) {
   T seq[] = {x1};
@@ -240,8 +248,6 @@ tbblas::sequence<T, size> max(const tbblas::sequence<T, size>& seq1,
   return result;
 }
 
-}
-
 /*** Pair creation ***/
 
 template<class T, unsigned size>
@@ -271,7 +277,7 @@ std::istream& operator>>(std::istream& in, tbblas::sequence<T, size>& seq) {
   return in;
 }
 
-/*** scalar operations ***/
+/*** Scalar operations ***/
 
 template<class T, unsigned size>
 tbblas::sequence<T, size> operator+(const tbblas::sequence<T, size>& seq,
@@ -310,6 +316,8 @@ tbblas::sequence<T, size> operator/(const tbblas::sequence<T, size>& seq,
   for (unsigned i = 0; i < size; ++i)
     result[i] = seq[i] / value;
   return result;
+}
+
 }
 
 #endif /* TBBLAS_SEQUENCE_HPP_ */

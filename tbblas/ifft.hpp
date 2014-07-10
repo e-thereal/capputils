@@ -10,6 +10,7 @@
 
 #include <tbblas/type_traits.hpp>
 #include <tbblas/complex.hpp>
+#include <tbblas/fft_plan.hpp>
 
 #include <boost/utility/enable_if.hpp>
 

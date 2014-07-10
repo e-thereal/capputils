@@ -12,6 +12,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/is_float.hpp>
+#include <boost/static_assert.hpp>
 
 #include <tbblas/tbblas.hpp>
 #include <tbblas/type_traits.hpp>
@@ -160,6 +162,25 @@ public:
 
   inline dim_t size() const {
     return _size;
+  }
+
+  inline void resize(const dim_t& size) {
+    // README: use 'void resize(const dim_t& size, const dim_t fullsize)' instead for complex value types!
+    BOOST_STATIC_ASSERT(!tbblas::is_complex<value_t>::value);
+    bool realloc = false;
+
+    for (unsigned i = 0; i < dim; ++i) {
+      if (size[i] != _size[i]) {
+        realloc = true;
+        _size[i] = size[i];
+      }
+    }
+    _fullsize = size;
+
+    if (realloc) {
+      TBBLAS_ALLOC_WARNING
+      _data = boost::shared_ptr<data_t>(new data_t(count()));
+    }
   }
 
   inline void resize(const dim_t& size, const dim_t fullsize) {

@@ -1,0 +1,118 @@
+/*
+ * rbm_model.hpp
+ *
+ *  Created on: Jul 3, 2014
+ *      Author: tombr
+ */
+
+#ifndef TBBLAS_DEEPLEARN_RBM_MODEL_HPP_
+#define TBBLAS_DEEPLEARN_RBM_MODEL_HPP_
+
+#include <tbblas/tensor.hpp>
+#include <tbblas/deeplearn/unit_type.hpp>
+
+namespace tbblas {
+
+namespace deeplearn {
+
+/// This class contains the parameters of an RBM
+/**
+ * Use the rbm class for inference, sampling and training of RBMs
+ */
+
+template<class T>
+class rbm_model {
+public:
+  typedef T value_t;
+  typedef tbblas::tensor<value_t, 2> host_matrix_t;
+  typedef typename host_matrix_t::dim_t dim_t;
+
+protected:
+  // Model in CPU memory
+  host_matrix_t _visibleBiases, _hiddenBiases, _weights, _mask, _mean, _stddev;
+  unit_type _visibleUnitType, _hiddenUnitType;
+
+public:
+  /// Creates a new conv_rbm layer (called from non-parallel code)
+  rbm_model() { }
+
+  rbm_model(const rbm_model<T>& model)
+   : _visibleBiases(model.visible_bias()), _hiddenBiases(model.hidden_bias()),
+     _weights(model.weights()), _mask(model.mask()),
+     _mean(model.mean()), _stddev(model.stddev()),
+     _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type())
+  { }
+
+public:
+  virtual ~rbm_model() { }
+
+  void set_weights(const host_matrix_t& weights) {
+    _weights = weights;
+  }
+
+  const host_matrix_t& weights() const {
+    return _weights;
+  }
+
+  void set_visible_bias(const host_matrix_t& bias) {
+    _visibleBiases = bias;
+  }
+
+  const host_matrix_t& visible_bias() const {
+    return _visibleBiases;
+  }
+
+  void set_hidden_bias(const host_matrix_t& bias) {
+    _hiddenBiases = bias;
+  }
+
+  const host_matrix_t& hidden_bias() const {
+    return _hiddenBiases;
+  }
+
+  void set_mask(const host_matrix_t& mask) {
+    _mask = mask;
+  }
+
+  const host_matrix_t& mask() const {
+    return _mask;
+  }
+
+  void set_visibles_type(const unit_type& type) {
+    _visibleUnitType = type;
+  }
+
+  const unit_type& visibles_type() const {
+    return _visibleUnitType;
+  }
+
+  void set_hiddens_type(const unit_type& type) {
+    _hiddenUnitType = type;
+  }
+
+  const unit_type& hiddens_type() const {
+    return _hiddenUnitType;
+  }
+
+  void set_mean(const host_matrix_t& mean) {
+    _mean = mean;
+  }
+
+  const host_matrix_t& mean() const {
+    return _mean;
+  }
+
+  void set_stddev(const host_matrix_t& stddev) {
+    _stddev = stddev;
+  }
+
+  const host_matrix_t& stddev() const {
+    return _stddev;
+  }
+};
+
+}
+
+}
+
+#endif /* TBBLAS_DEEPLEARN_RBM_MODEL_HPP_ */

@@ -30,10 +30,10 @@ private:
   cufftType_t type;
   dim_t size;
   unsigned dimension;
-  bool hasPlan;
+  bool hasPlan, isApproved;   ///< isApproved indicated if the plan has been tested to leave the input data alone
 
 public:
-  fft_plan_handle() : hasPlan(false) {
+  fft_plan_handle() : hasPlan(false), isApproved(false) {
   }
 
   ~fft_plan_handle() {
@@ -51,6 +51,8 @@ public:
 
     if (hasPlan)
       cufftDestroy(plan);
+
+    isApproved = false;
 
     this->size = size;
     this->type = type;
@@ -78,6 +80,14 @@ public:
 
     return plan;
   }
+
+  inline bool is_approved() {
+    return isApproved;
+  }
+
+  inline void approve() {
+    isApproved = true;
+  }
 };
 
 template<unsigned dim>
@@ -93,6 +103,14 @@ public:
 
   cufftHandle create(const dim_t& size, cufftType_t type, unsigned dimension) const {
     return handle->create(size, type, dimension);
+  }
+
+  inline bool is_approved() {
+    return handle->is_approved();
+  }
+
+  inline void approve() {
+    handle->approve();
   }
 };
 
