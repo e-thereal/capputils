@@ -64,6 +64,16 @@ public:
      _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type()), _convolutionType(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
      _shared_biases(model.shared_bias())
   {
+    set_filters(model.filters());
+    set_hidden_bias(model.hidden_bias());
+  }
+
+  template<class U>
+  conv_rbm_model(const conv_rbm_model<U,dims>& model)
+   : _visibleBiases(model.visible_bias()), _mask(model.mask()), _filterKernelSize(model.kernel_size()),
+     _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type()), _convolutionType(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
+     _shared_biases(model.shared_bias())
+  {
     _filters.resize(model.filters().size());
     for (size_t i = 0; i < model.filters().size(); ++i)
       _filters[i] = boost::make_shared<host_tensor_t>(*model.filters()[i]);
@@ -73,10 +83,9 @@ public:
       _hiddenBiases[i] = boost::make_shared<host_tensor_t>(*model.hidden_bias()[i]);
   }
 
-public:
-  virtual ~conv_rbm_model() {
-  }
+  virtual ~conv_rbm_model() { }
 
+public:
   void set_filters(const v_host_tensor_t& filters) {
     _filters.resize(filters.size());
     for (size_t i = 0; i < filters.size(); ++i)

@@ -43,9 +43,17 @@ public:
      _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type())
   { }
 
-public:
+  template<class U>
+  rbm_model(const rbm_model<U>& model)
+   : _visibleBiases(model.visible_bias()), _hiddenBiases(model.hidden_bias()),
+     _weights(model.weights()), _mask(model.mask()),
+     _mean(model.mean()), _stddev(model.stddev()),
+     _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type())
+  { }
+
   virtual ~rbm_model() { }
 
+public:
   void set_weights(const host_matrix_t& weights) {
     _weights = weights;
   }

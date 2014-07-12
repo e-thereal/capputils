@@ -106,7 +106,7 @@ protected:
   tensor_t _hiddens;
 
   int _gpu_count, _device_count, _filter_batch_length;
-  bool _memory_allocated, _double_weights, _padding, _host_updated;
+  bool _memory_allocated, _double_weights, _host_updated;
 
   value_t _sparsity_target, _sparsity_weight, _dropout_rate;
   sparsity_method _sparsity_method;
@@ -115,7 +115,7 @@ public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
   conv_rbm(model_t& model, size_t gpu_count = 1) : model(model),
     _gpu_count(gpu_count), _device_count(0), _filter_batch_length(1),
-    _memory_allocated(false), _double_weights(false), _padding(false), _host_updated(true),
+    _memory_allocated(false), _double_weights(false), _host_updated(true),
     _sparsity_target(0.1), _sparsity_weight(0), _dropout_rate(0), _sparsity_method(sparsity_method::OnlySharedBias)
   {
     assert(_gpu_count > 0);
@@ -169,11 +169,6 @@ public:
     // Prepare sizes
     visible_size = model.visible_bias().size();
     size = visible_size;
-
-    if (_padding) {
-      for (size_t j = 0; j < dimCount - 1; ++j)
-        size[j] = upper_power_of_two(size[j]);
-    }
 
     visible_layer_size = visible_size;
     layer_size = filter_batch_size = layer_batch_size = size;
@@ -469,6 +464,8 @@ public:
     if (!_memory_allocated)
       allocate_gpu_memory();
 
+    assert(v_v[0]->size() == visible_size);
+
     tensor_t& v = *v_v[0];
     tensor_t& v_mask = *v_v_mask[0];
     v = ((v - model.mean()) / model.stddev()) * tbblas::repeat(v_mask, size / layer_size);
@@ -477,6 +474,8 @@ public:
   void diversify_visibles() {
     if (!_memory_allocated)
       allocate_gpu_memory();
+
+    assert(v_v[0]->size() == visible_size);
 
     tensor_t& v = *v_v[0];
     tensor_t& v_mask = *v_v_mask[0];
@@ -488,6 +487,8 @@ public:
 
     if (!_memory_allocated)
       allocate_gpu_memory();
+
+    assert(_hiddens.size() == hidden_size);
 
     setup_threads();
 
@@ -557,6 +558,7 @@ public:
     if (!_memory_allocated)
       allocate_gpu_memory();
 
+    assert(v_v[0]->size() == visible_size);
     setup_threads();
 
     *v_cv[0] = tbblas::fft(*v_v[0], dimCount - 1, *v_plan_v[0]);
@@ -610,6 +612,8 @@ public:
 
     if (!_memory_allocated)
       allocate_gpu_memory();
+
+    assert(_hiddens.size() == hidden_size);
 
     setup_threads();
 
@@ -679,6 +683,8 @@ public:
 
     if (!_memory_allocated)
       allocate_gpu_memory();
+
+    assert(v_v[0]->size() == visible_size);
 
     setup_threads();
 
@@ -947,10 +953,26 @@ public:
     return *v_v[0];
   }
 
+  void allocate_visibles() {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    if (v_v[0]->size() != visible_size)
+      v_v[0]->resize(visible_size);
+  }
+
   tensor_t& hiddens() {
     if (!_memory_allocated)
       allocate_gpu_memory();
     return _hiddens;
+  }
+
+  void allocate_hiddens() {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    if (_hiddens.size() != hidden_size)
+      _hiddens.resize(hidden_size);
   }
 
   void set_batch_length(int length) {
@@ -991,17 +1013,6 @@ private:
     cudaSetDevice(0);
     omp_set_dynamic(0);
     omp_set_num_threads(_gpu_count);
-  }
-
-  unsigned int upper_power_of_two(unsigned int v) {
-    v--;
-    v |= v >> 1;
-    v |= v >> 2;
-    v |= v >> 4;
-    v |= v >> 8;
-    v |= v >> 16;
-    v++;
-    return v;
   }
 };
 
