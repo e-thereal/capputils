@@ -138,12 +138,41 @@ public:
     return _visibleUnitType;
   }
 
+  dim_t visibles_size() const {
+    return visible_bias().size();
+  }
+
+  size_t visibles_count() const {
+    return visible_bias().count();
+  }
+
   void set_hiddens_type(const unit_type& type) {
     _hiddenUnitType = type;
   }
 
   const unit_type& hiddens_type() const {
     return _hiddenUnitType;
+  }
+
+  dim_t hiddens_size() const {
+    dim_t hidden_topleft = seq<dimCount>(0);
+    if (convolution_type() == convolution_type::Valid){
+      hidden_topleft = kernel_size() / 2;
+      hidden_topleft[dimCount - 1] = 0;
+    }
+
+    dim_t hidden_size = visible_bias().size() - 2 * hidden_topleft;
+    hidden_size[dimCount - 1] = filters().size();
+
+    return hidden_size;
+  }
+
+  size_t hiddens_count() const {
+    dim_t hidden_size = hiddens_size();
+    size_t count = 1;
+    for (size_t i = 0; i < dims; ++i)
+      count *= hidden_size[i];
+    return count;
   }
 
   void set_convolution_type(const tbblas::deeplearn::convolution_type& type) {

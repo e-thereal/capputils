@@ -167,7 +167,7 @@ public:
     setup_threads();
 
     // Prepare sizes
-    visible_size = model.visible_bias().size();
+    visible_size = model.visibles_size();
     size = visible_size;
 
     visible_layer_size = visible_size;
@@ -180,7 +180,7 @@ public:
       hidden_topleft = model.kernel_size() / 2;
       hidden_topleft[dimCount - 1] = 0;
     } else {
-      hidden_topleft = seq(0,0,0,0);
+      hidden_topleft = seq<4>(0);
     }
 
     hidden_layer_size = visible_layer_size - 2 * hidden_topleft;
@@ -245,7 +245,7 @@ public:
       tensor_t& v_mask = *(v_v_mask[tid] = boost::make_shared<tensor_t>());
       tensor_t& h_mask = *(v_h_mask[tid] = boost::make_shared<tensor_t>());
       v_mask = zeros<value_t>(layer_size);
-      v_mask[seq(0,0,0,0), model.mask().size()] = model.mask();
+      v_mask[seq<dimCount>(0), model.mask().size()] = model.mask();
 
       // pad h mask according to convolution shrinkage
       if (model.convolution_type() == convolution_type::Valid){
@@ -954,11 +954,8 @@ public:
   }
 
   void allocate_visibles() {
-    if (!_memory_allocated)
-      allocate_gpu_memory();
-
-    if (v_v[0]->size() != visible_size)
-      v_v[0]->resize(visible_size);
+    if (v_v[0]->size() != model.visibles_size())
+      v_v[0]->resize(model.visibles_size());
   }
 
   tensor_t& hiddens() {
@@ -968,11 +965,8 @@ public:
   }
 
   void allocate_hiddens() {
-    if (!_memory_allocated)
-      allocate_gpu_memory();
-
-    if (_hiddens.size() != hidden_size)
-      _hiddens.resize(hidden_size);
+    if (_hiddens.size() != model.hiddens_size())
+      _hiddens.resize(model.hiddens_size());
   }
 
   void set_batch_length(int length) {

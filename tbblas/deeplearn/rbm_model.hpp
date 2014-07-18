@@ -102,6 +102,14 @@ public:
     return _hiddenUnitType;
   }
 
+  size_t visibles_count() const {
+    return _visibleBiases.count();
+  }
+
+  size_t hiddens_count() const {
+    return _hiddenBiases.count();
+  }
+
   void set_mean(const host_matrix_t& mean) {
     _mean = mean;
   }
