@@ -69,10 +69,14 @@ private:
 template<unsigned dim, bool device>
 float entropy(const tensor<float, dim, device>& tensor, float totalSum = 1.f) {
   if (totalSum == 1.f) {
-    return -thrust::transform_reduce(tensor.begin(), tensor.end(),
+    return -tbblas::detail::transform_reduce(
+        typename tbblas::detail::select_system<device>::system(),
+        tensor.begin(), tensor.end(),
         entropy_float(), 0.f, thrust::plus<float>());
   } else {
-    return -thrust::transform_reduce(tensor.begin(), tensor.end(),
+    return -tbblas::detail::transform_reduce(
+        typename tbblas::detail::select_system<device>::system(),
+        tensor.begin(), tensor.end(),
         entropy_float_norm(totalSum), 0.f, thrust::plus<float>());
   }
 }
@@ -80,10 +84,14 @@ float entropy(const tensor<float, dim, device>& tensor, float totalSum = 1.f) {
 template<unsigned dim, bool device>
 double entropy(const tensor<double, dim, device>& tensor, double totalSum = 1.0) {
   if (totalSum == 1.0) {
-    return -thrust::transform_reduce(tensor.begin(), tensor.end(),
+    return -tbblas::detail::transform_reduce(
+        typename tbblas::detail::select_system<device>::system(),
+        tensor.begin(), tensor.end(),
         entropy_double(), 0.0, thrust::plus<double>());
   } else {
-    return -thrust::transform_reduce(tensor.begin(), tensor.end(),
+    return -tbblas::detail::transform_reduce(
+        typename tbblas::detail::select_system<device>::system(),
+        tensor.begin(), tensor.end(),
         entropy_double_norm(totalSum), 0.0, thrust::plus<double>());
   }
 }

@@ -25,6 +25,7 @@ class rbm_model {
 public:
   typedef T value_t;
   typedef tbblas::tensor<value_t, 2> host_matrix_t;
+  typedef tbblas::tensor<value_t, 2, true> device_matrix_t;
   typedef typename host_matrix_t::dim_t dim_t;
 
 protected:
@@ -54,7 +55,11 @@ public:
   virtual ~rbm_model() { }
 
 public:
-  void set_weights(const host_matrix_t& weights) {
+  void set_weights(host_matrix_t& weights) {
+    _weights = weights;
+  }
+
+  void set_weights(device_matrix_t& weights) {
     _weights = weights;
   }
 
@@ -62,7 +67,11 @@ public:
     return _weights;
   }
 
-  void set_visible_bias(const host_matrix_t& bias) {
+  void set_visible_bias(host_matrix_t& bias) {
+    _visibleBiases = bias;
+  }
+
+  void set_visible_bias(device_matrix_t& bias) {
     _visibleBiases = bias;
   }
 
@@ -70,7 +79,11 @@ public:
     return _visibleBiases;
   }
 
-  void set_hidden_bias(const host_matrix_t& bias) {
+  void set_hidden_bias(host_matrix_t& bias) {
+    _hiddenBiases = bias;
+  }
+
+  void set_hidden_bias(device_matrix_t& bias) {
     _hiddenBiases = bias;
   }
 
@@ -78,7 +91,11 @@ public:
     return _hiddenBiases;
   }
 
-  void set_mask(const host_matrix_t& mask) {
+  void set_mask(host_matrix_t& mask) {
+    _mask = mask;
+  }
+
+  void set_mask(device_matrix_t& mask) {
     _mask = mask;
   }
 
@@ -110,7 +127,11 @@ public:
     return _hiddenBiases.count();
   }
 
-  void set_mean(const host_matrix_t& mean) {
+  void set_mean(host_matrix_t& mean) {
+    _mean = mean;
+  }
+
+  void set_mean(device_matrix_t& mean) {
     _mean = mean;
   }
 
@@ -118,7 +139,11 @@ public:
     return _mean;
   }
 
-  void set_stddev(const host_matrix_t& stddev) {
+  void set_stddev(host_matrix_t& stddev) {
+    _stddev = stddev;
+  }
+
+  void set_stddev(device_matrix_t& stddev) {
     _stddev = stddev;
   }
 

@@ -15,20 +15,12 @@
 
 #include <boost/static_assert.hpp>
 
+#include <tbblas/detail/copy.hpp>
+#include <tbblas/detail/system.hpp>
+
 #include <cassert>
 
 namespace tbblas {
-
-#if 0
-template<class T1, class T2, unsigned dim>
-void copy(T1 src, sequence<unsigned, dim> srcStart, sequence<unsigned, dim> srcPitch, sequence<bool, dim> srcFlipped,
-    T2 dst, sequence<unsigned, dim> dstStart, sequence<unsigned, dim> dstPitch, sequence<bool, dim> dstFlipped,
-    sequence<unsigned, dim> size)
-{
-  //BOOST_STATIC_ASSERT(0);
-  assert(0);
-}
-#endif
 
 template<class Tensor>
 struct proxy {
@@ -196,7 +188,7 @@ struct proxy {
     for (unsigned i = 0; i < dimCount; ++i) {
       assert(size[i] == _size[i]);
     }
-    thrust::copy(expr.begin(), expr.end(), begin());
+    tbblas::detail::copy(typename tbblas::detail::select_system<cuda_enabled && Expression::cuda_enabled>::system(), expr.begin(), expr.end(), begin());
     return *this;
   }
 
@@ -215,27 +207,6 @@ struct proxy {
     }
     return proxy_filler<proxy_t>(p), value;
   }
-
-#ifdef OLD_METHOD
-  const proxy<Tensor>&
-  operator=(const proxy<Tensor>& p) {
-    for (unsigned i = 0; i < dimCount; ++i) {
-      assert(size[i] == p.size[i]);
-    }
-    copy(&(*p.data)[0], p.start, p.pitch, p.flipped, &(*data)[0], start, pitch, flipped, size);
-    return p;
-  }
-
-  const Tensor&
-  operator=(const Tensor& t) {
-    for (unsigned i = 0; i < dimCount; ++i) {
-      assert(size[i] == t.size()[i]);
-    }
-    copy(&t.data()[0], sequence<unsigned, dimCount>(), size, sequence<bool, dimCount>(false),
-        &(*data)[0], start, pitch, sequence<bool, dimCount>(false), size);
-    return t;
-  }
-#endif
 
 private:
   boost::shared_ptr<data_t> _data;
@@ -266,179 +237,6 @@ proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
 {
   return proxy<tensor<T, dim, device> >(t, start, size);
 }
-
-/*** CUDA IMPLEMENTATIONS ***/
-
-#ifdef TBBLAS_OLD_COPY
-
-template<class T>
-void copy(thrust::device_ptr<const T> src, sequence<unsigned, 1> srcStart, sequence<unsigned, 1> srcPitch, sequence<bool, 1> srcFlipped,
-    thrust::device_ptr<T> dst, sequence<unsigned, 1> dstStart, sequence<unsigned, 1> dstPitch, sequence<bool, 1> dstFlipped,
-    sequence<unsigned, 1> size)
-{
-  // TODO: implement flipped using reverse iterator
-  assert(srcFlipped[0] == false);
-  assert(dstFlipped[0] == false);
-  thrust::copy(src + srcStart[0], src + srcStart[0] + size[0], dst + dstStart[0]);
-}
-
-template<class T>
-void copy(thrust::device_ptr<T> src, sequence<unsigned, 1> srcStart, sequence<unsigned, 1> srcPitch, sequence<bool, 1> srcFlipped,
-    thrust::device_ptr<T> dst, sequence<unsigned, 1> dstStart, sequence<unsigned, 1> dstPitch, sequence<bool, 1> dstFlipped,
-    sequence<unsigned, 1> size)
-{
-  // TODO: implement flipped using reverse iterator
-  assert(srcFlipped[0] == false);
-  assert(dstFlipped[0] == false);
-  thrust::copy(src + srcStart[0], src + srcStart[0] + size[0], dst + dstStart[0]);
-}
-
-template<class T>
-__global__ void copy2D_kernel(const T* src, sequence<unsigned, 2> srcStart, sequence<unsigned, 2> srcPitch, sequence<bool, 2> srcFlipped,
-    T* dst, sequence<unsigned, 2> dstStart, sequence<unsigned, 2> dstPitch, sequence<bool, 2> dstFlipped,
-    sequence<unsigned, 2> size)
-{
-  const int tx = threadIdx.x + blockIdx.x * blockDim.x;
-  const int ty = threadIdx.y + blockIdx.y * blockDim.y;
-
-  if (tx >= size[0] || ty >= size[1])
-    return;
-
-  const int sx = srcFlipped[0] ? size[0] - tx + srcStart[0] - 1 : tx + srcStart[0];
-  const int sy = srcFlipped[1] ? size[1] - ty + srcStart[1] - 1 : ty + srcStart[1];
-
-  const int dx = dstFlipped[0] ? size[0] - tx + dstStart[0] - 1 : tx + dstStart[0];
-  const int dy = dstFlipped[1] ? size[1] - ty + dstStart[1] - 1 : ty + dstStart[1];
-
-  dst[dy * dstPitch[0] + dx] = src[sy * srcPitch[0] + sx];
-}
-
-template<class T>
-void copy(thrust::device_ptr<const T> src, sequence<unsigned, 2> srcStart, sequence<unsigned, 2> srcPitch, sequence<bool, 2> srcFlipped,
-    thrust::device_ptr<T> dst, sequence<unsigned, 2> dstStart, sequence<unsigned, 2> dstPitch, sequence<bool, 2> dstFlipped,
-    sequence<unsigned, 2> size)
-{
-  dim3 blockDim(16, 16, 1);
-  dim3 gridDim((size[0] + blockDim.x - 1)/ blockDim.x, (size[1] + blockDim.y - 1) / blockDim.y, 1);
-
-  copy2D_kernel<<<gridDim, blockDim>>>(src.get(), srcStart, srcPitch, srcFlipped,
-      dst.get(), dstStart, dstPitch, dstFlipped, size);
-}
-
-template<class T>
-void copy(thrust::device_ptr<T> src, sequence<unsigned, 2> srcStart, sequence<unsigned, 2> srcPitch, sequence<bool, 2> srcFlipped,
-    thrust::device_ptr<T> dst, sequence<unsigned, 2> dstStart, sequence<unsigned, 2> dstPitch, sequence<bool, 2> dstFlipped,
-    sequence<unsigned, 2> size)
-{
-  dim3 blockDim(16, 16, 1);
-  dim3 gridDim((size[0] + blockDim.x - 1)/ blockDim.x, (size[1] + blockDim.y - 1) / blockDim.y, 1);
-
-  copy2D_kernel<<<gridDim, blockDim>>>(src.get(), srcStart, srcPitch, srcFlipped,
-      dst.get(), dstStart, dstPitch, dstFlipped, size);
-}
-
-template<class T>
-__global__ void copy3D_kernel(const T* src, sequence<unsigned, 3> srcStart, sequence<unsigned, 3> srcPitch, sequence<bool, 3> srcFlipped,
-    T* dst, sequence<unsigned, 3> dstStart, sequence<unsigned, 3> dstPitch, sequence<bool, 3> dstFlipped,
-    sequence<unsigned, 3> size)
-{
-  const int tx = threadIdx.x + blockIdx.x * blockDim.x;
-  const int ty = threadIdx.y + blockIdx.y * blockDim.y;
-  const int tz = blockIdx.z;
-
-  if (tx >= size[0] || ty >= size[1] || tz >= size[2])
-    return;
-
-  const int sx = srcFlipped[0] ? size[0] - tx + srcStart[0] - 1 : tx + srcStart[0];
-  const int sy = srcFlipped[1] ? size[1] - ty + srcStart[1] - 1 : ty + srcStart[1];
-  const int sz = srcFlipped[2] ? size[2] - tz + srcStart[2] - 1 : tz + srcStart[2];
-
-  const int dx = dstFlipped[0] ? size[0] - tx + dstStart[0] - 1 : tx + dstStart[0];
-  const int dy = dstFlipped[1] ? size[1] - ty + dstStart[1] - 1 : ty + dstStart[1];
-  const int dz = dstFlipped[2] ? size[2] - tz + dstStart[2] - 1 : tz + dstStart[2];
-
-  dst[(dz * dstPitch[1] + dy) * dstPitch[0] + dx]
-      = src[(sz * srcPitch[1] + sy) * srcPitch[0] + sx];
-}
-
-template<class T>
-void copy(thrust::device_ptr<const T> src, sequence<unsigned, 3> srcStart, sequence<unsigned, 3> srcPitch, sequence<bool, 3> srcFlipped,
-    thrust::device_ptr<T> dst, sequence<unsigned, 3> dstStart, sequence<unsigned, 3> dstPitch, sequence<bool, 3> dstFlipped,
-    sequence<unsigned, 3> size)
-{
-  dim3 blockDim(16, 16, 1);
-  dim3 gridDim((size[0] + blockDim.x - 1)/ blockDim.x, (size[1] + blockDim.y - 1) / blockDim.y, size[2]);
-
-  copy3D_kernel<<<gridDim, blockDim>>>(src.get(), srcStart, srcPitch, srcFlipped,
-      dst.get(), dstStart, dstPitch, dstFlipped, size);
-}
-
-template<class T>
-void copy(thrust::device_ptr<T> src, sequence<unsigned, 3> srcStart, sequence<unsigned, 3> srcPitch, sequence<bool, 3> srcFlipped,
-    thrust::device_ptr<T> dst, sequence<unsigned, 3> dstStart, sequence<unsigned, 3> dstPitch, sequence<bool, 3> dstFlipped,
-    sequence<unsigned, 3> size)
-{
-  dim3 blockDim(16, 16, 1);
-  dim3 gridDim((size[0] + blockDim.x - 1)/ blockDim.x, (size[1] + blockDim.y - 1) / blockDim.y, size[2]);
-
-  copy3D_kernel<<<gridDim, blockDim>>>(src.get(), srcStart, srcPitch, srcFlipped,
-      dst.get(), dstStart, dstPitch, dstFlipped, size);
-}
-
-template<class T>
-__global__ void copy4D_kernel(const T* src, sequence<unsigned, 4> srcStart, sequence<unsigned, 4> srcPitch, sequence<bool, 4> srcFlipped,
-    T* dst, sequence<unsigned, 4> dstStart, sequence<unsigned, 4> dstPitch, sequence<bool, 4> dstFlipped,
-    sequence<unsigned, 4> size)
-{
-  const int tx = threadIdx.x + blockIdx.x * blockDim.x;
-  const int ty = threadIdx.y + blockIdx.y * blockDim.y;
-  const int tz = blockIdx.z;
-
-  if (tx >= size[0] || ty >= size[1] || tz >= size[2])
-    return;
-
-  const int sx = srcFlipped[0] ? size[0] - tx + srcStart[0] - 1 : tx + srcStart[0];
-  const int sy = srcFlipped[1] ? size[1] - ty + srcStart[1] - 1 : ty + srcStart[1];
-  const int sz = srcFlipped[2] ? size[2] - tz + srcStart[2] - 1 : tz + srcStart[2];
-
-  const int dx = dstFlipped[0] ? size[0] - tx + dstStart[0] - 1 : tx + dstStart[0];
-  const int dy = dstFlipped[1] ? size[1] - ty + dstStart[1] - 1 : ty + dstStart[1];
-  const int dz = dstFlipped[2] ? size[2] - tz + dstStart[2] - 1 : tz + dstStart[2];
-
-  for (unsigned w = 0; w < size[3]; ++w) {
-    const int sw = srcFlipped[3] ? size[3] - w + srcStart[3] - 1 : w + srcStart[3];
-    const int dw = dstFlipped[3] ? size[3] - w + dstStart[3] - 1 : w + dstStart[3];
-
-    dst[((dw * dstPitch[2] + dz) * dstPitch[1] + dy) * dstPitch[0] + dx]
-        = src[((sw * srcPitch[2] + sz) * srcPitch[1] + sy) * srcPitch[0] + sx];
-  }
-}
-
-template<class T>
-void copy(thrust::device_ptr<const T> src, sequence<unsigned, 4> srcStart, sequence<unsigned, 4> srcPitch, sequence<bool, 4> srcFlipped,
-    thrust::device_ptr<T> dst, sequence<unsigned, 4> dstStart, sequence<unsigned, 4> dstPitch, sequence<bool, 4> dstFlipped,
-    sequence<unsigned, 4> size)
-{
-  dim3 blockDim(16, 16, 1);
-  dim3 gridDim((size[0] + blockDim.x - 1)/ blockDim.x, (size[1] + blockDim.y - 1) / blockDim.y, size[2]);
-
-  copy4D_kernel<<<gridDim, blockDim>>>(src.get(), srcStart, srcPitch, srcFlipped,
-      dst.get(), dstStart, dstPitch, dstFlipped, size);
-}
-
-template<class T>
-void copy(thrust::device_ptr<T> src, sequence<unsigned, 4> srcStart, sequence<unsigned, 4> srcPitch, sequence<bool, 4> srcFlipped,
-    thrust::device_ptr<T> dst, sequence<unsigned, 4> dstStart, sequence<unsigned, 4> dstPitch, sequence<bool, 4> dstFlipped,
-    sequence<unsigned, 4> size)
-{
-  dim3 blockDim(16, 16, 1);
-  dim3 gridDim((size[0] + blockDim.x - 1)/ blockDim.x, (size[1] + blockDim.y - 1) / blockDim.y, size[2]);
-
-  copy4D_kernel<<<gridDim, blockDim>>>(src.get(), srcStart, srcPitch, srcFlipped,
-      dst.get(), dstStart, dstPitch, dstFlipped, size);
-}
-
-#endif
 
 }
 

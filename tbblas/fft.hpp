@@ -12,6 +12,7 @@
 #include <tbblas/complex.hpp>
 #include <tbblas/sequence.hpp>
 #include <tbblas/fft_plan.hpp>
+#include <tbblas/context.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility.hpp>
@@ -39,6 +40,7 @@ struct fft_trait<float> {
   }
 
   static cufftResult exec(const cufftHandle& plan, float *idata, complex<float> *odata) {
+    cufftSetStream(plan, tbblas::context::get().stream);
     return cufftExecR2C(plan, idata, (cufftComplex*)odata);
   }
 };
@@ -55,6 +57,7 @@ struct fft_trait<double> {
   }
 
   static cufftResult exec(const cufftHandle& plan, double *idata, complex<double> *odata) {
+    cufftSetStream(plan, tbblas::context::get().stream);
     return cufftExecD2Z(plan, idata, (cufftDoubleComplex*)odata);
   }
 };
@@ -70,6 +73,7 @@ struct fft_trait<complex<float> > {
   }
 
   static cufftResult exec(const cufftHandle& plan, complex<float> *idata, complex<float> *odata) {
+    cufftSetStream(plan, tbblas::context::get().stream);
     return cufftExecC2C(plan, (cufftComplex*)idata, (cufftComplex*)odata, CUFFT_FORWARD);
   }
 };
@@ -85,6 +89,7 @@ struct fft_trait<complex<double> > {
   }
 
   static cufftResult exec(const cufftHandle& plan, complex<double> *idata, complex<double> *odata) {
+    cufftSetStream(plan, tbblas::context::get().stream);
     return cufftExecZ2Z(plan, (cufftDoubleComplex*)idata, (cufftDoubleComplex*)odata, CUFFT_FORWARD);
   }
 };
@@ -110,7 +115,6 @@ struct fft_operation
      _fullsize(tensor.size())
   { }
 
-  // TODO: copy memory to output buffer and perform FFT in-place
   void apply(tensor_t& output) const {
     cufftResult result;
 

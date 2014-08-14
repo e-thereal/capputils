@@ -11,12 +11,15 @@
 #include <tbblas/type_traits.hpp>
 #include <tbblas/proxy.hpp>
 #include <tbblas/complex.hpp>
+#include <tbblas/context.hpp>
 
 #include <thrust/reduce.h>
 #include <thrust/iterator/counting_iterator.h>
 #include <thrust/iterator/transform_iterator.h>
 #include <thrust/iterator/discard_iterator.h>
-#include <thrust/reduce.h>
+
+#include <tbblas/detail/reduce.hpp>
+#include <tbblas/detail/copy.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
@@ -29,7 +32,10 @@ typename boost::enable_if<is_expression<Expression>,
   typename Expression::value_t
 >::type
 sum(const Expression& expr) {
-  return thrust::reduce(expr.begin(), expr.end(), typename Expression::value_t());
+  return tbblas::detail::reduce(
+      typename tbblas::detail::select_system<Expression::cuda_enabled>::system(),
+      expr.begin(), expr.end(), typename Expression::value_t(),
+      thrust::plus<typename Expression::value_t>());
 }
 
 /* Sum along one dimension */
@@ -71,13 +77,21 @@ struct sum_operation {
   }
 
   void apply(tensor_t& output) const {
-    thrust::reduce_by_key(
-        thrust::make_transform_iterator(thrust::counting_iterator<int>(0), linear_index_to_column_index<int>(_proxy.size()[0])),
-        thrust::make_transform_iterator(thrust::counting_iterator<int>(0), linear_index_to_column_index<int>(_proxy.size()[0])) + _proxy.count(),
-        _proxy.begin(),
-        thrust::make_discard_iterator(),
-        output.begin()
-    );
+    // special case for the trivial sum operation of only one value (size[dimIdx] == 1)
+    // Since we reordered the proxy, we test if the first dimension is 1
+    if (_proxy.size()[0] == 1) {
+      tbblas::detail::copy(typename tbblas::detail::select_system<Proxy::cuda_enabled>::system(),
+          _proxy.begin(), _proxy.end(), output.begin());
+    } else {
+      tbblas::detail::reduce_by_key(
+          typename tbblas::detail::select_system<Proxy::cuda_enabled>::system(),
+          thrust::make_transform_iterator(thrust::counting_iterator<int>(0), linear_index_to_column_index<int>(_proxy.size()[0])),
+          thrust::make_transform_iterator(thrust::counting_iterator<int>(0), linear_index_to_column_index<int>(_proxy.size()[0])) + _proxy.count(),
+          _proxy.begin(),
+          thrust::make_discard_iterator(),
+          output.begin()
+      );
+    }
   }
 
   inline dim_t size() const {
@@ -158,14 +172,14 @@ template<class T>
 void sumLast(const proxy<tensor<T, 3, true> >& input, tensor<T, 3, true>& output) {
   dim3 blockSize(32, 32);
   dim3 gridSize((input.size()[0] + 31) / 32, (input.size()[1] + 31) / 32);
-  tbblas_sumLast<<<gridSize, blockSize>>>(output.data().data().get(), input.data().data().get(), input.size()[0], input.size()[1], input.size()[2]);
+  tbblas_sumLast<<<gridSize, blockSize, 0, context::get().stream>>>(output.data().data().get(), input.data().data().get(), input.size()[0], input.size()[1], input.size()[2]);
 }
 
 template<class T>
 void sumLast(const proxy<tensor<complex<T>, 3, true> >& input, tensor<complex<T>, 3, true>& output) {
   dim3 blockSize(32, 32);
   dim3 gridSize((2 * input.size()[0] + 31) / 32, (input.size()[1] + 31) / 32);
-  tbblas_sumLast<<<gridSize, blockSize>>>((T*)output.data().data().get(), (T*)input.data().data().get(), 2 * input.size()[0], input.size()[1], input.size()[2]);
+  tbblas_sumLast<<<gridSize, blockSize, 0, context::get().stream>>>((T*)output.data().data().get(), (T*)input.data().data().get(), 2 * input.size()[0], input.size()[1], input.size()[2]);
 }
 
 template<class T>
@@ -194,14 +208,14 @@ template<class T>
 void sumLast(const proxy<tensor<T, 4, true> >& input, tensor<T, 4, true>& output) {
   dim3 blockSize(32, 32);
   dim3 gridSize((input.size()[0] + 31) / 32, (input.size()[1] + 31) / 32);
-  tbblas_sumLast<<<gridSize, blockSize>>>(output.data().data().get(), input.data().data().get(), input.size()[0], input.size()[1], input.size()[2], input.size()[3]);
+  tbblas_sumLast<<<gridSize, blockSize, 0, context::get().stream>>>(output.data().data().get(), input.data().data().get(), input.size()[0], input.size()[1], input.size()[2], input.size()[3]);
 }
 
 template<class T>
 void sumLast(const proxy<tensor<complex<T>, 4, true> >& input, tensor<complex<T>, 4, true>& output) {
   dim3 blockSize(32, 32);
   dim3 gridSize((2 * input.size()[0] + 31) / 32, (input.size()[1] + 31) / 32);
-  tbblas_sumLast<<<gridSize, blockSize>>>((T*)output.data().data().get(), (T*)input.data().data().get(), 2 * input.size()[0], input.size()[1], input.size()[2], input.size()[3]);
+  tbblas_sumLast<<<gridSize, blockSize, 0, context::get().stream>>>((T*)output.data().data().get(), (T*)input.data().data().get(), 2 * input.size()[0], input.size()[1], input.size()[2], input.size()[3]);
 }
 #endif
 
@@ -247,7 +261,8 @@ struct sum_operation<tensor<T, 3, true> > {
     if (_dimIdx == dimCount - 1) {
       sumLast(_proxy, output);
     } else {
-      thrust::reduce_by_key(
+      tbblas::detail::reduce_by_key(
+          typename tbblas::detail::select_system<true>::system(),
           thrust::make_transform_iterator(thrust::counting_iterator<int>(0), linear_index_to_column_index<int>(_proxy.size()[0])),
           thrust::make_transform_iterator(thrust::counting_iterator<int>(0), linear_index_to_column_index<int>(_proxy.size()[0])) + _proxy.count(),
           _proxy.begin(),
@@ -270,17 +285,6 @@ private:
   dim_t _size, _fullsize;
   unsigned _dimIdx;
 };
-
-//template<class Tensor>
-//typename boost::enable_if<is_tensor<Tensor>,
-//  typename boost::enable_if_c<Tensor::dimCount == 3 && Tensor::cuda_enabled == true,
-//    sum_operation<Tensor>
-//  >::type
-//>::type
-//sum(Tensor& tensor, unsigned dimIdx) {
-//  assert(dimIdx < Tensor::dimCount);
-//  return sum_operation<Tensor>(tensor, dimIdx);
-//}
 
 template<class T>
 struct sum_operation<tensor<T, 4, true> > {
@@ -324,7 +328,8 @@ struct sum_operation<tensor<T, 4, true> > {
     if (_dimIdx == dimCount - 1) {
       sumLast(_proxy, output);
     } else {
-      thrust::reduce_by_key(
+      tbblas::detail::reduce_by_key(
+          typename tbblas::detail::select_system<true>::system(),
           thrust::make_transform_iterator(thrust::counting_iterator<int>(0), linear_index_to_column_index<int>(_proxy.size()[0])),
           thrust::make_transform_iterator(thrust::counting_iterator<int>(0), linear_index_to_column_index<int>(_proxy.size()[0])) + _proxy.count(),
           _proxy.begin(),

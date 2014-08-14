@@ -15,7 +15,10 @@
 #include <thrust/iterator/constant_iterator.h>
 #include <thrust/iterator/transform_iterator.h>
 #include <thrust/iterator/zip_iterator.h>
-#include <thrust/transform.h>
+//#include <thrust/transform.h>
+
+#include <tbblas/detail/for_each.hpp>
+#include <tbblas/detail/system.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
@@ -110,7 +113,8 @@ struct random_tensor
       first = last;
       last = first + std::min(count, maxCount);
       count -= std::min(count, maxCount);
-      thrust::for_each(
+      tbblas::detail::for_each(
+          typename tbblas::detail::select_system<cuda_enabled>::system(),
           thrust::make_zip_iterator(thrust::make_tuple(
               thrust::counting_iterator<unsigned>(first),
               generators->begin() + first)),
@@ -273,7 +277,7 @@ struct normal<float> {
 
 //  __host__
   static inline float rand(generator_t* gen) {
-    thrust::random::experimental::normal_distribution<float> dist;
+    thrust::random::normal_distribution<float> dist;
     return dist(*gen);
   }
 };
@@ -289,7 +293,7 @@ struct normal<double> {
 
 //  __host__
   static inline double rand(generator_t* gen) {
-    thrust::random::experimental::normal_distribution<double> dist;
+    thrust::random::normal_distribution<double> dist;
     return dist(*gen);
   }
 };

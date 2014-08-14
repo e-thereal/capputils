@@ -23,7 +23,7 @@ struct zeros_expression {
   typedef typename tensor<T, dim>::dim_t dim_t;
   typedef T value_t;
   static const unsigned dimCount = dim;
-  static const bool cuda_enabled = tensor<T, dim>::cuda_enabled;
+  static const bool cuda_enabled = true;    // try to use device is possible
 
   typedef thrust::constant_iterator<value_t> const_iterator;
 

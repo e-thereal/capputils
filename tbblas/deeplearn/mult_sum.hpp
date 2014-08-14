@@ -12,6 +12,7 @@
 #include <tbblas/proxy.hpp>
 #include <tbblas/complex.hpp>
 #include <tbblas/tensor.hpp>
+#include <tbblas/context.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
@@ -69,7 +70,7 @@ struct conj_mult_sum_operation {
 
     dim3 blockSize(threadCount);
     dim3 gridSize((layerVoxelCount + threadCount - 1) / threadCount, filterCount);
-    tbblas_conj_mult_sum<<<gridSize, blockSize>>>(_tensor.data().data().get(), _filters.data().data().get(), output.data().data().get(),
+    tbblas_conj_mult_sum<<<gridSize, blockSize, 0, tbblas::context::get().stream>>>(_tensor.data().data().get(), _filters.data().data().get(), output.data().data().get(),
         layerVoxelCount, channelCount, filterCount);
   }
 

@@ -12,6 +12,7 @@
 #include <tbblas/proxy.hpp>
 #include <tbblas/complex.hpp>
 #include <tbblas/tensor.hpp>
+#include <tbblas/context.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
@@ -87,7 +88,7 @@ struct repeat_mult_sum_operation {
 
     dim3 blockSize(threadCount);
     dim3 gridSize((layerVoxelCount + threadCount - 1) / threadCount, channelCount);
-    tbblas_repeat_mult_sum<<<gridSize, blockSize>>>(_hiddens.data().data().get(), _filters.data().data().get(), output.data().data().get(),
+    tbblas_repeat_mult_sum<<<gridSize, blockSize, 0, tbblas::context::get().stream>>>(_hiddens.data().data().get(), _filters.data().data().get(), output.data().data().get(),
         layerVoxelCount, channelCount, filterCount);
   }
 
@@ -100,7 +101,7 @@ struct repeat_mult_sum_operation {
 
     dim3 blockSize(threadCount);
     dim3 gridSize((layerVoxelCount + threadCount - 1) / threadCount, channelCount);
-    tbblas_repeat_mult_sum_inc<<<gridSize, blockSize>>>(_hiddens.data().data().get(), _filters.data().data().get(), output.data().data().get(),
+    tbblas_repeat_mult_sum_inc<<<gridSize, blockSize, 0, tbblas::context::get().stream>>>(_hiddens.data().data().get(), _filters.data().data().get(), output.data().data().get(),
         layerVoxelCount, channelCount, filterCount);
   }
 

@@ -16,6 +16,8 @@
 
 #include <boost/utility/enable_if.hpp>
 
+#include <tbblas/detail/for_each.hpp>
+
 namespace tbblas {
 
 template<class T>
@@ -123,7 +125,8 @@ struct real_expression {
     for (unsigned i = 0; i < dimCount; ++i) {
       assert(size[i] == this->size()[i]);
     }
-    thrust::for_each(
+    tbblas::detail::for_each(
+        typename tbblas::detail::select_system<cuda_enabled && Expression::cuda_enabled>(),
         thrust::make_zip_iterator(thrust::make_tuple(this->expr.begin(), expr.begin())),
         thrust::make_zip_iterator(thrust::make_tuple(this->expr.end(), expr.end())),
         set_real());

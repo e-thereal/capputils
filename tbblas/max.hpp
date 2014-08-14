@@ -11,7 +11,7 @@
 #include <tbblas/type_traits.hpp>
 #include <tbblas/binary_expression.hpp>
 
-#include <thrust/reduce.h>
+#include <tbblas/detail/reduce.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
@@ -23,7 +23,9 @@ typename boost::enable_if<is_expression<Expression>,
   typename Expression::value_t
 >::type
 max(const Expression& expr) {
-  return thrust::reduce(expr.begin(), expr.end(),
+  return tbblas::detail::reduce(
+      typename tbblas::detail::select_system<Expression::cuda_enabled>::system(),
+      expr.begin(), expr.end(),
       boost::numeric::bounds<typename Expression::value_t>::lowest(),
       thrust::maximum<typename Expression::value_t>());
 }

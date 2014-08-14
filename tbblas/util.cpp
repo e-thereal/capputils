@@ -7,8 +7,8 @@
 
 #include <tbblas/util.hpp>
 
-#include <omp.h>
 #include <cuda_runtime.h>
+#include <tbblas/context.hpp>
 
 #include <cassert>
 
@@ -28,17 +28,8 @@ void enable_peer_access(int gpu_count) {
 
   assert(gpu_count > 0);
   assert(gpu_count <= deviceCount);
-  assert(omp_get_num_threads() == 1);
 
-  cudaSetDevice(0);
-  omp_set_dynamic(0);
-  omp_set_num_threads(gpu_count);
-
-  #pragma omp parallel
-  {
-    /*** PREPARE GPU THREADS ***/
-
-    const int tid = omp_get_thread_num();
+  for (int tid = 0; tid < gpu_count; ++tid) {
     cudaSetDevice(tid);
 
     // Enable peer to peer access of each card with the master card and vice versa
@@ -49,6 +40,7 @@ void enable_peer_access(int gpu_count) {
       cudaDeviceEnablePeerAccess(0, 0);
     }
   }
+  cudaSetDevice(0);
 }
 
 void disable_peer_access(int gpu_count) {
@@ -60,17 +52,9 @@ void disable_peer_access(int gpu_count) {
 
   assert(gpu_count > 0);
   assert(gpu_count <= deviceCount);
-  assert(omp_get_num_threads() == 1);
 
-  cudaSetDevice(0);
-  omp_set_dynamic(0);
-  omp_set_num_threads(gpu_count);
 
-  #pragma omp parallel
-  {
-    /*** PREPARE GPU THREADS ***/
-
-    const int tid = omp_get_thread_num();
+  for (int tid = 0; tid < gpu_count; ++tid) {
     cudaSetDevice(tid);
 
     // Enable peer to peer access of each card with the master card and vice versa
@@ -81,6 +65,11 @@ void disable_peer_access(int gpu_count) {
       cudaDeviceDisablePeerAccess(0);
     }
   }
+  cudaSetDevice(0);
+}
+
+void synchronize() {
+  cudaStreamSynchronize(tbblas::context::get().stream);
 }
 
 }

@@ -11,6 +11,7 @@
 #include <tbblas/type_traits.hpp>
 #include <tbblas/complex.hpp>
 #include <tbblas/fft_plan.hpp>
+#include <tbblas/context.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
@@ -29,6 +30,7 @@ struct ifft_trait<float> {
   const static cufftType type = CUFFT_C2R;
 
   static cufftResult exec(const cufftHandle& plan, complex<float> *idata, float *odata) {
+    cufftSetStream(plan, tbblas::context::get().stream);
     return cufftExecC2R(plan, (cufftComplex*)idata, odata);
   }
 };
@@ -38,6 +40,7 @@ struct ifft_trait<double> {
   const static cufftType type = CUFFT_Z2D;
 
   static cufftResult exec(const cufftHandle& plan, complex<double> *idata, double *odata) {
+    cufftSetStream(plan, tbblas::context::get().stream);
     return cufftExecZ2D(plan, (cufftDoubleComplex*)idata, odata);
   }
 };

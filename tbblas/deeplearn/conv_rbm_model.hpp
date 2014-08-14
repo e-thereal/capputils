@@ -86,7 +86,7 @@ public:
   virtual ~conv_rbm_model() { }
 
 public:
-  void set_filters(const v_host_tensor_t& filters) {
+  void set_filters(v_host_tensor_t& filters) {
     _filters.resize(filters.size());
     for (size_t i = 0; i < filters.size(); ++i)
       _filters[i] = boost::make_shared<host_tensor_t>(*filters[i]);
@@ -96,7 +96,11 @@ public:
     return _filters;
   }
 
-  void set_visible_bias(const host_tensor_t& bias) {
+  size_t filter_count() const {
+    return _filters.size();
+  }
+
+  void set_visible_bias(host_tensor_t& bias) {
     _visibleBiases = bias;
   }
 
@@ -104,7 +108,7 @@ public:
     return _visibleBiases;
   }
 
-  void set_hidden_bias(const v_host_tensor_t& bias) {
+  void set_hidden_bias(v_host_tensor_t& bias) {
     _hiddenBiases.resize(bias.size());
     for (size_t i = 0; i < bias.size(); ++i)
       _hiddenBiases[i] = boost::make_shared<host_tensor_t>(*bias[i]);
@@ -114,7 +118,7 @@ public:
     return _hiddenBiases;
   }
 
-  void set_mask(const host_tensor_t& mask) {
+  void set_mask(host_tensor_t& mask) {
     _mask = mask;
   }
 

@@ -12,8 +12,6 @@
 #include <tbblas/proxy.hpp>
 #include <tbblas/type_traits.hpp>
 
-#include <cublas.h>
-
 namespace tbblas {
 
 template<class T, class Tcp, class Tp>

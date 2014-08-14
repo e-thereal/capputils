@@ -14,6 +14,8 @@
 #include <tbblas/repeat.hpp>
 #include <tbblas/zeros.hpp>
 
+#include <tbblas/context.hpp>
+
 namespace tbblas {
 
 struct optimized {};
@@ -184,7 +186,7 @@ public:
 //    tbblas_print(paddedHaloSizeX);
 //    tbblas_print(sharedMemorySize);
 
-    filter3d_kernel<<<(_size + blockDim - 1) / blockDim, blockDim, sharedMemorySize>>>(
+    filter3d_kernel<<<(_size + blockDim - 1) / blockDim, blockDim, sharedMemorySize,context::get().stream>>>(
             T(),
             input.data().data().get(), input.size(),
             kernel.data().data().get(), kernel.size(),

@@ -8,7 +8,8 @@
 #ifndef TBBLAS_TENSOR_HPP_
 #define TBBLAS_TENSOR_HPP_
 
-#include <thrust/copy.h>
+#include <tbblas/detail/copy.hpp>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -19,6 +20,7 @@
 #include <tbblas/type_traits.hpp>
 #include <tbblas/sequence.hpp>
 #include <tbblas/fill.hpp>
+#include <tbblas/context.hpp>
 
 #include <iostream>
 
@@ -98,7 +100,27 @@ public:
     _fullsize = tensor.fullsize();
 
     _data = boost::shared_ptr<data_t>(new data_t(count));
-    thrust::copy(tensor.begin(), tensor.end(), begin());
+    tbblas::detail::copy(typename tbblas::detail::select_system<device>::system(), tensor.begin(), tensor.end(), begin());
+  }
+
+  template<bool device2>
+  tensor(const tensor<T, dim, device2>& tensor, typename boost::enable_if_c<device != device2, int>::type = 0) {
+    TBBLAS_ALLOC_WARNING
+
+    const dim_t& size = tensor.size();
+    size_t count = 1;
+    for (unsigned i = 0; i < dim; ++i) {
+      _size[i] = size[i];
+      count *= size[i];
+    }
+    _fullsize = tensor.fullsize();
+    _data = boost::shared_ptr<data_t>(new data_t(count));
+
+    cudaMemcpyAsync(thrust::raw_pointer_cast(_data->data()),
+        thrust::raw_pointer_cast(tensor.data().data()),
+        count * sizeof(T),
+        (device ? cudaMemcpyHostToDevice : cudaMemcpyDeviceToHost),
+        tbblas::context::get().stream);
   }
 
   template<class T2, bool device2>
@@ -115,7 +137,7 @@ public:
     _fullsize = tensor.fullsize();
 
     _data = boost::shared_ptr<data_t>(new data_t(count));
-    thrust::copy(tensor.begin(), tensor.end(), begin());
+    tbblas::detail::copy(typename tbblas::detail::select_system<device && device2>::system(), tensor.begin(), tensor.end(), begin());
   }
 
   template<class Operation>
@@ -147,12 +169,11 @@ public:
     _fullsize = expr.fullsize();
 
     _data = boost::shared_ptr<data_t>(new data_t(count()));
-    thrust::copy(expr.begin(), expr.end(), begin());
+    tbblas::detail::copy(typename tbblas::detail::select_system<device && Expression::cuda_enabled>::system(), expr.begin(), expr.end(), begin());
   }
 
   virtual ~tensor() {
     TBBLAS_FREE_MESSAGE
-//    std::cout << "Destructing '" << name << "' ..." << std::endl;
   }
 
 public:
@@ -273,14 +294,28 @@ public:
 
   inline tensor_t& operator=(const tensor_t& tensor) {
     resize(tensor.size(), tensor.fullsize());
-    thrust::copy(tensor.begin(), tensor.end(), begin());
+    tbblas::detail::copy(typename tbblas::detail::select_system<device>::system(), tensor.begin(), tensor.end(), begin());
+    return *this;
+  }
+
+
+  template<bool device2>
+  inline typename boost::enable_if_c<device != device2, tensor>::type&
+  operator=(const tensor<T, dim, device2>& t) {
+    resize(t.size(), t.fullsize());
+
+    cudaMemcpyAsync(thrust::raw_pointer_cast(_data->data()),
+        thrust::raw_pointer_cast(t.data().data()),
+        count() * sizeof(T),
+        (device ? cudaMemcpyHostToDevice : cudaMemcpyDeviceToHost),
+        tbblas::context::get().stream);
     return *this;
   }
 
   template<class T2, bool device2>
   inline tensor_t& operator=(const tensor<T2, dim, device2>& tensor) {
     resize(tensor.size(), tensor.fullsize());
-    thrust::copy(tensor.begin(), tensor.end(), begin());
+    tbblas::detail::copy(typename tbblas::detail::select_system<device && device2>::system(), tensor.begin(), tensor.end(), begin());
     return *this;
   }
 
@@ -321,7 +356,7 @@ public:
   >::type&
   operator=(const Expression& expr) {
     resize(expr.size(), expr.fullsize());
-    thrust::copy(expr.begin(), expr.end(), begin());
+    tbblas::detail::copy(typename tbblas::detail::select_system<device && Expression::cuda_enabled>::system(), expr.begin(), expr.end(), begin());
     return *this;
   }
 
@@ -339,7 +374,7 @@ public:
   }
 
   proxy_filler<proxy<tensor_t> > operator=(const value_t& value) {
-    return subrange(*this, dim_t(0), size()) = value;
+    return subrange(*this, seq<dimCount>(0), size()) = value;
   }
 };
 

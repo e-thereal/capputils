@@ -12,6 +12,9 @@
 #include <iostream>
 #include <fstream>
 
+#include <tbblas/detail/copy.hpp>
+#include <tbblas/detail/system.hpp>
+
 namespace tbblas {
 
 template<class T, unsigned dim, bool device>
@@ -22,9 +25,13 @@ void serialize(const tbblas::tensor<T, dim, device>& tensor, std::ostream& out) 
   typename tbblas::tensor<T, dim, device>::dim_t fullsize = tensor.fullsize();
   out.write((char*)&fullsize, sizeof(fullsize));
 
-  std::vector<T> buffer(tensor.count());
-  thrust::copy(tensor.begin(), tensor.end(), buffer.begin());
-  out.write((char*)&buffer[0], sizeof(T) * tensor.count());
+  if (device) {
+    std::vector<T> buffer(tensor.count());
+    thrust::copy(tensor.begin(), tensor.end(), buffer.begin());
+    out.write((char*)&buffer[0], sizeof(T) * tensor.count());
+  } else {
+    out.write((char*)thrust::raw_pointer_cast(tensor.data().data()), sizeof(T) * tensor.count());
+  }
 }
 
 template<class T, unsigned dim, bool device>
@@ -40,9 +47,13 @@ void deserialize(std::istream& in, tbblas::tensor<T, dim, device>& tensor) {
   in.read((char*)&fullsize, sizeof(fullsize));
   tensor.resize(size, fullsize);
 
-  std::vector<T> buffer(tensor.count());
-  in.read((char*)&buffer[0], sizeof(T) * tensor.count());
-  thrust::copy(buffer.begin(), buffer.end(), tensor.begin());
+  if (device) {
+    std::vector<T> buffer(tensor.count());
+    in.read((char*)&buffer[0], sizeof(T) * tensor.count());
+    thrust::copy(buffer.begin(), buffer.end(), tensor.begin());
+  } else {
+    in.read((char*)thrust::raw_pointer_cast(tensor.data().data()), sizeof(T) * tensor.count());
+  }
 }
 
 template<class T, unsigned dim, bool device>

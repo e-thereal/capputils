@@ -20,9 +20,9 @@ typename boost::enable_if<is_tensor<Tensor>,
     const proxy<Tensor>
   >::type
 >::type
-row(Tensor& tensor, unsigned rowIdx) {
-  assert(rowIdx < tensor.size()[0]);
-  return tensor[seq((int)rowIdx, 0), seq(1, tensor.size()[1])];
+row(Tensor& tensor, int rowIdx) {
+  assert(0 <= rowIdx && rowIdx < tensor.size()[0]);
+  return tensor[seq(rowIdx, 0), seq(1, tensor.size()[1])];
 }
 
 }

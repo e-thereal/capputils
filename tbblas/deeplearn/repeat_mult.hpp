@@ -12,6 +12,7 @@
 #include <tbblas/proxy.hpp>
 #include <tbblas/complex.hpp>
 #include <tbblas/tensor.hpp>
+#include <tbblas/context.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
@@ -89,7 +90,7 @@ struct conj_repeat_mult_operation {
 
     dim3 blockSize(threadCount);
     dim3 gridSize((layerVoxelCount + threadCount - 1) / threadCount, channelCount);
-    tbblas_conj_repeat_mult<<<gridSize, blockSize>>>(_visibles.data().data().get(), _hiddens.data().data().get(), filters.data().data().get(),
+    tbblas_conj_repeat_mult<<<gridSize, blockSize, 0, tbblas::context::get().stream>>>(_visibles.data().data().get(), _hiddens.data().data().get(), filters.data().data().get(),
         layerVoxelCount, channelCount, filterCount, _eps);
   }
 
@@ -101,7 +102,7 @@ struct conj_repeat_mult_operation {
 
     dim3 blockSize(threadCount);
     dim3 gridSize((layerVoxelCount + threadCount - 1) / threadCount, channelCount);
-    tbblas_conj_repeat_mult_inc<<<gridSize, blockSize>>>(_visibles.data().data().get(), _hiddens.data().data().get(), filters.data().data().get(),
+    tbblas_conj_repeat_mult_inc<<<gridSize, blockSize, 0, tbblas::context::get().stream>>>(_visibles.data().data().get(), _hiddens.data().data().get(), filters.data().data().get(),
         layerVoxelCount, channelCount, filterCount, _eps);
   }
 

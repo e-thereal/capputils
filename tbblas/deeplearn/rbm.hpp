@@ -350,6 +350,15 @@ public:
     dc = dc - epsilonhb * hidact / V.size()[0];
   }
 
+  // CAUTION: ONLY USE THIS FUNCTION IF YOU KNOW WHAT YOU ARE DOING
+  // Should probably check, if the model is the same and needs a don't
+  // write to model mechanism
+  void accumulate_gradients(rbm<value_t>& rbm) {
+    rbm.dW = dW = dW + rbm.dW;
+    rbm.db = db = db + rbm.db;
+    rbm.dc = dc = dc + rbm.dc;
+  }
+
   void apply_gradient() {
     _host_updated = false;
 

@@ -14,6 +14,8 @@ extern int peer_access_enabled_count;
 void enable_peer_access(int gpu_count);
 void disable_peer_access(int gpu_count);
 
+void synchronize();
+
 }
 
 

@@ -10,7 +10,7 @@
 
 #include <tbblas/type_traits.hpp>
 
-#include <thrust/inner_product.h>
+#include <tbblas/detail/inner_product.hpp>
 
 #include <cassert>
 
@@ -32,7 +32,9 @@ typename boost::enable_if<is_expression<Expression1>,
 dot(const Expression1& expr1, const Expression2& expr2) {
   assert(expr1.size() == expr2.size());
   assert(expr1.fullsize() == expr2.fullsize());
-  return thrust::inner_product(expr1.begin(), expr1.end(), expr2.begin(), typename Expression1::value_t());
+  return tbblas::detail::inner_product(
+      typename tbblas::detail::select_system<Expression1::cuda_enabled && Expression2::cuda_enabled>::system(),
+      expr1.begin(), expr1.end(), expr2.begin(), typename Expression1::value_t());
 }
 
 }

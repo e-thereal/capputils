@@ -13,6 +13,8 @@
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 
+#include <thrust/system/cuda/experimental/pinned_allocator.h>
+
 #include <tbblas/tbblas.hpp>
 
 namespace tbblas {
@@ -43,7 +45,7 @@ struct complex_type<double> {
 
 template<class T, bool device = false>
 struct vector_type {
-  typedef thrust::host_vector<T> vector_t;
+  typedef thrust::host_vector<T, thrust::cuda::experimental::pinned_allocator<T> > vector_t;
 };
 
 template<class T>

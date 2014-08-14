@@ -45,21 +45,14 @@ public:
     _fullsize = abs(expr1.fullsize() - expr2.fullsize()) + 1;
     _maxSize = max(expr1.size(), expr2.size());
 
-//    std::cout << "size1: " << expr1.size() << std::endl;
-//    std::cout << "size2: " << expr2.size() << std::endl;
-//    std::cout << "result: " << _size << std::endl;
-//    std::cout << "padded: " << _maxSize << std::endl;
     for (unsigned i = 0; i < dimCount; ++i)
       _paddedSize[i] = upper_power_of_two(_maxSize[i]);
-//    std::cout << "padded: " << _paddedSize << std::endl;
   }
 
   void apply(tensor_t& output) const {
-//    std::cout << "output: " << output.size() << std::endl;
-
     tensor_t padded1 = zeros<value_t>(_paddedSize), padded2 = zeros<value_t>(_paddedSize);
-    padded1[sequence<int,dimCount>(0), expr1.size()] = expr1;
-    padded2[sequence<int,dimCount>(0), expr2.size()] = expr2;
+    padded1[seq<dimCount>(0), expr1.size()] = expr1;
+    padded2[seq<dimCount>(0), expr2.size()] = expr2;
 
     plan_t plan;
     ctensor_t ctens1 = fft(padded1, plan);
