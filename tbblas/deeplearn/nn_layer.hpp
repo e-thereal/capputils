@@ -118,24 +118,16 @@ public:
     if (!_memory_allocated)
       allocate_gpu_memory();
 
-//    tbblas_print(sum(V));
-//    tbblas_print(sum(W));
-
     H = prod(V, W);
-//    tbblas_print(sum(H));
     H = H + repeat(b, H.size() / b.size());
-//    tbblas_print(sum(H));
 
     switch (model.activation_function()) {
       case activation_function::Sigmoid: H = sigm(H);    break;
       case activation_function::ReLU:    H = max(0, H);  break;
       case activation_function::Softmax:
         H = exp(H);
-//        tbblas_print(sum(H));
         hidnorm = sum(H, 1);
-//        tbblas_print(sum(hidnorm));
         H = H / (tolerance + repeat(hidnorm, H.size() / hidnorm.size()));
-//        tbblas_print(sum(H));
         break;
     }
   }
@@ -168,19 +160,23 @@ public:
   }
 
   /// Takes visible deltas of successive layer as input
-  void backprop_hidden_deltas(matrix_t& deltas) {
+  template<class Expression>
+  typename boost::enable_if<tbblas::is_expression<Expression>,
+    typename boost::enable_if_c<Expression::dimCount == 2, int>::type >::type
+  backprop_hidden_deltas(const Expression& deltas) {
     switch(model.activation_function()) {
     case activation_function::Sigmoid:
-      dH = dH * H * (1 - H);
+      dH = deltas * H * (1 - H);
       break;
 
     case activation_function::ReLU:
-      dH = dH * (H > 0);
+      dH = deltas * (H > 0);
       break;
 
     default:
       throw std::runtime_error("Unsupported activation function.");
     }
+    return 0;
   }
 
   /// Requires hidden deltas and visibles
