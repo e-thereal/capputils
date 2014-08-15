@@ -32,6 +32,7 @@ FileExistsAttribute::~FileExistsAttribute() {
 bool FileExistsAttribute::valid(const IClassProperty& property,
     const ReflectableClass& object)
 {
+  // TODO: Instead, iterate through enumeration if EnumerableAttribute is set
   if (!dynamic_cast<const ClassProperty<string>* >(&property))
     throw capputils::exceptions::AssertionException("Cannot cast property to string.");
 

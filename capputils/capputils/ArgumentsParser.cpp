@@ -10,6 +10,7 @@
 #include <cstring>
 #include <iostream>
 #include <cmath>
+#include <sstream>
 
 #include <capputils/attributes/FlagAttribute.h>
 #include <capputils/attributes/DescriptionAttribute.h>
@@ -183,16 +184,31 @@ void ArgumentsParser::PrintUsage(const std::string& header, ParameterDescription
 }
 
 void ArgumentsParser::PrintDefaultUsage(const std::string& programName, ReflectableClass& object, bool showOnlyParameters) {
+  std::stringstream header;
   ParameterDescriptions parameters;
   CreateParameterDescriptions(object, showOnlyParameters, parameters);
-  ArgumentsParser::PrintDefaultUsage(programName, parameters);
+
+  DescriptionAttribute* description = object.getAttribute<DescriptionAttribute>();
+  if (description)
+    header << "\n" << description->getDescription() << "\n";
+
+  if (parameters.operands)
+    header << "\nUsage: " << programName << " <" << parameters.operands->longName << "> [switches], where switches are:";
+  else
+    header << "\nUsage: " << programName << " [switches], where switches are:";
+
+  ArgumentsParser::PrintUsage(header.str(), parameters);
 }
 
 void ArgumentsParser::PrintDefaultUsage(const std::string& programName, ParameterDescriptions& parameters) {
+  std::stringstream header;
+
   if (parameters.operands)
-    ArgumentsParser::PrintUsage(std::string("\nUsage: ") + programName + " <" + parameters.operands->longName + "> [switches], where switches are:", parameters);
+    header << "\nUsage: " << programName << " <" << parameters.operands->longName << "> [switches], where switches are:";
   else
-    ArgumentsParser::PrintUsage(std::string("\nUsage: ") + programName + " [switches], where switches are:", parameters);
+    header << "\nUsage: " << programName << " [switches], where switches are:";
+
+  ArgumentsParser::PrintUsage(header.str(), parameters);
 }
 
 void ArgumentsParser::CreateParameterDescriptions(ReflectableClass& object, bool includeOnlyParameters, ParameterDescriptions& parameters) {

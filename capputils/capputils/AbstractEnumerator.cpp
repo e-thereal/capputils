@@ -20,6 +20,7 @@ AbstractEnumerator::~AbstractEnumerator() {
 void AbstractEnumerator::toStream(std::ostream& stream) const {
   stream << value;
 }
+
 void AbstractEnumerator::fromStream(std::istream& stream) {
   std::vector<std::string>& values = getValues();
   stream >> value;

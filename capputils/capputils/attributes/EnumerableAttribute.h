@@ -267,7 +267,7 @@ public:
   }
 };
 
-template<class T, bool reflectable>
+template<class T, bool reflectable = false>
 AttributeWrapper* Enumerable() {
   return new AttributeWrapper(new EnumerableAttribute<T, reflectable>());
 }
