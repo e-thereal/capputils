@@ -51,11 +51,13 @@ public:
   virtual ~nn_layer_model() { }
 
 public:
-  void set_weights(host_matrix_t& weights) {
+  template<class U>
+  void set_weights(const tensor<U, 2>& weights) {
     _weights = weights;
   }
 
-  void set_weights(device_matrix_t& weights) {
+  template<class U>
+  void set_weights(const tensor<U, 2, true>& weights) {
     _weights = weights;
   }
 
@@ -63,11 +65,13 @@ public:
     return _weights;
   }
 
-  void set_bias(host_matrix_t& bias) {
+  template<class U>
+  void set_bias(const tensor<U, 2>& bias) {
     _biases = bias;
   }
 
-  void set_bias(device_matrix_t& bias) {
+  template<class U>
+  void set_bias(const tensor<U, 2, true>& bias) {
     _biases = bias;
   }
 
@@ -91,11 +95,13 @@ public:
     return _weights.size()[1];
   }
 
-  void set_mean(host_matrix_t& mean) {
+  template<class U>
+  void set_mean(const tensor<U, 2>& mean) {
     _mean = mean;
   }
 
-  void set_mean(device_matrix_t& mean) {
+  template<class U>
+  void set_mean(const tensor<U, 2, true>& mean) {
     _mean = mean;
   }
 
@@ -103,11 +109,13 @@ public:
     return _mean;
   }
 
-  void set_stddev(host_matrix_t& stddev) {
+  template<class U>
+  void set_stddev(const tensor<U, 2>& stddev) {
     _stddev = stddev;
   }
 
-  void set_stddev(device_matrix_t& stddev) {
+  template<class U>
+  void set_stddev(const tensor<U, 2, true>& stddev) {
     _stddev = stddev;
   }
 

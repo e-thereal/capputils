@@ -159,6 +159,10 @@ public:
     dV = prod(dH, trans(W));
   }
 
+  void backprop_visibles() {
+    V = prod(H, trans(W));
+  }
+
   /// Takes visible deltas of successive layer as input
   template<class Expression>
   typename boost::enable_if<tbblas::is_expression<Expression>,
@@ -166,7 +170,7 @@ public:
   backprop_hidden_deltas(const Expression& deltas) {
     switch(model.activation_function()) {
     case activation_function::Sigmoid:
-      dH = deltas * H * (1 - H);
+      dH = deltas * H * (1 + -H);
       break;
 
     case activation_function::ReLU:
@@ -218,6 +222,9 @@ public:
     return dV;
   }
 };
+
+template<class T>
+const T nn_layer<T>::tolerance;
 
 }
 

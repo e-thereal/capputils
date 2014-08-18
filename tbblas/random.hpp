@@ -25,13 +25,6 @@
 #include <curand_kernel.h>
 #include <boost/static_assert.hpp>
 
-#ifndef __CUDACC__
-#include <boost/math/special_functions/erf.hpp>
-double erfcinv(double x) {
-  return boost::math::erfc_inv(x);
-}
-#endif
-
 #include <thrust/random.h>
 
 namespace tbblas {

@@ -14,5 +14,6 @@
 #include <tbblas/prod.hpp>
 #include <tbblas/row.hpp>
 #include <tbblas/column.hpp>
+#include <tbblas/identity.hpp>
 
 #endif /* LINALG_HPP_ */

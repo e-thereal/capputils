@@ -394,6 +394,9 @@ public:
   }
 };
 
+template<class T>
+const T rbm<T>::tolerance;
+
 }
 
 }

@@ -1155,6 +1155,9 @@ private:
   }
 };
 
+template<class T, unsigned dims>
+const T conv_rbm<T, dims>::tolerance;
+
 }
 
 }
