@@ -127,6 +127,8 @@ public:
     std::string result;
     std::stringstream s(value);
     std::vector<T> vec;
+    if (value.size() == 0)
+        return vec;
     while (!s.eof()) {
       s >> result;
       vec.push_back(Converter<T>::fromString(result));
