@@ -194,7 +194,7 @@ public:
     // Calculate the total activation of the hidden and visible units
     hidact = sum(dH, 0);
 
-    dW = momentum * dW + epsilon * prods / V.size()[0] + weightcost * W;
+    dW = momentum * dW + epsilon * prods / V.size()[0] + weightcost * epsilon * W;
     db = momentum * db + epsilon * hidact / V.size()[0];
 
     W = W - dW;
