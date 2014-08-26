@@ -35,7 +35,7 @@
 									<listOptionValue builtIn="false" value="/res1/software/cuda/include"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblastest/src/convnet}&quot;"/>
 								</option>
-								<option id="cuda.toolchain.compiler.option.misc.other.1112520598" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fopenmp -Xcompiler -fmessage-length=0 -gencode=arch=compute_20,code=\&quot;sm_20,compute_20\&quot;" valueType="string"/>
+								<option id="cuda.toolchain.compiler.option.misc.other.1112520598" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fopenmp -Xcompiler -fmessage-length=0 -gencode=arch=compute_30,code=\&quot;sm_30,compute_30\&quot;" valueType="string"/>
 								<inputType id="cuda.toolchain.compiler.input.263340465" superClass="cuda.toolchain.compiler.input"/>
 							</tool>
 							<tool id="cuda.toolchain.gnu.cpp.compiler.1701481600" name="GCC C++ Compiler" superClass="cuda.toolchain.gnu.cpp.compiler">
@@ -144,7 +144,7 @@
 								</option>
 								<option defaultValue="gnu.c.optimization.level.most" id="cuda.toolchain.compiler.option.optimization.level.70631186" name="Optimization Level" superClass="cuda.toolchain.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="cuda.toolchain.compiler.option.debugging.level.1371945401" name="Debug Level" superClass="cuda.toolchain.compiler.option.debugging.level" value="cuda.toolchain.compiler.option.debugging.level.none" valueType="enumerated"/>
-								<option id="cuda.toolchain.compiler.option.misc.other.638362504" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fopenmp -Xcompiler -fmessage-length=0 -gencode=arch=compute_20,code=\&quot;sm_20,compute_20\&quot;" valueType="string"/>
+								<option id="cuda.toolchain.compiler.option.misc.other.638362504" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fopenmp -Xcompiler -fmessage-length=0 -gencode=arch=compute_${COMPUTE_CAPABILITY},code=\&quot;sm_${COMPUTE_CAPABILITY},compute_${COMPUTE_CAPABILITY}\&quot;" valueType="string"/>
 								<inputType id="cuda.toolchain.compiler.input.154128504" superClass="cuda.toolchain.compiler.input"/>
 							</tool>
 							<tool id="cuda.toolchain.gnu.cpp.compiler.55856132" name="GCC C++ Compiler" superClass="cuda.toolchain.gnu.cpp.compiler">
@@ -155,7 +155,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblastest/src/convnet}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.pic.1142154657" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
-								<option id="gnu.cpp.compiler.option.other.other.2128662272" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fopenmp" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.2128662272" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fopenmp -std=c++0x" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.644255974" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cuda.toolchain.gnu.c.compiler.870328440" name="GCC C Compiler" superClass="cuda.toolchain.gnu.c.compiler">
@@ -182,6 +182,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gomp"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="blas"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="convnet"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_thread"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1987775841" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

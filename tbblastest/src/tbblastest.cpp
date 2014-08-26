@@ -15,6 +15,7 @@ int i = 1;
 
 int main(int argc, char** argv) {
 
+  synctest();
 //  ompsegfault();
 //  helloworld();
 //  convtest();
@@ -35,13 +36,13 @@ int main(int argc, char** argv) {
 //  benchmarks();
 //  rearrangetest();
 
-  if (argc != 5) {
-    std::cout << "Usage: " << argv[0] << " <size> <channel count> <filter count> <reps>" << std::endl;
-    return 1;
-  }
+//  if (argc != 5) {
+//    std::cout << "Usage: " << argv[0] << " <size> <channel count> <filter count> <reps>" << std::endl;
+//    return 1;
+//  }
 
 //  trainertests(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
-  fasttrainer(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
+//  fasttrainer(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
 
   return 0;
 }
