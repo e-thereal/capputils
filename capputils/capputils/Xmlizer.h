@@ -31,13 +31,13 @@ public:
   static void ToDocument(std::ostream& os, TiXmlNode* node);
 
   static void GetPropertyFromXml(reflection::ReflectableClass& object,
-      reflection::IClassProperty* property, const TiXmlNode& node);
+      reflection::IClassProperty* property, TiXmlNode& node);
   static void GetPropertyFromXml(reflection::ReflectableClass& object,
       reflection::IClassProperty* property, const std::string& filename);
 
-  static reflection::ReflectableClass* CreateReflectableClass(const TiXmlNode& xmlNode);
+  static reflection::ReflectableClass* CreateReflectableClass(TiXmlNode& xmlNode);
   static reflection::ReflectableClass* CreateReflectableClass(const ::std::string& filename);
-  static void FromXml(reflection::ReflectableClass& object, const TiXmlNode& xmlNode);
+  static void FromXml(reflection::ReflectableClass& object, TiXmlNode& xmlNode);
   static void FromXml(reflection::ReflectableClass& object, const ::std::string& filename);
   static void FromXmlString(reflection::ReflectableClass& object, const std::string& xmlString);
 };

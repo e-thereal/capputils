@@ -14,6 +14,7 @@
 #include <capputils/attributes/ReuseAttribute.h>
 #include <capputils/attributes/VolatileAttribute.h>
 #include <capputils/attributes/IXmlableAttribute.h>
+#include <capputils/attributes/RenamedAttribute.h>
 
 #include <capputils/reflection/ReflectableClassFactory.h>
 
@@ -148,9 +149,24 @@ void Xmlizer::ToDocument(std::ostream& os, TiXmlNode* node) {
   os << printer.Str();
 }
 
-ReflectableClass* Xmlizer::CreateReflectableClass(const TiXmlNode& xmlNode) {
+ReflectableClass* Xmlizer::CreateReflectableClass(TiXmlNode& xmlNode) {
   ReflectableClass* object = ReflectableClassFactory::getInstance().newInstance(makeClassName(xmlNode.Value()));
+
   if (object) {
+    // Check if the object has been renamed. In that case get the new name, free the old object, create the new object and rename the XmlNode
+    RenamedAttribute* renamed = object->getAttribute<RenamedAttribute>();
+    ReflectableClass* renamedObject = NULL;
+    if (renamed) {
+      try {
+        renamedObject = ReflectableClassFactory::getInstance().newInstance(renamed->getNewName());
+      } catch (...) { }
+      if (renamedObject) {
+        xmlNode.SetValue(makeXmlName(renamed->getNewName()));
+        delete object;
+        object = renamedObject;
+      }
+    }
+
     Xmlizer::FromXml(*object, xmlNode);
     return object;
   }
@@ -166,7 +182,7 @@ reflection::ReflectableClass* Xmlizer::CreateReflectableClass(const ::std::strin
   return CreateReflectableClass(*doc.FirstChildElement());
 }
 
-void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClassProperty* property, const TiXmlElement* element) {
+void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClassProperty* property, TiXmlElement* element) {
 
   // TODO: how to read attributes right? Need an atomic read. Setting a property might change
   //       an attribute (e.g. TimeStamps are set when the property is set). So attributes should
@@ -174,7 +190,7 @@ void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClass
   //       the saved value. But setting a property could trigger other actions that read an attribute,
   //       thus attributes should be read before setting the value of a property. Actions are triggered
   //       through the observe mechanism. Probable solution is not to fire change events until all attributes
-  //       have been read. This required a lock and unlock mechanism for observable classes. Current workaround
+  //       have been read. This requires a lock and unlock mechanism for observable classes. Current workaround
   //       is to read attributes twice. Make sure, that the observe attribute is the first attribute thus
   //       guaranteeing, that no attributes are executed before the change event has been fired.
   const vector<IAttribute*>& attributes = property->getAttributes();
@@ -202,11 +218,11 @@ void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClass
           delete newObject;
       }
     } else if (enumerableAttribute) {
-      const TiXmlNode* collectionElement = element->FirstChild("Collection");
+      TiXmlNode* collectionElement = element->FirstChild("Collection");
       boost::shared_ptr<IPropertyIterator> iter = enumerableAttribute->getPropertyIterator(object, property);
-      for (const TiXmlNode* node = collectionElement->FirstChild("Item"); node; node = node->NextSibling("Item")) {
+      for (TiXmlNode* node = collectionElement->FirstChild("Item"); node; node = node->NextSibling("Item")) {
         if (node->Type() == TiXmlNode::TINYXML_ELEMENT) {
-          const TiXmlElement* itemElement = dynamic_cast<const TiXmlElement*>(node);
+          TiXmlElement* itemElement = dynamic_cast<TiXmlElement*>(node);
           setValueOfProperty(object, iter.get(), itemElement);
           iter->next();
         }
@@ -222,10 +238,10 @@ void setValueOfProperty(reflection::ReflectableClass& object, reflection::IClass
 }
 
 void Xmlizer::GetPropertyFromXml(reflection::ReflectableClass& object,
-      reflection::IClassProperty* property, const TiXmlNode& xmlNode)
+      reflection::IClassProperty* property, TiXmlNode& xmlNode)
 {
   using namespace std;
-  const TiXmlNode* xNode = &xmlNode;
+  TiXmlNode* xNode = &xmlNode;
 
   // TODO: error handling
   if (!property)
@@ -235,10 +251,10 @@ void Xmlizer::GetPropertyFromXml(reflection::ReflectableClass& object,
     xNode = xNode->FirstChild(makeXmlName(object.getClassName()));
   }
 
-  const TiXmlNode* node = xNode->FirstChild(property->getName());
+  TiXmlNode* node = xNode->FirstChild(property->getName());
   if (node) {
     if (node->Type() == TiXmlNode::TINYXML_ELEMENT) {
-      const TiXmlElement* element = dynamic_cast<const TiXmlElement*>(node);
+      TiXmlElement* element = dynamic_cast<TiXmlElement*>(node);
       setValueOfProperty(object, property, element);
     }
   }
@@ -255,17 +271,17 @@ void Xmlizer::GetPropertyFromXml(reflection::ReflectableClass& object,
   Xmlizer::GetPropertyFromXml(object, property, doc);
 }
 
-void Xmlizer::FromXml(reflection::ReflectableClass& object, const TiXmlNode& xmlNode) {
+void Xmlizer::FromXml(reflection::ReflectableClass& object, TiXmlNode& xmlNode) {
   using namespace std;
-  const TiXmlNode* xNode = &xmlNode;
+  TiXmlNode* xNode = &xmlNode;
 
   if (makeXmlName(object.getClassName()).compare(xNode->Value()) != 0) {
     xNode = xNode->FirstChild(makeXmlName(object.getClassName()));
   }
 
-  for (const TiXmlNode* node = xNode->FirstChild(); node; node = node->NextSibling()) {
+  for (TiXmlNode* node = xNode->FirstChild(); node; node = node->NextSibling()) {
     if (node->Type() == TiXmlNode::TINYXML_ELEMENT) {
-      const TiXmlElement* element = dynamic_cast<const TiXmlElement*>(node);
+      TiXmlElement* element = dynamic_cast<TiXmlElement*>(node);
       reflection::IClassProperty* property = object.findProperty(element->Value());
       if (property) {
         setValueOfProperty(object, property, element);
