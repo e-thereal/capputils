@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?fileVersion 4.0.0?>
-
-<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="cdt.managedbuild.config.gnu.lib.debug.1108083634">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.lib.debug.1108083634" moduleId="org.eclipse.cdt.core.settings" name="Debug">
@@ -37,7 +35,7 @@
 									<listOptionValue builtIn="false" value="&quot;${RESPROG_INC_PATH}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${CUDASDK_INC_PATH}&quot;"/>
 								</option>
-								<option id="cuda.toolchain.compiler.option.misc.other.1540825661" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fmessage-length=0 -gencode=arch=compute_30,code=\&quot;sm_30,compute_30\&quot; -Xcompiler -fpic -Xcompiler -fopenmp" valueType="string"/>
+								<option id="cuda.toolchain.compiler.option.misc.other.1540825661" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fmessage-length=0 -gencode=arch=compute_${COMPUTE_CAPABILITY},code=\&quot;sm_${COMPUTE_CAPABILITY},compute_${COMPUTE_CAPABILITY}\&quot; -Xcompiler -fpic -Xcompiler -fopenmp" valueType="string"/>
 								<option id="cuda.toolchain.compiler.option.preprocessor.def.2130928240" name="Defined symbols (-D)" superClass="cuda.toolchain.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="TBBLAS_DISABLE_CBLAS"/>
 								</option>
@@ -118,7 +116,7 @@
 									<listOptionValue builtIn="false" value="&quot;/${RESPROG_INC_PATH}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;/${CUDASDK_INC_PATH}&quot;"/>
 								</option>
-								<option id="cuda.toolchain.compiler.option.misc.other.20254432" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fmessage-length=0 -gencode=arch=compute_21,code=\&quot;sm_21,compute_21\&quot; -Xcompiler -fpic -Xcompiler -fopenmp" valueType="string"/>
+								<option id="cuda.toolchain.compiler.option.misc.other.20254432" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fmessage-length=0 -gencode=arch=compute_${COMPUTE_CAPABILITY},code=\&quot;sm_${COMPUTE_CAPABILITY},compute_${COMPUTE_CAPABILITY}\&quot; -Xcompiler -fpic -Xcompiler -fopenmp" valueType="string"/>
 								<option id="cuda.toolchain.compiler.option.preprocessor.def.1000073077" name="Defined symbols (-D)" superClass="cuda.toolchain.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="TBBLAS_DISABLE_CBLAS"/>
 								</option>

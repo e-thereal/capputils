@@ -21,7 +21,6 @@
 #include <boost/make_shared.hpp>
 #include <vector>
 
-
 namespace tbblas {
 
 namespace deeplearn {

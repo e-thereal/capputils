@@ -48,6 +48,9 @@ void serialize(const tbblas::deeplearn::conv_rbm_model<T, dim>& model, std::ostr
   capputils::attributes::serialize_trait<unit_type>::writeToFile(model.hiddens_type(), out);
   serialize(model.mask(), out);
   capputils::attributes::serialize_trait<convolution_type>::writeToFile(model.convolution_type(), out);
+
+  bool shared = model.shared_bias();
+  out.write((char*)&shared, sizeof(shared));
 }
 
 template<class T, unsigned dim>
@@ -109,6 +112,10 @@ void deserialize(std::istream& in, tbblas::deeplearn::conv_rbm_model<T, dim>& mo
   convolution_type conv_type;
   capputils::attributes::serialize_trait<convolution_type>::readFromFile(conv_type, in);
   model.set_convolution_type(conv_type);
+
+  bool shared = false;
+  in.read((char*)&shared, sizeof(shared));
+  model.set_shared_bias(shared);
 }
 
 template<class T, unsigned dim>

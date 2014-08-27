@@ -14,7 +14,7 @@ namespace tbblas {
 
 namespace deeplearn {
 
-CapputilsEnumerator(activation_function, Sigmoid, ReLU, Softmax);
+CapputilsEnumerator(activation_function, Sigmoid, ReLU, Softmax, Linear);
 
 }
 

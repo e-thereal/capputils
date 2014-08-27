@@ -129,6 +129,7 @@ public:
         hidnorm = sum(H, 1);
         H = H / (tolerance + repeat(hidnorm, H.size() / hidnorm.size()));
         break;
+      case activation_function::Linear:  break;
     }
   }
 
@@ -149,6 +150,7 @@ public:
       break;
 
     case activation_function::Softmax:
+    case activation_function::Linear:
       dH = H - repeat(target, H.size() / target.size());
       break;
     }
@@ -177,14 +179,25 @@ public:
       dH = deltas * (H > 0);
       break;
 
+    case activation_function::Linear:
+      dH = deltas;
+      break;
+
     default:
       throw std::runtime_error("Unsupported activation function.");
     }
     return 0;
   }
 
-  /// Requires hidden deltas and visibles
-  void update_model(value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
+  void init_gradient_updates(value_t epsilon, value_t momentum, value_t weightcost) {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    dW = momentum * dW + weightcost * epsilon * W;
+    db = momentum * db;
+  }
+
+  void update_gradient(value_t epsilon) {
     if (!_memory_allocated)
       allocate_gpu_memory();
 
@@ -194,13 +207,39 @@ public:
     // Calculate the total activation of the hidden and visible units
     hidact = sum(dH, 0);
 
-    dW = momentum * dW + epsilon * prods / V.size()[0] + weightcost * epsilon * W;
-    db = momentum * db + epsilon * hidact / V.size()[0];
+    dW += epsilon * prods / V.size()[0];
+    db += epsilon * hidact / V.size()[0];
+  }
+
+  void apply_gradient() {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
 
     W = W - dW;
     b = b - db;
 
     _host_updated = false;
+  }
+
+  /// Requires hidden deltas and visibles
+  void update_model(value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
+    init_gradient_updates(epsilon, momentum, weightcost);
+    update_gradient(epsilon);
+    apply_gradient();
+
+//    // (x_n)(mu_n)'
+//    prods = tbblas::prod(trans(V), dH);
+//
+//    // Calculate the total activation of the hidden and visible units
+//    hidact = sum(dH, 0);
+//
+//    dW = momentum * dW + epsilon * prods / V.size()[0] + weightcost * epsilon * W;
+//    db = momentum * db + epsilon * hidact / V.size()[0];
+//
+//    W = W - dW;
+//    b = b - db;
+//
+//    _host_updated = false;
   }
 
   // Access to model data

@@ -74,7 +74,7 @@ class conv_rbm {
   typedef std::vector<boost::shared_ptr<tensor_t> > v_tensor_t;
 
   typedef tbblas::tensor<complex_t, dimCount, true> ctensor_t;
-  typedef tbblas::tensor<complex_t, dimCount, false> host_ctensor_t;
+  typedef std::vector<boost::shared_ptr<ctensor_t> > v_ctensor_t;
 
   typedef tbblas::random_tensor<value_t, dimCount, true, tbblas::uniform<value_t> > uniform_t;
   typedef tbblas::random_tensor<value_t, dimCount, true, tbblas::normal<value_t> > normal_t;
@@ -89,7 +89,7 @@ protected:
 
   // weights and bias terms in GPU memory
   ctensor_t cb, cbinc;
-  std::vector<boost::shared_ptr<ctensor_t> > cF, cc, cFinc, ccinc;
+  v_ctensor_t cF, cc, cFinc, ccinc;
   v_tensor_t drops;
 
   // visible and hidden units in GPU memory
