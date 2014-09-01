@@ -64,7 +64,7 @@ public:
   /**
    * \brief Returns all attributes of a class.
    * 
-   * \return Vector containg pointers to all attributes of the class.
+   * \return Vector containing pointers to all attributes of the class.
    * 
    * \remark
    * - This method is automatically defined by the BeginPropertyDefinitions macro.
@@ -157,7 +157,7 @@ public:
    * - This method can be used to check if a class is flagged with a particular attribute.
    */
   template<class AT>
-  AT* getAttribute() {
+  AT* getAttribute() const {
     AT* attribute = 0;
     const std::vector<attributes::IAttribute*>& attributes = getAttributes();
     for (unsigned i = 0; i < attributes.size(); ++i) {

@@ -124,23 +124,35 @@ void Xmlizer::ToXml(TiXmlNode& xmlNode, const ReflectableClass& object) {
 }
 
 void Xmlizer::ToXml(std::ostream& os, const reflection::ReflectableClass& object) {
-  ToDocument(os, Xmlizer::CreateXml(object));
+  DescriptionAttribute* description = object.getAttribute<DescriptionAttribute>();
+  if (description)
+    ToDocument(os, Xmlizer::CreateXml(object), description->getDescription());
+  else
+    ToDocument(os, Xmlizer::CreateXml(object));
 }
 
 void Xmlizer::ToXml(const ::std::string& filename, const reflection::ReflectableClass& object) {
-  ToFile(filename, Xmlizer::CreateXml(object));
+  DescriptionAttribute* description = object.getAttribute<DescriptionAttribute>();
+  if (description)
+    ToFile(filename, Xmlizer::CreateXml(object), description->getDescription());
+  else
+    ToFile(filename, Xmlizer::CreateXml(object));
 }
 
-void Xmlizer::ToFile(const ::std::string& filename, TiXmlNode* node) {
+void Xmlizer::ToFile(const ::std::string& filename, TiXmlNode* node, const std::string& description) {
   TiXmlDocument xmlDoc;
   xmlDoc.LinkEndChild(new TiXmlDeclaration("1.0", "", ""));
+  if (description.size())
+    xmlDoc.LinkEndChild(new TiXmlComment(description.c_str()));
   xmlDoc.LinkEndChild(node);
   xmlDoc.SaveFile(filename);
 }
 
-void Xmlizer::ToDocument(std::ostream& os, TiXmlNode* node) {
+void Xmlizer::ToDocument(std::ostream& os, TiXmlNode* node, const std::string& description) {
   TiXmlDocument xmlDoc;
   xmlDoc.LinkEndChild(new TiXmlDeclaration("1.0", "", ""));
+  if (description.size())
+    xmlDoc.LinkEndChild(new TiXmlComment(description.c_str()));
   xmlDoc.LinkEndChild(node);
 
   TiXmlPrinter printer;

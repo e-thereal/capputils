@@ -27,8 +27,8 @@ public:
   static void ToXml(TiXmlNode& xmlNode, const reflection::ReflectableClass& object);
   static void ToXml(const ::std::string& filename, const reflection::ReflectableClass& object);
   static void ToXml(std::ostream& os, const reflection::ReflectableClass& object);
-  static void ToFile(const ::std::string& filename, TiXmlNode* node);
-  static void ToDocument(std::ostream& os, TiXmlNode* node);
+  static void ToFile(const ::std::string& filename, TiXmlNode* node, const std::string& description = "");
+  static void ToDocument(std::ostream& os, TiXmlNode* node, const std::string& description = "");
 
   static void GetPropertyFromXml(reflection::ReflectableClass& object,
       reflection::IClassProperty* property, TiXmlNode& node);
