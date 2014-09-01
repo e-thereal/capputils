@@ -40,6 +40,13 @@ struct merge_trait<boost::shared_ptr<std::vector<T> > > {
       collection->resize(position + 1);
     collection->at(position) = value;
   }
+
+  static void deleteValueAt(collection_t& collection, int position) {
+    // tickle down values and shrink collection size
+    for (size_t i = position; i < collection->size() - 1; ++i)
+      collection->at(position) = collection->at(position + 1);
+    collection->resize(collection->size() - 1);
+  }
 };
 
 template<class T>
@@ -54,6 +61,13 @@ struct merge_trait<std::vector<T> > {
       collection.resize(position + 1);
     collection.at(position) = value;
   }
+
+  static void deleteValueAt(collection_t& collection, int position) {
+    // tickle down values and shrink collection size
+    for (size_t i = position; i < collection.size() - 1; ++i)
+      collection.at(position) = collection.at(position + 1);
+    collection.resize(collection.size() - 1);
+  }
 };
 
 class IMergeAttribute : public virtual IAttribute {
@@ -65,6 +79,10 @@ public:
       const capputils::reflection::IClassProperty* fromProperty) = 0;
 
   virtual const std::type_info& getValueType() const = 0;
+
+  virtual void deleteValue(capputils::reflection::ReflectableClass& object,
+      const capputils::reflection::IClassProperty* property,
+      int position) = 0;
 };
 
 template<class T>
@@ -96,6 +114,23 @@ public:
 
   virtual const std::type_info& getValueType() const {
     return typeid(value_t);
+  }
+
+  virtual void deleteValue(capputils::reflection::ReflectableClass& object,
+      const capputils::reflection::IClassProperty* property,
+      int position)
+  {
+    using namespace capputils::reflection;
+
+    const ClassProperty<collection_t>* collectionProperty = dynamic_cast<const ClassProperty<collection_t>* >(property);
+
+    if (!collectionProperty)
+      return;
+
+    collection_t collection = collectionProperty->getValue(object);
+    merge_trait<collection_t>::allocate(collection);
+    merge_trait<collection_t>::deleteValueAt(collection, position);
+    collectionProperty->setValue(object, collection);
   }
 };
 
