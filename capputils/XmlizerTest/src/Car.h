@@ -45,7 +45,7 @@ class Car : public capputils::reflection::ReflectableClass,
   Property(DoorCount, int)
   Property(HighSpeed, double)
   Property(ModelName, std::string)
-  Property(Nicknames, boost::shared_ptr<std::vector<std::string> >)
+  Property(Nicknames, std::vector<std::string>)
   Property(LicenseFile, std::string)
   Property(Help, bool)
   Property(Engine, EngineType)

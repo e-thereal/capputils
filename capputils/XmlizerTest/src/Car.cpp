@@ -48,7 +48,7 @@ EngineDescription::~EngineDescription() {
   cout << "Delete EngineDescription" << endl;
 }
 
-BeginPropertyDefinitions(Car)
+BeginPropertyDefinitions(Car, Description("This class handles stuff related to cars."))
 
   DefineProperty(DoorCount, Description("Number of doors (default = 3)"), Observe(Id), Parameter("", "d"))
   DefineProperty(HighSpeed, Observe(Id), TimeStamp(Id), Parameter("speed", "s"), Description("High speed."), WithinRange(0.0, 250.0))

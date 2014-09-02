@@ -134,15 +134,15 @@ int main(int argc, char** argv) {
   cout << "Model Name: " << car.getModelName() << endl;
   cout << "Engine: " << car.getEngine() << endl;
 
-  if (car.getNicknames()) {
+//  if (car.getNicknames()) {
     std::cout << "Nicknames:" << std::endl;
-    for (size_t i = 0; i < car.getNicknames()->size(); ++i) {
-      cout << car.getNicknames()->at(i) << std::endl;
+    for (size_t i = 0; i < car.getNicknames().size(); ++i) {
+      cout << car.getNicknames().at(i) << std::endl;
     }
-  }
+//  }
 
 //	cout << "Engine Type: " << car.getEngine() << endl;
-  //Xmlizer::ToXml("car.xml", car);
+  Xmlizer::ToXml("car.xml", car);
 
   if (car.getGenerateBashCompletion().size()) {
     GenerateBashCompletion::Generate("XmlizerTest", car, car.getGenerateBashCompletion());
