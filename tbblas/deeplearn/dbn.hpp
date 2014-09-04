@@ -90,15 +90,17 @@ public:
     }
   }
 
-  void infer_visibles(int topLayer = -1) {
+  void infer_visibles(int topLayer = -1, bool onlyFilters = false) {
     if (topLayer == -1)
       topLayer = _crbms.size() + _rbms.size();
     else
       topLayer = std::min(topLayer, (int)(_crbms.size() + _rbms.size()));
 
+    tbblas_print(topLayer);
+
     // top-down inference
     for (int i = topLayer - _crbms.size() - 1; i >= 0; --i) {
-      _rbms[i]->infer_visibles();
+      _rbms[i]->infer_visibles(onlyFilters);
       if (i > 0) {
         _rbms[i - 1]->hiddens() = _rbms[i]->visibles();
       }
@@ -112,12 +114,14 @@ public:
     }
 
     for (int i = std::min(topLayer, (int)_crbms.size()) - 1; i >= 0; --i) {
-      _crbms[i]->infer_visibles();
+      tbblas_print(i);
+      _crbms[i]->infer_visibles(onlyFilters);
       if (i > 0) {
         _crbms[i - 1]->allocate_hiddens();
 
-        dim_t block = _crbms[i - 1]->hiddens().size() / _crbms[i]->visibles().size();
-        block[dimCount - 1] = 1;
+//        dim_t block = _crbms[i - 1]->hiddens().size() / _crbms[i]->visibles().size();
+//        block[dimCount - 1] = 1;
+        dim_t block = _model.stride_size(i);
         _crbms[i - 1]->hiddens() = rearrange_r(_crbms[i]->visibles(), block);
       }
     }
@@ -137,8 +141,9 @@ public:
     for (size_t i = 0; i < _crbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
       _crbms[i]->infer_hiddens();
       if (i + 1 < _crbms.size()) {
-        dim_t block = _crbms[i]->hiddens().size() / _model.crbms()[i + 1]->visible_bias().size();
-        block[dimCount - 1] = 1;
+//        dim_t block = _crbms[i]->hiddens().size() / _model.crbms()[i + 1]->visible_bias().size();
+//        block[dimCount - 1] = 1;
+        dim_t block = _model.stride_size(i + 1);
 
         _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), block);
       }
@@ -186,8 +191,9 @@ public:
       if (i > 0) {
         _crbms[i - 1]->allocate_hiddens();
 
-        dim_t block = _crbms[i - 1]->hiddens().size() / _crbms[i]->visibles().size();
-        block[dimCount - 1] = 1;
+//        dim_t block = _crbms[i - 1]->hiddens().size() / _crbms[i]->visibles().size();
+//        block[dimCount - 1] = 1;
+        dim_t block = _model.stride_size(i);
         _crbms[i - 1]->hiddens() = rearrange_r(_crbms[i]->visibles(), block);
       }
     }
@@ -207,9 +213,9 @@ public:
     for (size_t i = 0; i < _crbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
       _crbms[i]->sample_hiddens();
       if (i + 1 < _crbms.size()) {
-        dim_t block = _crbms[i]->hiddens().size() / _model.crbms()[i + 1]->visible_bias().size();
-        block[dimCount - 1] = 1;
-
+//        dim_t block = _crbms[i]->hiddens().size() / _model.crbms()[i + 1]->visible_bias().size();
+//        block[dimCount - 1] = 1;
+        dim_t block = _model.stride_size(i + 1);
         _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), block);
       }
     }
@@ -286,9 +292,11 @@ public:
     throw std::runtime_error("The given layer is not part of the DBN!");
   }
 
-  tensor_t& chiddens(int layer) {
+  tensor_t& chiddens(int layer = -1) {
+    if (layer == -1)
+      layer = _crbms.size() - 1;
     if (layer >= 0 && layer < _crbms.size())
-      return _crbms[layer]->visibles();
+      return _crbms[layer]->hiddens();
 
     throw std::runtime_error("The given layer is not part of the DBN!");
   }
@@ -305,7 +313,7 @@ public:
     if (layer == -1)
       layer = _rbms.size() - 1;
     if (layer >= 0 && layer < _rbms.size())
-      return _rbms[layer]->visibles();
+      return _rbms[layer]->hiddens();
 
     throw std::runtime_error("The given layer is not part of the DBN!");
   }

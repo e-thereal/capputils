@@ -57,7 +57,7 @@ public:
     _cnn_layers.resize(model.cnn_layers().size());
     for (size_t i = 0; i < _cnn_layers.size(); ++i) {
       _cnn_layers[i] = boost::make_shared<cnn_layer_t>(boost::ref(*model.cnn_layers()[i]));
-      _cnn_layers[i]->set_batch_length(model.cnn_layers()[i]->filter_count());
+//      _cnn_layers[i]->set_batch_length(model.cnn_layers()[i]->filter_count());
     }
 
     _nn_layers.resize(model.nn_layers().size());
@@ -136,6 +136,11 @@ public:
       _cnn_layers[i]->apply_gradient();
     for (size_t i = 0; i < _nn_layers.size(); ++i)
       _nn_layers[i]->apply_gradient();
+  }
+
+  void set_batch_length(int layer, int length) {
+    if (layer < _cnn_layers.size())
+      _cnn_layers[layer]->set_batch_length(length);
   }
 
   void set_input(tensor_t& input) {

@@ -295,11 +295,11 @@ public:
     h_drop = h_rand > _dropout_rate;
   }
 
-  void init_gradient_updates(value_t momentum = 0, value_t weightcost = 0) {
+  void init_gradient_updates(value_t epsilonw = 1, value_t momentum = 0, value_t weightcost = 0) {
     if (!_memory_allocated)
       allocate_gpu_memory();
 
-    dW = momentum * dW - weightcost * W;
+    dW = momentum * dW - epsilonw * weightcost * W;
     db = momentum * db;
     dc = momentum * dc;
   }

@@ -11,6 +11,8 @@
 #include <tbblas/deeplearn/conv_rbm_model.hpp>
 #include <tbblas/deeplearn/rbm_model.hpp>
 
+#include <stdexcept>
+
 namespace tbblas {
 
 namespace deeplearn {
@@ -20,6 +22,7 @@ class dbn_model {
 public:
   typedef T value_t;
   static const unsigned dimCount = dims;
+  typedef typename tensor<value_t, dimCount>::dim_t dim_t;
 
   typedef conv_rbm_model<T, dims> crbm_t;
   typedef rbm_model<T> rbm_t;
@@ -55,6 +58,14 @@ public:
 
   const v_crbm_t& crbms() const {
     return _crbms;
+  }
+
+  dim_t stride_size(int layer) {
+    if (layer <= 0 || layer >= _crbms.size())
+      throw std::runtime_error("Invalid layer specified.");
+    dim_t block = _crbms[layer - 1]->hiddens_size() / _crbms[layer]->visibles_size();
+    block[dimCount - 1] = 1;
+    return block;
   }
 
   template<class U>

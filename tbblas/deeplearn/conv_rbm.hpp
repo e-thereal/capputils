@@ -111,7 +111,7 @@ protected:
 
   tensor_t _hiddens;
 
-  int _gpu_count, _device_count, _filter_batch_length, _voxel_count;
+  int _gpu_count, _device_count, _filter_batch_length, _hidden_count;
   bool _memory_allocated, _double_weights, _host_updated;
 
   value_t _sparsity_target, _sparsity_weight, _dropout_rate;
@@ -154,7 +154,7 @@ public:
 
     v_stream.resize(gpu_count);
 
-    _voxel_count = sum(model.mask()) * model.visibles_size()[dimCount - 1];
+    _hidden_count = sum(model.mask()) * model.hiddens_size()[dimCount - 1];
   }
 
 private:
@@ -1070,12 +1070,12 @@ private:
       h[hidden_topleft, hidden_layer_batch_size] = _hiddens[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
       ch = fft(h, dimCount - 1, plan_h);
 
-      *cFinc[k] += conj_repeat_mult(cv, ch, epsilonw / _voxel_count);
+      *cFinc[k] += conj_repeat_mult(cv, ch, epsilonw / _hidden_count);
       *ccinc[k] = *ccinc[k] + epsilonhb / model.visibles_size()[dimCount - 1] * tbblas::mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * ch;
       switch(_sparsity_method) {
       case sparsity_method::WeightsAndBias:
         chdiff = _sparsity_target * h.count() * mask<complex_t>(ch.size(), ch.fullsize(), spMaskSize) - ch;
-        *cFinc[k] = *cFinc[k] + epsilonw / _voxel_count * _sparsity_weight * repeat(conj(chdiff), cFinc[k]->size() / ch.size()) * repeat(cv, cFinc[k]->size() / cv.size());
+        *cFinc[k] = *cFinc[k] + epsilonw / _hidden_count * _sparsity_weight * repeat(conj(chdiff), cFinc[k]->size() / ch.size()) * repeat(cv, cFinc[k]->size() / cv.size());
         *ccinc[k] = *ccinc[k] + epsilonhb / model.visibles_size()[dimCount - 1] * _sparsity_weight * mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * chdiff;
         break;
 
@@ -1115,7 +1115,7 @@ private:
       h[hidden_topleft, hidden_layer_batch_size] = _hiddens[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
       ch = fft(h, dimCount - 1, plan_h);
 
-      *cFinc[k] += conj_repeat_mult(cv, ch, -epsilonw / _voxel_count);
+      *cFinc[k] += conj_repeat_mult(cv, ch, -epsilonw / _hidden_count);
       *ccinc[k] = *ccinc[k] - epsilonhb / model.visibles_size()[dimCount - 1] * tbblas::mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * ch;
     }
   }
