@@ -15,7 +15,8 @@ int i = 1;
 
 int main(int argc, char** argv) {
 
-  synctest();
+  transformtest();
+//  synctest();
 //  ompsegfault();
 //  helloworld();
 //  convtest();
