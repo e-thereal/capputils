@@ -13,6 +13,13 @@
 #include <iostream>
 #include <fstream>
 
+/**
+ * Versions:
+ * 0: initial version, doesn't even have magic code or version number
+ * 1: first real version. Comes with magic code, version number and stride size
+ */
+#define CURRENT_CONVRBM_VERSION 1
+
 namespace tbblas {
 
 namespace deeplearn {
@@ -21,7 +28,13 @@ namespace deeplearn {
 
 template<class T, unsigned dim>
 void serialize(const tbblas::deeplearn::conv_rbm_model<T, dim>& model, std::ostream& out) {
+
+  unsigned magic = 0xDEE9DEE9;
+  unsigned version = CURRENT_CONVRBM_VERSION;
   unsigned count = 0;
+
+  out.write((char*)&magic, sizeof(magic));
+  out.write((char*)&version, sizeof(version));
 
   count = model.filters().size();
   out.write((char*)&count, sizeof(count));
@@ -36,6 +49,9 @@ void serialize(const tbblas::deeplearn::conv_rbm_model<T, dim>& model, std::ostr
     serialize(*model.hidden_bias()[i], out);
 
   typename tbblas::deeplearn::conv_rbm_model<T, dim>::dim_t size = model.kernel_size();
+  out.write((char*)&size, sizeof(size));
+
+  size = model.stride_size();
   out.write((char*)&size, sizeof(size));
 
   T mean = model.mean();
@@ -66,9 +82,22 @@ void deserialize(std::istream& in, tbblas::deeplearn::conv_rbm_model<T, dim>& mo
   typedef typename conv_rbm_model<T, dim>::v_host_tensor_t v_host_tensor_t;
 
   unsigned count = 0;
+  unsigned magic = 0;
+  unsigned version = 0;
+  unsigned count = 0;
   host_tensor_t tensor;
 
-  in.read((char*)&count, sizeof(count));
+  // If at least version 1 (magic code was introduced), read version and count
+  in.read((char*)&magic, sizeof(magic));
+  if (magic == 0xDEE9DEE9) {
+    in.read((char*)&version, sizeof(version));
+    assert(version > 0);
+    in.read((char*)&count, sizeof(count));
+  } else {  // else, there is no version number, so the first number is the filter count
+    count = version;
+    version = 0;
+  }
+
   v_host_tensor_t filters(count);
   for (size_t i = 0; i < count; ++i) {
     deserialize(in, tensor);
@@ -90,6 +119,13 @@ void deserialize(std::istream& in, tbblas::deeplearn::conv_rbm_model<T, dim>& mo
   typename tbblas::deeplearn::conv_rbm_model<T, dim>::dim_t size;
   in.read((char*)&size, sizeof(size));
   model.set_kernel_size(size);
+
+  if (version >= 1) {
+    in.read((char*)&size, sizeof(size));
+    model.set_stride_size(size);
+  } else {
+    model.set_stride_size(seq<dim>(1));
+  }
 
   T mean = 0;
   in.read((char*)&mean, sizeof(mean));

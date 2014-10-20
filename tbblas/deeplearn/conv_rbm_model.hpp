@@ -44,7 +44,7 @@ protected:
   // Model in CPU memory
   host_tensor_t _visibleBiases, _mask;
   v_host_tensor_t _filters, _hiddenBiases;
-  dim_t _filterKernelSize;
+  dim_t _filterKernelSize, _stride_size;
 
   unit_type _visibleUnitType, _hiddenUnitType;
   tbblas::deeplearn::convolution_type _convolutionType;
@@ -54,12 +54,12 @@ protected:
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
-  conv_rbm_model() : _mean(0), _stddev(1), _shared_biases(false)
+  conv_rbm_model() : _stride_size(seq<dimCount>(1)), _mean(0), _stddev(1), _shared_biases(false)
   {
   }
 
   conv_rbm_model(const conv_rbm_model<T,dims>& model)
-   : _visibleBiases(model.visible_bias()), _mask(model.mask()), _filterKernelSize(model.kernel_size()),
+   : _visibleBiases(model.visible_bias()), _mask(model.mask()), _filterKernelSize(model.kernel_size()), _stride_size(model.stride_size()),
      _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type()), _convolutionType(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
      _shared_biases(model.shared_bias())
   {
@@ -69,7 +69,7 @@ public:
 
   template<class U>
   conv_rbm_model(const conv_rbm_model<U,dims>& model)
-   : _visibleBiases(model.visible_bias()), _mask(model.mask()), _filterKernelSize(model.kernel_size()),
+   : _visibleBiases(model.visible_bias()), _mask(model.mask()), _filterKernelSize(model.kernel_size()), _stride_size(model.stride_size()),
      _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type()), _convolutionType(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
      _shared_biases(model.shared_bias())
   {
@@ -133,12 +133,31 @@ public:
     return _filterKernelSize;
   }
 
+  void set_stride_size(const dim_t& size) {
+    _stride_size = size;
+  }
+
+  const dim_t& stride_size() const {
+    return _stride_size;
+  }
+
   void set_visibles_type(const unit_type& type) {
     _visibleUnitType = type;
   }
 
   const unit_type& visibles_type() const {
     return _visibleUnitType;
+  }
+
+  dim_t input_size() const {
+    dim_t size = visibles_size() * _stride_size;
+
+    size_t count = 1;
+    for (size_t i = 0; i < dimCount; ++i)
+      count *= _stride_size[i];
+
+    size[dimCount - 1] = size[dimCount - 1] / count;
+    return size;
   }
 
   dim_t visibles_size() const {

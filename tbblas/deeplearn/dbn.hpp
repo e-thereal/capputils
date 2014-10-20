@@ -96,8 +96,6 @@ public:
     else
       topLayer = std::min(topLayer, (int)(_crbms.size() + _rbms.size()));
 
-    tbblas_print(topLayer);
-
     // top-down inference
     for (int i = topLayer - _crbms.size() - 1; i >= 0; --i) {
       _rbms[i]->infer_visibles(onlyFilters);
@@ -118,11 +116,7 @@ public:
       _crbms[i]->infer_visibles(onlyFilters);
       if (i > 0) {
         _crbms[i - 1]->allocate_hiddens();
-
-//        dim_t block = _crbms[i - 1]->hiddens().size() / _crbms[i]->visibles().size();
-//        block[dimCount - 1] = 1;
-        dim_t block = _model.stride_size(i);
-        _crbms[i - 1]->hiddens() = rearrange_r(_crbms[i]->visibles(), block);
+        _crbms[i - 1]->hiddens() = rearrange_r(_crbms[i]->visibles(), _model.stride_size(i));
       }
     }
   }
@@ -141,11 +135,7 @@ public:
     for (size_t i = 0; i < _crbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
       _crbms[i]->infer_hiddens();
       if (i + 1 < _crbms.size()) {
-//        dim_t block = _crbms[i]->hiddens().size() / _model.crbms()[i + 1]->visible_bias().size();
-//        block[dimCount - 1] = 1;
-        dim_t block = _model.stride_size(i + 1);
-
-        _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), block);
+        _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), _model.stride_size(i + 1));
       }
     }
 
@@ -190,18 +180,13 @@ public:
       _crbms[i]->sample_visibles();
       if (i > 0) {
         _crbms[i - 1]->allocate_hiddens();
-
-//        dim_t block = _crbms[i - 1]->hiddens().size() / _crbms[i]->visibles().size();
-//        block[dimCount - 1] = 1;
-        dim_t block = _model.stride_size(i);
-        _crbms[i - 1]->hiddens() = rearrange_r(_crbms[i]->visibles(), block);
+        _crbms[i - 1]->hiddens() = rearrange_r(_crbms[i]->visibles(), _model.stride_size(i));
       }
     }
   }
 
   // -1 indicates the top-most layer
   void sample_hiddens(int maxLayer = -1) {
-
     int currentLayer = 0;
 
     if (maxLayer == -1)
@@ -213,10 +198,7 @@ public:
     for (size_t i = 0; i < _crbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
       _crbms[i]->sample_hiddens();
       if (i + 1 < _crbms.size()) {
-//        dim_t block = _crbms[i]->hiddens().size() / _model.crbms()[i + 1]->visible_bias().size();
-//        block[dimCount - 1] = 1;
-        dim_t block = _model.stride_size(i + 1);
-        _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), block);
+        _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), _model.stride_size(i + 1));
       }
     }
 
@@ -282,6 +264,21 @@ public:
   void set_batch_length(int layer, int length) {
     if (layer < _crbms.size())
       _crbms[layer]->set_batch_length(length);
+  }
+
+  void set_input(tensor_t& input) {
+    if (!_crbms.size())
+      throw std::runtime_error("The DBN does not have a convolutional layer!");
+
+    assert(_model.crbms()[0]->input_size() == input.size());
+    _crbms[0]->visibles() = rearrange(input, _model.crbms()[0]->stride_size());
+  }
+
+  void get_input(tensor_t& input) {
+    if (!_crbms.size())
+      throw std::runtime_error("The DBN does not have a convolutional layer!");
+
+    input = rearrange_r(_crbms[0]->visibles(), _model.crbms()[0]->stride_size());
   }
 
   // Access to model data

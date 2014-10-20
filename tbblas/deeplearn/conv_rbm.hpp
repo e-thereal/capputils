@@ -526,6 +526,15 @@ public:
     }
   }
 
+  void set_input(tensor_t& input) {
+    assert(model.input_size() == input.size());
+    visibles() = rearrange(input, model.stride_size());
+  }
+
+  void get_input(tensor_t& input) {
+    input = rearrange_r(visibles(), model.stride_size());
+  }
+
   // Access to model data
   tensor_t& visibles() {
     if (!_memory_allocated)
