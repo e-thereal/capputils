@@ -1,0 +1,108 @@
+%%This is a very basic article template.
+%%There is just one section and two subsections.
+\documentclass{article}
+
+\usepackage{xspace}
+
+\newcommand{\tbblas}{\texttt{tbblas}\xspace}
+
+\title{\tbblas Documentation}
+\author{Tom Brosch}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Introduction}
+
+Library was created to have basic BLAS functionality but in a more modern and
+user-friendly interface. Mostly inspired by MATLAB, although there are
+significant differences. If there is something left, than it's the rule that for
+loops and direct element access should be avoided for best performance. This
+library builds heavily upon two other libraries---\texttt{thrust} and
+\texttt{boost}, hence the name \tbblas.
+
+\subsection{Prerequisites}
+
+Requires CUDA, although a CUDA-enabled graphics card is not needed. Most
+functions are implemented using different backends. Will denote which backend is
+available. Can be CPU, OpenMP, or CUDA.
+
+Need \texttt{thrust} 1.8 and \texttt{boost}.
+
+\subsection{Building a Simple Project}
+
+\tbblas is mostly a header library but some parts are in a library. Need to link
+to the following libraries:
+\begin{itemize}
+  \item \verb|boost_thread|
+  \item \verb|boost_bla|
+  \item \tbblas
+\end{itemize}
+
+Have a hello world program and step by step compilation.
+
+\subsection{Getting Started with \tbblas}
+
+Some basic examples (create a matrix, fill it, print it).
+\texttt{tbblas\_print}
+
+\begin{verbatim}
+tensor<float, 2> A;
+A = 1, 2, 3,
+    4, 5, 6;
+tbblas_print(A);
+
+Output:
+A = [2x3]
+    1		2		3
+    4		5		6
+\end{verbatim}
+
+How to do sub matrices. Some basic arithmetic.
+
+\section{The \tbblas API}
+
+\subsection{The Basics}
+
+\subsubsection{Tensors}
+
+The basic container for your data is a tensor. Used to
+store data. Can be $n$-dimensional. Implemented as a template with the following
+template parameters: data type, dimension, host or device memory.
+
+\subsubsection{Sequence}
+
+Fixed length. Used for sizes and indexes. Stored in registered on either the GPU
+or the CPU. Will be transferred automatically. Supported operations are listed
+in Table~??. There are a couple of functions that simply the creation of a
+sequence. Starts all with \texttt{seq()}. Give some examples.
+
+\subsection{Sub-tensors or Proxies}
+
+Used to access data. Can write to a proxy.
+
+\subsection{Expressions}
+
+Input can be an expression, output can be an expression, a proxy, or a tensor.
+List all expressions.
+
+\subsection{Operations}
+
+For performance reasons, sometimes it's an expression as input, but the output
+is mostly a tensor. List most of the operations that are implemented.
+
+\section{Deep Learning}
+
+\subsection{Restricted Boltzmann Machines}
+
+\subsection{Convolutional Restricted Boltzmann Machines}
+
+\subsection{Deep Belief Networks}
+
+\subsection{Neural Networks}
+
+\subsection{Convolutional Neural Networks}
+
+\end{document}
