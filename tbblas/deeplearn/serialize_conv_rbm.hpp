@@ -84,7 +84,6 @@ void deserialize(std::istream& in, tbblas::deeplearn::conv_rbm_model<T, dim>& mo
   unsigned count = 0;
   unsigned magic = 0;
   unsigned version = 0;
-  unsigned count = 0;
   host_tensor_t tensor;
 
   // If at least version 1 (magic code was introduced), read version and count
@@ -94,7 +93,7 @@ void deserialize(std::istream& in, tbblas::deeplearn::conv_rbm_model<T, dim>& mo
     assert(version > 0);
     in.read((char*)&count, sizeof(count));
   } else {  // else, there is no version number, so the first number is the filter count
-    count = version;
+    count = magic;
     version = 0;
   }
 

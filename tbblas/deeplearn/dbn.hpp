@@ -112,7 +112,6 @@ public:
     }
 
     for (int i = std::min(topLayer, (int)_crbms.size()) - 1; i >= 0; --i) {
-      tbblas_print(i);
       _crbms[i]->infer_visibles(onlyFilters);
       if (i > 0) {
         _crbms[i - 1]->allocate_hiddens();
