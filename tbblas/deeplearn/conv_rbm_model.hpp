@@ -40,6 +40,13 @@ public:
   typedef tbblas::tensor<value_t, dimCount> host_tensor_t;
   typedef std::vector<boost::shared_ptr<host_tensor_t> > v_host_tensor_t;
 
+  /**
+   * Versions:
+   * 0: initial version, doesn't even have magic code or version number
+   * 1: first real version. Comes with magic code, version number and stride size
+   */
+  static const unsigned CURRENT_VERSION = 1;
+
 protected:
   // Model in CPU memory
   host_tensor_t _visibleBiases, _mask;
@@ -51,17 +58,18 @@ protected:
 
   value_t _mean, _stddev;
   bool _shared_biases;
+  unsigned _version;
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
-  conv_rbm_model() : _stride_size(seq<dimCount>(1)), _mean(0), _stddev(1), _shared_biases(false)
+  conv_rbm_model() : _stride_size(seq<dimCount>(1)), _mean(0), _stddev(1), _shared_biases(false), _version(CURRENT_VERSION)
   {
   }
 
   conv_rbm_model(const conv_rbm_model<T,dims>& model)
    : _visibleBiases(model.visible_bias()), _mask(model.mask()), _filterKernelSize(model.kernel_size()), _stride_size(model.stride_size()),
      _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type()), _convolutionType(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
-     _shared_biases(model.shared_bias())
+     _shared_biases(model.shared_bias()), _version(model.version())
   {
     set_filters(model.filters());
     set_hidden_bias(model.hidden_bias());
@@ -71,7 +79,7 @@ public:
   conv_rbm_model(const conv_rbm_model<U,dims>& model)
    : _visibleBiases(model.visible_bias()), _mask(model.mask()), _filterKernelSize(model.kernel_size()), _stride_size(model.stride_size()),
      _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type()), _convolutionType(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
-     _shared_biases(model.shared_bias())
+     _shared_biases(model.shared_bias()), _version(model.version())
   {
     _filters.resize(model.filters().size());
     for (size_t i = 0; i < model.filters().size(); ++i)
@@ -233,6 +241,14 @@ public:
 
   bool shared_bias() const {
     return _shared_biases;
+  }
+
+  void set_version(unsigned version) {
+    _version = version;
+  }
+
+  unsigned version() const {
+    return _version;
   }
 };
 

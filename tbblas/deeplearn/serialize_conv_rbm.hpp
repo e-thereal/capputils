@@ -13,13 +13,6 @@
 #include <iostream>
 #include <fstream>
 
-/**
- * Versions:
- * 0: initial version, doesn't even have magic code or version number
- * 1: first real version. Comes with magic code, version number and stride size
- */
-#define CURRENT_CONVRBM_VERSION 1
-
 namespace tbblas {
 
 namespace deeplearn {
@@ -30,7 +23,7 @@ template<class T, unsigned dim>
 void serialize(const tbblas::deeplearn::conv_rbm_model<T, dim>& model, std::ostream& out) {
 
   unsigned magic = 0xDEE9DEE9;
-  unsigned version = CURRENT_CONVRBM_VERSION;
+  unsigned version = model.version();
   unsigned count = 0;
 
   out.write((char*)&magic, sizeof(magic));
@@ -51,8 +44,10 @@ void serialize(const tbblas::deeplearn::conv_rbm_model<T, dim>& model, std::ostr
   typename tbblas::deeplearn::conv_rbm_model<T, dim>::dim_t size = model.kernel_size();
   out.write((char*)&size, sizeof(size));
 
-  size = model.stride_size();
-  out.write((char*)&size, sizeof(size));
+  if (version >= 1) {
+    size = model.stride_size();
+    out.write((char*)&size, sizeof(size));
+  }
 
   T mean = model.mean();
   out.write((char*)&mean, sizeof(mean));
@@ -90,12 +85,12 @@ void deserialize(std::istream& in, tbblas::deeplearn::conv_rbm_model<T, dim>& mo
   in.read((char*)&magic, sizeof(magic));
   if (magic == 0xDEE9DEE9) {
     in.read((char*)&version, sizeof(version));
-    assert(version > 0);
     in.read((char*)&count, sizeof(count));
   } else {  // else, there is no version number, so the first number is the filter count
     count = magic;
     version = 0;
   }
+  model.set_version(version);
 
   v_host_tensor_t filters(count);
   for (size_t i = 0; i < count; ++i) {

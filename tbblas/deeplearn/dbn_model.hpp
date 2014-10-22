@@ -67,16 +67,14 @@ public:
   dim_t stride_size(int layer) {
     if (layer < 0 || layer >= (int)_crbms.size())
       throw std::runtime_error("Invalid layer specified.");
+
     if (layer == 0)
       return _crbms[0]->stride_size();
 
     dim_t block = _crbms[layer - 1]->hiddens_size() / _crbms[layer]->visibles_size();
     block[dimCount - 1] = 1;
-    if (block != _crbms[layer]->stride_size()) {
-      std::cout << "[Warning] Stride size does not match calculated stride size." << std::endl;
-      tbblas_print(block);
-      tbblas_print(_crbms[layer]->stride_size());
-//      throw std::runtime_error("Stride size does not match calculated stride size.");
+    if (_crbms[layer]->version() >= 1 && block != _crbms[layer]->stride_size()) {
+      throw std::runtime_error("Stride size does not match calculated stride size.");
     }
     return block;
   }
