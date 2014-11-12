@@ -46,8 +46,8 @@ class rbm {
   typedef tbblas::tensor<value_t, 2> host_matrix_t;
   typedef typename matrix_t::dim_t dim_t;
 
-  typedef tbblas::random_tensor<value_t, 2, true, tbblas::uniform<value_t> > uniform_t;
-  typedef tbblas::random_tensor<value_t, 2, true, tbblas::normal<value_t> > normal_t;
+  typedef tbblas::random_tensor2<value_t, 2, true, tbblas::uniform<value_t> > uniform_t;
+  typedef tbblas::random_tensor2<value_t, 2, true, tbblas::normal<value_t> > normal_t;
 
   typedef rbm_model<value_t> model_t;
 
@@ -105,8 +105,8 @@ public:
     mean = model.mean();
     stddev = model.stddev();
 
-    if (m.size() != mean.size())
-      m = ones<value_t>(mean.size());
+    if (m.size() != b.size())
+      m = ones<value_t>(b.size());
 
     W = W * repeat(trans(m), W.size() / trans(m).size());
 
@@ -129,6 +129,8 @@ public:
     model.set_weights(W);
     model.set_visible_bias(b);
     model.set_hidden_bias(c);
+
+    tbblas::synchronize();
   }
 
   void normalize_visibles() {
@@ -224,13 +226,13 @@ public:
 
     switch (model.visibles_type()) {
       case unit_type::Gaussian:  break;
-      case unit_type::Bernoulli: V = sigm(V) > v_rand;    break;
+      case unit_type::Bernoulli: V = sigm(V) > v_rand();    break;
       case unit_type::MyReLU:
-      case unit_type::ReLU:      V = max(0.0, V + sqrt(sigm(V)) * v_noise); break;
-      case unit_type::ReLU1:     V = min(1.0, max(0.0, V + (V > 0) * (V < 1.0) * v_noise)); break;
-      case unit_type::ReLU2:     V = min(2.0, max(0.0, V + (V > 0) * (V < 2.0) * v_noise)); break;
-      case unit_type::ReLU4:     V = min(4.0, max(0.0, V + (V > 0) * (V < 4.0) * v_noise)); break;
-      case unit_type::ReLU8:     V = min(8.0, max(0.0, V + (V > 0) * (V < 8.0) * v_noise)); break;
+      case unit_type::ReLU:      V = max(0.0, V + sqrt(sigm(V)) * v_noise()); break;
+      case unit_type::ReLU1:     V = min(1.0, max(0.0, V + (V > 0) * (V < 1.0) * v_noise())); break;
+      case unit_type::ReLU2:     V = min(2.0, max(0.0, V + (V > 0) * (V < 2.0) * v_noise())); break;
+      case unit_type::ReLU4:     V = min(4.0, max(0.0, V + (V > 0) * (V < 4.0) * v_noise())); break;
+      case unit_type::ReLU8:     V = min(8.0, max(0.0, V + (V > 0) * (V < 8.0) * v_noise())); break;
     }
 
     V = V * repeat(m, V.size() / m.size());
@@ -264,13 +266,13 @@ public:
     }
 
     switch (model.hiddens_type()) {
-      case unit_type::Bernoulli: H = sigm(H) > h_rand; break;
+      case unit_type::Bernoulli: H = sigm(H) > h_rand(); break;
       case unit_type::MyReLU:
-      case unit_type::ReLU:      H = max(0.0, H + sqrt(sigm(H)) * h_noise); break;
-      case unit_type::ReLU1:     H = min(1.0, max(0.0, H + (H > 0) * (H < 1.0) * h_noise)); break;
-      case unit_type::ReLU2:     H = min(2.0, max(0.0, H + (H > 0) * (H < 2.0) * h_noise)); break;
-      case unit_type::ReLU4:     H = min(4.0, max(0.0, H + (H > 0) * (H < 4.0) * h_noise)); break;
-      case unit_type::ReLU8:     H = min(8.0, max(0.0, H + (H > 0) * (H < 8.0) * h_noise)); break;
+      case unit_type::ReLU:      H = max(0.0, H + sqrt(sigm(H)) * h_noise()); break;
+      case unit_type::ReLU1:     H = min(1.0, max(0.0, H + (H > 0) * (H < 1.0) * h_noise())); break;
+      case unit_type::ReLU2:     H = min(2.0, max(0.0, H + (H > 0) * (H < 2.0) * h_noise())); break;
+      case unit_type::ReLU4:     H = min(4.0, max(0.0, H + (H > 0) * (H < 4.0) * h_noise())); break;
+      case unit_type::ReLU8:     H = min(8.0, max(0.0, H + (H > 0) * (H < 8.0) * h_noise())); break;
     }
 
     if (_dropout_rate > 0)
@@ -292,7 +294,7 @@ public:
     if (h_rand.size() != h_size)
       h_rand.resize(h_size);
 
-    h_drop = h_rand > _dropout_rate;
+    h_drop = h_rand() > _dropout_rate;
   }
 
   void init_gradient_updates(value_t epsilonw = 1, value_t momentum = 0, value_t weightcost = 0) {

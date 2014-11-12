@@ -49,6 +49,13 @@ void serialize(const tbblas::deeplearn::conv_rbm_model<T, dim>& model, std::ostr
     out.write((char*)&size, sizeof(size));
   }
 
+  if (version >= 2) {
+    size = model.pooling_size();
+    out.write((char*)&size, sizeof(size));
+
+    capputils::attributes::serialize_trait<pooling_method>::writeToFile(model.pooling_method(), out);
+  }
+
   T mean = model.mean();
   out.write((char*)&mean, sizeof(mean));
 
@@ -119,6 +126,17 @@ void deserialize(std::istream& in, tbblas::deeplearn::conv_rbm_model<T, dim>& mo
     model.set_stride_size(size);
   } else {
     model.set_stride_size(seq<dim>(1));
+  }
+
+  if (version >= 2) {
+    in.read((char*)&size, sizeof(size));
+    model.set_pooling_size(size);
+
+    pooling_method method;
+    capputils::attributes::serialize_trait<pooling_method>::readFromFile(method, in);
+    model.set_pooling_method(method);
+  } else {
+    model.set_pooling_size(seq<dim>(1));
   }
 
   T mean = 0;

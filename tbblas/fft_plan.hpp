@@ -17,6 +17,8 @@
 #include <cufft.h>
 
 #include <cassert>
+#include <sstream>
+#include <stdexcept>
 
 namespace tbblas {
 
@@ -44,6 +46,8 @@ public:
 
 public:
   cufftHandle create(const dim_t& size, cufftType_t type, unsigned dimension) {
+    cufftResult result;
+
     if (hasPlan && this->size == size && this->type == type && this->dimension == dimension)
       return plan;
 
@@ -73,10 +77,15 @@ public:
     for (unsigned i = 0; i < rank; ++i)
       n[i] = size[rank - i - 1];
 
-    assert(cufftPlanMany(&plan, rank, n,
+    if((result = cufftPlanMany(&plan, rank, n,
         0, 0, 0,
         0, 0, 0,
-        type, batch) == CUFFT_SUCCESS);
+        type, batch)) != CUFFT_SUCCESS)
+    {
+      std::stringstream s;
+      s << "Could not create FFT plan. Error code: " << result;
+      throw std::runtime_error(s.str().c_str());
+    }
 
     return plan;
   }

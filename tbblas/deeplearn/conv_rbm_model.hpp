@@ -16,10 +16,13 @@
 
 #include <tbblas/deeplearn/convolution_type.hpp>
 #include <tbblas/deeplearn/unit_type.hpp>
+#include <tbblas/deeplearn/pooling_method.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <vector>
+
+#include <stdexcept>
 
 namespace tbblas {
 
@@ -44,17 +47,19 @@ public:
    * Versions:
    * 0: initial version, doesn't even have magic code or version number
    * 1: first real version. Comes with magic code, version number and stride size
+   * 2: Added pooling information
    */
-  static const unsigned CURRENT_VERSION = 1;
+  static const unsigned CURRENT_VERSION = 2;
 
 protected:
   // Model in CPU memory
   host_tensor_t _visibleBiases, _mask;
   v_host_tensor_t _filters, _hiddenBiases;
-  dim_t _filterKernelSize, _stride_size;
+  dim_t _filterKernelSize, _stride_size, _pooling_size;
 
   unit_type _visibleUnitType, _hiddenUnitType;
   tbblas::deeplearn::convolution_type _convolutionType;
+  tbblas::deeplearn::pooling_method _pooling_method;
 
   value_t _mean, _stddev;
   bool _shared_biases;
@@ -62,14 +67,14 @@ protected:
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
-  conv_rbm_model() : _stride_size(seq<dimCount>(1)), _mean(0), _stddev(1), _shared_biases(false), _version(CURRENT_VERSION)
+  conv_rbm_model() : _stride_size(seq<dimCount>(1)), _pooling_size(seq<dimCount>(1)), _mean(0), _stddev(1), _shared_biases(false), _version(CURRENT_VERSION)
   {
   }
 
   conv_rbm_model(const conv_rbm_model<T,dims>& model)
-   : _visibleBiases(model.visible_bias()), _mask(model.mask()), _filterKernelSize(model.kernel_size()), _stride_size(model.stride_size()),
-     _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type()), _convolutionType(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
-     _shared_biases(model.shared_bias()), _version(model.version())
+   : _visibleBiases(model.visible_bias()), _mask(model.mask()), _filterKernelSize(model.kernel_size()), _stride_size(model.stride_size()), _pooling_size(model.pooling_size()),
+     _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type()), _convolutionType(model.convolution_type()), _pooling_method(model.pooling_method()),
+     _mean(model.mean()), _stddev(model.stddev()), _shared_biases(model.shared_bias()), _version(model.version())
   {
     set_filters(model.filters());
     set_hidden_bias(model.hidden_bias());
@@ -77,9 +82,9 @@ public:
 
   template<class U>
   conv_rbm_model(const conv_rbm_model<U,dims>& model)
-   : _visibleBiases(model.visible_bias()), _mask(model.mask()), _filterKernelSize(model.kernel_size()), _stride_size(model.stride_size()),
-     _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type()), _convolutionType(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
-     _shared_biases(model.shared_bias()), _version(model.version())
+   : _visibleBiases(model.visible_bias()), _mask(model.mask()), _filterKernelSize(model.kernel_size()), _stride_size(model.stride_size()), _pooling_size(model.pooling_size()),
+     _visibleUnitType(model.visibles_type()), _hiddenUnitType(model.hiddens_type()), _convolutionType(model.convolution_type()), _pooling_method(model.pooling_method()),
+     _mean(model.mean()), _stddev(model.stddev()), _shared_biases(model.shared_bias()), _version(model.version())
   {
     _filters.resize(model.filters().size());
     for (size_t i = 0; i < model.filters().size(); ++i)
@@ -97,6 +102,10 @@ public:
     _filters.resize(filters.size());
     for (size_t i = 0; i < filters.size(); ++i)
       _filters[i] = boost::make_shared<host_tensor_t>(*filters[i]);
+  }
+
+  v_host_tensor_t& filters() {
+    return _filters;
   }
 
   const v_host_tensor_t& filters() const {
@@ -119,6 +128,10 @@ public:
     _hiddenBiases.resize(bias.size());
     for (size_t i = 0; i < bias.size(); ++i)
       _hiddenBiases[i] = boost::make_shared<host_tensor_t>(*bias[i]);
+  }
+
+  v_host_tensor_t& hidden_bias() {
+    return _hiddenBiases;
   }
 
   const v_host_tensor_t& hidden_bias() const {
@@ -185,13 +198,10 @@ public:
   }
 
   dim_t hiddens_size() const {
-    dim_t hidden_topleft = seq<dimCount>(0);
+    dim_t hidden_size = visible_bias().size();
     if (convolution_type() == convolution_type::Valid){
-      hidden_topleft = kernel_size() / 2;
-      hidden_topleft[dimCount - 1] = 0;
+      hidden_size = hidden_size - kernel_size() + 1;
     }
-
-    dim_t hidden_size = visible_bias().size() - 2 * hidden_topleft;
     hidden_size[dimCount - 1] = filters().size();
 
     return hidden_size;
@@ -205,12 +215,36 @@ public:
     return count;
   }
 
+  dim_t pooled_size() const {
+    return hiddens_size() / _pooling_size;
+  }
+
+  size_t pooled_count() const {
+    return pooled_size().prod();
+  }
+
   void set_convolution_type(const tbblas::deeplearn::convolution_type& type) {
     _convolutionType = type;
   }
 
   const tbblas::deeplearn::convolution_type& convolution_type() const {
     return _convolutionType;
+  }
+
+  void set_pooling_size(const dim_t& size) {
+    _pooling_size = size;
+  }
+
+  const dim_t& pooling_size() const {
+    return _pooling_size;
+  }
+
+  void set_pooling_method(const tbblas::deeplearn::pooling_method& method) {
+    _pooling_method = method;
+  }
+
+  const tbblas::deeplearn::pooling_method& pooling_method() const {
+    return _pooling_method;
   }
 
   void set_mean(value_t mean) {
@@ -249,6 +283,68 @@ public:
 
   unsigned version() const {
     return _version;
+  }
+
+  void change_stride(dim_t stride) {
+    if (!_shared_biases)
+      throw std::runtime_error("Changing the stride is only supported for shared bias models.");
+
+    if (_stride_size == seq<dimCount>(1)) {
+
+      // Add stride to the model
+
+      host_tensor_t v = rearrange(_visibleBiases, stride);
+      _visibleBiases = v;
+
+      dim_t layerSize = v.size();
+      layerSize[dimCount - 1] = 1;
+
+      _mask = ones<value_t>(layerSize);
+
+      host_tensor_t f;
+      for (size_t i = 0; i < _filters.size(); ++i) {
+        f = rearrange(*_filters[i], stride);
+        *_filters[i] = f;
+        *_hiddenBiases[i] = ones<value_t>(layerSize) * (*_hiddenBiases[i])[seq<dimCount>(0)];
+      }
+
+      _filterKernelSize = _filters[0]->size();
+    } else if (stride == seq<dimCount>(1)) {
+
+      // Unstride the model
+
+      host_tensor_t v = rearrange_r(_visibleBiases, _stride_size);
+      _visibleBiases = v;
+
+      dim_t layerSize = v.size();
+      layerSize[dimCount - 1] = 1;
+
+      _mask = ones<value_t>(layerSize);
+
+      host_tensor_t f;
+      for (size_t i = 0; i < _filters.size(); ++i) {
+        f = rearrange_r(*_filters[i], _stride_size);
+        *_filters[i] = f;
+        *_hiddenBiases[i] = ones<value_t>(layerSize) * (*_hiddenBiases[i])[seq<dimCount>(0)];
+      }
+      _filterKernelSize = _filters[0]->size();
+    } else {
+      throw std::runtime_error("Either the old or the new stride must be 1.");
+    }
+
+    set_stride_size(stride);
+  }
+
+  void change_size(dim_t size) {
+    dim_t layerSize = size;
+    layerSize[dimCount - 1] = 1;
+
+    _mask = ones<value_t>(layerSize);
+    _visibleBiases = ones<value_t>(size) * _visibleBiases[seq<dimCount>(0)];
+
+    for (size_t i = 0; i < _filters.size(); ++i) {
+      *_hiddenBiases[i] = ones<value_t>(layerSize) * (*_hiddenBiases[i])[seq<dimCount>(0)];
+    }
   }
 };
 

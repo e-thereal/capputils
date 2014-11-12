@@ -290,6 +290,10 @@ public:
     return subrange(*this, pair.first, pair.second);
   }
 
+  const proxy<tensor_t> operator[](const std::pair<std::pair<sequence<int, dim>, sequence<int, dim> >, sequence<int, dim> >& pair) {
+    return slice(*this, pair.first.first, pair.first.second, pair.second);
+  }
+
   /*** apply operations ***/
 
   inline tensor_t& operator=(const tensor_t& tensor) {

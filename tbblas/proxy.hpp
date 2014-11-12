@@ -46,14 +46,13 @@ struct proxy {
     dim_t _pitch;
     size_t _first;
     flipped_t _flipped;
-//    size_t _count;
+    dim_t _stride;
 
-    index_functor(const dim_t& start, const dim_t& size, const dim_t& pitch, const flipped_t& flipped, const dim_t& order) {
-//      _count = 1;
+    index_functor(const dim_t& start, const dim_t& size, const dim_t& pitch, const flipped_t& flipped, const dim_t& order, const dim_t& stride)  {
       for (unsigned i = 0; i < dimCount; ++i) {
         _size[i] = size[i];
         _flipped[i] = flipped[i];
-//        _count *= pitch[i];
+        _stride[i] = stride[i];
       }
 
       dim_t originalPitch;
@@ -72,11 +71,10 @@ struct proxy {
     difference_type operator()(difference_type i) const
     {
       difference_type index;
-      index = (_flipped[0] ? _size[0] - (i % _size[0]) - 1 : i % _size[0]) * _pitch[0];
+      index = (_flipped[0] ? _size[0] - (i % _size[0]) - 1 : i % _size[0]) * _stride[0] * _pitch[0];
       for (unsigned k = 1; k < dimCount; ++k) {
-        index += (_flipped[k] ? _size[k] - ((i /=  _size[k-1]) % _size[k]) - 1 : (i /= _size[k-1]) % _size[k]) * _pitch[k];
+        index += (_flipped[k] ? _size[k] - ((i /=  _size[k-1]) % _size[k]) - 1 : (i /= _size[k-1]) % _size[k]) * _stride[k] * _pitch[k];
       }
-//      assert(index + _first < _count);
       return index + _first;
     }
   };
@@ -88,14 +86,14 @@ struct proxy {
   typedef iterator const_iterator;
 
   proxy(Tensor& tensor)
-   : _data(tensor.shared_data()), _size(tensor.size()), _fullsize(tensor.fullsize()), _pitch(tensor.size()), _flipped(tbblas::seq<dimCount>(false))
+   : _data(tensor.shared_data()), _size(tensor.size()), _fullsize(tensor.fullsize()), _pitch(tensor.size()), _flipped(tbblas::seq<dimCount>(false)), _stride(tbblas::seq<dimCount>(1))
   {
     for (unsigned i = 0; i < dimCount; ++i)
       _order[i] = i;
   }
 
   proxy(Tensor& tensor, const dim_t& size)
-   : _data(tensor.shared_data()), _size(size), _fullsize(size), _pitch(size), _flipped(false)
+   : _data(tensor.shared_data()), _size(size), _fullsize(size), _pitch(size), _flipped(false), _stride(tbblas::seq<dimCount>(1))
   {
     for (unsigned i = 0; i < dimCount; ++i)
       _order[i] = i;
@@ -103,7 +101,7 @@ struct proxy {
 
   proxy(Tensor& tensor, const sequence<unsigned, dimCount>& start,
       const sequence<unsigned, dimCount>& size)
-   : _data(tensor.shared_data()), _start(start), _size(size), _fullsize(size), _pitch(tensor.size()), _flipped(tbblas::seq<dimCount>(false))
+   : _data(tensor.shared_data()), _start(start), _size(size), _fullsize(size), _pitch(tensor.size()), _flipped(tbblas::seq<dimCount>(false)), _stride(tbblas::seq<dimCount>(1))
   {
     for (unsigned i = 0; i < dimCount; ++i) {
       assert(_start[i] + _size[i] <= _pitch[i]);
@@ -111,8 +109,19 @@ struct proxy {
     }
   }
 
+  proxy(Tensor& tensor, const sequence<unsigned, dimCount>& start,
+      const sequence<unsigned, dimCount>& stride,
+      const sequence<unsigned, dimCount>& size)
+   : _data(tensor.shared_data()), _start(start), _size(size / stride), _fullsize(size / stride), _pitch(tensor.size()), _flipped(tbblas::seq<dimCount>(false)), _stride(stride)
+  {
+    for (unsigned i = 0; i < dimCount; ++i) {
+      assert(_start[i] + _size[i] * _stride[i] - _stride[i] <= _pitch[i] - 1);
+      _order[i] = i;
+    }
+  }
+
   inline iterator begin() const {
-    index_functor functor(_start, _size, _pitch, _flipped, _order);
+    index_functor functor(_start, _size, _pitch, _flipped, _order, _stride);
     CountingIterator counting(0);
     TransformIterator transform(counting, functor);
     PermutationIterator permu(_data->begin(), transform);
@@ -152,12 +161,14 @@ struct proxy {
     dim_t oldSize = _size;
     dim_t oldFullsize = _fullsize;
     dim_t oldStart = _start;
+    dim_t oldStride = _stride;
 
     for (unsigned i = 0; i < dimCount; ++i) {
       _order[i] = oldOrder[order[i]];
       _size[i] = oldSize[order[i]];
       _fullsize[i] = oldFullsize[order[i]];
       _start[i] = oldStart[order[i]];
+      _stride[i] = oldStride[order[i]];
     }
   }
 
@@ -210,7 +221,7 @@ struct proxy {
 
 private:
   boost::shared_ptr<data_t> _data;
-  dim_t _start, _size, _fullsize, _pitch, _order;
+  dim_t _start, _size, _fullsize, _pitch, _order, _stride;
   sequence<bool, dimCount> _flipped;
 };
 
@@ -225,17 +236,24 @@ struct is_expression<proxy<T> > {
 };
 
 template<class T, unsigned dim, bool device>
-proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
+const proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
     const sequence<unsigned, dim>& start, const sequence<unsigned, dim>& size)
 {
   return proxy<tensor<T, dim, device> >(t, start, size);
 }
 
 template<class T, unsigned dim, bool device>
-proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
+const proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
     const sequence<int, dim>& start, const sequence<int, dim>& size)
 {
   return proxy<tensor<T, dim, device> >(t, start, size);
+}
+
+template<class T, unsigned dim, bool device>
+const proxy<tensor<T, dim, device> > slice(tensor<T, dim, device>& t,
+    const sequence<int, dim>& start, const sequence<int, dim>& stride, const sequence<int, dim>& size)
+{
+  return proxy<tensor<T, dim, device> >(t, start, stride, size);
 }
 
 }

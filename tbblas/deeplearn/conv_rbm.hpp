@@ -36,7 +36,6 @@
 #include <tbblas/deeplearn/repeat_mult_sum.hpp>
 #include <tbblas/deeplearn/convolution_type.hpp>
 #include <tbblas/deeplearn/unit_type.hpp>
-#include <tbblas/deeplearn/sparsity_method.hpp>
 #include <tbblas/deeplearn/dropout_method.hpp>
 
 #include <tbblas/deeplearn/conv_rbm_model.hpp>
@@ -76,8 +75,8 @@ class conv_rbm {
   typedef tbblas::tensor<complex_t, dimCount, true> ctensor_t;
   typedef std::vector<boost::shared_ptr<ctensor_t> > v_ctensor_t;
 
-  typedef tbblas::random_tensor<value_t, dimCount, true, tbblas::uniform<value_t> > uniform_t;
-  typedef tbblas::random_tensor<value_t, dimCount, true, tbblas::normal<value_t> > normal_t;
+  typedef tbblas::random_tensor2<value_t, dimCount, true, tbblas::uniform<value_t> > uniform_t;
+  typedef tbblas::random_tensor2<value_t, dimCount, true, tbblas::normal<value_t> > normal_t;
 
   typedef conv_rbm_model<value_t, dimCount> model_t;
 
@@ -88,8 +87,8 @@ protected:
   model_t& model;
 
   // weights and bias terms in GPU memory
-  ctensor_t cb, cbinc;
-  v_ctensor_t cF, cc, cFinc, ccinc;
+  ctensor_t cb;
+  v_ctensor_t cF, cc;
   v_tensor_t drops;
 
   // visible and hidden units in GPU memory
@@ -99,23 +98,22 @@ protected:
         visible_layer_size, hidden_layer_size, layer_size,
         hidden_layer_batch_size, layer_batch_size,
         filter_batch_size, hidden_topleft,
-        vbMaskSize, hbMaskSize, spMaskSize;
+        vbMaskSize, hbMaskSize;
 
   // one element per thread
   std::vector<boost::shared_ptr<tensor_t> > v_v, v_h, v_f, v_v_mask, v_h_mask;
-  std::vector<boost::shared_ptr<ctensor_t> > v_cv, v_ch, v_chdiff;
+  std::vector<boost::shared_ptr<ctensor_t> > v_cv, v_ch;
   std::vector<boost::shared_ptr<plan_t> > v_plan_v, v_iplan_v, v_plan_h, v_iplan_h;
   std::vector<boost::shared_ptr<uniform_t> > v_v_rand, v_h_rand;
   std::vector<boost::shared_ptr<normal_t> > v_v_noise, v_h_noise;
   std::vector<cudaStream_t> v_stream;
 
-  tensor_t _hiddens;
+  tensor_t _hiddens, _pooled;
 
   int _gpu_count, _device_count, _filter_batch_length, _hidden_count;
-  bool _memory_allocated, _double_weights, _host_updated;
+  bool _memory_allocated, _double_weights;
 
-  value_t _sparsity_target, _sparsity_weight, _dropout_rate;
-  sparsity_method _sparsity_method;
+  value_t _dropout_rate;
 
   boost::barrier _barrier;
   boost::mutex _mtx;
@@ -124,9 +122,8 @@ public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
   conv_rbm(model_t& model, size_t gpu_count = 1) : model(model),
     _gpu_count(gpu_count), _device_count(0), _filter_batch_length(1),
-    _memory_allocated(false), _double_weights(false), _host_updated(true),
-    _sparsity_target(0.1), _sparsity_weight(0), _dropout_rate(0), _sparsity_method(sparsity_method::OnlySharedBias),
-    _barrier(gpu_count)
+    _memory_allocated(false), _double_weights(false),
+    _dropout_rate(0), _barrier(gpu_count)
   {
     cudaGetDeviceCount(&_device_count);
 
@@ -140,7 +137,6 @@ public:
     v_h_mask.resize(gpu_count);
     v_cv.resize(gpu_count);
     v_ch.resize(gpu_count);
-    v_chdiff.resize(gpu_count);
 
     v_plan_v.resize(gpu_count);
     v_iplan_v.resize(gpu_count);
@@ -182,34 +178,32 @@ public:
       enable_peer_access(_gpu_count);
 
     // Prepare sizes
-    visible_size = model.visibles_size();
-    size = visible_size;
+    size =visible_size = model.visibles_size();
+    hidden_size = model.hiddens_size();
 
     visible_layer_size = visible_size;
     layer_size = filter_batch_size = layer_batch_size = size;
-    visible_layer_size[dimCount - 1] = layer_size[dimCount - 1] = 1;
+    hidden_layer_size = hidden_layer_batch_size = hidden_size;
+    hidden_layer_size[dimCount - 1] = visible_layer_size[dimCount - 1] = layer_size[dimCount - 1] = 1;
     filter_batch_size[dimCount - 1] = size[dimCount - 1] * _filter_batch_length;
     layer_batch_size[dimCount - 1] = _filter_batch_length;
+    hidden_layer_batch_size = hidden_layer_size * seq(1,1,1,_filter_batch_length);
 
     if (model.convolution_type() == convolution_type::Valid){
       hidden_topleft = model.kernel_size() / 2;
       hidden_topleft[dimCount - 1] = 0;
     } else {
-      hidden_topleft = seq<4>(0);
+      hidden_topleft = seq<dimCount>(0);
     }
-
-    hidden_layer_size = visible_layer_size - 2 * hidden_topleft;
-    hidden_layer_batch_size = hidden_layer_size * seq(1,1,1,_filter_batch_length);
-    hidden_size = visible_size - 2 * hidden_topleft;
-    hidden_size[dimCount - 1] = model.filters().size();
 
     _hiddens = zeros<value_t>(hidden_size);
 
+#ifndef TBBLAS_CONV_RBM_NO_SELFTEST
     // Test if the FFT bug is gonna bug us ;)
     {
-      random_tensor<value_t, dimCount, true, normal<value_t> > v_noise(size);
+      random_tensor2<value_t, dimCount, true, normal<value_t> > v_noise(size);
 
-      tensor_t A = v_noise, B = A;
+      tensor_t A = v_noise(), B = A;
       ctensor_t cA = fft(A, dimCount - 1), cB = cA;
 
       if (dot(A - B, A - B) != 0)
@@ -220,9 +214,9 @@ public:
         throw std::runtime_error("Bug detected in cuFFT (backward transform)!");
     }
     {
-      random_tensor<value_t, dimCount, true, normal<value_t> > v_noise(layer_batch_size);
+      random_tensor2<value_t, dimCount, true, normal<value_t> > v_noise(layer_batch_size);
 
-      tensor_t A = v_noise, B = A;
+      tensor_t A = v_noise(), B = A;
       ctensor_t cA = fft(A, dimCount - 1), cB = cA;
 
       if (dot(A - B, A - B) != 0)
@@ -232,12 +226,11 @@ public:
       if (abs(dot(cA - cB, cA - cB)) != 0)
         throw std::runtime_error("Bug detected in cuFFT (backward transform)!");
     }
+#endif
 
     cF.resize(model.filters().size() / _filter_batch_length);
     cc.resize(model.hidden_bias().size() / _filter_batch_length);
 
-    cFinc.resize(cF.size());
-    ccinc.resize(cc.size());
     drops.resize(cF.size());
 
     if (_gpu_count > 1) {
@@ -252,35 +245,8 @@ public:
     }
   }
 
-  void write_model_to_host() {
-    using namespace tbblas;
-
-    if (_host_updated)
-      return;
-
-    _host_updated = true;
-
-    if (!_memory_allocated)
-      allocate_gpu_memory();
-
-    if (_gpu_count > 1) {
-      std::vector<boost::shared_ptr<boost::thread> > threads(_gpu_count);
-      for (size_t i = 0; i < threads.size(); ++i)
-        threads[i] = boost::make_shared<boost::thread>(&conv_rbm<T,dims>::write_model_to_host_parallel, this, i);
-
-      for (size_t i = 0; i < threads.size(); ++i)
-        threads[i]->join();
-    } else {
-      write_model_to_host_parallel(0);
-    }
-  }
-
   void free_gpu_memory() {
-    if (!_host_updated)
-      write_model_to_host();
-
     cb = ctensor_t();
-    cbinc = ctensor_t();
 
     if (_gpu_count > 1) {
       std::vector<boost::shared_ptr<boost::thread> > threads(_gpu_count);
@@ -318,6 +284,28 @@ public:
     tensor_t& v = *v_v[0];
     tensor_t& v_mask = *v_v_mask[0];
     v = ((v * model.stddev()) + model.mean()) * tbblas::repeat(v_mask, size / layer_size);
+  }
+
+  void pool_hiddens() {
+    switch (model.pooling_method()) {
+    case pooling_method::NoPooling:
+      _pooled = _hiddens;
+      break;
+
+    default:
+      throw std::runtime_error("Unsupported pooling method.");
+    }
+  }
+
+  void unpool_hiddens() {
+    switch (model.pooling_method()) {
+    case pooling_method::NoPooling:
+      _hiddens = _pooled;
+      break;
+
+    default:
+      throw std::runtime_error("Unsupported pooling method.");
+    }
   }
 
   void infer_visibles(bool onlyFilters = false) {
@@ -430,102 +418,6 @@ public:
     }
   }
 
-  void init_gradient_updates(value_t momentum = 0, value_t weightcost = 0) {
-    if (!_memory_allocated)
-      allocate_gpu_memory();
-
-    cbinc = momentum * cbinc;
-
-    if (_gpu_count > 1) {
-      std::vector<boost::shared_ptr<boost::thread> > threads(_gpu_count);
-      for (size_t i = 0; i < threads.size(); ++i)
-        threads[i] = boost::make_shared<boost::thread>(&conv_rbm<T,dims>::init_gradient_updates_parallel, this, i, momentum, weightcost);
-
-      for (size_t i = 0; i < threads.size(); ++i)
-        threads[i]->join();
-    } else {
-      init_gradient_updates_parallel(0, momentum, weightcost);
-    }
-  }
-
-  void update_positive_gradient(value_t epsilonw, value_t epsilonvb, value_t epsilonhb) {
-    using namespace tbblas;
-
-    if (!_memory_allocated)
-      allocate_gpu_memory();
-
-    // TODO: how much time does this take?
-    *v_cv[0] = tbblas::fft(*v_v[0], dimCount - 1, *v_plan_v[0]);
-    if (_gpu_count > 1)
-      tbblas::synchronize();
-
-    if (_gpu_count > 1) {
-      std::vector<boost::shared_ptr<boost::thread> > threads(_gpu_count);
-      for (size_t i = 0; i < threads.size(); ++i)
-        threads[i] = boost::make_shared<boost::thread>(&conv_rbm<T,dims>::update_positive_gradient_parallel, this, i, epsilonw, epsilonvb, epsilonhb);
-      for (size_t i = 0; i < threads.size(); ++i)
-        threads[i]->join();
-    } else {
-      update_positive_gradient_parallel(0, epsilonw, epsilonvb, epsilonhb);
-    }
-  }
-
-  void update_negative_gradient(value_t epsilonw, value_t epsilonvb, value_t epsilonhb) {
-    using namespace tbblas;
-
-    if (!_memory_allocated)
-      allocate_gpu_memory();
-
-    *v_cv[0] = tbblas::fft(*v_v[0], dimCount - 1, *v_plan_v[0]);
-    if (_gpu_count > 1)
-      tbblas::synchronize();
-
-    if (_gpu_count > 1) {
-      std::vector<boost::shared_ptr<boost::thread> > threads(_gpu_count);
-      for (size_t i = 0; i < threads.size(); ++i)
-        threads[i] = boost::make_shared<boost::thread>(&conv_rbm<T,dims>::update_negative_gradient_parallel, this, i, epsilonw, epsilonvb, epsilonhb);
-
-      for (size_t i = 0; i < threads.size(); ++i)
-        threads[i]->join();
-    } else {
-      update_negative_gradient_parallel(0, epsilonw, epsilonvb, epsilonhb);
-    }
-  }
-
-  // CAUTION: ONLY USE THIS FUNCTION IF YOU KNOW WHAT YOU ARE DOING
-  // Should probably check, if the model is the same and needs a don't
-  // write to model mechanism
-  void accumulate_gradients(conv_rbm<value_t, dimCount>& crbm) {
-    assert(_gpu_count == 1);
-
-    for (size_t k = 0; k < cFinc.size(); ++k) {
-      *crbm.cFinc[k] = *cFinc[k] = *cFinc[k] + *crbm.cFinc[k];
-      *crbm.ccinc[k] = *ccinc[k] = *ccinc[k] + *crbm.ccinc[k];
-    }
-
-    crbm.cbinc = cbinc = cbinc + crbm.cbinc;
-  }
-
-  void apply_gradient() {
-    _host_updated = false;
-
-    using namespace tbblas;
-
-    if (!_memory_allocated)
-      allocate_gpu_memory();
-
-    if (_gpu_count > 1) {
-      std::vector<boost::shared_ptr<boost::thread> > threads(_gpu_count);
-      for (size_t i = 0; i < threads.size(); ++i)
-        threads[i] = boost::make_shared<boost::thread>(&conv_rbm<T,dims>::apply_gradient_parallel, this, i);
-
-      for (size_t i = 0; i < threads.size(); ++i)
-        threads[i]->join();
-    } else {
-      apply_gradient_parallel(0);
-    }
-  }
-
   void set_input(tensor_t& input) {
     assert(model.input_size() == input.size());
     visibles() = rearrange(input, model.stride_size());
@@ -558,6 +450,17 @@ public:
       _hiddens.resize(model.hiddens_size());
   }
 
+  tensor_t& pooled_units() {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+    return _pooled;
+  }
+
+  void allocate_pooled_units() {
+    if (_pooled.size() != model.pooled_size())
+      _pooled.resize(model.pooled_size());
+  }
+
   void set_batch_length(int length) {
     if (length < 1 || model.filter_count() % length != 0)
       throw std::runtime_error("Filter count must be a multiple of filter batch length!");
@@ -577,16 +480,21 @@ public:
     return _filter_batch_length;
   }
 
-  void set_sparsity_target(value_t target) {
-    _sparsity_target = target;
-  }
+  void change_mask(host_tensor_t& mask) {
+    using namespace tbblas;
 
-  void set_sparsity_weight(value_t weight) {
-    _sparsity_weight = weight;
-  }
+    if (!_memory_allocated)
+      allocate_gpu_memory();
 
-  void set_sparsity_method(const sparsity_method& method) {
-    _sparsity_method = method;
+    if (_gpu_count > 1) {
+      std::vector<boost::shared_ptr<boost::thread> > threads(_gpu_count);
+      for (size_t i = 0; i < threads.size(); ++i)
+        threads[i] = boost::make_shared<boost::thread>(&conv_rbm<T,dims>::change_mask_parallel, this, i, mask);
+      for (size_t i = 0; i < threads.size(); ++i)
+        threads[i]->join();
+    } else {
+      change_mask_parallel(0, mask);
+    }
   }
 
 private:
@@ -603,7 +511,6 @@ private:
     v_h[tid] = boost::make_shared<tensor_t>();
     v_cv[tid] = boost::make_shared<ctensor_t>();
     v_ch[tid] = boost::make_shared<ctensor_t>();
-    v_chdiff[tid] = boost::make_shared<ctensor_t>();
 
     plan_t& plan_v = *(v_plan_v[tid] = boost::make_shared<plan_t>());
     plan_t& iplan_v = *(v_iplan_v[tid] = boost::make_shared<plan_t>());
@@ -627,7 +534,6 @@ private:
     if (tid == 0) {
       tensor_t b = model.visible_bias();
       cb = fft(b, dimCount - 1, plan_v);
-      cbinc = zeros<complex_t>(cb.size(), cb.fullsize());
     }
 
     // Copy filters to the device and pre-calculate the FFT
@@ -646,8 +552,6 @@ private:
         f = ifftshift(pad, dimCount - 1);
         cf = fft(f, dimCount - 1, plan_f);
         cF[k] = boost::make_shared<ctensor_t>(cf);
-        cf = zeros<complex_t>(cf.size(), cf.fullsize());
-        cFinc[k] = boost::make_shared<ctensor_t>(cf);
 
         h = zeros<value_t>(layer_batch_size);
         for (int j = 0; j < _filter_batch_length; ++j) {
@@ -655,8 +559,6 @@ private:
         }
         ch = fft(h, dimCount - 1, plan_h);
         cc[k] = boost::make_shared<ctensor_t>(ch);
-        ch = zeros<complex_t>(ch.size(), ch.fullsize());
-        ccinc[k] = boost::make_shared<ctensor_t>(ch);
 
         drops[k] = boost::make_shared<tensor_t>();
       }
@@ -706,57 +608,6 @@ private:
         hbMaskSize[1] = 1;
         hbMaskSize[2] = 1;
       }
-
-      spMaskSize = cc[0]->size();
-      spMaskSize[0] = 1;
-      spMaskSize[1] = 1;
-      spMaskSize[2] = 1;
-    }
-    if (_gpu_count > 1)
-      tbblas::synchronize();
-  }
-
-  void write_model_to_host_parallel(size_t tid) {
-    if (_gpu_count > 1)
-      cudaSetDevice(tid % _device_count);
-
-    change_stream context(_gpu_count == 1 ? context::get().stream : v_stream[tid]);
-
-    tensor_t& f = *v_f[tid];
-    tensor_t& h = *v_h[tid];
-    ctensor_t& cv = *v_cv[tid];
-    ctensor_t& ch = *v_ch[tid];
-    plan_t& plan_v = *v_plan_v[tid];
-    plan_t& iplan_v = *v_iplan_v[tid];
-    plan_t& iplan_h = *v_iplan_h[tid];
-
-    dim_t fullsize = cv.fullsize();
-    tensor_t p;
-
-    for (size_t k = tid; k < cF.size(); k += _gpu_count) {
-      for (int j = 0; j < _filter_batch_length; ++j) {
-        dim_t topleft = size / 2 - model.kernel_size() / 2;
-        cv = (*cF[k])[seq(0,0,0,j*cv.size()[3]), cv.size()];
-        cv.set_fullsize(fullsize);
-        f = ifft(cv, dimCount - 1, iplan_v);
-        p = fftshift(f, dimCount - 1);
-
-        *model.filters()[k * _filter_batch_length + j] = p[topleft, model.kernel_size()];
-      }
-
-      h = ifft(*cc[k], dimCount - 1, iplan_h);
-      h = h * (abs(h) > 1e-16);
-
-      for (int j = 0; j < _filter_batch_length; ++j) {
-        *model.hidden_bias()[k * _filter_batch_length + j] = h[seq(0,0,0,j),layer_size];
-      }
-    }
-
-    if (tid == 0) {
-      f = ifft(cb, dimCount - 1, iplan_v);
-      f = f * (abs(f) > 1e-16);
-      host_tensor_t b = f;
-      model.set_visible_bias(b);
     }
     if (_gpu_count > 1)
       tbblas::synchronize();
@@ -775,7 +626,6 @@ private:
     v_h_mask[tid] = boost::shared_ptr<tensor_t>();
     v_cv[tid] = boost::shared_ptr<ctensor_t>();
     v_ch[tid] = boost::shared_ptr<ctensor_t>();
-    v_chdiff[tid] = boost::shared_ptr<ctensor_t>();
 
     v_plan_v[tid] = boost::shared_ptr<plan_t>();
     v_iplan_v[tid] = boost::shared_ptr<plan_t>();
@@ -783,7 +633,7 @@ private:
     v_iplan_h[tid] = boost::shared_ptr<plan_t>();
 
     for (size_t k = tid; k < cF.size(); k += _gpu_count) {
-      cF[k] = cc[k] = cFinc[k] = ccinc[k] = boost::shared_ptr<ctensor_t>();
+      cF[k] = cc[k] = boost::shared_ptr<ctensor_t>();
       drops[k] = boost::shared_ptr<tensor_t>();
     }
 
@@ -952,13 +802,13 @@ private:
 
       switch(model.visibles_type()) {
         case unit_type::Gaussian:  break;
-        case unit_type::Bernoulli: v = sigm(v) > v_rand; break;
+        case unit_type::Bernoulli: v = sigm(v) > v_rand(); break;
         case unit_type::MyReLU:
-        case unit_type::ReLU:      v = max(0.0, v + sqrt(sigm(v)) * v_noise); break;
-        case unit_type::ReLU1:     v = min(1.0, max(0.0, v + (v > 0) * (v < 1.0) * v_noise)); break;
-        case unit_type::ReLU2:     v = min(2.0, max(0.0, v + (v > 0) * (v < 2.0) * v_noise)); break;
-        case unit_type::ReLU4:     v = min(4.0, max(0.0, v + (v > 0) * (v < 4.0) * v_noise)); break;
-        case unit_type::ReLU8:     v = min(8.0, max(0.0, v + (v > 0) * (v < 8.0) * v_noise)); break;
+        case unit_type::ReLU:      v = max(0.0, v + sqrt(sigm(v)) * v_noise()); break;
+        case unit_type::ReLU1:     v = min(1.0, max(0.0, v + (v > 0) * (v < 1.0) * v_noise())); break;
+        case unit_type::ReLU2:     v = min(2.0, max(0.0, v + (v > 0) * (v < 2.0) * v_noise())); break;
+        case unit_type::ReLU4:     v = min(4.0, max(0.0, v + (v > 0) * (v < 4.0) * v_noise())); break;
+        case unit_type::ReLU8:     v = min(8.0, max(0.0, v + (v > 0) * (v < 8.0) * v_noise())); break;
       }
       v = v * repeat(v_mask, size / layer_size);
       if (_gpu_count > 1)
@@ -992,13 +842,13 @@ private:
       h = ifft(ch, dimCount - 1, iplan_h);
 
       switch (model.hiddens_type()) {
-        case unit_type::Bernoulli: h = sigm(h) > h_rand; break;
+        case unit_type::Bernoulli: h = sigm(h) > h_rand(); break;
         case unit_type::MyReLU:
-        case unit_type::ReLU:      h = max(0.0, h + sqrt(sigm(h)) * h_noise); break;
-        case unit_type::ReLU1:     h = min(1.0, max(0.0, h + (h > 0) * (h < 1.0) * h_noise)); break;
-        case unit_type::ReLU2:     h = min(2.0, max(0.0, h + (h > 0) * (h < 2.0) * h_noise)); break;
-        case unit_type::ReLU4:     h = min(4.0, max(0.0, h + (h > 0) * (h < 4.0) * h_noise)); break;
-        case unit_type::ReLU8:     h = min(8.0, max(0.0, h + (h > 0) * (h < 8.0) * h_noise)); break;
+        case unit_type::ReLU:      h = max(0.0, h + sqrt(sigm(h)) * h_noise()); break;
+        case unit_type::ReLU1:     h = min(1.0, max(0.0, h + (h > 0) * (h < 1.0) * h_noise())); break;
+        case unit_type::ReLU2:     h = min(2.0, max(0.0, h + (h > 0) * (h < 2.0) * h_noise())); break;
+        case unit_type::ReLU4:     h = min(4.0, max(0.0, h + (h > 0) * (h < 4.0) * h_noise())); break;
+        case unit_type::ReLU8:     h = min(8.0, max(0.0, h + (h > 0) * (h < 8.0) * h_noise())); break;
       }
       if (_dropout_rate > 0)
         h = h * *drops[k] / (1. - _dropout_rate) * repeat(h_mask, h.size() / h_mask.size());
@@ -1023,7 +873,7 @@ private:
 
     if (method == dropout_method::DropColumn) {
       if (tid == 0) {
-        *drops[0] = h_rand > _dropout_rate;
+        *drops[0] = h_rand() > _dropout_rate;
         *drops[0] = repeat((*drops[0])[seq(0,0,0,0),layer_size], layer_batch_size / layer_size);
       }
       if (_gpu_count > 1) {
@@ -1038,129 +888,34 @@ private:
         *drops[k] = *drops[tid];
     } else {
       for (size_t k = tid; k < drops.size(); k += _gpu_count)
-        *drops[k] = h_rand > _dropout_rate;
+        *drops[k] = h_rand() > _dropout_rate;
     }
   }
 
-  void init_gradient_updates_parallel(size_t tid, value_t momentum, value_t weightcost) {
-    if (_gpu_count > 1)
+  void change_mask_parallel(int tid, host_tensor_t& mask) {
+    if (_gpu_count > 1) {
       cudaSetDevice(tid % _device_count);
+      cudaStreamCreate(&v_stream[tid]);
+    }
 
     change_stream context(_gpu_count == 1 ? context::get().stream : v_stream[tid]);
 
-    for (size_t k = tid; k < cF.size(); k += _gpu_count) {
-      *cFinc[k] = momentum * *cFinc[k] - weightcost * *cF[k];
-      *ccinc[k] = momentum * *ccinc[k];
-    }
-  }
+    tensor_t& v_mask = *v_v_mask[tid];
+    tensor_t& h_mask = *v_h_mask[tid];
+    v_mask = zeros<value_t>(layer_size);
+    v_mask[seq<dimCount>(0), mask.size()] = mask;
 
-  void update_positive_gradient_parallel(size_t tid, value_t epsilonw, value_t epsilonvb, value_t epsilonhb) {
+    // pad h mask according to convolution shrinkage
+    if (model.convolution_type() == convolution_type::Valid){
+      h_mask = zeros<value_t>(layer_size);
+      h_mask[hidden_topleft, hidden_layer_size] = ones<value_t>(hidden_layer_size);
+      h_mask = h_mask * v_mask;
+    } else {
+      h_mask = v_mask;
+    }
+
     if (_gpu_count > 1)
-      cudaSetDevice(tid % _device_count);
-
-    change_stream context(_gpu_count == 1 ? context::get().stream : v_stream[tid]);
-
-    tensor_t& h = *v_h[tid];
-    ctensor_t& cv = *v_cv[tid];
-    ctensor_t& ch = *v_ch[tid];
-    ctensor_t& chdiff = *v_chdiff[tid];
-    plan_t& plan_h = *v_plan_h[tid];
-
-    // TODO: how much time does this take?
-    if (tid != 0)
-      cv = *v_cv[0];
-
-    if (tid == 0)
-      cbinc = cbinc + epsilonvb / model.visibles_size()[dimCount - 1] * tbblas::mask<complex_t>(cv.size(), cv.fullsize(), vbMaskSize) * cv;
-
-    for (size_t k = tid; k < cF.size(); k += _gpu_count) {
-
-      h = zeros<value_t>(layer_batch_size);
-      h[hidden_topleft, hidden_layer_batch_size] = _hiddens[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
-      ch = fft(h, dimCount - 1, plan_h);
-
-      *cFinc[k] += conj_repeat_mult(cv, ch, epsilonw / _hidden_count);
-      *ccinc[k] = *ccinc[k] + epsilonhb / model.visibles_size()[dimCount - 1] * tbblas::mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * ch;
-      switch(_sparsity_method) {
-      case sparsity_method::WeightsAndBias:
-        chdiff = _sparsity_target * h.count() * mask<complex_t>(ch.size(), ch.fullsize(), spMaskSize) - ch;
-        *cFinc[k] = *cFinc[k] + epsilonw / _hidden_count * _sparsity_weight * repeat(conj(chdiff), cFinc[k]->size() / ch.size()) * repeat(cv, cFinc[k]->size() / cv.size());
-        *ccinc[k] = *ccinc[k] + epsilonhb / model.visibles_size()[dimCount - 1] * _sparsity_weight * mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * chdiff;
-        break;
-
-      case sparsity_method::OnlyBias:
-        chdiff = _sparsity_target * h.count() * mask<complex_t>(ch.size(), ch.fullsize(), spMaskSize) - ch;
-        *ccinc[k] = *ccinc[k] + epsilonhb / model.visibles_size()[dimCount - 1] * _sparsity_weight * mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * chdiff;
-        break;
-
-      case sparsity_method::OnlySharedBias:
-        *ccinc[k] = *ccinc[k] + epsilonhb / model.visibles_size()[dimCount - 1] * _sparsity_weight * mask<complex_t>(ch.size(), ch.fullsize(), spMaskSize) * (_sparsity_target * h.count() + -ch);
-        break;
-      }
-    }
-  }
-
-  void update_negative_gradient_parallel(size_t tid, value_t epsilonw, value_t epsilonvb, value_t epsilonhb) {
-    if (_gpu_count > 1)
-      cudaSetDevice(tid % _device_count);
-
-    change_stream context(_gpu_count == 1 ? context::get().stream : v_stream[tid]);
-
-    tensor_t& h = *v_h[tid];
-    ctensor_t& cv = *v_cv[tid];
-    ctensor_t& ch = *v_ch[tid];
-    plan_t& plan_h = *v_plan_h[tid];
-
-    // TODO: how much time does this take?
-    if (tid != 0)
-      cv = *v_cv[0];
-
-    if (tid == 0)
-      cbinc = cbinc - epsilonvb / model.visibles_size()[dimCount - 1] * tbblas::mask<complex_t>(cv.size(), cv.fullsize(), vbMaskSize) * cv;
-
-    for (size_t k = tid; k < cF.size(); k += _gpu_count) {
-
-      h = zeros<value_t>(layer_batch_size);
-      h[hidden_topleft, hidden_layer_batch_size] = _hiddens[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
-      ch = fft(h, dimCount - 1, plan_h);
-
-      *cFinc[k] += conj_repeat_mult(cv, ch, -epsilonw / _hidden_count);
-      *ccinc[k] = *ccinc[k] - epsilonhb / model.visibles_size()[dimCount - 1] * tbblas::mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * ch;
-    }
-  }
-
-  void apply_gradient_parallel(size_t tid) {
-    if (_gpu_count > 1)
-      cudaSetDevice(tid % _device_count);
-
-    change_stream context(_gpu_count == 1 ? context::get().stream : v_stream[tid]);
-
-    tensor_t& f = *v_f[tid];
-    tensor_t& h = *v_h[tid];
-    ctensor_t& cv = *v_cv[tid];
-    ctensor_t& ch = *v_ch[tid];
-    plan_t& plan_v = *v_plan_v[tid];
-    plan_t& iplan_v = *v_iplan_v[tid];
-
-    dim_t fullsize = cv.fullsize();
-
-    for (size_t k = tid; k < cF.size(); k += _gpu_count) {
-      // Mask filters
-      for (int j = 0; j < _filter_batch_length; ++j) {
-        cv = (*cFinc[k])[seq(0,0,0,j*cv.size()[3]), cv.size()];
-        cv.set_fullsize(fullsize);
-        f = ifft(cv, dimCount - 1, iplan_v);
-        f = f * tbblas::mask<value_t>(f.size(), model.kernel_size());
-        cv = fft(f, dimCount - 1, plan_v);
-        (*cFinc[k])[seq(0,0,0,j*cv.size()[3]), cv.size()] = cv;
-      }
-
-      *cF[k] = *cF[k] + *cFinc[k];
-      *cc[k] = *cc[k] + *ccinc[k];
-    }
-
-    if (tid == 0)
-      cb = cb + cbinc;
+      tbblas::synchronize();
   }
 };
 

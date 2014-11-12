@@ -18,7 +18,7 @@ namespace tbblas {
 
 namespace transform {
 
-// TODO: introduce transform_plan to avoid multiple allocation and delocation of the cuda array
+// TODO: introduce transform_plan to avoid multiple allocation and deallocation of the CUDA array
 //       since we don't know if the participating tensor has changed, we still need to copy
 //       the tensor to the array. Need to measure how much this impacts the performance
 

@@ -106,14 +106,16 @@ public:
     _memory_allocated = true;
 
     // Prepare sizes
-    visible_size = model.visibles_size();
-    size = visible_size;
+    size = visible_size = model.visibles_size();
+    hidden_size = model.hiddens_size();
 
     visible_layer_size = visible_size;
     layer_size = filter_batch_size = layer_batch_size = size;
-    visible_layer_size[dimCount - 1] = layer_size[dimCount - 1] = 1;
+    hidden_layer_size = hidden_layer_batch_size = hidden_size;
+    hidden_layer_size = visible_layer_size[dimCount - 1] = layer_size[dimCount - 1] = 1;
     filter_batch_size[dimCount - 1] = size[dimCount - 1] * _filter_batch_length;
     layer_batch_size[dimCount - 1] = _filter_batch_length;
+    hidden_layer_batch_size = hidden_layer_size * seq(1,1,1,_filter_batch_length);
 
     if (model.convolution_type() == convolution_type::Valid){
       hidden_topleft = model.kernel_size() / 2;
@@ -122,13 +124,9 @@ public:
       hidden_topleft = seq<4>(0);
     }
 
-    hidden_layer_size = visible_layer_size - 2 * hidden_topleft;
-    hidden_layer_batch_size = hidden_layer_size * seq(1,1,1,_filter_batch_length);
-    hidden_size = visible_size - 2 * hidden_topleft;
-    hidden_size[dimCount - 1] = model.filters().size();
-
     H = zeros<value_t>(hidden_size);
 
+#ifndef TBBLAS_CNN_NO_SELFTEST
     // Test if the FFT bug is gonna bug us ;)
     {
       random_tensor<value_t, dimCount, true, normal<value_t> > v_noise(size);
@@ -156,6 +154,7 @@ public:
       if (abs(dot(cA - cB, cA - cB)) != 0)
         throw std::runtime_error("Bug detected in cuFFT (backward transform)!");
     }
+#endif
 
     cF.resize(model.filters().size() / _filter_batch_length);
     cb.resize(model.bias().size() / _filter_batch_length);

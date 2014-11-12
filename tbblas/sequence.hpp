@@ -152,6 +152,20 @@ struct sequence {
     return dim_type_trait<T, size>::convert(*this);
   }
 
+  value_t sum() const {
+    value_t sum = 0;
+    for (unsigned i = 0; i < size; ++i)
+      sum += _seq[i];
+    return sum;
+  }
+
+  value_t prod() const {
+    value_t product = 1;
+    for (unsigned i = 0; i < size; ++i)
+      product *= _seq[i];
+    return product;
+  }
+
 //  template<class T2>
 //  operator sequence<T2, size>() const {
 //    typename sequence<T2, size>::seq_t seq;
@@ -248,6 +262,16 @@ tbblas::sequence<T, size> max(const tbblas::sequence<T, size>& seq1,
   return result;
 }
 
+template<class T, unsigned size>
+tbblas::sequence<T, size> min(const tbblas::sequence<T, size>& seq1,
+    const tbblas::sequence<T, size>& seq2)
+{
+  tbblas::sequence<T, size> result;
+  for (unsigned i = 0; i < size; ++i)
+    result[i] = (seq1[i] < seq2[i] ? seq1[i] : seq2[i]);
+  return result;
+}
+
 /*** Pair creation ***/
 
 template<class T, unsigned size>
@@ -255,6 +279,13 @@ std::pair<tbblas::sequence<T, size>, tbblas::sequence<T, size> > operator,(const
     const tbblas::sequence<T, size>& seq2)
 {
   return std::pair<tbblas::sequence<T, size>, tbblas::sequence<T, size> >(seq1, seq2);
+}
+
+template<class T, unsigned size>
+std::pair<std::pair<tbblas::sequence<T, size>, tbblas::sequence<T, size> >, tbblas::sequence<T, size> > operator,(const std::pair<tbblas::sequence<T, size>, tbblas::sequence<T, size> >& pair,
+    const tbblas::sequence<T, size>& seq)
+{
+  return std::pair<std::pair<tbblas::sequence<T, size>, tbblas::sequence<T, size> >, tbblas::sequence<T, size> >(pair, seq);
 }
 
 /*** Input/output ***/

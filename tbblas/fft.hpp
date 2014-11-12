@@ -21,6 +21,8 @@
 #include <cufft.h>
 
 #include <cassert>
+#include <stdexcept>
+#include <sstream>
 
 namespace tbblas {
 
@@ -118,16 +120,40 @@ struct fft_operation
   void apply(tensor_t& output) const {
     cufftResult result;
 
-//    assert(cudaThreadSynchronize() == cudaSuccess);
-
+#ifndef TBBLAS_NO_BATCHED_FFT
     if((result = fft_trait<input_t>::exec(_plan.create(_tensor.size(), fft_trait<input_t>::type, _dimension),
             _tensor.data().data().get(), output.data().data().get())) != CUFFT_SUCCESS)
     {
-      std::cout << result << std::endl;
-      assert(0);
+      std::stringstream s;
+      s << "Could not execute FFT plan. Error code: " << result;
+      throw std::runtime_error(s.str().c_str());
+    }
+#else
+    // determine the size of a sub tensor, the number of elements of a sub tensor and the number of sub tensors
+    dim_t inSize = _tensor.size(), outSize = output.size();
+    for (unsigned i = _dimension; i < tensor_t::dimCount; ++i) {
+      inSize[i] = outSize[i] = 1;
     }
 
-//    assert(cudaThreadSynchronize() == cudaSuccess);
+    size_t inCount = 1, outCount = 1;
+    for (unsigned i = 0; i < _dimension; ++i) {
+      inCount *= inSize[i];
+      outCount *= outSize[i];
+    }
+
+    size_t batchCount = _tensor.count() / inCount;
+
+    for (size_t iBatch = 0; iBatch < batchCount; ++iBatch) {
+      if((result = fft_trait<input_t>::exec(_plan.create(inSize, fft_trait<input_t>::type, _dimension),
+              _tensor.data().data().get() + iBatch * inCount,
+              output.data().data().get() + iBatch * outCount)
+          ) != CUFFT_SUCCESS)
+      {
+        std::cout << result << std::endl;
+        assert(0);
+      }
+    }
+#endif
   }
 
   inline dim_t size() const {

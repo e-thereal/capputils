@@ -11,21 +11,21 @@
 
 #include <tbblas/tensor.hpp>
 #include <tbblas/type_traits.hpp>
+#include <tbblas/context.hpp>
 
 #include <thrust/iterator/constant_iterator.h>
 #include <thrust/iterator/transform_iterator.h>
 #include <thrust/iterator/zip_iterator.h>
-//#include <thrust/transform.h>
+#include <thrust/random.h>
 
 #include <tbblas/detail/for_each.hpp>
 #include <tbblas/detail/system.hpp>
 
 #include <boost/utility/enable_if.hpp>
-
-#include <curand_kernel.h>
 #include <boost/static_assert.hpp>
 
-#include <thrust/random.h>
+#include <curand_kernel.h>
+#include <curand.h>
 
 namespace tbblas {
 
@@ -218,6 +218,148 @@ struct is_expression<random_tensor<T, dim, device, Distribution> > {
   static const bool value = true;
 };
 
+/*** NEW RANDOM TENSOR CODE STARTS HERE ***/
+
+template<class T, unsigned dim, bool device>
+struct random_values {
+  static const unsigned dimCount = dim;
+  static const bool cuda_enabled = device;
+
+  typedef T value_t;
+  typedef typename tensor<value_t, dimCount, cuda_enabled>::dim_t dim_t;
+  typedef typename vector_type<value_t, cuda_enabled>::vector_t data_t;
+
+  typedef typename data_t::const_iterator const_iterator;
+
+  random_values() {
+    resize(seq<dimCount>(0));
+  }
+
+  random_values(dim_t size) {
+    resize(size);
+  }
+
+  void resize(const dim_t& size) {
+    size_t count = 1;
+    for (unsigned i = 0; i < dimCount; ++i) {
+      _size[i] = size[i];
+      count *= size[i];
+    }
+    _values.resize((count + 1) & ~1);   // round up to the nearest even number
+  }
+
+  inline const_iterator begin() const {
+    return _values.begin();
+  }
+
+  inline const_iterator end() const {
+    return _values.begin() + count();
+  }
+
+  inline dim_t size() const {
+    return _size;
+  }
+
+  inline dim_t fullsize() const {
+    return _size;
+  }
+
+  inline size_t count() const {
+    size_t count = 1;
+    for (unsigned i = 0; i < dim; ++i) {
+      count *= _size[i];
+    }
+    return count;
+  }
+
+  inline size_t total_count() const {
+    return _values.size();
+  }
+
+  inline value_t* raw_pointer() {
+    return thrust::raw_pointer_cast(_values.data());
+  }
+
+private:
+  dim_t _size;
+  data_t _values;
+};
+
+template<class T, unsigned dim, bool device>
+struct is_expression<random_values<T, dim, device> > {
+  static const bool value = true;
+};
+
+template<class T, unsigned dim, bool device, class Distribution>
+struct random_tensor2
+{
+  typedef T value_t;
+  static const unsigned dimCount = dim;
+  static const bool cuda_enabled = device;
+  typedef typename tensor<value_t, dimCount, cuda_enabled>::dim_t dim_t;
+  typedef random_values<T, dim, device> data_t;
+
+  random_tensor2(size_t x1 = 1, size_t x2 = 1, size_t x3 = 1, size_t x4 = 1, size_t x5 = 1)
+  {
+    if (cuda_enabled)
+      curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+    else
+      curandCreateGeneratorHost(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+
+    BOOST_STATIC_ASSERT(dimCount < 5);
+
+    size_t input[] = {x1, x2, x3, x4, x5};
+
+    for (unsigned i = 0; i < dimCount; ++i) {
+      _size[i] = input[i];
+    }
+
+    resize(_size);
+    reset(input[dimCount]);
+  }
+
+  random_tensor2(const dim_t& size, unsigned seed = 0) {
+    curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+    resize(size);
+    reset(seed);
+  }
+
+  ~random_tensor2() {
+    curandDestroyGenerator(gen);
+  }
+
+  void resize(const dim_t& size) {
+    _values.resize(size);
+  }
+
+  void resize(const dim_t& size, unsigned seed) {
+    _values.resize(size);
+    reset(seed);
+  }
+
+  void reset(unsigned seed = 0) {
+    curandSetPseudoRandomGeneratorSeed(gen, seed);
+  }
+
+  const data_t& operator()(bool redraw = true) {
+    if (redraw) {
+      if (cuda_enabled)
+        curandSetStream(gen, context::get().stream);
+      Distribution::generate(gen, _values.raw_pointer(), _values.total_count());
+    }
+    return _values;
+  }
+
+  inline dim_t size() const {
+    return _size;
+  }
+
+private:
+  data_t _values;
+  dim_t _size;
+  curandGenerator_t gen;
+};
+
 /*** Distributions ***/
 
 template<class T>
@@ -237,6 +379,10 @@ struct uniform<float> {
     thrust::random::uniform_real_distribution<float> dist;
     return dist(*gen);
   }
+
+  static inline void generate(curandGenerator_t generator, float *outputPtr, size_t num) {
+    curandGenerateUniform(generator, outputPtr, num);
+  }
 };
 
 template<>
@@ -252,6 +398,10 @@ struct uniform<double> {
   static inline double rand(generator_t* gen) {
     thrust::random::uniform_real_distribution<double> dist;
     return dist(*gen);
+  }
+
+  static inline void generate(curandGenerator_t generator, double *outputPtr, size_t num) {
+    curandGenerateUniformDouble(generator, outputPtr, num);
   }
 };
 
@@ -273,6 +423,10 @@ struct normal<float> {
     thrust::random::normal_distribution<float> dist;
     return dist(*gen);
   }
+
+  static inline void generate(curandGenerator_t generator, float *outputPtr, size_t num) {
+    curandGenerateNormal(generator, outputPtr, num, 0.0f, 1.0f);
+  }
 };
 
 template<>
@@ -288,6 +442,10 @@ struct normal<double> {
   static inline double rand(generator_t* gen) {
     thrust::random::normal_distribution<double> dist;
     return dist(*gen);
+  }
+
+  static inline void generate(curandGenerator_t generator, double *outputPtr, size_t num) {
+    curandGenerateNormalDouble(generator, outputPtr, num, 0.0, 1.0);
   }
 };
 

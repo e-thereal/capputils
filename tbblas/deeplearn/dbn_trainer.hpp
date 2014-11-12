@@ -1,17 +1,17 @@
 /*
- * dbn.hpp
+ * dbn_trainer.hpp
  *
  *  Created on: Jul 10, 2014
  *      Author: tombr
  */
 
-#ifndef TBBLAS_DEEPLEARN_DBN_HPP_
-#define TBBLAS_DEEPLEARN_DBN_HPP_
+#ifndef TBBLAS_DEEPLEARN_DBN_TRAINER_HPP_
+#define TBBLAS_DEEPLEARN_DBN_TRAINER_HPP_
 
 #include <tbblas/rearrange.hpp>
 
 #include <tbblas/deeplearn/dbn_model.hpp>
-#include <tbblas/deeplearn/conv_rbm.hpp>
+#include <tbblas/deeplearn/conv_rbm_trainer.hpp>
 #include <tbblas/deeplearn/rbm.hpp>
 
 #include <thrust/execution_policy.h>
@@ -26,7 +26,7 @@ namespace tbblas {
 namespace deeplearn {
 
 template<class T, unsigned dims>
-class dbn {
+class dbn_trainer {
   const static unsigned dimCount = dims;
   typedef T value_t;
   typedef typename tbblas::tensor<value_t, dimCount>::dim_t dim_t;
@@ -40,7 +40,7 @@ class dbn {
   typedef std::vector<boost::shared_ptr<tensor_t> > v_tensor_t;
 
   typedef dbn_model<value_t, dimCount> model_t;
-  typedef conv_rbm<value_t, dimCount> crbm_t;
+  typedef conv_rbm_trainer<value_t, dimCount> crbm_t;
   typedef rbm<value_t> rbm_t;
 
 protected:
@@ -50,7 +50,7 @@ protected:
   std::vector<boost::shared_ptr<rbm_t> > _rbms;
 
 public:
-  dbn(model_t& model, size_t gpu_count = 1) : _model(model) {
+  dbn_trainer(model_t& model, size_t gpu_count = 1) : _model(model) {
     _crbms.resize(model.crbms().size());
     for (size_t i = 0; i < _crbms.size(); ++i) {
       _crbms[i] = boost::make_shared<crbm_t>(boost::ref(*model.crbms()[i]));
@@ -62,10 +62,10 @@ public:
   }
 
 private:
-  dbn(const dbn<T, dims>&);
+  dbn_trainer(const dbn_trainer<T, dims>&);
 
 public:
-  virtual ~dbn() { }
+  virtual ~dbn_trainer() { }
 
   void allocate_gpu_memory() {
     for (size_t i = 0; i < _crbms.size(); ++i)
@@ -217,6 +217,49 @@ public:
     }
   }
 
+  void init_gradient_updates(value_t momentum = 0, value_t weightcost = 0) {
+    for (size_t i = 0; i < _crbms.size(); ++i)
+      _crbms[i]->init_gradient_updates(momentum, weightcost);
+
+    for (size_t i = 0; i < _rbms.size(); ++i)
+      _rbms[i]->init_gradient_updates(momentum, weightcost);
+  }
+
+  void update_positive_gradient(value_t epsilonw, value_t epsilonvb, value_t epsilonhb) {
+    for (size_t i = 0; i < _crbms.size(); ++i)
+      _crbms[i]->update_positive_gradient(epsilonw, epsilonvb, epsilonhb);
+
+    for (size_t i = 0; i < _rbms.size(); ++i)
+      _rbms[i]->update_positive_gradient(epsilonw, epsilonvb, epsilonhb);
+  }
+
+  void update_negative_gradient(value_t epsilonw, value_t epsilonvb, value_t epsilonhb) {
+    for (size_t i = 0; i < _crbms.size(); ++i)
+      _crbms[i]->update_negative_gradient(epsilonw, epsilonvb, epsilonhb);
+
+    for (size_t i = 0; i < _rbms.size(); ++i)
+      _rbms[i]->update_negative_gradient(epsilonw, epsilonvb, epsilonhb);
+  }
+
+  // CAUTION: ONLY USE THIS FUNCTION IF YOU KNOW WHAT YOU ARE DOING
+  // Should probably check, if the model is the same and needs a don't
+  // write to model mechanism
+  void accumulate_gradients(dbn_trainer<value_t, dimCount>& dbn) {
+    for (size_t i = 0; i < _crbms.size(); ++i)
+      _crbms[i]->accumulate_gradients(*dbn._crbms[i]);
+
+    for (size_t i = 0; i < _rbms.size(); ++i)
+      _rbms[i]->accumulate_gradients(*dbn._rbms[i]);
+  }
+
+  void apply_gradient() {
+    for (size_t i = 0; i < _crbms.size(); ++i)
+      _crbms[i]->apply_gradient();
+
+    for (size_t i = 0; i < _rbms.size(); ++i)
+      _rbms[i]->apply_gradient();
+  }
+
   void set_batch_length(int layer, int length) {
     if (layer < _crbms.size())
       _crbms[layer]->set_batch_length(length);
@@ -276,4 +319,4 @@ public:
 
 }
 
-#endif /* TBBLAS_DEEPLEARN_DBN_HPP_ */
+#endif /* TBBLAS_DEEPLEARN_DBN_TRAINER_HPP_ */
