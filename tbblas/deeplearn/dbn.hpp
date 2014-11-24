@@ -90,6 +90,7 @@ public:
     }
   }
 
+  // if it has a pooling layer, do it from the pooling layer
   void infer_visibles(int topLayer = -1, bool onlyFilters = false) {
     if (topLayer == -1)
       topLayer = _crbms.size() + _rbms.size();
@@ -106,16 +107,32 @@ public:
 
     // Transition from convolutional model to dense model
     if (_crbms.size() && _rbms.size() && topLayer > _crbms.size()) {
-      _crbms[_crbms.size() - 1]->allocate_hiddens();
-      thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream),
-          _rbms[0]->visibles().begin(), _rbms[0]->visibles().end(), _crbms[_crbms.size() - 1]->hiddens().begin());
+      if (_model.crbms()[_crbms.size() - 1]->pooling_method() == pooling_method::NoPooling) {
+        _crbms[_crbms.size() - 1]->allocate_hiddens();
+        thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream),
+            _rbms[0]->visibles().begin(), _rbms[0]->visibles().end(), _crbms[_crbms.size() - 1]->hiddens().begin());
+      } else {
+        _crbms[_crbms.size() - 1]->allocate_pooled_units();
+        thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream),
+            _rbms[0]->visibles().begin(), _rbms[0]->visibles().end(), _crbms[_crbms.size() - 1]->pooled_units().begin());
+      }
     }
 
     for (int i = std::min(topLayer, (int)_crbms.size()) - 1; i >= 0; --i) {
+      if (_model.crbms()[i]->pooling_method() != pooling_method::NoPooling) {
+        _crbms[i]->unpool_hiddens();
+      }
+
       _crbms[i]->infer_visibles(onlyFilters);
       if (i > 0) {
-        _crbms[i - 1]->allocate_hiddens();
-        _crbms[i - 1]->hiddens() = rearrange_r(_crbms[i]->visibles(), _model.stride_size(i));
+        if (_model.crbms()[i - 1]->pooling_method() == pooling_method::NoPooling) {
+          _crbms[i - 1]->allocate_hiddens();
+          _crbms[i - 1]->hiddens() = rearrange_r(_crbms[i]->visibles(), _model.stride_size(i));
+        } else {
+          _crbms[i - 1]->allocate_pooled_units();
+          _crbms[i - 1]->pooled_units() = rearrange_r(_crbms[i]->visibles(), _model.stride_size(i));
+
+        }
       }
     }
   }
@@ -133,17 +150,28 @@ public:
     // bottom-up inference
     for (size_t i = 0; i < _crbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
       _crbms[i]->infer_hiddens();
+      if (_model.crbms()[i]->pooling_method() != pooling_method::NoPooling)
+        _crbms[i]->pool_hiddens();
+
       if (i + 1 < _crbms.size()) {
-        _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), _model.stride_size(i + 1));
+        if (_model.crbms()[i]->pooling_method() != pooling_method::NoPooling)
+          _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), _model.stride_size(i + 1));
+        else
+          _crbms[i + 1]->visibles() = rearrange(_crbms[i]->pooled_units(), _model.stride_size(i + 1));
       }
     }
 
     // Transition from convolutional model to dense model
     if (_crbms.size() && _rbms.size() && maxLayer > _crbms.size()) {
-      _rbms[0]->visibles().resize(seq(1, (int)_crbms[_crbms.size() - 1]->hiddens().count()));
-
-      thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream), _crbms[_crbms.size() - 1]->hiddens().begin(),
-          _crbms[_crbms.size() - 1]->hiddens().end(), _rbms[0]->visibles().begin());
+      if (_model.crbms()[_crbms.size() - 1]->pooling_method() == pooling_method::NoPooling) {
+        _rbms[0]->visibles().resize(seq(1, (int)_crbms[_crbms.size() - 1]->hiddens().count()));
+        thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream), _crbms[_crbms.size() - 1]->hiddens().begin(),
+            _crbms[_crbms.size() - 1]->hiddens().end(), _rbms[0]->visibles().begin());
+      } else {
+        _rbms[0]->visibles().resize(seq(1, (int)_crbms[_crbms.size() - 1]->pooled_units().count()));
+        thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream), _crbms[_crbms.size() - 1]->pooled_units().begin(),
+            _crbms[_crbms.size() - 1]->pooled_units().end(), _rbms[0]->visibles().begin());
+      }
     }
 
     for (size_t i = 0; i < _rbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
@@ -170,16 +198,31 @@ public:
 
     // Transition from convolutional model to dense model
     if (_crbms.size() && _rbms.size() && topLayer > _crbms.size()) {
-      _crbms[_crbms.size() - 1]->allocate_hiddens();
-      thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream),
-          _rbms[0]->visibles().begin(), _rbms[0]->visibles().end(), _crbms[_crbms.size() - 1]->hiddens().begin());
+
+      if (_model.crbms()[_crbms.size() - 1]->pooling_method() == pooling_method::NoPooling) {
+        _crbms[_crbms.size() - 1]->allocate_hiddens();
+        thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream),
+            _rbms[0]->visibles().begin(), _rbms[0]->visibles().end(), _crbms[_crbms.size() - 1]->hiddens().begin());
+      } else {
+        _crbms[_crbms.size() - 1]->allocate_pooled_units();
+        thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream),
+            _rbms[0]->visibles().begin(), _rbms[0]->visibles().end(), _crbms[_crbms.size() - 1]->pooled_units().begin());
+      }
     }
 
     for (int i = std::min(topLayer, (int)_crbms.size()) - 1; i >= 0; --i) {
+      if (_model.crbms()[i]->pooling_method() != pooling_method::NoPooling)
+        _crbms[i]->unpool_hiddens();
+
       _crbms[i]->sample_visibles();
       if (i > 0) {
-        _crbms[i - 1]->allocate_hiddens();
-        _crbms[i - 1]->hiddens() = rearrange_r(_crbms[i]->visibles(), _model.stride_size(i));
+        if (_model.crbms[i]->pooling_method() == pooling_method::NoPooling) {
+          _crbms[i - 1]->allocate_hiddens();
+          _crbms[i - 1]->hiddens() = rearrange_r(_crbms[i]->visibles(), _model.stride_size(i));
+        } else {
+          _crbms[i - 1]->allocate_pooled_units();
+          _crbms[i - 1]->pooled_units() = rearrange_r(_crbms[i]->visibles(), _model.stride_size(i));
+        }
       }
     }
   }
@@ -196,17 +239,29 @@ public:
     // bottom-up inference
     for (size_t i = 0; i < _crbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
       _crbms[i]->sample_hiddens();
+      if (_model.crbms()[i]->pooling_method() != pooling_method::NoPooling)
+        _crbms[i]->pool_hiddens();
+
       if (i + 1 < _crbms.size()) {
-        _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), _model.stride_size(i + 1));
+        if (_model.crbms()[i]->pooling_method() == pooling_method::NoPooling) {
+          _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), _model.stride_size(i + 1));
+        } else {
+          _crbms[i + 1]->visibles() = rearrange(_crbms[i]->pooled_units(), _model.stride_size(i + 1));
+        }
       }
     }
 
     // Transition from convolutional model to dense model
     if (_crbms.size() && _rbms.size() && maxLayer > _crbms.size()) {
-      _rbms[0]->visibles().resize(seq(1, (int)_crbms[_crbms.size() - 1]->hiddens().count()));
-
-      thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream), _crbms[_crbms.size() - 1]->hiddens().begin(),
-          _crbms[_crbms.size() - 1]->hiddens().end(), _rbms[0]->visibles().begin());
+      if (_model.crbms()[_crbms.size() - 1]->pooling_method() == pooling_method::NoPooling) {
+        _rbms[0]->visibles().resize(seq(1, (int)_crbms[_crbms.size() - 1]->hiddens().count()));
+        thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream), _crbms[_crbms.size() - 1]->hiddens().begin(),
+            _crbms[_crbms.size() - 1]->hiddens().end(), _rbms[0]->visibles().begin());
+      } else {
+        _rbms[0]->visibles().resize(seq(1, (int)_crbms[_crbms.size() - 1]->pooled_units().count()));
+        thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream), _crbms[_crbms.size() - 1]->pooled_units().begin(),
+            _crbms[_crbms.size() - 1]->pooled_units().end(), _rbms[0]->visibles().begin());
+      }
     }
 
     for (size_t i = 0; i < _rbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
@@ -250,6 +305,29 @@ public:
       layer = _crbms.size() - 1;
     if (layer >= 0 && layer < _crbms.size())
       return _crbms[layer]->hiddens();
+
+    throw std::runtime_error("The given layer is not part of the DBN!");
+  }
+
+  tensor_t& cpooled_units(int layer = -1) {
+    if (layer == -1)
+      layer = _crbms.size() - 1;
+    if (layer >= 0 && layer < _crbms.size())
+      return _crbms[layer]->pooled_units();
+
+    throw std::runtime_error("The given layer is not part of the DBN!");
+  }
+
+  tensor_t& coutput(int layer = -1) {
+    if (layer == -1)
+      layer = _crbms.size() - 1;
+    if (layer >= 0 && layer < _crbms.size()) {
+      if (_model.crbms()[layer]->pooling_method() == pooling_method::NoPooling) {
+        return _crbms[layer]->hiddens();
+      } else {
+        return _crbms[layer]->pooled_units();
+      }
+    }
 
     throw std::runtime_error("The given layer is not part of the DBN!");
   }

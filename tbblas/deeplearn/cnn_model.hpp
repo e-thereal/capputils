@@ -103,4 +103,4 @@ public:
 
 }
 
-#endif /* TBBLAS_DEEPLEARN_DBN_MODEL_HPP_ */
+#endif /* TBBLAS_DEEPLEARN_CNN_MODEL_HPP_ */

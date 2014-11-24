@@ -86,22 +86,21 @@ struct proxy {
   typedef iterator const_iterator;
 
   proxy(Tensor& tensor)
-   : _data(tensor.shared_data()), _size(tensor.size()), _fullsize(tensor.fullsize()), _pitch(tensor.size()), _flipped(tbblas::seq<dimCount>(false)), _stride(tbblas::seq<dimCount>(1))
+   : _data(tensor.shared_data()), _size(tensor.size()), _fullsize(tensor.fullsize()), _pitch(tensor.size()), _stride(tbblas::seq<dimCount>(1)), _flipped(tbblas::seq<dimCount>(false))
   {
     for (unsigned i = 0; i < dimCount; ++i)
       _order[i] = i;
   }
 
   proxy(Tensor& tensor, const dim_t& size)
-   : _data(tensor.shared_data()), _size(size), _fullsize(size), _pitch(size), _flipped(false), _stride(tbblas::seq<dimCount>(1))
+   : _data(tensor.shared_data()), _size(size), _fullsize(size), _pitch(size), _stride(tbblas::seq<dimCount>(1)), _flipped(false)
   {
     for (unsigned i = 0; i < dimCount; ++i)
       _order[i] = i;
   }
 
-  proxy(Tensor& tensor, const sequence<unsigned, dimCount>& start,
-      const sequence<unsigned, dimCount>& size)
-   : _data(tensor.shared_data()), _start(start), _size(size), _fullsize(size), _pitch(tensor.size()), _flipped(tbblas::seq<dimCount>(false)), _stride(tbblas::seq<dimCount>(1))
+  proxy(Tensor& tensor, const dim_t& start, const dim_t& size)
+   : _data(tensor.shared_data()), _start(start), _size(size), _fullsize(size), _pitch(tensor.size()), _stride(tbblas::seq<dimCount>(1)), _flipped(tbblas::seq<dimCount>(false))
   {
     for (unsigned i = 0; i < dimCount; ++i) {
       assert(_start[i] + _size[i] <= _pitch[i]);
@@ -109,13 +108,11 @@ struct proxy {
     }
   }
 
-  proxy(Tensor& tensor, const sequence<unsigned, dimCount>& start,
-      const sequence<unsigned, dimCount>& stride,
-      const sequence<unsigned, dimCount>& size)
-   : _data(tensor.shared_data()), _start(start), _size(size / stride), _fullsize(size / stride), _pitch(tensor.size()), _flipped(tbblas::seq<dimCount>(false)), _stride(stride)
+  proxy(Tensor& tensor, const dim_t& start, const dim_t& stride, const dim_t& size)
+   : _data(tensor.shared_data()), _start(start), _size((size + stride - 1) / stride), _fullsize(size / stride), _pitch(tensor.size()), _stride(stride), _flipped(tbblas::seq<dimCount>(false))
   {
     for (unsigned i = 0; i < dimCount; ++i) {
-      assert(_start[i] + _size[i] * _stride[i] - _stride[i] <= _pitch[i] - 1);
+      assert(_start[i] + _size[i] * _stride[i] - _stride[i] < _pitch[i]);
       _order[i] = i;
     }
   }

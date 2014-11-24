@@ -223,6 +223,17 @@ public:
     return pooled_size().prod();
   }
 
+  dim_t output_size() const {
+    if (_pooling_method == tbblas::deeplearn::pooling_method::NoPooling)
+      return hiddens_size();
+    else
+      return pooled_size();
+  }
+
+  size_t output_count() const {
+    return output_size().prod();
+  }
+
   void set_convolution_type(const tbblas::deeplearn::convolution_type& type) {
     _convolutionType = type;
   }

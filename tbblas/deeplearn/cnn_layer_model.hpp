@@ -159,7 +159,7 @@ public:
   }
 
   dim_t hiddens_size() const {
-    dim_t hidden_size = visible_bias().size();
+    dim_t hidden_size = visibles_size();
     if (convolution_type() == convolution_type::Valid){
       hidden_size = hidden_size - kernel_size() + 1;
     }

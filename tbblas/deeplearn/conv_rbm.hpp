@@ -292,6 +292,10 @@ public:
       _pooled = _hiddens;
       break;
 
+    case pooling_method::StridePooling:
+      _pooled = _hiddens[seq<dimCount>(0), model.pooling_size(), _hiddens.size()];
+      break;
+
     default:
       throw std::runtime_error("Unsupported pooling method.");
     }
@@ -301,6 +305,11 @@ public:
     switch (model.pooling_method()) {
     case pooling_method::NoPooling:
       _hiddens = _pooled;
+      break;
+
+    case pooling_method::StridePooling:
+      allocate_hiddens();
+      _hiddens[seq<dimCount>(0), model.pooling_size(), _hiddens.size()] = _pooled;
       break;
 
     default:
@@ -519,6 +528,7 @@ private:
 
     tensor_t& v_mask = *(v_v_mask[tid] = boost::make_shared<tensor_t>());
     tensor_t& h_mask = *(v_h_mask[tid] = boost::make_shared<tensor_t>());
+
     v_mask = zeros<value_t>(layer_size);
     v_mask[seq<dimCount>(0), model.mask().size()] = model.mask();
 

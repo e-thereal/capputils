@@ -71,7 +71,7 @@ public:
     if (layer == 0)
       return _crbms[0]->stride_size();
 
-    dim_t block = _crbms[layer - 1]->hiddens_size() / _crbms[layer]->visibles_size();
+    dim_t block = _crbms[layer - 1]->pooled_size() / _crbms[layer]->visibles_size();
     block[dimCount - 1] = 1;
     if (_crbms[layer]->version() >= 1 && block != _crbms[layer]->stride_size()) {
       throw std::runtime_error("Stride size does not match calculated stride size.");

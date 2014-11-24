@@ -112,7 +112,7 @@ public:
     visible_layer_size = visible_size;
     layer_size = filter_batch_size = layer_batch_size = size;
     hidden_layer_size = hidden_layer_batch_size = hidden_size;
-    hidden_layer_size = visible_layer_size[dimCount - 1] = layer_size[dimCount - 1] = 1;
+    hidden_layer_size[dimCount - 1] = visible_layer_size[dimCount - 1] = layer_size[dimCount - 1] = 1;
     filter_batch_size[dimCount - 1] = size[dimCount - 1] * _filter_batch_length;
     layer_batch_size[dimCount - 1] = _filter_batch_length;
     hidden_layer_batch_size = hidden_layer_size * seq(1,1,1,_filter_batch_length);
