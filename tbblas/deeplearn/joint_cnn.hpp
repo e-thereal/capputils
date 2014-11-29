@@ -23,7 +23,7 @@ namespace tbblas {
 namespace deeplearn {
 
 template<class T, unsigned dims>
-class cnn {
+class joint_cnn {
   const static unsigned dimCount = dims;
   typedef T value_t;
   typedef typename tbblas::tensor<value_t, dimCount>::dim_t dim_t;
@@ -50,7 +50,7 @@ protected:
   v_nn_layer_t _left_nn_layers, _right_nn_layers, _joint_nn_layers;
 
 public:
-  cnn(model_t& model) : _model(model) {
+  joint_cnn(model_t& model) : _model(model) {
     if (model.left_cnn_layers().size() == 0 || model.left_nn_layers().size() == 0 ||
         model.right_cnn_layers().size() == 0 || model.right_nn_layers().size() == 0 ||
         model.joint_nn_layers().size() == 0)
@@ -85,7 +85,7 @@ public:
   }
 
 private:
-  cnn(const cnn<T, dims>&);
+  joint_cnn(const joint_cnn<T, dims>&);
 
 public:
   void normalize_visibles() {
@@ -144,7 +144,7 @@ public:
         (int)_right_nn_layers[_right_nn_layers.size() - 1]->hiddens().count()));
 
     _joint_nn_layers[0]->visibles()[seq(0,0), _left_nn_layers[_left_nn_layers.size() - 1]->hiddens().size()] = _left_nn_layers[_left_nn_layers.size() - 1]->hiddens();
-    _joint_nn_layers[0]->visibles()[seq(0, _left_nn_layers[_left_nn_layers.size() - 1]->hiddens().count()), _right_nn_layers[_right_nn_layers.size() - 1]->hiddens().size()] = _right_nn_layers[_right_nn_layers.size() - 1]->hiddens();
+    _joint_nn_layers[0]->visibles()[seq(0, (int)_left_nn_layers[_left_nn_layers.size() - 1]->hiddens().count()), _right_nn_layers[_right_nn_layers.size() - 1]->hiddens().size()] = _right_nn_layers[_right_nn_layers.size() - 1]->hiddens();
 
 
     for (size_t i = 0; i < _joint_nn_layers.size(); ++i) {
@@ -168,8 +168,6 @@ public:
     for (size_t i = 0; i < _joint_nn_layers.size(); ++i)
       _joint_nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
   }
-
-  // TODO: implement this
 
   // requires the hidden units to be inferred
   void update_gradient(matrix_t& target, value_t epsilon1, value_t epsilon2) {
@@ -221,7 +219,7 @@ public:
     /* Back prop right pathway */
 
     _right_nn_layers[_right_nn_layers.size() - 1]->backprop_hidden_deltas(
-        _joint_nn_layers[0]->visible_deltas()[seq(0,_left_nn_layers[_left_nn_layers.size() - 1]->hiddens().count()), _right_nn_layers[_right_nn_layers.size() - 1]->hiddens().size()]);
+        _joint_nn_layers[0]->visible_deltas()[seq(0, (int)_left_nn_layers[_left_nn_layers.size() - 1]->hiddens().count()), _right_nn_layers[_right_nn_layers.size() - 1]->hiddens().size()]);
     _right_nn_layers[_right_nn_layers.size() - 1]->update_gradient(epsilon2);
 
     // Perform back propagation
@@ -284,7 +282,7 @@ public:
   }
 
   matrix_t& hiddens() {
-    return _joint_nn_layers[_nn_layers.size() - 1]->hiddens();
+    return _joint_nn_layers[_joint_nn_layers.size() - 1]->hiddens();
   }
 };
 

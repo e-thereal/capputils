@@ -361,15 +361,15 @@ public:
     return 0;
   }
 
-  void init_gradient_updates(value_t epsilon, value_t momentum, value_t weightcost) {
-    for (size_t k = 0; k < cF.size(); ++k) {
-      *cFinc[k] = momentum * *cFinc[k] + epsilon * weightcost * *cF[k];
-      *cbinc[k] = momentum * *cbinc[k];
-    }
-  }
+//  void init_gradient_updates(value_t epsilon, value_t momentum, value_t weightcost) {
+//    for (size_t k = 0; k < cF.size(); ++k) {
+//      *cFinc[k] = momentum * *cFinc[k] + epsilon * weightcost * *cF[k];
+//      *cbinc[k] = momentum * *cbinc[k];
+//    }
+//  }
 
   /// Requires hidden deltas and visibles
-  void update_gradient(value_t epsilon) {
+  void update_gradient() {
     if (!_memory_allocated)
       allocate_gpu_memory();
 
@@ -381,12 +381,12 @@ public:
       h[hidden_topleft, hidden_layer_batch_size] = dH[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
       ch = fft(h, dimCount - 1, plan_h);
 
-      *cFinc[k] += conj_repeat_mult(cv, ch, epsilon / _voxel_count);
-      *cbinc[k] = *cbinc[k] + epsilon / model.visibles_size()[dimCount - 1] * tbblas::mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * ch;
+      *cFinc[k] += conj_repeat_mult(cv, ch, value_t(1) / _voxel_count);
+      *cbinc[k] = *cbinc[k] + value_t(1) / model.visibles_size()[dimCount - 1] * tbblas::mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * ch;
     }
   }
 
-  void apply_gradient() {
+  void perform_momentum_step(value_t epsilon, value_t momentum, value_t weightcost) {
     dim_t fullsize = cv.fullsize();
 
     for (size_t k = 0; k < cF.size(); ++k) {
@@ -400,8 +400,11 @@ public:
         (*cFinc[k])[seq(0,0,0,j*cv.size()[3]), cv.size()] = cv;
       }
 
-      *cF[k] = *cF[k] - *cFinc[k];
-      *cb[k] = *cb[k] - *cbinc[k];
+      *cF[k] = *cF[k] - epsilon * *cFinc[k];
+      *cb[k] = *cb[k] - epsilon * *cbinc[k];
+
+      *cFinc[k] = momentum * *cFinc[k] + weightcost * *cF[k];
+      *cbinc[k] = momentum * *cbinc[k];
     }
 
     _host_updated = false;

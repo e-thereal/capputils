@@ -319,7 +319,10 @@ struct random_tensor2
   }
 
   random_tensor2(const dim_t& size, unsigned seed = 0) {
-    curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+    if (cuda_enabled)
+      curandCreateGenerator(&gen, CURAND_RNG_PSEUDO_DEFAULT);
+    else
+      curandCreateGeneratorHost(&gen, CURAND_RNG_PSEUDO_DEFAULT);
     resize(size);
     reset(seed);
   }

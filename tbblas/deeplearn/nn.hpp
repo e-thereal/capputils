@@ -57,31 +57,31 @@ public:
     }
   }
 
-  void init_gradient_updates(value_t epsilon, value_t momentum, value_t weightcost) {
-    for (size_t i = 0; i < _layers.size(); ++i)
-      _layers[i]->init_gradient_updates(epsilon, momentum, weightcost);
-  }
+//  void init_gradient_updates(value_t epsilon, value_t momentum, value_t weightcost) {
+//    for (size_t i = 0; i < _layers.size(); ++i)
+//      _layers[i]->init_gradient_updates(epsilon, momentum, weightcost);
+//  }
 
   // requires the hidden units to be inferred
-  void update_gradient(matrix_t& target, value_t epsilon) {
+  void update_gradient(matrix_t& target) {
     _layers[_layers.size() - 1]->calculate_deltas(target);
-    _layers[_layers.size() - 1]->update_gradient(epsilon);
+    _layers[_layers.size() - 1]->update_gradient();
 
     // Perform back propagation
     for (int i = _layers.size() - 2; i >= 0; --i) {
       _layers[i + 1]->backprop_visible_deltas();
       _layers[i]->backprop_hidden_deltas(_layers[i + 1]->visible_deltas());
-      _layers[i]->update_gradient(epsilon);
+      _layers[i]->update_gradient();
     }
   }
 
-  void apply_gradient() {
+  void momentum_step(value_t epsilon, value_t momentum, value_t weightcost) {
     for (size_t i = 0; i < _layers.size(); ++i)
-      _layers[i]->apply_gradient();
+      _layers[i]->momentum_step(epsilon, momentum, weightcost);
   }
 
   // requires the hidden units to be inferred
-  void update_model(matrix_t& target, value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
+  void momentum_update(matrix_t& target, value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
     _layers[_layers.size() - 1]->calculate_deltas(target);
 
     // Perform back propagation
@@ -91,9 +91,31 @@ public:
     }
 
     // Update gradients
-    _layers[_layers.size() - 1]->update_model(epsilon, momentum, weightcost);
+    _layers[_layers.size() - 1]->momentum_update(epsilon, momentum, weightcost);
     for (int i = _layers.size() - 2; i >= 0; --i) {
-      _layers[i]->update_model(epsilon, momentum, weightcost);
+      _layers[i]->momentum_update(epsilon, momentum, weightcost);
+    }
+  }
+
+  void adadelta_step(value_t epsilon, value_t momentum, value_t weightcost) {
+    for (size_t i = 0; i < _layers.size(); ++i)
+      _layers[i]->adadelta_step(epsilon, momentum, weightcost);
+  }
+
+  // requires the hidden units to be inferred
+  void adadelta_update(matrix_t& target, value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
+    _layers[_layers.size() - 1]->calculate_deltas(target);
+
+    // Perform back propagation
+    for (int i = _layers.size() - 2; i >= 0; --i) {
+      _layers[i + 1]->backprop_visible_deltas();
+      _layers[i]->backprop_hidden_deltas(_layers[i + 1]->visible_deltas());
+    }
+
+    // Update gradients
+    _layers[_layers.size() - 1]->adadelta_update(epsilon, momentum, weightcost);
+    for (int i = _layers.size() - 2; i >= 0; --i) {
+      _layers[i]->adadelta_update(epsilon, momentum, weightcost);
     }
   }
 

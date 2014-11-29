@@ -48,6 +48,7 @@ protected:
 
   // weights and bias terms in GPU memory
   matrix_t W, b, dW, db, mean, stddev;
+  matrix_t dW2, db2, deltaW2, deltab2;
 
   // visible and hidden units in GPU memory
   matrix_t V, H, dV, dH;
@@ -55,11 +56,12 @@ protected:
   matrix_t prods, hidact, hidnorm;
 
   bool _memory_allocated, _host_updated;
+  value_t _current_batch_size;
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
   nn_layer(model_t& model) : model(model),
-    _memory_allocated(false), _host_updated(true)
+    _memory_allocated(false), _host_updated(true), _current_batch_size(0)
   { }
 
 private:
@@ -86,8 +88,8 @@ public:
     mean = model.mean();
     stddev = model.stddev();
 
-    dW = zeros<value_t>(W.size());
-    db = zeros<value_t>(b.size());
+    deltaW2 = dW2 = dW = zeros<value_t>(W.size());
+    deltab2 = db2 = db = zeros<value_t>(b.size());
   }
 
   void write_model_to_host() {
@@ -189,15 +191,15 @@ public:
     return 0;
   }
 
-  void init_gradient_updates(value_t epsilon, value_t momentum, value_t weightcost) {
-    if (!_memory_allocated)
-      allocate_gpu_memory();
+//  void init_gradient_updates(value_t epsilon, value_t momentum, value_t weightcost) {
+//    if (!_memory_allocated)
+//      allocate_gpu_memory();
+//
+//    dW = momentum * dW + weightcost * epsilon * W;
+//    db = momentum * db;
+//  }
 
-    dW = momentum * dW + weightcost * epsilon * W;
-    db = momentum * db;
-  }
-
-  void update_gradient(value_t epsilon) {
+  void update_gradient() {
     if (!_memory_allocated)
       allocate_gpu_memory();
 
@@ -207,25 +209,60 @@ public:
     // Calculate the total activation of the hidden and visible units
     hidact = sum(dH, 0);
 
-    dW += epsilon * prods / V.size()[0];
-    db += epsilon * hidact / V.size()[0];
+    dW += prods / V.size()[0];
+    db += hidact / V.size()[0];
+
+    ++_current_batch_size;
   }
 
-  void apply_gradient() {
+  void momentum_step(value_t epsilon, value_t momentum, value_t weightcost) {
     if (!_memory_allocated)
       allocate_gpu_memory();
 
-    W = W - dW;
-    b = b - db;
+    if (_current_batch_size) {
+      deltaW2 = momentum * deltaW2 + dW / _current_batch_size + weightcost * W;
+      deltab2 = momentum * deltab2 + db / _current_batch_size;
+
+      W = W - epsilon * deltaW2;
+      b = b - epsilon * deltab2;
+
+      dW = zeros<value_t>(dW.size());
+      db = zeros<value_t>(db.size());
+    }
+
+    _current_batch_size = 0;
+
+    _host_updated = false;
+  }
+
+  void adadelta_step(value_t epsilon, value_t momentum, value_t weightcost) {
+    if (_current_batch_size) {
+      dW = dW / _current_batch_size + weightcost * W;
+      db = db / _current_batch_size;
+
+      dW2 = momentum * dW2 + (1.0 - momentum) * dW * dW;
+      db2 = momentum * db2 + (1.0 - momentum) * db * db;
+
+      // note that deltaW = - sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW;
+      W = W - sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW;
+      b = b - sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * db;
+
+      deltaW2 = momentum * deltaW2 + (1.0 - momentum) * sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW * sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW;
+      deltab2 = momentum * deltab2 + (1.0 - momentum) * sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * db * sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * db;
+
+      dW = zeros<value_t>(dW.size());
+      db = zeros<value_t>(db.size());
+    }
+
+    _current_batch_size = 0;
 
     _host_updated = false;
   }
 
   /// Requires hidden deltas and visibles
-  void update_model(value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
-    init_gradient_updates(epsilon, momentum, weightcost);
-    update_gradient(epsilon);
-    apply_gradient();
+  void momentum_update(value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
+    update_gradient();
+    momentum_step(epsilon, momentum, weightcost);
 
 //    // (x_n)(mu_n)'
 //    prods = tbblas::prod(trans(V), dH);
@@ -242,6 +279,11 @@ public:
 //    _host_updated = false;
   }
 
+  void adadelta_update(value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
+    update_gradient();
+    adadelta_step(epsilon, momentum, weightcost);
+  }
+
   // Access to model data
   matrix_t& visibles() {
     if (!_memory_allocated)
@@ -255,7 +297,8 @@ public:
     return H;
   }
 
-  const matrix_t& visible_deltas() {
+  // Don't change the return value.
+  matrix_t& visible_deltas() {
     if (!_memory_allocated)
       allocate_gpu_memory();
     return dV;

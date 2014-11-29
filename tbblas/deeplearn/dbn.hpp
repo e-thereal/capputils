@@ -154,7 +154,7 @@ public:
         _crbms[i]->pool_hiddens();
 
       if (i + 1 < _crbms.size()) {
-        if (_model.crbms()[i]->pooling_method() != pooling_method::NoPooling)
+        if (_model.crbms()[i]->pooling_method() == pooling_method::NoPooling)
           _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), _model.stride_size(i + 1));
         else
           _crbms[i + 1]->visibles() = rearrange(_crbms[i]->pooled_units(), _model.stride_size(i + 1));

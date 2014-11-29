@@ -679,7 +679,8 @@ private:
     for (size_t k = tid; k < cF.size(); k += _gpu_count) {
       h = zeros<value_t>(layer_batch_size);
       h[hidden_topleft, hidden_layer_batch_size] = _hiddens[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
-      h = h * repeat(h_mask, h.size() / h_mask.size());
+      if (!onlyFilters)
+        h = h * repeat(h_mask, h.size() / h_mask.size());
       ch = fft(h, dimCount - 1, plan_h);
       cv += repeat_mult_sum(ch, *cF[k]);
     }

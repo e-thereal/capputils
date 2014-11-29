@@ -281,7 +281,7 @@ public:
     return data()[idx];
   }
 
-  // returning const proxy in order to avoid copy contructors when assigning values to returned proxy
+  // returning const proxy in order to avoid copy constructors when assigning values to returned proxy
   const proxy<tensor_t> operator[](const std::pair<sequence<unsigned, dim>, sequence<unsigned, dim> >& pair) {
     return subrange(*this, pair.first, pair.second);
   }

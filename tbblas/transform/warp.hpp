@@ -21,10 +21,10 @@ namespace transform {
 //       the tensor to the array. Need to measure how much this impacts the performance
 
 template<class T>
-void warp(tensor<T, 3, true>& input, const typename tensor<T, 3, true>::dim_t& voxel_size, tensor<T, 4, true>& deformation, tensor<T, 3, true>& output);
+void warp(tensor<T, 3, true>& input, const sequence<T, 3>& voxel_size, tensor<T, 4, true>& deformation, tensor<T, 3, true>& output);
 
 template<>
-void warp(tensor<float, 3, true>& input, const tensor<float, 3, true>::dim_t& voxel_size, tensor<float, 4, true>& deformation, tensor<float, 3, true>& output);
+void warp(tensor<float, 3, true>& input, const sequence<float, 3>& voxel_size, tensor<float, 4, true>& deformation, tensor<float, 3, true>& output);
 
 template<class Tensor, class Deformation>
 struct warp_operation {
@@ -36,7 +36,7 @@ struct warp_operation {
   typedef Tensor tensor_t;
   typedef Deformation deformation_t;
 
-  warp_operation(Tensor& tensor, Deformation& deformation, const dim_t& voxel_size)
+  warp_operation(Tensor& tensor, Deformation& deformation, const sequence<value_t, dimCount>& voxel_size)
    : _tensor(tensor), _deformation(deformation), _size(tensor.size()), _fullsize(tensor.fullsize()), _voxel_size(voxel_size)
   { }
 
@@ -55,7 +55,8 @@ struct warp_operation {
 private:
   Tensor& _tensor;
   Deformation& _deformation;
-  dim_t _size, _fullsize, _voxel_size;
+  dim_t _size, _fullsize;
+  sequence<value_t, dimCount> _voxel_size;
 };
 
 }
@@ -75,7 +76,7 @@ typename boost::enable_if<is_tensor<Tensor>,
       >::type
     >::type
 >::type
-warp(Tensor& tensor, Deformation& deformation, const typename Tensor::dim_t& voxel_size) {
+warp(Tensor& tensor, Deformation& deformation, const sequence<typename Tensor::value_t, Tensor::dimCount>& voxel_size) {
   for (unsigned i = 0; i < Tensor::dimCount; ++i)
     assert(deformation.size()[i] == tensor.size()[i]);
   assert(deformation.size()[Tensor::dimCount] == Tensor::dimCount);

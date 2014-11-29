@@ -96,15 +96,15 @@ public:
     }
   }
 
-  void init_gradient_updates(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
-    for (size_t i = 0; i < _cnn_layers.size(); ++i)
-      _cnn_layers[i]->init_gradient_updates(epsilon1, momentum, weightcost);
-    for (size_t i = 0; i < _nn_layers.size(); ++i)
-      _nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
-  }
+//  void init_gradient_updates(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
+//    for (size_t i = 0; i < _cnn_layers.size(); ++i)
+//      _cnn_layers[i]->init_gradient_updates(epsilon1, momentum, weightcost);
+//    for (size_t i = 0; i < _nn_layers.size(); ++i)
+//      _nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
+//  }
 
   // requires the hidden units to be inferred
-  void update_gradient(matrix_t& target, value_t epsilon1, value_t epsilon2) {
+  void update_gradient(matrix_t& target) {
     _nn_layers[_nn_layers.size() - 1]->calculate_deltas(target);
     _nn_layers[_nn_layers.size() - 1]->update_gradient(epsilon2);
 
@@ -112,7 +112,7 @@ public:
     for (int i = _nn_layers.size() - 2; i >= 0; --i) {
       _nn_layers[i + 1]->backprop_visible_deltas();
       _nn_layers[i]->backprop_hidden_deltas(_nn_layers[i + 1]->visible_deltas());
-      _nn_layers[i]->update_gradient(epsilon2);
+      _nn_layers[i]->update_gradient();
     }
 
     const size_t clast = _cnn_layers.size() - 1;
@@ -120,22 +120,23 @@ public:
     _cnn_layers[clast]->backprop_hidden_deltas(reshape(
         _nn_layers[0]->visible_deltas(),
         _model.cnn_layers()[clast]->hiddens_size()));
-    _cnn_layers[clast]->update_gradient(epsilon1);
+    _cnn_layers[clast]->update_gradient();
 
     for (int i = _cnn_layers.size() - 2; i >= 0; --i) {
       _cnn_layers[i + 1]->backprop_visible_deltas();
       _cnn_layers[i]->backprop_hidden_deltas(rearrange_r(
           _cnn_layers[i + 1]->visible_deltas(),
           _model.cnn_layers()[i + 1]->stride_size()));
-      _cnn_layers[i]->update_gradient(epsilon1);
+      _cnn_layers[i]->update_gradient();
     }
   }
 
-  void apply_gradient() {
+  void perform_momentum_step(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
     for (size_t i = 0; i < _cnn_layers.size(); ++i)
-      _cnn_layers[i]->apply_gradient();
+      _cnn_layers[i]->perform_momentum_step(epsilon1, momentum, weightcost);
+
     for (size_t i = 0; i < _nn_layers.size(); ++i)
-      _nn_layers[i]->apply_gradient();
+      _nn_layers[i]->perform_momentum_step(epsilon2, momentum, weightcost);
   }
 
   void set_batch_length(int layer, int length) {

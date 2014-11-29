@@ -13,7 +13,7 @@ namespace transform {
 
 texture<float, 3, cudaReadModeElementType> warp_tex;  // 3D texture
 
-__global__ void warp3DKernel(float *d_result, tensor<float, 3>::dim_t dimension, float* d_deformation, tensor<float, 3>::dim_t voxelSize, uint k) {
+__global__ void warp3DKernel(float *d_result, tensor<float, 3>::dim_t dimension, float* d_deformation, sequence<float, 3> voxelSize, uint k) {
   uint i = (blockDim.x * blockIdx.x + threadIdx.x);
   uint j = (blockDim.y * blockIdx.y + threadIdx.y);
 
@@ -29,13 +29,13 @@ __global__ void warp3DKernel(float *d_result, tensor<float, 3>::dim_t dimension,
   const int size = dimension[0] * dimension[1] * dimension[2];
 
   d_result[t] = tex3D(warp_tex,
-      (float)i + d_deformation[t] / (float)voxelSize[0] + 0.5f,
-      (float)j + d_deformation[t + size] / (float)voxelSize[1] + 0.5f,
-      (float)k + d_deformation[t + 2 * size] / (float)voxelSize[2] + 0.5f);
+      (float)i + d_deformation[t] / voxelSize[0] + 0.5f,
+      (float)j + d_deformation[t + size] / voxelSize[1] + 0.5f,
+      (float)k + d_deformation[t + 2 * size] / voxelSize[2] + 0.5f);
 }
 
 template<>
-void warp(tensor<float, 3, true>& input, const tensor<float, 3, true>::dim_t& voxel_size, tensor<float, 4, true>& deformation, tensor<float, 3, true>& output) {
+void warp(tensor<float, 3, true>& input, const sequence<float, 3>& voxel_size, tensor<float, 4, true>& deformation, tensor<float, 3, true>& output) {
   const int BlockWidth = 16;
   const int BlockHeight = 16;
 
