@@ -8,6 +8,9 @@
 #ifndef TBBLAS_DEEPLEARN_DBN_HPP_
 #define TBBLAS_DEEPLEARN_DBN_HPP_
 
+// TODO: rename to conv_dbn and create separated dbn class
+// TODO: momentum_step and adadelta_step replace init_gradient and apply_gradient
+
 #include <tbblas/rearrange.hpp>
 
 #include <tbblas/deeplearn/dbn_model.hpp>

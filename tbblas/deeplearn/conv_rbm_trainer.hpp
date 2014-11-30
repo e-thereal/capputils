@@ -8,6 +8,8 @@
 #ifndef TBBLAS_DEEPLEARN_CONV_RBM_TRAINER_HPP_
 #define TBBLAS_DEEPLEARN_CONV_RBM_TRAINER_HPP_
 
+// TODO: no separated trainer module. Fuse it into the conv_rbm class with lazy initialization of variables
+
 #include <tbblas/deeplearn/conv_rbm.hpp>
 #include <tbblas/deeplearn/sparsity_method.hpp>
 

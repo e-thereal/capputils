@@ -8,6 +8,10 @@
 #ifndef TBBLAS_DEEPLEARN_RBM_HPP_
 #define TBBLAS_DEEPLEARN_RBM_HPP_
 
+// TODO: lazy initialisation of variables used for training
+// TODO: momentum_step and adadelta_step replace init_gradient and apply_gradient
+// TODO: counter in update_gradient
+
 #include <tbblas/tensor.hpp>
 #include <tbblas/math.hpp>
 #include <tbblas/zeros.hpp>
@@ -30,14 +34,6 @@
 namespace tbblas {
 
 namespace deeplearn {
-
-/// This class creates multiple threads
-/**
- * Some changes to the previous design:
- * - No thread local variables. Thread local variables are replaced by vectors of
- *   shared pointers. Better control over the creation and destruction of variables.
- * - Every thread has a local reference to the memory. Makes code cleaner.
- */
 
 template<class T>
 class rbm {

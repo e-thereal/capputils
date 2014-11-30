@@ -59,7 +59,13 @@ protected:
   std::string name;
 
 public:
-  tensor(size_t x1 = 1, size_t x2 = 1, size_t x3 = 1, size_t x4 = 1) {
+  tensor() : _size(seq<dimCount>(0)), _fullsize(seq<dimCount>(0)) {
+    TBBLAS_ALLOC_WARNING
+
+    _data = boost::shared_ptr<data_t>(new data_t(0));
+  }
+
+  tensor(size_t x1, size_t x2 = 1, size_t x3 = 1, size_t x4 = 1) {
     TBBLAS_ALLOC_WARNING
 
     const size_t size[] = {x1, x2, x3, x4};

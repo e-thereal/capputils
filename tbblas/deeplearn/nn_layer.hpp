@@ -48,7 +48,7 @@ protected:
 
   // weights and bias terms in GPU memory
   matrix_t W, b, dW, db, mean, stddev;
-  matrix_t dW2, db2, deltaW2, deltab2;
+  matrix_t dW2, db2, deltaW2, deltab2, deltaW, deltab;
 
   // visible and hidden units in GPU memory
   matrix_t V, H, dV, dH;
@@ -87,9 +87,6 @@ public:
 
     mean = model.mean();
     stddev = model.stddev();
-
-    deltaW2 = dW2 = dW = zeros<value_t>(W.size());
-    deltab2 = db2 = db = zeros<value_t>(b.size());
   }
 
   void write_model_to_host() {
@@ -159,6 +156,9 @@ public:
   }
 
   void backprop_visible_deltas() {
+    if (!dH.count())
+      throw std::runtime_error("You need to calculate the deltas before bproping them.");
+
     // will be called by the previous layer
     dV = prod(dH, trans(W));
   }
@@ -191,17 +191,17 @@ public:
     return 0;
   }
 
-//  void init_gradient_updates(value_t epsilon, value_t momentum, value_t weightcost) {
-//    if (!_memory_allocated)
-//      allocate_gpu_memory();
-//
-//    dW = momentum * dW + weightcost * epsilon * W;
-//    db = momentum * db;
-//  }
-
   void update_gradient() {
     if (!_memory_allocated)
       allocate_gpu_memory();
+
+    if (!dH.count())
+      throw std::runtime_error("Hidden deltas not calculated.");
+
+    if (!dW.count())
+      dW = zeros<value_t>(W.size());
+    if (!db.count())
+      db = zeros<value_t>(b.size());
 
     // (x_n)(mu_n)'
     prods = tbblas::prod(trans(V), dH);
@@ -219,12 +219,18 @@ public:
     if (!_memory_allocated)
       allocate_gpu_memory();
 
-    if (_current_batch_size) {
-      deltaW2 = momentum * deltaW2 + dW / _current_batch_size + weightcost * W;
-      deltab2 = momentum * deltab2 + db / _current_batch_size;
+    // Lazy initialisation
+    if (!deltaW.count())
+      deltaW = zeros<value_t>(W.size());
+    if (!deltab.count())
+      deltab = zeros<value_t>(b.size());
 
-      W = W - epsilon * deltaW2;
-      b = b - epsilon * deltab2;
+    if (_current_batch_size) {
+      deltaW = momentum * deltaW + dW / _current_batch_size + weightcost * W;
+      deltab = momentum * deltab + db / _current_batch_size;
+
+      W = W - epsilon * deltaW;
+      b = b - epsilon * deltab;
 
       dW = zeros<value_t>(dW.size());
       db = zeros<value_t>(db.size());
@@ -236,6 +242,15 @@ public:
   }
 
   void adadelta_step(value_t epsilon, value_t momentum, value_t weightcost) {
+    if (!dW2.count())
+      dW2 = zeros<value_t>(W.size());
+    if (!db2.count())
+      db2 = zeros<value_t>(b.size());
+    if (!deltaW2.count())
+      deltaW2 = zeros<value_t>(W.size());
+    if (!deltab2.count())
+      deltab2 = zeros<value_t>(b.size());
+
     if (_current_batch_size) {
       dW = dW / _current_batch_size + weightcost * W;
       db = db / _current_batch_size;
@@ -263,20 +278,6 @@ public:
   void momentum_update(value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
     update_gradient();
     momentum_step(epsilon, momentum, weightcost);
-
-//    // (x_n)(mu_n)'
-//    prods = tbblas::prod(trans(V), dH);
-//
-//    // Calculate the total activation of the hidden and visible units
-//    hidact = sum(dH, 0);
-//
-//    dW = momentum * dW + epsilon * prods / V.size()[0] + weightcost * epsilon * W;
-//    db = momentum * db + epsilon * hidact / V.size()[0];
-//
-//    W = W - dW;
-//    b = b - db;
-//
-//    _host_updated = false;
   }
 
   void adadelta_update(value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {

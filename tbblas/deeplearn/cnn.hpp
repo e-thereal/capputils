@@ -106,7 +106,7 @@ public:
   // requires the hidden units to be inferred
   void update_gradient(matrix_t& target) {
     _nn_layers[_nn_layers.size() - 1]->calculate_deltas(target);
-    _nn_layers[_nn_layers.size() - 1]->update_gradient(epsilon2);
+    _nn_layers[_nn_layers.size() - 1]->update_gradient();
 
     // Perform back propagation
     for (int i = _nn_layers.size() - 2; i >= 0; --i) {
@@ -131,12 +131,20 @@ public:
     }
   }
 
-  void perform_momentum_step(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
+  void momentum_step(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
     for (size_t i = 0; i < _cnn_layers.size(); ++i)
-      _cnn_layers[i]->perform_momentum_step(epsilon1, momentum, weightcost);
+      _cnn_layers[i]->momentum_step(epsilon1, momentum, weightcost);
 
     for (size_t i = 0; i < _nn_layers.size(); ++i)
-      _nn_layers[i]->perform_momentum_step(epsilon2, momentum, weightcost);
+      _nn_layers[i]->momentum_step(epsilon2, momentum, weightcost);
+  }
+
+  void adadelta_step(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
+    for (size_t i = 0; i < _cnn_layers.size(); ++i)
+      _cnn_layers[i]->adadelta_step(epsilon1, momentum, weightcost);
+
+    for (size_t i = 0; i < _nn_layers.size(); ++i)
+      _nn_layers[i]->adadelta_step(epsilon2, momentum, weightcost);
   }
 
   void set_batch_length(int layer, int length) {

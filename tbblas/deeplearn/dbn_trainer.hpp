@@ -8,6 +8,8 @@
 #ifndef TBBLAS_DEEPLEARN_DBN_TRAINER_HPP_
 #define TBBLAS_DEEPLEARN_DBN_TRAINER_HPP_
 
+// TODO: No Separate class for the training.
+
 #include <tbblas/rearrange.hpp>
 
 #include <tbblas/deeplearn/dbn_model.hpp>
