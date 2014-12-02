@@ -60,7 +60,7 @@ void warp(tensor<float, 3, true>& input, const sequence<float, 3>& voxel_size, t
 
   // set texture parameters
   warp_tex.normalized = false;                    // access with normalized texture coordinates
-  warp_tex.filterMode = cudaFilterModeLinear;    // linear interpolation
+  warp_tex.filterMode = cudaFilterModeLinear;     // linear interpolation
 
   warp_tex.addressMode[0] = cudaAddressModeClamp;
   warp_tex.addressMode[1] = cudaAddressModeClamp;
@@ -79,6 +79,59 @@ void warp(tensor<float, 3, true>& input, const sequence<float, 3>& voxel_size, t
   }
 
   cudaUnbindTexture(warp_tex);
+  cudaFreeArray(d_cudaArray);
+}
+
+template<>
+void warp(tensor<float, 4, true>& input, const sequence<float, 3>& voxel_size, tensor<float, 4, true>& deformation, tensor<float, 4, true>& output) {
+  const int BlockWidth = 16;
+  const int BlockHeight = 16;
+
+  assert(deformation.size()[0] == input.size()[0]);
+  assert(deformation.size()[1] == input.size()[1]);
+  assert(deformation.size()[2] == input.size()[2]);
+  assert(deformation.size()[3] == 3);
+
+  cudaArray *d_cudaArray;
+
+  const cudaExtent volumeSize = make_cudaExtent(input.size()[0], input.size()[1], input.size()[2]);
+  cudaChannelFormatDesc texDesc = cudaCreateChannelDesc<float>();
+  cudaMalloc3DArray(&d_cudaArray, &texDesc, volumeSize);
+
+  for (int iChannel = 0; iChannel < input.size()[3]; ++iChannel) {
+
+    const int offset = iChannel * input.size()[0] * input.size()[1] * input.size()[2];
+
+    cudaMemcpy3DParms cpy_params = {0};
+    cpy_params.extent = volumeSize;
+    cpy_params.kind = cudaMemcpyDeviceToDevice;
+    cpy_params.dstArray = d_cudaArray;
+    cpy_params.srcPtr = make_cudaPitchedPtr(input.data().data().get() + offset, input.size()[0] * sizeof(float),
+        input.size()[0], input.size()[1]);
+    cudaMemcpy3D(&cpy_params);
+
+    // set texture parameters
+    warp_tex.normalized = false;                    // access with normalized texture coordinates
+    warp_tex.filterMode = cudaFilterModeLinear;     // linear interpolation
+
+    warp_tex.addressMode[0] = cudaAddressModeClamp;
+    warp_tex.addressMode[1] = cudaAddressModeClamp;
+    warp_tex.addressMode[2] = cudaAddressModeClamp;
+
+    // bind array to 3D texture
+    cudaBindTextureToArray(warp_tex, d_cudaArray, texDesc);
+
+    // Start kernel
+    dim3 gridDim((output.size()[0] + BlockWidth - 1) / BlockWidth,
+        (output.size()[1] + BlockHeight - 1) / BlockHeight);
+    dim3 blockDim(BlockWidth, BlockHeight);
+
+    for (uint k = 0; k < output.size()[2]; ++k) {
+      warp3DKernel<<<gridDim, blockDim>>>(output.data().data().get() + offset, seq(output.size()[0], output.size()[1], output.size()[2]), deformation.data().data().get(), voxel_size, k);
+    }
+
+    cudaUnbindTexture(warp_tex);
+  }
   cudaFreeArray(d_cudaArray);
 }
 

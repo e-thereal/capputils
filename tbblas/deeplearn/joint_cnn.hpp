@@ -155,33 +155,33 @@ public:
     }
   }
 
-  void init_gradient_updates(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
-    for (size_t i = 0; i < _left_cnn_layers.size(); ++i)
-      _left_cnn_layers[i]->init_gradient_updates(epsilon1, momentum, weightcost);
-    for (size_t i = 0; i < _right_cnn_layers.size(); ++i)
-      _right_cnn_layers[i]->init_gradient_updates(epsilon1, momentum, weightcost);
-
-    for (size_t i = 0; i < _left_nn_layers.size(); ++i)
-      _left_nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
-    for (size_t i = 0; i < _right_nn_layers.size(); ++i)
-      _right_nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
-    for (size_t i = 0; i < _joint_nn_layers.size(); ++i)
-      _joint_nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
-  }
+//  void init_gradient_updates(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
+//    for (size_t i = 0; i < _left_cnn_layers.size(); ++i)
+//      _left_cnn_layers[i]->init_gradient_updates(epsilon1, momentum, weightcost);
+//    for (size_t i = 0; i < _right_cnn_layers.size(); ++i)
+//      _right_cnn_layers[i]->init_gradient_updates(epsilon1, momentum, weightcost);
+//
+//    for (size_t i = 0; i < _left_nn_layers.size(); ++i)
+//      _left_nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
+//    for (size_t i = 0; i < _right_nn_layers.size(); ++i)
+//      _right_nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
+//    for (size_t i = 0; i < _joint_nn_layers.size(); ++i)
+//      _joint_nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
+//  }
 
   // requires the hidden units to be inferred
-  void update_gradient(matrix_t& target, value_t epsilon1, value_t epsilon2) {
+  void update_gradient(matrix_t& target) {
 
     /* Back prop joint layers */
 
     _joint_nn_layers[_joint_nn_layers.size() - 1]->calculate_deltas(target);
-    _joint_nn_layers[_joint_nn_layers.size() - 1]->update_gradient(epsilon2);
+    _joint_nn_layers[_joint_nn_layers.size() - 1]->update_gradient();
 
     // Perform back propagation
     for (int i = _joint_nn_layers.size() - 2; i >= 0; --i) {
       _joint_nn_layers[i + 1]->backprop_visible_deltas();
       _joint_nn_layers[i]->backprop_hidden_deltas(_joint_nn_layers[i + 1]->visible_deltas());
-      _joint_nn_layers[i]->update_gradient(epsilon2);
+      _joint_nn_layers[i]->update_gradient();
     }
 
     _joint_nn_layers[0]->backprop_visible_deltas();
@@ -190,13 +190,13 @@ public:
 
     _left_nn_layers[_left_nn_layers.size() - 1]->backprop_hidden_deltas(
         _joint_nn_layers[0]->visible_deltas()[seq(0,0), _left_nn_layers[_left_nn_layers.size() - 1]->hiddens().size()]);
-    _left_nn_layers[_left_nn_layers.size() - 1]->update_gradient(epsilon2);
+    _left_nn_layers[_left_nn_layers.size() - 1]->update_gradient();
 
     // Perform back propagation
     for (int i = _left_nn_layers.size() - 2; i >= 0; --i) {
       _left_nn_layers[i + 1]->backprop_visible_deltas();
       _left_nn_layers[i]->backprop_hidden_deltas(_left_nn_layers[i + 1]->visible_deltas());
-      _left_nn_layers[i]->update_gradient(epsilon2);
+      _left_nn_layers[i]->update_gradient();
     }
 
     {
@@ -205,14 +205,14 @@ public:
       _left_cnn_layers[clast]->backprop_hidden_deltas(reshape(
           _left_nn_layers[0]->visible_deltas(),
           _model.left_cnn_layers()[clast]->hiddens_size()));
-      _left_cnn_layers[clast]->update_gradient(epsilon1);
+      _left_cnn_layers[clast]->update_gradient();
 
       for (int i = _left_cnn_layers.size() - 2; i >= 0; --i) {
         _left_cnn_layers[i + 1]->backprop_visible_deltas();
         _left_cnn_layers[i]->backprop_hidden_deltas(rearrange_r(
             _left_cnn_layers[i + 1]->visible_deltas(),
             _model.left_cnn_layers()[i + 1]->stride_size()));
-        _left_cnn_layers[i]->update_gradient(epsilon1);
+        _left_cnn_layers[i]->update_gradient();
       }
     }
 
@@ -220,13 +220,13 @@ public:
 
     _right_nn_layers[_right_nn_layers.size() - 1]->backprop_hidden_deltas(
         _joint_nn_layers[0]->visible_deltas()[seq(0, (int)_left_nn_layers[_left_nn_layers.size() - 1]->hiddens().count()), _right_nn_layers[_right_nn_layers.size() - 1]->hiddens().size()]);
-    _right_nn_layers[_right_nn_layers.size() - 1]->update_gradient(epsilon2);
+    _right_nn_layers[_right_nn_layers.size() - 1]->update_gradient();
 
     // Perform back propagation
     for (int i = _right_nn_layers.size() - 2; i >= 0; --i) {
       _right_nn_layers[i + 1]->backprop_visible_deltas();
       _right_nn_layers[i]->backprop_hidden_deltas(_right_nn_layers[i + 1]->visible_deltas());
-      _right_nn_layers[i]->update_gradient(epsilon2);
+      _right_nn_layers[i]->update_gradient();
     }
 
     {
@@ -235,30 +235,44 @@ public:
       _right_cnn_layers[clast]->backprop_hidden_deltas(reshape(
           _right_nn_layers[0]->visible_deltas(),
           _model.right_cnn_layers()[clast]->hiddens_size()));
-      _right_cnn_layers[clast]->update_gradient(epsilon1);
+      _right_cnn_layers[clast]->update_gradient();
 
       for (int i = _right_cnn_layers.size() - 2; i >= 0; --i) {
         _right_cnn_layers[i + 1]->backprop_visible_deltas();
         _right_cnn_layers[i]->backprop_hidden_deltas(rearrange_r(
             _right_cnn_layers[i + 1]->visible_deltas(),
             _model.right_cnn_layers()[i + 1]->stride_size()));
-        _right_cnn_layers[i]->update_gradient(epsilon1);
+        _right_cnn_layers[i]->update_gradient();
       }
     }
   }
 
-  void apply_gradient() {
+  void momentum_step(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
     for (size_t i = 0; i < _left_cnn_layers.size(); ++i)
-      _left_cnn_layers[i]->apply_gradient();
+      _left_cnn_layers[i]->momentum_step(epsilon1, momentum, weightcost);
     for (size_t i = 0; i < _right_cnn_layers.size(); ++i)
-      _right_cnn_layers[i]->apply_gradient();
+      _right_cnn_layers[i]->momentum_step(epsilon1, momentum, weightcost);
 
     for (size_t i = 0; i < _left_nn_layers.size(); ++i)
-      _left_nn_layers[i]->apply_gradient();
+      _left_nn_layers[i]->momentum_step(epsilon2, momentum, weightcost);
     for (size_t i = 0; i < _right_nn_layers.size(); ++i)
-      _right_nn_layers[i]->apply_gradient();
+      _right_nn_layers[i]->momentum_step(epsilon2, momentum, weightcost);
     for (size_t i = 0; i < _joint_nn_layers.size(); ++i)
-      _joint_nn_layers[i]->apply_gradient();
+      _joint_nn_layers[i]->momentum_step(epsilon2, momentum, weightcost);
+  }
+
+  void adadelta_step(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
+    for (size_t i = 0; i < _left_cnn_layers.size(); ++i)
+      _left_cnn_layers[i]->adadelta_step(epsilon1, momentum, weightcost);
+    for (size_t i = 0; i < _right_cnn_layers.size(); ++i)
+      _right_cnn_layers[i]->adadelta_step(epsilon1, momentum, weightcost);
+
+    for (size_t i = 0; i < _left_nn_layers.size(); ++i)
+      _left_nn_layers[i]->adadelta_step(epsilon2, momentum, weightcost);
+    for (size_t i = 0; i < _right_nn_layers.size(); ++i)
+      _right_nn_layers[i]->adadelta_step(epsilon2, momentum, weightcost);
+    for (size_t i = 0; i < _joint_nn_layers.size(); ++i)
+      _joint_nn_layers[i]->adadelta_step(epsilon2, momentum, weightcost);
   }
 
   void set_left_batch_length(int layer, int length) {

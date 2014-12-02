@@ -74,61 +74,14 @@ public:
     _cnn_layers[0]->normalize_visibles();
   }
 
+  // Infer hidden units recursively
   void infer_hiddens() {
-    for (size_t i = 0; i < _cnn_layers.size(); ++i) {
-      _cnn_layers[i]->infer_hiddens();
-      if (i + 1 < _cnn_layers.size())
-        _cnn_layers[i + 1]->visibles() = rearrange(_cnn_layers[i]->hiddens(), _model.cnn_layers()[i + 1]->stride_size());
-    }
-
-    // Transition from convolutional model to dense model
-    _nn_layers[0]->visibles().resize(seq(1, (int)_cnn_layers[_cnn_layers.size() - 1]->hiddens().count()));
-
-    // todo: use reshape instead
-    thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream), _cnn_layers[_cnn_layers.size() - 1]->hiddens().begin(),
-        _cnn_layers[_cnn_layers.size() - 1]->hiddens().end(), _nn_layers[0]->visibles().begin());
-
-    for (size_t i = 0; i < _nn_layers.size(); ++i) {
-      _nn_layers[i]->infer_hiddens();
-      if (i + 1 < _nn_layers.size()) {
-        _nn_layers[i + 1]->visibles() = _nn_layers[i]->hiddens();
-      }
-    }
+    infer_hiddens(0);
   }
 
-//  void init_gradient_updates(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
-//    for (size_t i = 0; i < _cnn_layers.size(); ++i)
-//      _cnn_layers[i]->init_gradient_updates(epsilon1, momentum, weightcost);
-//    for (size_t i = 0; i < _nn_layers.size(); ++i)
-//      _nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
-//  }
-
-  // requires the hidden units to be inferred
+  // Does not require the hidden units to be inferred
   void update_gradient(matrix_t& target) {
-    _nn_layers[_nn_layers.size() - 1]->calculate_deltas(target);
-    _nn_layers[_nn_layers.size() - 1]->update_gradient();
-
-    // Perform back propagation
-    for (int i = _nn_layers.size() - 2; i >= 0; --i) {
-      _nn_layers[i + 1]->backprop_visible_deltas();
-      _nn_layers[i]->backprop_hidden_deltas(_nn_layers[i + 1]->visible_deltas());
-      _nn_layers[i]->update_gradient();
-    }
-
-    const size_t clast = _cnn_layers.size() - 1;
-    _nn_layers[0]->backprop_visible_deltas();
-    _cnn_layers[clast]->backprop_hidden_deltas(reshape(
-        _nn_layers[0]->visible_deltas(),
-        _model.cnn_layers()[clast]->hiddens_size()));
-    _cnn_layers[clast]->update_gradient();
-
-    for (int i = _cnn_layers.size() - 2; i >= 0; --i) {
-      _cnn_layers[i + 1]->backprop_visible_deltas();
-      _cnn_layers[i]->backprop_hidden_deltas(rearrange_r(
-          _cnn_layers[i + 1]->visible_deltas(),
-          _model.cnn_layers()[i + 1]->stride_size()));
-      _cnn_layers[i]->update_gradient();
-    }
+    update_gradient(0, target);
   }
 
   void momentum_step(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
@@ -159,6 +112,84 @@ public:
 
   matrix_t& hiddens() {
     return _nn_layers[_nn_layers.size() - 1]->hiddens();
+  }
+
+protected:
+  void infer_hiddens(int iLayer) {
+    if (iLayer < _cnn_layers.size()) {
+
+      // Infer convolutional layer
+      const int i = iLayer;
+
+      _cnn_layers[i]->infer_hiddens();
+      if (iLayer + 1 < _cnn_layers.size()) {
+        _cnn_layers[i + 1]->visibles() = rearrange(_cnn_layers[i]->hiddens(), _model.cnn_layers()[i + 1]->stride_size());
+        infer_hiddens(iLayer + 1);
+      } else {
+        // Transition from convolutional model to dense model
+        _nn_layers[0]->visibles() = reshape(_cnn_layers[i]->hiddens(), 1, _cnn_layers[i]->hiddens().count());
+        infer_hiddens(iLayer + 1);
+      }
+    } else if (iLayer - _cnn_layers.size() < _nn_layers.size()) {
+
+      // Infer dense layer
+      const int i = iLayer - _cnn_layers.size();
+
+      _nn_layers[i]->infer_hiddens();
+      if (i + 1 < _nn_layers.size()) {
+        _nn_layers[i + 1]->visibles() = _nn_layers[i]->hiddens();
+        infer_hiddens(iLayer + 1);
+      }
+
+    } else {
+      // should never happen
+      assert(0);
+    }
+  }
+
+  void update_gradient(int iLayer, matrix_t& target) {
+    if (iLayer < _cnn_layers.size()) {
+
+      // Infer convolutional layer
+      const int i = iLayer;
+
+      _cnn_layers[i]->infer_hiddens();
+      if (iLayer + 1 < _cnn_layers.size()) {
+        _cnn_layers[i + 1]->visibles() = rearrange(_cnn_layers[i]->hiddens(), _model.cnn_layers()[i + 1]->stride_size());
+        update_gradient(iLayer + 1, target);
+
+        _cnn_layers[i + 1]->backprop_visible_deltas();
+        _cnn_layers[i]->backprop_hidden_deltas(rearrange_r(_cnn_layers[i + 1]->visible_deltas(), _model.cnn_layers()[i + 1]->stride_size()));
+        _cnn_layers[i]->update_gradient();
+      } else {
+        // Transition from convolutional model to dense model
+        _nn_layers[0]->visibles() = reshape(_cnn_layers[i]->hiddens(), 1, _cnn_layers[i]->hiddens().count());
+        update_gradient(iLayer + 1, target);
+
+        // Transition back
+        _nn_layers[0]->backprop_visible_deltas();
+        _cnn_layers[i]->backprop_hidden_deltas(reshape(_nn_layers[0]->visible_deltas(), _model.cnn_layers()[i]->hiddens_size()));
+        _cnn_layers[i]->update_gradient();
+      }
+    } else if (iLayer - _cnn_layers.size() < _nn_layers.size()) {
+      // Infer dense layer
+      const int i = iLayer - _cnn_layers.size();
+
+      _nn_layers[i]->infer_hiddens();
+      if (i + 1 < _nn_layers.size()) {
+        _nn_layers[i + 1]->visibles() = _nn_layers[i]->hiddens();
+        update_gradient(iLayer + 1, target);
+
+        _nn_layers[i + 1]->backprop_visible_deltas();
+        _nn_layers[i]->backprop_hidden_deltas(_nn_layers[i + 1]->visible_deltas());
+        _nn_layers[i]->update_gradient();
+      } else {
+        _nn_layers[i]->calculate_deltas(target);
+        _nn_layers[i]->update_gradient();
+      }
+    } else {
+      assert(0); // should never happen
+    }
   }
 };
 

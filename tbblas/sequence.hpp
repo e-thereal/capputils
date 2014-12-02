@@ -114,6 +114,29 @@ struct sequence {
     return result;
   }
 
+  sequence_t operator%(const sequence_t& seq) const {
+    sequence_t result;
+    for (unsigned i = 0; i < size; ++i)
+      result[i] = _seq[i] % seq[i];
+    return result;
+  }
+
+  /*** Logic operators ***/
+
+//  sequence_t operator||(const sequence_t& seq) const {
+//    sequence_t result;
+//    for (unsigned i = 0; i < size; ++i)
+//      result[i] = _seq[i] || seq[i];
+//    return result;
+//  }
+//
+//  sequence_t operator&&(const sequence_t& seq) const {
+//    sequence_t result;
+//    for (unsigned i = 0; i < size; ++i)
+//      result[i] = _seq[i] && seq[i];
+//    return result;
+//  }
+
   /*** Comparison operators ***/
 
   bool operator<(const sequence_t& seq) const {
@@ -206,10 +229,6 @@ struct dim_type_trait<T, 4> {
   }
 };
 
-//template<class T, unsigned dim>
-//sequence<T, dim> seq(const T seq[]) {
-//  return sequence<T, dim>(seq);
-//}
 
 template<unsigned dims, class T>
 sequence<T, dims> seq(const T& x) {
@@ -243,6 +262,8 @@ sequence<T, 4u> seq(T x1, T x2, T x3, T x4) {
   return sequence<T, 4u>(seq);
 }
 
+/*** Useful functions ***/
+
 template<class T, unsigned size>
 tbblas::sequence<T, size> abs(const tbblas::sequence<T, size>& seq)
 {
@@ -270,6 +291,28 @@ tbblas::sequence<T, size> min(const tbblas::sequence<T, size>& seq1,
   for (unsigned i = 0; i < size; ++i)
     result[i] = (seq1[i] < seq2[i] ? seq1[i] : seq2[i]);
   return result;
+}
+
+/*** Incrementing sequences ***/
+
+template<class T, unsigned size>
+typename boost::enable_if_c<size >= 1,
+  tbblas::sequence<T, size>
+>::type
+inc(const tbblas::sequence<T, size>& current, const tbblas::sequence<T, size>& limits) {
+  tbblas::sequence<T, size> incremented = current;
+
+  ++incremented[0];
+  for (size_t i = 0; i < size - 1; ++i) {
+    if (incremented[i] >= limits[i]) {
+      incremented[i] = 0;
+      ++incremented[i + 1];
+    } else {
+      break;
+    }
+  }
+
+  return incremented;
 }
 
 /*** Pair creation ***/
