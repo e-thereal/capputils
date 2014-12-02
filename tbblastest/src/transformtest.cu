@@ -13,8 +13,10 @@
 #include <tbblas/transform/fmatrix4.hpp>
 #include <tbblas/transform/io.hpp>
 #include <tbblas/transform/transform.hpp>
+#include <tbblas/transform/warp.hpp>
 
 typedef tbblas::tensor<float, 3, true> volume_t;
+typedef tbblas::tensor<float, 4, true> tensor_t;
 
 void transformtest() {
   using namespace tbblas::transform;
@@ -34,4 +36,9 @@ void transformtest() {
 
   vol2 = transform(vol1, mat);
   tbblas_print(vol2);
+
+  tensor_t deform1, deform2;
+  vol2 = warp(vol1, deform1);
+
+  deform2 = warp(deform2, deform1);
 }
