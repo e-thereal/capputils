@@ -169,8 +169,9 @@ public:
 //      _joint_nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
 //  }
 
-  // requires the hidden units to be inferred
   void update_gradient(matrix_t& target) {
+
+    infer_hiddens();
 
     /* Back prop joint layers */
 

@@ -16,6 +16,8 @@
 #include <tbblas/rearrange.hpp>
 #include <tbblas/reshape.hpp>
 
+#include <tbblas/sequence_iterator.hpp>
+
 #include <stdexcept>
 
 namespace tbblas {
@@ -50,7 +52,7 @@ protected:
   v_cnn_layer_t _cnn_layers;
   v_nn_layer_t _nn_layers;
   v_dim_t _patch_sizes, _patch_counts;
-  v_tensor_t _target_tensors;
+  v_tensor_t _target_tensors, _deltas, _hiddens;
   matrix_t _target_matrix;
 
 public:
@@ -65,9 +67,14 @@ public:
     _patch_sizes.resize(_cnn_layers.size());
     _patch_counts.resize(_cnn_layers.size() + 1);
     _target_tensors.resize(_cnn_layers.size());
+    _deltas.resize(_cnn_layers.size());
+    _hiddens.resize(_cnn_layers.size());
 
-    for (size_t i = 0; i < _target_tensors.size(); ++i)
+    for (size_t i = 0; i < _target_tensors.size(); ++i) {
       _target_tensors[i] = boost::make_shared<tensor_t>();
+      _deltas[i] = boost::make_shared<tensor_t>();
+      _hiddens[i] = boost::make_shared<tensor_t>();
+    }
 
     _patch_counts[0] = patch_count;
     _patch_counts[0][dimCount - 1] = 1;
@@ -84,11 +91,9 @@ public:
         }
       }
 
-      tbblas_print(i);
-      tbblas_print(_patch_counts[i]);
-
       _patch_sizes[i] = model.cnn_layers()[i]->input_size();
       model.cnn_layers()[i]->change_size(_patch_sizes[i] + _patch_counts[i] - 1);
+
       _cnn_layers[i] = boost::make_shared<cnn_layer_t>(boost::ref(*model.cnn_layers()[i]));
       _patch_counts[i + 1] = max(seq<dimCount>(1), _patch_counts[i] / model.cnn_layers()[i]->pooling_size());
     }
@@ -114,90 +119,20 @@ public:
   }
 
   void infer_hiddens() {
-//    infer_hiddens(0);
-    // blockCount = product of pooling_sizes = image counts in the last layer
-    // Iterate over all images of the last layer and calculate them
-    // For each image, iterator over all patches and write them to the hidden unit matrix
-
-//    for (dim_t iBlock = seq<dimCount>(0); iBlock < blockCount; inc(iBlock, blockCount)) {
-//      // calculate the block index for each layer. If the block index has changed from the previous calculation, e.g. the remainder is 1,
-//      // then recalculate the layer
-//    }
-
-    // Dense hidden units will be processed in one batch. Allocate memory for them
-
-//    _nn_layers[0]->visibles().resize(seq(
-//        (int)_super_patch_counts[dimCount].prod() * _patch_counts[dimCount],
-//        (int)_cnn_layers[_cnn_layers.size() - 1]->filter_count()));
-//
-//    for (dim_t iSuperPatch = seq<dimCount(0); iSuperPatch < superPatchCount; inc(iSuperPatch, superPatchCount)) {
-//      for (size_t i = 0; i < _cnn_layers.size(); ++i) {
-//
-//        _cnn_layers[i]->infer_hiddens();
-//
-//        // TODO: get
-//        tensor_t slices = _cnn_layers[i]->hiddens()[seq(0,0,0,0), model.pooling_size(), _cnn_layers[i]->hiddens().size() - seq(0,0,0,0)];
-//
-//        if (i + 1 < _cnn_layers.size()) {
-//          _cnn_layers[i + 1]->visibles() = slice;
-//        } else if (i + 1 == _cnn_layers.size()) {
-//
-//
-//          // Transition from convolutional model to dense model
-////          thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream), _cnn_layers[_cnn_layers.size() - 1]->hiddens().begin(),
-////              _cnn_layers[_cnn_layers.size() - 1]->hiddens().end(), _nn_layers[0]->visibles().begin());
-//
-//          dim_t patch_count = slice.size(), column_size = seq<dimCount>(1);
-//          patch_count[dimCount - 1] = 1;
-//          column_size[dimCount - 1] = slice.size()[dimCount - 1];
-//
-//          for (dim_t iPatch = seq<dimCount>(0); iPatch < patch_count; inc(iPatch, patch_count)) {
-//            // TODO: calculate the 1D patch index
-//            const int iRow = 0;
-//
-//            // Reshape one column of the 4D super patch to a row of the 2D visible units matrix
-//            row(_nn_layers[0]->visibles(), iRow) = reshape(slice[iPatch, column_size], 1, _nn_layers[0]->visibles().size()[1]);
-//          }
-//        }
-//      }
-//    }
-//
-//
-//    for (size_t i = 0; i < _nn_layers.size(); ++i) {
-//      _nn_layers[i]->infer_hiddens();
-//      if (i + 1 < _nn_layers.size()) {
-//        _nn_layers[i + 1]->visibles() = _nn_layers[i]->hiddens();
-//      }
-//    }
+    infer_hiddens(0);
   }
 
-//  // requires the hidden units to be inferred
-//  void update_gradient(matrix_t& target) {
-//    _nn_layers[_nn_layers.size() - 1]->calculate_deltas(target);
-//    _nn_layers[_nn_layers.size() - 1]->update_gradient();
-//
-//    // Perform back propagation
-//    for (int i = _nn_layers.size() - 2; i >= 0; --i) {
-//      _nn_layers[i + 1]->backprop_visible_deltas();
-//      _nn_layers[i]->backprop_hidden_deltas(_nn_layers[i + 1]->visible_deltas());
-//      _nn_layers[i]->update_gradient();
-//    }
-//
-//    const size_t clast = _cnn_layers.size() - 1;
-//    _nn_layers[0]->backprop_visible_deltas();
-//    _cnn_layers[clast]->backprop_hidden_deltas(reshape(
-//        _nn_layers[0]->visible_deltas(),
-//        _model.cnn_layers()[clast]->hiddens_size()));
-//    _cnn_layers[clast]->update_gradient();
-//
-//    for (int i = _cnn_layers.size() - 2; i >= 0; --i) {
-//      _cnn_layers[i + 1]->backprop_visible_deltas();
-//      _cnn_layers[i]->backprop_hidden_deltas(rearrange_r(
-//          _cnn_layers[i + 1]->visible_deltas(),
-//          _model.cnn_layers()[i + 1]->stride_size()));
-//      _cnn_layers[i]->update_gradient();
-//    }
-//  }
+  void update_gradient(tensor_t& target) {
+    dim_t targetSize = _patch_counts[0];
+    targetSize[dimCount - 1] = target.size()[dimCount - 1];
+
+    if (targetSize != target.size()) {
+      throw std::runtime_error("Target size doesn't match the expected patch count.");
+    }
+
+    *_target_tensors[0] = target;
+    update_gradient(0);
+  }
 
   void momentum_step(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
     for (size_t i = 0; i < _cnn_layers.size(); ++i)
@@ -225,16 +160,13 @@ public:
     _cnn_layers[0]->visibles() = rearrange(input, _model.cnn_layers()[0]->stride_size());
   }
 
-  matrix_t& hiddens() {
-    return _nn_layers[_nn_layers.size() - 1]->hiddens();
+  tensor_t& hiddens() {
+    return *_hiddens[0];
   }
 
-public:
+protected:
   // TODO: infer_hiddens function takes tensor as input and writes the hidden values to that tensor
-  // Writing occurs recursively and the back-recursion.
-  void infer_hiddens2() {
-    infer_hiddens(0);
-  }
+  // Writing occurs recursively in the back-recursion.
 
   void infer_hiddens(int iLayer) {
     if (iLayer < _cnn_layers.size()) {
@@ -251,22 +183,23 @@ public:
             blockCount[iDim] = 1;
         }
 
-        for (dim_t iBlock = seq<dimCount>(0); iBlock < blockCount; inc(iBlock, blockCount)) {
+        for (sequence_iterator<dim_t> iBlock(seq<dimCount>(0), blockCount); iBlock; ++iBlock) {
           _cnn_layers[i + 1]->visibles() =
-              _cnn_layers[i]->hiddens()[iBlock, _model.cnn_layers()[i]->pooling_size(), _cnn_layers[i]->hiddens().size() - iBlock];
+              _cnn_layers[i]->hiddens()[*iBlock, _model.cnn_layers()[i]->pooling_size(), _cnn_layers[i]->hiddens().size() - *iBlock];
 
           infer_hiddens(iLayer + 1);
         }
       } else {
-        dim_t iBlock = seq<dimCount>(0);
         dim_t blockCount = _patch_counts[i];
         dim_t hiddenSize = _model.cnn_layers()[i]->hiddens_size() - _patch_sizes[i] + 1;
         dim_t blockSize = hiddenSize / _model.cnn_layers()[i]->pooling_size();
         _nn_layers[0]->visibles().resize(seq(blockCount.prod(), blockSize.prod()));
-        for (int i = 0; iBlock < blockCount; inc(iBlock, blockCount), ++i) {
+
+        sequence_iterator<dim_t> iBlock(seq<dimCount>(0), blockCount);
+        for (int i = 0; iBlock; ++iBlock, ++i) {
 
           // Transition from convolutional model to dense model
-          row(_nn_layers[0]->visibles(), i) = reshape(_cnn_layers[i]->hiddens()[iBlock, _model.cnn_layers()[i]->pooling_size(), hiddenSize], 1, blockSize.prod());
+          row(_nn_layers[0]->visibles(), i) = reshape(_cnn_layers[i]->hiddens()[*iBlock, _model.cnn_layers()[i]->pooling_size(), hiddenSize], 1, blockSize.prod());
         }
         infer_hiddens(iLayer + 1);
       }
@@ -287,19 +220,8 @@ public:
     }
   }
 
-  void update_gradient2(tensor_t& target) {
-    dim_t targetSize = _patch_counts[0];
-    targetSize[dimCount - 1] = target.size()[dimCount - 1];
-
-    if (targetSize != target.size()) {
-      throw std::runtime_error("Target size doesn't match the expected patch count.");
-    }
-
-    *_target_tensors[0] = target;
-    update_gradient(0, target);
-  }
-
   void update_gradient(int iLayer) {
+
     if (iLayer < _cnn_layers.size()) {
 
       // Infer convolutional layer
@@ -315,49 +237,50 @@ public:
             blockCount[iDim] = 1;
         }
 
-        tensor_t deltas(_cnn_layers[i]->hiddens());
-        for (dim_t iBlock = seq<dimCount>(0); iBlock < blockCount; inc(iBlock, blockCount)) {
+        _deltas[i]->resize(_cnn_layers[i]->hiddens().size());
+        _hiddens[i]->resize(_target_tensors[i]->size());
+        for (sequence_iterator<dim_t> iBlock(seq<dimCount>(0), blockCount); iBlock; ++iBlock) {
 
           // Wrap target and visibles
-          *_target_tensors[i + 1] = (*_target_tensors[i])[iBlock, _model.cnn_layers()[i]->poolig_size(), _target_tensors[i]->size() - iBlock];
+          *_target_tensors[i + 1] = (*_target_tensors[i])[*iBlock, _model.cnn_layers()[i]->pooling_size(), _target_tensors[i]->size() - *iBlock];
           _cnn_layers[i + 1]->visibles() =
-              _cnn_layers[i]->hiddens()[iBlock, _model.cnn_layers()[i]->pooling_size(), _cnn_layers[i]->hiddens().size() - iBlock];
+              _cnn_layers[i]->hiddens()[*iBlock, _model.cnn_layers()[i]->pooling_size(), _cnn_layers[i]->hiddens().size() - blockCount + 1];
 
           update_gradient(iLayer + 1);
           _cnn_layers[i + 1]->backprop_visible_deltas();
-          deltas[iBlock, _model.cnn_layers()[i]->pooling_size(), _cnn_layers[i]->hiddens().size() - iBlock] = _cnn_layers[i + 1]->visible_deltas();
+          (*_deltas[i])[*iBlock, _model.cnn_layers()[i]->pooling_size(), _cnn_layers[i]->hiddens().size() - blockCount + 1] = _cnn_layers[i + 1]->visible_deltas();
+
+          (*_hiddens[i])[*iBlock, _model.cnn_layers()[i]->pooling_size(), _target_tensors[i]->size() - *iBlock] = *_hiddens[i + 1];
         }
-        _cnn_layers[i]->backprop_hidden_deltas(deltas);
+        _cnn_layers[i]->backprop_hidden_deltas(*_deltas[i]);
         _cnn_layers[i]->update_gradient();
       } else {
 
-        dim_t iBlock = seq<dimCount>(0);
         dim_t blockCount = _patch_counts[i];
-        dim_t hiddenSize = _model.cnn_layers()[i]->hiddens_size() - _patch_sizes[i] + 1;
+        dim_t hiddenSize = _model.cnn_layers()[i]->hiddens_size() - _patch_counts[i] + 1;
         dim_t blockSize = hiddenSize / _model.cnn_layers()[i]->pooling_size();
 
-        // TODO: completed reshaping the target into a matrix. Need to revise from here after
-
         _nn_layers[0]->visibles().resize(seq(blockCount.prod(), blockSize.prod()));
-        _target_matrix = trans(reshape(target, target.size()[dimCount - 1], blockCount.prod()));
-        for (int i = 0; iBlock < blockCount; inc(iBlock, blockCount), ++i) {
+        _target_matrix = reshape(*_target_tensors[i], blockCount.prod(), _target_tensors[i]->size()[dimCount - 1]);
 
-          // Transition from convolutional model to dense model
-          row(_nn_layers[0]->visibles(), i) = reshape(_cnn_layers[i]->hiddens()[iBlock, _model.cnn_layers()[i]->pooling_size(), hiddenSize], 1, blockSize.prod());
+        // Transition from convolutional model to dense model
+        sequence_iterator<dim_t> iBlock(seq<dimCount>(0), blockCount);
+        for (int iRow = 0; iBlock; ++iBlock, ++iRow) {
+          row(_nn_layers[0]->visibles(), iRow) = reshape(_cnn_layers[i]->hiddens()[*iBlock, _model.cnn_layers()[i]->pooling_size(), hiddenSize], 1, blockSize.prod());
         }
 
         update_gradient(iLayer + 1);
-
-
-        // Transition from convolutional model to dense model
-//        _nn_layers[0]->visibles() = reshape(_cnn_layers[i]->hiddens(), 1, _cnn_layers[i]->hiddens().count());
-//        update_gradient(iLayer + 1, target);
+        *_hiddens[i] = reshape(_nn_layers[_nn_layers.size() - 1]->hiddens(), _target_tensors[i]->size());
 
         // Transition back
         _nn_layers[0]->backprop_visible_deltas();
+        _deltas[i]->resize(_cnn_layers[i]->hiddens().size());
+        iBlock = sequence_iterator<dim_t>(seq<dimCount>(0), blockCount);
+        for (int iRow = 0; iBlock; ++iBlock, ++iRow) {
+          (*_deltas[i])[*iBlock, _model.cnn_layers()[i]->pooling_size(), hiddenSize] = reshape(row(_nn_layers[0]->visible_deltas(), iRow), blockSize);
+        }
 
-        // TODO: properly collect deltas
-        _cnn_layers[i]->backprop_hidden_deltas(reshape(_nn_layers[0]->visible_deltas(), _model.cnn_layers()[i]->hiddens_size()));
+        _cnn_layers[i]->backprop_hidden_deltas(*_deltas[i]);
         _cnn_layers[i]->update_gradient();
       }
     } else if (iLayer - _cnn_layers.size() < _nn_layers.size()) {

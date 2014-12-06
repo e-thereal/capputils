@@ -21,6 +21,10 @@ template<class T, unsigned dim>
 void serialize(const tbblas::deeplearn::cnn_layer_model<T, dim>& model, std::ostream& out) {
   unsigned count = 0;
 
+  uint16_t version = model.version();
+
+  out.write((char*)&version, sizeof(version));
+
   count = model.filters().size();
   out.write((char*)&count, sizeof(count));
   for (size_t i = 0; i < count; ++i)
@@ -37,6 +41,9 @@ void serialize(const tbblas::deeplearn::cnn_layer_model<T, dim>& model, std::ost
   size = model.stride_size();
   out.write((char*)&size, sizeof(size));
 
+  size = model.pooling_size();
+  out.write((char*)&size, sizeof(size));
+
   T mean = model.mean();
   out.write((char*)&mean, sizeof(mean));
 
@@ -48,6 +55,7 @@ void serialize(const tbblas::deeplearn::cnn_layer_model<T, dim>& model, std::ost
 
   capputils::attributes::serialize_trait<activation_function>::writeToFile(model.activation_function(), out);
   capputils::attributes::serialize_trait<convolution_type>::writeToFile(model.convolution_type(), out);
+  capputils::attributes::serialize_trait<pooling_method>::writeToFile(model.pooling_method(), out);
 }
 
 template<class T, unsigned dim>
@@ -63,7 +71,11 @@ void deserialize(std::istream& in, tbblas::deeplearn::cnn_layer_model<T, dim>& m
   typedef typename cnn_layer_model<T, dim>::v_host_tensor_t v_host_tensor_t;
 
   unsigned count = 0;
+  uint16_t version;
   host_tensor_t tensor;
+
+  in.read((char*)&version, sizeof(version));
+  model.set_version(version);
 
   in.read((char*)&count, sizeof(count));
   v_host_tensor_t filters(count);
@@ -88,6 +100,9 @@ void deserialize(std::istream& in, tbblas::deeplearn::cnn_layer_model<T, dim>& m
   in.read((char*)&size, sizeof(size));
   model.set_stride_size(size);
 
+  in.read((char*)&size, sizeof(size));
+  model.set_pooling_size(size);
+
   T mean = 0;
   in.read((char*)&mean, sizeof(mean));
   model.set_mean(mean);
@@ -107,6 +122,10 @@ void deserialize(std::istream& in, tbblas::deeplearn::cnn_layer_model<T, dim>& m
   convolution_type conv_type;
   capputils::attributes::serialize_trait<convolution_type>::readFromFile(conv_type, in);
   model.set_convolution_type(conv_type);
+
+  pooling_method pooling;
+  capputils::attributes::serialize_trait<pooling_method>::readFromFile(pooling, in);
+  model.set_pooling_method(pooling);
 }
 
 template<class T, unsigned dim>

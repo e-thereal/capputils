@@ -38,7 +38,15 @@ public:
   typedef tbblas::tensor<value_t, dimCount> host_tensor_t;
   typedef std::vector<boost::shared_ptr<host_tensor_t> > v_host_tensor_t;
 
+  /**
+   * Versions:
+   * 0: initial version, already comes with a version number (no magic code needed)
+   */
+  static const uint16_t CURRENT_VERSION = 0;
+
 protected:
+  uint16_t _version;
+
   // Model in CPU memory
   v_host_tensor_t _filters, _biases;
   dim_t _kernel_size, _stride_size, _pooling_size;
@@ -52,10 +60,13 @@ protected:
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
-  cnn_layer_model() : _stride_size(seq<dimCount>(1)), _pooling_size(seq<dimCount>(1)), _mean(0), _stddev(1), _shared_biases(false) { }
+  cnn_layer_model()
+   : _version(CURRENT_VERSION),
+     _stride_size(seq<dimCount>(1)), _pooling_size(seq<dimCount>(1)), _mean(0), _stddev(1), _shared_biases(false) { }
 
   cnn_layer_model(const cnn_layer_model<T,dims>& model)
-   : _kernel_size(model.kernel_size()), _stride_size(model.stride_size()), _pooling_size(model.pooling_size()),
+   : _version(model._version),
+     _kernel_size(model.kernel_size()), _stride_size(model.stride_size()), _pooling_size(model.pooling_size()),
      _activation_function(model.activation_function()),
      _convolution_type(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
      _shared_biases(model.shared_bias())
@@ -83,6 +94,14 @@ public:
   virtual ~cnn_layer_model() { }
 
 public:
+  void set_version(uint16_t version) {
+    _version = version;
+  }
+
+  uint16_t version() const {
+    return _version;
+  }
+
   void set_filters(const v_host_tensor_t& filters) {
     if (filters.size() == 0)
       throw std::runtime_error("A CNN layer must contain at least one filter.");

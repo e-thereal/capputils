@@ -22,9 +22,12 @@ struct dim_type_trait {
 
 template<class T, unsigned size>
 struct sequence {
+public:
   typedef T value_t;
   typedef T seq_t[size];
   typedef sequence<T, size> sequence_t;
+
+  static const unsigned dimCount = size;
 
   sequence() {
     for (unsigned i = 0; i < size; ++i)
@@ -202,6 +205,16 @@ private:
 };
 
 template<class T>
+struct is_sequence {
+  static const bool value = false;
+};
+
+template<class T, unsigned size>
+struct is_sequence<tbblas::sequence<T, size> > {
+  static const bool value = false;
+};
+
+template<class T>
 struct dim_type_trait<T, 1> {
   static dim3 convert(const sequence<T, 1>& s) {
     return dim3(s[0]);
@@ -291,28 +304,6 @@ tbblas::sequence<T, size> min(const tbblas::sequence<T, size>& seq1,
   for (unsigned i = 0; i < size; ++i)
     result[i] = (seq1[i] < seq2[i] ? seq1[i] : seq2[i]);
   return result;
-}
-
-/*** Incrementing sequences ***/
-
-template<class T, unsigned size>
-typename boost::enable_if_c<size >= 1,
-  tbblas::sequence<T, size>
->::type
-inc(const tbblas::sequence<T, size>& current, const tbblas::sequence<T, size>& limits) {
-  tbblas::sequence<T, size> incremented = current;
-
-  ++incremented[0];
-  for (size_t i = 0; i < size - 1; ++i) {
-    if (incremented[i] >= limits[i]) {
-      incremented[i] = 0;
-      ++incremented[i + 1];
-    } else {
-      break;
-    }
-  }
-
-  return incremented;
 }
 
 /*** Pair creation ***/
