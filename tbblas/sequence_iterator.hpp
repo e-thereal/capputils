@@ -22,6 +22,20 @@ class sequence_iterator {
 public:
   sequence_iterator(const sequence_t& start, const sequence_t& size) : _current(start), _start(start), _size(size) { }
 
+  size_t count() {
+    return _size.prod();
+  }
+
+  size_t current() {
+    size_t curr = _current[dimCount - 1] - _start[dimCount - 1];
+
+    for (int i = dimCount - 2; i >= 0; --i) {
+      curr = curr * _size[i] + _current[i] - _start[i];
+    }
+
+    return curr;
+  }
+
   sequence_iterator<T> operator++() {
     ++_current[0];
     for (size_t i = 0; i < dimCount - 1; ++i) {

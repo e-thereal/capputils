@@ -45,6 +45,22 @@ private:
   nn(const nn<T>&);
 
 public:
+  void set_objective_function(const tbblas::deeplearn::objective_function& objective) {
+    _layers[_layers.size() - 1]->set_objective_function(objective);
+  }
+
+  tbblas::deeplearn::objective_function objective_function() const {
+    return _layers[_layers.size() - 1]->objective_function();
+  }
+
+  void set_sensitivity_ratio(const value_t& ratio) {
+    _layers[_layers.size() - 1]->set_sensitivity_ratio(ratio);
+  }
+
+  value_t sensitivity_ratio() const {
+    return _layers[_layers.size() - 1]->sensitivity_ratio();
+  }
+
   void normalize_visibles() {
     _layers[0]->normalize_visibles();
   }

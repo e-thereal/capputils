@@ -23,6 +23,7 @@
 
 #include <tbblas/deeplearn/math.hpp>
 #include <tbblas/deeplearn/nn_layer_model.hpp>
+#include <tbblas/deeplearn/objective_function.hpp>
 
 #include <iostream>
 #include <stdexcept>
@@ -58,10 +59,13 @@ protected:
   bool _memory_allocated, _host_updated;
   value_t _current_batch_size;
 
+  tbblas::deeplearn::objective_function _objective_function;
+  value_t _sensitivity_ratio;
+
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
   nn_layer(model_t& model) : model(model),
-    _memory_allocated(false), _host_updated(true), _current_batch_size(0)
+    _memory_allocated(false), _host_updated(true), _current_batch_size(0), _sensitivity_ratio(0.5)
   { }
 
 private:
@@ -71,6 +75,22 @@ public:
   virtual ~nn_layer() {
     if (!_host_updated)
       write_model_to_host();
+  }
+
+  void set_objective_function(const tbblas::deeplearn::objective_function& objective) {
+    _objective_function = objective;
+  }
+
+  tbblas::deeplearn::objective_function objective_function() const {
+    return _objective_function;
+  }
+
+  void set_sensitivity_ratio(const value_t& ratio) {
+    _sensitivity_ratio = ratio;
+  }
+
+  value_t sensitivity_ratio() const {
+    return _sensitivity_ratio;
   }
 
   /// Transforms
@@ -138,21 +158,46 @@ public:
     // Needs target values as input
     // Need to know the objective function
 
-    // delta = (hidden - target) * f'(X)
-    switch (model.activation_function()) {
-    case activation_function::Sigmoid:
-      dH = (H - repeat(target, H.size() / target.size())) * H * (1 + -H);
+    switch (_objective_function) {
+    case tbblas::deeplearn::objective_function::SSD:
+
+      // delta = (hidden - target) * f'(X)
+      switch (model.activation_function()) {
+      case activation_function::Sigmoid:
+        dH = (H - target) * H * (1 + -H);
+        break;
+
+      case activation_function::ReLU:
+        dH = (H - target) * (H > 0);
+        break;
+
+      case activation_function::Softmax:
+      case activation_function::Linear:
+        dH = H - target;
+        break;
+      }
       break;
 
-    case activation_function::ReLU:
-      dH = (H - repeat(target, H.size() / target.size())) * (H > 0);
-      break;
+      case tbblas::deeplearn::objective_function::SenSpe:
+        {
+          // delta = (-alpha* target - beta * target + beta) * f'(X)
 
-    case activation_function::Softmax:
-    case activation_function::Linear:
-      dH = H - repeat(target, H.size() / target.size());
-      break;
+          const value_t positive_ratio = sum(target) / (value_t)target.count();
+          const value_t alpha = _sensitivity_ratio / positive_ratio;
+          const value_t beta = (value_t(1) - _sensitivity_ratio) / (value_t(1) - positive_ratio);
+
+          switch (model.activation_function()) {
+          case activation_function::Sigmoid:
+            dH = -(alpha * target - beta * (1 + -target)) * H * (1 + -H);
+            break;
+
+          default:
+            throw std::runtime_error("Undefined activation function for objective function 'Sensitivity + Specificity'");
+          }
+        }
+        break;
     }
+
   }
 
   void backprop_visible_deltas() {
