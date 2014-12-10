@@ -59,6 +59,8 @@ class cnn_layer {
 
   static const value_t tolerance = 1e-8;
 
+  typedef tbblas::random_tensor2<value_t, 4, true, tbblas::uniform<value_t> > uniform_t;
+
 protected:
   // Model in CPU memory
   model_t& model;
@@ -76,15 +78,16 @@ protected:
   tensor_t v, h, shifted_f, padded_f, h_mask, H, dv, dH;
   ctensor_t cv, ch, chdiff;
   plan_t plan_v, iplan_v, plan_h, iplan_h;
+  uniform_t h_rand;
 
   int _filter_batch_length, _voxel_count;
   bool _memory_allocated, _host_updated;
-  value_t _current_batch_size;
+  value_t _current_batch_size, _dropout_rate;
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
   cnn_layer(model_t& model) : model(model), _filter_batch_length(1),
-      _memory_allocated(false), _host_updated(true), _current_batch_size(0)
+      _memory_allocated(false), _host_updated(true), _current_batch_size(0), _dropout_rate(0)
   {
     _voxel_count = model.visibles_count();
   }
@@ -96,6 +99,13 @@ public:
   virtual ~cnn_layer() {
     if (!_host_updated)
       write_model_to_host();
+  }
+
+  void set_dropout_rate(const value_t& rate) {
+    if (rate < 0 || rate >= 1)
+      throw std::runtime_error("Drop out rate must be in [0,1).");
+
+    _dropout_rate = rate;
   }
 
   /// Transforms
@@ -260,13 +270,21 @@ public:
     v = (v - model.mean()) / model.stddev();
   }
 
-  void infer_hiddens() {
+  void infer_hiddens(bool dropout = false) {
     using namespace tbblas;
 
     if (!_memory_allocated)
       allocate_gpu_memory();
 
     assert(v.size() == visible_size);
+
+//    if (dropout && _dropout_rate > 0) {
+//      dim_t h_size = seq(V.size()[0], W.size()[1]);
+//      if (h_rand.size() != h_size)
+//        h_rand.resize(h_size);
+//
+//      h_drop = h_rand() > _dropout_rate;
+//    }
 
     cv = fft(v, dimCount - 1, plan_v);
 
@@ -282,6 +300,13 @@ public:
         case activation_function::Linear:  break;
         default:
           throw std::runtime_error("Unsupported activation function.");
+      }
+
+      if (dropout && _dropout_rate > 0) {
+        if (h_rand.size() != h.size())
+          h_rand.resize(h.size());
+
+        h = h * (h_rand() > _dropout_rate) / (1. - _dropout_rate);
       }
 
       H[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size] = h[hidden_topleft, hidden_layer_batch_size];

@@ -39,6 +39,8 @@ class nn_layer {
   typedef tbblas::tensor<value_t, 2> host_matrix_t;
   typedef typename matrix_t::dim_t dim_t;
 
+  typedef tbblas::random_tensor2<value_t, 2, true, tbblas::uniform<value_t> > uniform_t;
+
   typedef nn_layer_model<value_t> model_t;
 
   static const value_t tolerance = 1e-8;
@@ -53,6 +55,7 @@ protected:
 
   // visible and hidden units in GPU memory
   matrix_t V, H, dV, dH;
+  uniform_t h_rand;
 
   matrix_t prods, hidact, hidnorm;
 
@@ -60,12 +63,12 @@ protected:
   value_t _current_batch_size;
 
   tbblas::deeplearn::objective_function _objective_function;
-  value_t _sensitivity_ratio;
+  value_t _sensitivity_ratio, _dropout_rate;
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
   nn_layer(model_t& model) : model(model),
-    _memory_allocated(false), _host_updated(true), _current_batch_size(0), _sensitivity_ratio(0.5)
+    _memory_allocated(false), _host_updated(true), _current_batch_size(0), _sensitivity_ratio(0.5), _dropout_rate(0)
   { }
 
 private:
@@ -91,6 +94,13 @@ public:
 
   value_t sensitivity_ratio() const {
     return _sensitivity_ratio;
+  }
+
+  void set_dropout_rate(const value_t& rate) {
+    if (rate < 0 || rate >= 1)
+      throw std::runtime_error("Drop out rate must be in [0,1).");
+
+    _dropout_rate = rate;
   }
 
   /// Transforms
@@ -131,7 +141,7 @@ public:
     V = (V - repeat(mean, V.size() / mean.size())) / repeat(stddev, V.size() / stddev.size());
   }
 
-  void infer_hiddens() {
+  void infer_hiddens(bool dropout = false) {
     using namespace tbblas;
 
     if (!_memory_allocated)
@@ -149,6 +159,12 @@ public:
         H = H / (tolerance + repeat(hidnorm, H.size() / hidnorm.size()));
         break;
       case activation_function::Linear:  break;
+    }
+
+    if (dropout && _dropout_rate > 0) {
+      if (h_rand.size() != H.size())
+        h_rand.resize(H.size());
+      H = H * (h_rand() > _dropout_rate) / (1. - _dropout_rate);
     }
   }
 
@@ -178,24 +194,24 @@ public:
       }
       break;
 
-      case tbblas::deeplearn::objective_function::SenSpe:
-        {
-          // delta = (-alpha* target - beta * target + beta) * f'(X)
+    case tbblas::deeplearn::objective_function::SenSpe:
+      {
+        // delta = (-alpha* target - beta * target + beta) * f'(X)
 
-          const value_t positive_ratio = sum(target) / (value_t)target.count();
-          const value_t alpha = _sensitivity_ratio / positive_ratio;
-          const value_t beta = (value_t(1) - _sensitivity_ratio) / (value_t(1) - positive_ratio);
+        const value_t positive_ratio = sum(target) / (value_t)target.count();
+        const value_t alpha = _sensitivity_ratio / (positive_ratio + value_t(1e-8));
+        const value_t beta = (value_t(1) - _sensitivity_ratio) / (value_t(1) - positive_ratio + value_t(1e-8));
 
-          switch (model.activation_function()) {
-          case activation_function::Sigmoid:
-            dH = -(alpha * target - beta * (1 + -target)) * H * (1 + -H);
-            break;
+        switch (model.activation_function()) {
+        case activation_function::Sigmoid:
+          dH = (alpha * target + beta * (1 + -target)) * (H - target) * H * (1 + -H);
+          break;
 
-          default:
-            throw std::runtime_error("Undefined activation function for objective function 'Sensitivity + Specificity'");
-          }
+        default:
+          throw std::runtime_error("Undefined activation function for objective function 'Sensitivity + Specificity'");
         }
-        break;
+      }
+      break;
     }
 
   }

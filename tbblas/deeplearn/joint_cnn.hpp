@@ -93,12 +93,12 @@ public:
     _right_cnn_layers[0]->normalize_visibles();
   }
 
-  void infer_hiddens() {
+  void infer_hiddens(bool dropout = false) {
 
     /* Infer hiddens of left pathway */
 
     for (size_t i = 0; i < _left_cnn_layers.size(); ++i) {
-      _left_cnn_layers[i]->infer_hiddens();
+      _left_cnn_layers[i]->infer_hiddens(dropout);
       if (i + 1 < _left_cnn_layers.size())
         _left_cnn_layers[i + 1]->visibles() = rearrange(_left_cnn_layers[i]->hiddens(), _model.left_cnn_layers()[i + 1]->stride_size());
     }
@@ -110,7 +110,7 @@ public:
         _left_cnn_layers[_left_cnn_layers.size() - 1]->hiddens().end(), _left_nn_layers[0]->visibles().begin());
 
     for (size_t i = 0; i < _left_nn_layers.size(); ++i) {
-      _left_nn_layers[i]->infer_hiddens();
+      _left_nn_layers[i]->infer_hiddens(dropout);
       if (i + 1 < _left_nn_layers.size()) {
         _left_nn_layers[i + 1]->visibles() = _left_nn_layers[i]->hiddens();
       }
@@ -119,7 +119,7 @@ public:
     /* Infer hiddens of right pathway */
 
     for (size_t i = 0; i < _right_cnn_layers.size(); ++i) {
-      _right_cnn_layers[i]->infer_hiddens();
+      _right_cnn_layers[i]->infer_hiddens(dropout);
       if (i + 1 < _right_cnn_layers.size())
         _right_cnn_layers[i + 1]->visibles() = rearrange(_right_cnn_layers[i]->hiddens(), _model.right_cnn_layers()[i + 1]->stride_size());
     }
@@ -131,7 +131,7 @@ public:
         _right_cnn_layers[_right_cnn_layers.size() - 1]->hiddens().end(), _right_nn_layers[0]->visibles().begin());
 
     for (size_t i = 0; i < _right_nn_layers.size(); ++i) {
-      _right_nn_layers[i]->infer_hiddens();
+      _right_nn_layers[i]->infer_hiddens(dropout);
       if (i + 1 < _right_nn_layers.size()) {
         _right_nn_layers[i + 1]->visibles() = _right_nn_layers[i]->hiddens();
       }
@@ -148,30 +148,16 @@ public:
 
 
     for (size_t i = 0; i < _joint_nn_layers.size(); ++i) {
-      _joint_nn_layers[i]->infer_hiddens();
+      _joint_nn_layers[i]->infer_hiddens(dropout);
       if (i + 1 < _joint_nn_layers.size()) {
         _joint_nn_layers[i + 1]->visibles() = _joint_nn_layers[i]->hiddens();
       }
     }
   }
 
-//  void init_gradient_updates(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
-//    for (size_t i = 0; i < _left_cnn_layers.size(); ++i)
-//      _left_cnn_layers[i]->init_gradient_updates(epsilon1, momentum, weightcost);
-//    for (size_t i = 0; i < _right_cnn_layers.size(); ++i)
-//      _right_cnn_layers[i]->init_gradient_updates(epsilon1, momentum, weightcost);
-//
-//    for (size_t i = 0; i < _left_nn_layers.size(); ++i)
-//      _left_nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
-//    for (size_t i = 0; i < _right_nn_layers.size(); ++i)
-//      _right_nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
-//    for (size_t i = 0; i < _joint_nn_layers.size(); ++i)
-//      _joint_nn_layers[i]->init_gradient_updates(epsilon2, momentum, weightcost);
-//  }
-
   void update_gradient(matrix_t& target) {
 
-    infer_hiddens();
+    infer_hiddens(true);
 
     /* Back prop joint layers */
 
@@ -276,6 +262,8 @@ public:
       _joint_nn_layers[i]->adadelta_step(epsilon2, momentum, weightcost);
   }
 
+  /*** Set parameters of the training method ***/
+
   void set_left_batch_length(int layer, int length) {
     if (layer < _left_cnn_layers.size())
       _left_cnn_layers[layer]->set_batch_length(length);
@@ -285,6 +273,53 @@ public:
     if (layer < _right_cnn_layers.size())
       _right_cnn_layers[layer]->set_batch_length(length);
   }
+
+  void set_left_dropout_rate(int layer, const value_t& rate) {
+    if (layer < _left_cnn_layers.size())
+      _left_cnn_layers[layer]->set_dropout_rate(rate);
+    else if (layer - _left_cnn_layers.size() < _left_nn_layers.size())
+      _left_nn_layers[layer - _left_cnn_layers.size()]->set_dropout_rate(rate);
+  }
+
+  void set_right_dropout_rate(int layer, const value_t& rate) {
+    if (layer < _right_cnn_layers.size())
+      _right_cnn_layers[layer]->set_dropout_rate(rate);
+    else if (layer - _right_cnn_layers.size() < _left_nn_layers.size())
+      _right_nn_layers[layer - _right_cnn_layers.size()]->set_dropout_rate(rate);
+  }
+
+  void set_joint_dropout_rate(int layer, const value_t& rate) {
+    if (layer < _joint_nn_layers.size())
+      _joint_nn_layers[layer]->set_dropout_rate(rate);
+  }
+
+//    for (size_t i = 0; i < _left_nn_layers.size(); ++i)
+//      _left_nn_layers[i]->set_dropout_rate(rate);
+//
+//    for (size_t i = 0; i < _right_nn_layers.size(); ++i)
+//      _right_nn_layers[i]->set_dropout_rate(rate);
+//
+//    for (size_t i = 0; i < _joint_nn_layers.size() - 1; ++i)
+//      _joint_nn_layers[i]->set_dropout_rate(rate);
+//  }
+
+  void set_objective_function(const tbblas::deeplearn::objective_function& objective) {
+    _joint_nn_layers[_joint_nn_layers.size() - 1]->set_objective_function(objective);
+  }
+
+  tbblas::deeplearn::objective_function objective_function() const {
+    return _joint_nn_layers[_joint_nn_layers.size() - 1]->objective_function();
+  }
+
+  void set_sensitivity_ratio(const value_t& ratio) {
+    _joint_nn_layers[_joint_nn_layers.size() - 1]->set_sensitivity_ratio(ratio);
+  }
+
+  value_t sensitivity_ratio() const {
+    return _joint_nn_layers[_joint_nn_layers.size() - 1]->sensitivity_ratio();
+  }
+
+  /*** Set input ***/
 
   void set_left_input(tensor_t& input) {
     assert(_model.left_cnn_layers()[0]->input_size() == input.size());

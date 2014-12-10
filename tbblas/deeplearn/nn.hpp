@@ -61,6 +61,11 @@ public:
     return _layers[_layers.size() - 1]->sensitivity_ratio();
   }
 
+  void set_dropout_rate(int iLayer, const value_t& rate) {
+    if (iLayer > 0 && iLayer < _layers.size())
+      _layers[iLayer]->set_dropout_rate(rate);
+  }
+
   void normalize_visibles() {
     _layers[0]->normalize_visibles();
   }
@@ -73,13 +78,14 @@ public:
     }
   }
 
-//  void init_gradient_updates(value_t epsilon, value_t momentum, value_t weightcost) {
-//    for (size_t i = 0; i < _layers.size(); ++i)
-//      _layers[i]->init_gradient_updates(epsilon, momentum, weightcost);
-//  }
-
-  // requires the hidden units to be inferred
+  // Doesn't requires the hidden units to be inferred
   void update_gradient(matrix_t& target) {
+    for (size_t i = 0; i < _layers.size(); ++i) {
+      _layers[i]->infer_hiddens(true);
+      if (i + 1 < _layers.size())
+        _layers[i + 1]->visibles() = _layers[i]->hiddens();
+    }
+
     _layers[_layers.size() - 1]->calculate_deltas(target);
     _layers[_layers.size() - 1]->update_gradient();
 
@@ -98,17 +104,19 @@ public:
 
   // requires the hidden units to be inferred
   void momentum_update(matrix_t& target, value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
+    for (size_t i = 0; i < _layers.size(); ++i) {
+      _layers[i]->infer_hiddens(true);
+      if (i + 1 < _layers.size())
+        _layers[i + 1]->visibles() = _layers[i]->hiddens();
+    }
+
     _layers[_layers.size() - 1]->calculate_deltas(target);
+    _layers[_layers.size() - 1]->momentum_update(epsilon, momentum, weightcost);
 
     // Perform back propagation
     for (int i = _layers.size() - 2; i >= 0; --i) {
       _layers[i + 1]->backprop_visible_deltas();
       _layers[i]->backprop_hidden_deltas(_layers[i + 1]->visible_deltas());
-    }
-
-    // Update gradients
-    _layers[_layers.size() - 1]->momentum_update(epsilon, momentum, weightcost);
-    for (int i = _layers.size() - 2; i >= 0; --i) {
       _layers[i]->momentum_update(epsilon, momentum, weightcost);
     }
   }
@@ -120,17 +128,19 @@ public:
 
   // requires the hidden units to be inferred
   void adadelta_update(matrix_t& target, value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
+    for (size_t i = 0; i < _layers.size(); ++i) {
+      _layers[i]->infer_hiddens(true);
+      if (i + 1 < _layers.size())
+        _layers[i + 1]->visibles() = _layers[i]->hiddens();
+    }
+
     _layers[_layers.size() - 1]->calculate_deltas(target);
+    _layers[_layers.size() - 1]->adadelta_update(epsilon, momentum, weightcost);
 
     // Perform back propagation
     for (int i = _layers.size() - 2; i >= 0; --i) {
       _layers[i + 1]->backprop_visible_deltas();
       _layers[i]->backprop_hidden_deltas(_layers[i + 1]->visible_deltas());
-    }
-
-    // Update gradients
-    _layers[_layers.size() - 1]->adadelta_update(epsilon, momentum, weightcost);
-    for (int i = _layers.size() - 2; i >= 0; --i) {
       _layers[i]->adadelta_update(epsilon, momentum, weightcost);
     }
   }

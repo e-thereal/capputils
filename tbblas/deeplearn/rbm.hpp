@@ -8,7 +8,7 @@
 #ifndef TBBLAS_DEEPLEARN_RBM_HPP_
 #define TBBLAS_DEEPLEARN_RBM_HPP_
 
-// TODO: lazy initialisation of variables used for training
+// TODO: lazy initialization of variables used for training
 // TODO: momentum_step and adadelta_step replace init_gradient and apply_gradient
 // TODO: counter in update_gradient
 
