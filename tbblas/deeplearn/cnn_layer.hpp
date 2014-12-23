@@ -506,7 +506,7 @@ public:
     if (!cFinc.size() || !cbinc.size())
       throw std::runtime_error("No gradient calculated.");
 
-    if (!dF2.size() || deltaF.size() || !deltaF2.size()) {
+    if (!dF2.size() || !deltaF.size() || !deltaF2.size()) {
       dF2.resize(model.filter_count());
       deltaF.resize(model.filter_count());
       deltaF2.resize(model.filter_count());

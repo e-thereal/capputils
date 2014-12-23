@@ -51,7 +51,7 @@ protected:
 
   // weights and bias terms in GPU memory
   matrix_t W, b, dW, db, mean, stddev;
-  matrix_t dW2, db2, deltaW2, deltab2, deltaW, deltab;
+  matrix_t dW2, db2, deltaW2, deltab2, deltaW, deltab, duW, dub;
 
   // visible and hidden units in GPU memory
   matrix_t V, H, dV, dH;
@@ -196,24 +196,75 @@ public:
 
     case tbblas::deeplearn::objective_function::SenSpe:
       {
+        if (model.activation_function() != activation_function::Sigmoid)
+          throw std::runtime_error("Activation function for objective function 'Sensitivity + Specificity' must be 'Sigmoid'.");
+
         // delta = (-alpha* target - beta * target + beta) * f'(X)
 
         const value_t positive_ratio = sum(target) / (value_t)target.count();
         const value_t alpha = _sensitivity_ratio / (positive_ratio + value_t(1e-8));
         const value_t beta = (value_t(1) - _sensitivity_ratio) / (value_t(1) - positive_ratio + value_t(1e-8));
 
-        switch (model.activation_function()) {
-        case activation_function::Sigmoid:
-          dH = (alpha * target + beta * (1 + -target)) * (H - target) * H * (1 + -H);
-          break;
-
-        default:
-          throw std::runtime_error("Undefined activation function for objective function 'Sensitivity + Specificity'");
-        }
+        dH = (alpha * target + beta * (1 + -target)) * (H - target) * H * (1 + -H);
       }
       break;
-    }
 
+    default:
+      throw std::runtime_error("Undefined objective function for calculate_deltas(target).");
+    }
+  }
+
+  /// Requires hidden activation and hidden total activation
+  void calculate_u_deltas(matrix_t& target) {
+    // this is used for the output layer
+    // Needs target values as input
+    // Need to know the objective function
+
+    switch (_objective_function) {
+    case tbblas::deeplearn::objective_function::DSC:
+      if (model.activation_function() != activation_function::Sigmoid)
+        throw std::runtime_error("Activation function for objective function 'DSC' must be 'Sigmoid'.");
+
+      dH = 2 * target * H * (1 + -H);
+      break;
+
+    case tbblas::deeplearn::objective_function::DSC2:
+      if (model.activation_function() != activation_function::Sigmoid)
+        throw std::runtime_error("Activation function for objective function 'DSC2' must be 'Sigmoid'.");
+
+      dH = 4 * target * (H - target) * H * (1 + -H);
+      break;
+
+    default:
+      throw std::runtime_error("Undefined objective function for calculate_u_deltas(target).");
+    }
+  }
+
+  /// Requires hidden activation and hidden total activation
+  void calculate_v_deltas(matrix_t& target) {
+    // this is used for the output layer
+    // Needs target values as input
+    // Need to know the objective function
+
+    switch (_objective_function) {
+    case tbblas::deeplearn::objective_function::DSC:
+      if (model.activation_function() != activation_function::Sigmoid)
+        throw std::runtime_error("Activation function for objective function 'DSC' must be 'Sigmoid'.");
+
+      dH = H * (1 + -H);
+      break;
+
+    case tbblas::deeplearn::objective_function::DSC2:
+      if (model.activation_function() != activation_function::Sigmoid)
+        throw std::runtime_error("Activation function for objective function 'DSC2' must be 'Sigmoid'.");
+
+      // delta = 2 * y_j * f'(X)
+      dH = 2 * H * H * (1 + -H);
+      break;
+
+    default:
+      throw std::runtime_error("Undefined objective function for calculate_v_deltas(target).");
+    }
   }
 
   void backprop_visible_deltas() {
@@ -276,11 +327,59 @@ public:
     ++_current_batch_size;
   }
 
+  void update_u_gradient() {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    if (!dH.count())
+      throw std::runtime_error("Hidden deltas not calculated.");
+
+    // (x_n)(mu_n)'
+    prods = tbblas::prod(trans(V), dH);
+
+    // Calculate the total activation of the hidden and visible units
+    hidact = sum(dH, 0);
+
+//    duW = prods / V.size()[0];
+//    dub = hidact / V.size()[0];
+    duW = prods;
+    dub = hidact;
+  }
+
+  void update_v_gradient(value_t u, value_t v) {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    if (!dH.count())
+      throw std::runtime_error("Hidden deltas not calculated.");
+
+    if (!dW.count())
+      dW = zeros<value_t>(W.size());
+    if (!db.count())
+      db = zeros<value_t>(b.size());
+
+    // (x_n)(mu_n)'
+    prods = tbblas::prod(trans(V), dH);
+
+    // Calculate the total activation of the hidden and visible units
+    hidact = sum(dH, 0);
+
+    // TODO: decide the sign depending on the objective function
+    // TODO: need to update the objective function for every layer in the nn class
+
+//    dW += -(duW * v - u * prods / V.size()[0]) / (v * v);
+//    db += -(dub * v - u * hidact / V.size()[0]) / (v * v);
+    dW += value_t(-1) * (duW * v - u * prods) / (v * v);
+    db += value_t(-1) * (dub * v - u * hidact) / (v * v);
+
+    ++_current_batch_size;
+  }
+
   void momentum_step(value_t epsilon, value_t momentum, value_t weightcost) {
     if (!_memory_allocated)
       allocate_gpu_memory();
 
-    // Lazy initialisation
+    // Lazy initialization
     if (!deltaW.count())
       deltaW = zeros<value_t>(W.size());
     if (!deltab.count())
@@ -333,17 +432,6 @@ public:
     _current_batch_size = 0;
 
     _host_updated = false;
-  }
-
-  /// Requires hidden deltas and visibles
-  void momentum_update(value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
-    update_gradient();
-    momentum_step(epsilon, momentum, weightcost);
-  }
-
-  void adadelta_update(value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
-    update_gradient();
-    adadelta_step(epsilon, momentum, weightcost);
   }
 
   // Access to model data

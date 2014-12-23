@@ -14,7 +14,7 @@ namespace tbblas {
 
 namespace deeplearn {
 
-CapputilsEnumerator(objective_function, SSD, SenSpe);
+CapputilsEnumerator(objective_function, SSD, SenSpe, DSC, DSC2);
 
 }
 

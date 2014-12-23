@@ -5,8 +5,8 @@
  *      Author: tombr
  */
 
-#ifndef TBBLAS_DEEPLEARN_SERIALIZE_DBN_HPP_
-#define TBBLAS_DEEPLEARN_SERIALIZE_DBN_HPP_
+#ifndef TBBLAS_DEEPLEARN_SERIALIZE_NN_HPP_
+#define TBBLAS_DEEPLEARN_SERIALIZE_NN_HPP_
 
 #include <tbblas/deeplearn/nn_model.hpp>
 #include <tbblas/deeplearn/serialize_nn_layer.hpp>
@@ -61,4 +61,4 @@ void deserialize(const std::string& filename, tbblas::deeplearn::nn_model<T>& mo
 
 }
 
-#endif /* TBBLAS_DEEPLEARN_SERIALIZE_DBN_HPP_ */
+#endif /* TBBLAS_DEEPLEARN_SERIALIZE_NN_HPP_ */
