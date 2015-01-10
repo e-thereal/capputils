@@ -1,12 +1,12 @@
 /*
- * cnn_layer.hpp
+ * reverse_cnn_layer.hpp
  *
- *  Created on: Aug 19, 2014
+ *  Created on: Jan 05, 2015
  *      Author: tombr
  */
 
-#ifndef TBBLAS_DEEPLEARN_CNN_LAYER_HPP_
-#define TBBLAS_DEEPLEARN_CNN_LAYER_HPP_
+#ifndef TBBLAS_DEEPLEARN_REVERSE_CNN_LAYER_HPP_
+#define TBBLAS_DEEPLEARN_REVERSE_CNN_LAYER_HPP_
 
 #include <tbblas/tensor.hpp>
 #include <tbblas/fft.hpp>
@@ -26,7 +26,8 @@
 #include <tbblas/deeplearn/repeat_mult.hpp>
 #include <tbblas/deeplearn/repeat_mult_sum.hpp>
 
-#include <tbblas/deeplearn/cnn_layer_model.hpp>
+#include <tbblas/deeplearn/reverse_cnn_layer_model.hpp>
+#include <tbblas/deeplearn/objective_function.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -39,7 +40,7 @@ namespace tbblas {
 namespace deeplearn {
 
 template<class T, unsigned dims>
-class cnn_layer {
+class reverse_cnn_layer {
   const static unsigned dimCount = dims;
   typedef T value_t;
   typedef typename tbblas::tensor<value_t, dimCount>::dim_t dim_t;
@@ -55,9 +56,7 @@ class cnn_layer {
   typedef tbblas::tensor<complex_t, dimCount, true> ctensor_t;
   typedef std::vector<boost::shared_ptr<ctensor_t> > v_ctensor_t;
 
-  typedef cnn_layer_model<value_t, dimCount> model_t;
-
-  static const value_t tolerance = 1e-8;
+  typedef reverse_cnn_layer_model<value_t, dimCount> model_t;
 
   typedef tbblas::random_tensor2<value_t, 4, true, tbblas::uniform<value_t> > uniform_t;
 
@@ -66,41 +65,61 @@ protected:
   model_t& model;
 
   // weights and bias terms in GPU memory
-  v_ctensor_t cF, cb, cFinc, cbinc;
-  v_tensor_t deltaF, deltab, dF2, db2, deltaF2, deltab2;
+  ctensor_t cb, cbinc;
+  tensor_t deltab, db2, deltab2;
+  v_ctensor_t cF, cFinc;
+  v_tensor_t deltaF, dF2, deltaF2;
 
   // Sizes
   dim_t padded_visible_size, visible_size, hidden_size,
         visible_layer_size, hidden_layer_size,
         hidden_layer_batch_size, visible_layer_batch_size,
         visible_batch_size, kernel_size, padded_kernel_size,
-        hidden_topleft, hbMaskSize;
+        hidden_topleft, vbMaskSize;
 
   tensor_t v, h, shifted_f, padded_f, padded_k, v_mask, h_mask;
   tensor_t padded_v, H, padded_dv, dH;
   ctensor_t cv, ch, chdiff;
   plan_t plan_v, iplan_v, plan_h, iplan_h;
-  uniform_t h_rand;
+  uniform_t h_rand, v_rand;
 
   int _filter_batch_length, _voxel_count;
   bool _memory_allocated, _host_updated;
-  value_t _current_batch_size, _dropout_rate;
+  value_t _current_batch_size, _dropout_rate, _sensitivity_ratio;
+
+  tbblas::deeplearn::objective_function _objective_function;
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
-  cnn_layer(model_t& model) : model(model), _filter_batch_length(1),
-      _memory_allocated(false), _host_updated(true), _current_batch_size(0), _dropout_rate(0)
+  reverse_cnn_layer(model_t& model) : model(model), _filter_batch_length(1),
+      _memory_allocated(false), _host_updated(true), _current_batch_size(0), _dropout_rate(0), _sensitivity_ratio(0.5)
   {
     _voxel_count = model.visibles_count();
   }
 
 private:
-  cnn_layer(const cnn_layer&);
+  reverse_cnn_layer(const reverse_cnn_layer&);
 
 public:
-  virtual ~cnn_layer() {
+  virtual ~reverse_cnn_layer() {
     if (!_host_updated)
       write_model_to_host();
+  }
+
+  void set_objective_function(const tbblas::deeplearn::objective_function& objective) {
+    _objective_function = objective;
+  }
+
+  tbblas::deeplearn::objective_function objective_function() const {
+    return _objective_function;
+  }
+
+  void set_sensitivity_ratio(const value_t& ratio) {
+    _sensitivity_ratio = ratio;
+  }
+
+  value_t sensitivity_ratio() const {
+    return _sensitivity_ratio;
   }
 
   void set_dropout_rate(const value_t& rate) {
@@ -176,15 +195,23 @@ public:
 #endif
 
     cF.resize(model.filters().size() / _filter_batch_length);
-    cb.resize(model.bias().size() / _filter_batch_length);
 
     {
       dim_t padded_mask_size = padded_visible_size;
-      dim_t mask_size = model.visibles_size();
-      mask_size[dimCount - 1] = padded_mask_size[dimCount - 1] = 1;
+      padded_mask_size[dimCount - 1] = 1;
 
       v_mask = zeros<value_t>(padded_mask_size);
-      v_mask[seq<dimCount>(0), mask_size] = ones<value_t>(mask_size);
+      v_mask[seq<dimCount>(0), model.mask().size()] = model.mask();
+
+      _voxel_count = sum(v_mask) * padded_visible_size[dimCount - 1];
+
+//
+//      dim_t padded_mask_size = padded_visible_size;
+//      dim_t mask_size = model.visibles_size();
+//      mask_size[dimCount - 1] = padded_mask_size[dimCount - 1] = 1;
+//
+//      v_mask = zeros<value_t>(padded_mask_size);
+//      v_mask[seq<dimCount>(0), mask_size] = ones<value_t>(mask_size);
     }
 
     // pad h mask according to convolution shrinkage
@@ -194,6 +221,13 @@ public:
     } else {
       h_mask = ones<value_t>(visible_layer_size);
     }
+
+    padded_v = zeros<value_t>(padded_visible_size);
+    padded_v[seq<dimCount>(0), model.visibles_size()] = model.bias();
+    v = rearrange(padded_v, model.stride_size());
+    cb = fft(v, dimCount - 1, plan_v);
+
+    padded_v = zeros<value_t>(padded_visible_size);
 
     // Copy filters to the device and pre-calculate the FFT
     {
@@ -225,19 +259,19 @@ public:
         cf = fft(f, dimCount - 1, plan_f);
         cF[k] = boost::make_shared<ctensor_t>(cf);
 
-        h = zeros<value_t>(visible_layer_batch_size);
-        for (int j = 0; j < _filter_batch_length; ++j) {
-          h[seq(0,0,0,j), visible_layer_size] = *model.bias()[k * _filter_batch_length + j];
-        }
-        ch = fft(h, dimCount - 1, plan_h);
-        cb[k] = boost::make_shared<ctensor_t>(ch);
+//        h = zeros<value_t>(visible_layer_batch_size);
+//        for (int j = 0; j < _filter_batch_length; ++j) {
+//          h[seq(0,0,0,j), visible_layer_size] = *model.bias()[k * _filter_batch_length + j];
+//        }
+//        ch = fft(h, dimCount - 1, plan_h);
+//        cb[k] = boost::make_shared<ctensor_t>(ch);
       }
     }
 
-    hbMaskSize = cb[0]->size();
+    vbMaskSize = cb.size();
     if (model.shared_bias()) {
       for (size_t i = 0; i < dimCount - 1; ++i)
-        hbMaskSize[i] = 1;
+        vbMaskSize[i] = 1;
     }
   }
 
@@ -267,106 +301,29 @@ public:
         padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
         *model.filters()[k * _filter_batch_length + j] = padded_k[seq<dimCount>(0), model.kernel_size()];
       }
-
-      h = ifft(*cb[k], dimCount - 1, iplan_h);
-      h = h * (abs(h) > 1e-16);
-
-      for (int j = 0; j < _filter_batch_length; ++j) {
-        *model.bias()[k * _filter_batch_length + j] = h[seq(0,0,0,j),visible_layer_size];
-      }
     }
+
+    v = ifft(cb, dimCount - 1, iplan_v);
+    v = v * (abs(v) > 1e-16);
+    tensor_t padded = rearrange_r(v, model.stride_size());
+    host_tensor_t b = padded[seq<dimCount>(0), model.visibles_size()];
     tbblas::synchronize();
+    model.set_bias(b);
   }
 
-  void normalize_visibles() {
-    if (!_memory_allocated)
-      allocate_gpu_memory();
-
-    assert(padded_v.size() == padded_visible_size);
-    padded_v = (padded_v - model.mean()) / model.stddev() * repeat(v_mask, padded_v.size() / v_mask.size());
-  }
-
-  void infer_hiddens(bool dropout = false) {
-    using namespace tbblas;
-
+  void diversify_visibles() {
     if (!_memory_allocated)
       allocate_gpu_memory();
 
     assert(padded_v.size() == padded_visible_size);
 
-    v = rearrange(padded_v, model.stride_size());
-    cv = fft(v, dimCount - 1, plan_v);
-
-    for (size_t k = 0; k < cF.size(); ++k) {
-      ch = conj_mult_sum(cv, *cF[k]);
-
-      ch = ch + *cb[k];
-      h = ifft(ch, dimCount - 1, iplan_h);
-
-      switch (model.activation_function()) {
-        case activation_function::Sigmoid: h = sigm(h); break;
-        case activation_function::ReLU:    h = max(0.0, h);  break;
-        case activation_function::Linear:  break;
-        default:
-          throw std::runtime_error("Unsupported activation function.");
-      }
-
-      if (dropout && _dropout_rate > 0) {
-        if (h_rand.size() != h.size())
-          h_rand.resize(h.size());
-
-        h = h * (h_rand() > _dropout_rate) / (1. - _dropout_rate);
-      }
-
-      H[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size] = h[hidden_topleft, hidden_layer_batch_size];
-    }
+    padded_v = ((padded_v * model.stddev()) + model.mean()) * repeat(v_mask, padded_v.size() / v_mask.size());
   }
 
-  /// Requires hidden activation and hidden total activation
-  void calculate_deltas(tensor_t& target) {
-    // this is used for the output layer
-    // Needs target values as input
-    // Need to know the objective function
+  void infer_visibles(bool dropout = false) {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
 
-    // delta = (hidden - target) * f'(X)
-    switch (model.activation_function()) {
-    case activation_function::Sigmoid:
-      dH = (H - target) * H * (1 + -H);
-      break;
-
-    case activation_function::ReLU:
-      dH = (H - target) * (H > 0);
-      break;
-
-    case activation_function::Softmax:
-    case activation_function::Linear:
-      dH = H - target;
-      break;
-
-    default:
-      throw std::runtime_error("Undefined objective function for cnn_layer::calculate_deltas(target).");
-    }
-  }
-
-  void backprop_visible_deltas() {
-    // will be called by the previous layer
-
-    assert(dH.size() == hidden_size);
-
-    cv = zeros<complex_t>(cF[0]->size() / seq(1,1,1,_filter_batch_length), cF[0]->fullsize() / seq(1,1,1,_filter_batch_length));
-    for (size_t k = 0; k < cF.size(); ++k) {
-      h = zeros<value_t>(visible_layer_batch_size);
-      h[hidden_topleft, hidden_layer_batch_size] = dH[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
-      h = h * repeat(h_mask, h.size() / h_mask.size());
-      ch = fft(h, dimCount - 1, plan_h);
-      cv += repeat_mult_sum(ch, *cF[k]);
-    }
-    v = ifft(cv, dimCount - 1, iplan_v);
-    padded_dv = rearrange_r(v, model.stride_size());
-    padded_dv = padded_dv * repeat(v_mask, padded_dv.size() / v_mask.size());
-  }
-
-  void backprop_visibles() {
     assert(H.size() == hidden_size);
 
     cv = zeros<complex_t>(cF[0]->size() / seq(1,1,1,_filter_batch_length), cF[0]->fullsize() / seq(1,1,1,_filter_batch_length));
@@ -377,29 +334,178 @@ public:
       ch = fft(h, dimCount - 1, plan_h);
       cv += repeat_mult_sum(ch, *cF[k]);
     }
+    cv += cb;
+
     v = ifft(cv, dimCount - 1, iplan_v);
+    switch (model.activation_function()) {
+      case activation_function::Sigmoid: v = sigm(v); break;
+      case activation_function::ReLU:    v = max(0.0, v);  break;
+      case activation_function::Linear:  break;
+      default:
+        throw std::runtime_error("Unsupported activation function.");
+    }
+
+    if (dropout && _dropout_rate > 0) {
+      if (v_rand.size() != v.size())
+        v_rand.resize(v.size());
+
+      v = v * (v_rand() > _dropout_rate) / (1. - _dropout_rate);
+    }
+
     padded_v = rearrange_r(v, model.stride_size());
     padded_v = padded_v * repeat(v_mask, padded_v.size() / v_mask.size());
+  }
+
+
+  /// Requires visible activation and hidden total activation
+  void calculate_deltas(tensor_t& target) {
+    // this is used for the output layer
+    // Needs target values as input
+    // Need to know the objective function
+
+
+    assert(target.size() == model.visibles_size());
+
+    switch (_objective_function) {
+    case tbblas::deeplearn::objective_function::SSD:
+
+      // delta = (visible - target) * f'(X)
+      switch (model.activation_function()) {
+      case activation_function::Sigmoid:
+        padded_dv[seq<dimCount>(0), model.visibles_size()] =
+            (visibles() - target) * visibles() * (1 + -visibles());
+        break;
+
+      case activation_function::ReLU:
+        padded_dv[seq<dimCount>(0), model.visibles_size()] =
+            (visibles() - target) * (visibles() > 0);
+        break;
+
+      case activation_function::Softmax:
+      case activation_function::Linear:
+        padded_dv[seq<dimCount>(0), model.visibles_size()] =
+            visibles() - target;
+        break;
+      }
+      break;
+
+    case tbblas::deeplearn::objective_function::SenSpe:
+      {
+        if (model.activation_function() != activation_function::Sigmoid)
+          throw std::runtime_error("Activation function for objective function 'Sensitivity + Specificity' must be 'Sigmoid'.");
+
+        // delta = (-alpha* target - beta * target + beta) * f'(X)
+
+        const value_t positive_ratio = sum(target) / (value_t)target.count();
+        const value_t alpha = _sensitivity_ratio / (positive_ratio + value_t(1e-8));
+        const value_t beta = (value_t(1) - _sensitivity_ratio) / (value_t(1) - positive_ratio + value_t(1e-8));
+
+        padded_dv[seq<dimCount>(0), model.visibles_size()] =
+            (alpha * target + beta * (1 + -target)) * (visibles() - target) * visibles() * (1 + -visibles());
+      }
+      break;
+
+    default:
+      throw std::runtime_error("Undefined objective function for calculate_deltas(target).");
+    }
+  }
+
+  /// Requires visible activation
+  void calculate_u_deltas(tensor_t& target) {
+    // this is used for the output layer
+    // Needs target values as input
+    // Need to know the objective function
+
+    switch (_objective_function) {
+    case tbblas::deeplearn::objective_function::DSC:
+      if (model.activation_function() != activation_function::Sigmoid)
+        throw std::runtime_error("Activation function for objective function 'DSC' must be 'Sigmoid'.");
+
+      padded_dv[seq<dimCount>(0), model.visibles_size()] =
+          2 * target * visibles() * (1 + -visibles());
+      break;
+
+    default:
+      throw std::runtime_error("Undefined objective function for calculate_u_deltas(target).");
+    }
+  }
+
+  /// Requires visible activation and hidden total activation
+  void calculate_v_deltas(tensor_t& target) {
+    // this is used for the output layer
+    // Needs target values as input
+    // Need to know the objective function
+
+    switch (_objective_function) {
+    case tbblas::deeplearn::objective_function::DSC:
+      if (model.activation_function() != activation_function::Sigmoid)
+        throw std::runtime_error("Activation function for objective function 'DSC' must be 'Sigmoid'.");
+
+      padded_dv[seq<dimCount>(0), model.visibles_size()] =
+          visibles() * (1 + -visibles());
+      break;
+
+    default:
+      throw std::runtime_error("Undefined objective function for calculate_v_deltas(target).");
+    }
+  }
+
+  void backprop_hidden_deltas() {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    assert(padded_dv.size() == padded_visible_size);
+
+    v = rearrange(padded_dv, model.stride_size());
+    cv = fft(v, dimCount - 1, plan_v);
+
+    dH = zeros<value_t>(hidden_size);
+    for (size_t k = 0; k < cF.size(); ++k) {
+      ch = conj_mult_sum(cv, *cF[k]);
+      h = ifft(ch, dimCount - 1, iplan_h);
+      dH[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size] = h[hidden_topleft, hidden_layer_batch_size];
+    }
+  }
+
+  void backprop_hiddens() {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    assert(padded_v.size() == padded_visible_size);
+
+    v = rearrange(padded_v, model.stride_size());
+    cv = fft(v, dimCount - 1, plan_v);
+
+    dH = zeros<value_t>(hidden_size);
+    for (size_t k = 0; k < cF.size(); ++k) {
+      ch = conj_mult_sum(cv, *cF[k]);
+      h = ifft(ch, dimCount - 1, iplan_h);
+      H[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size] = h[hidden_topleft, hidden_layer_batch_size];
+    }
   }
 
   /// Takes visible deltas of successive layer as input
   template<class Expression>
   typename boost::enable_if<tbblas::is_expression<Expression>,
     typename boost::enable_if_c<Expression::dimCount == dimCount, int>::type >::type
-  backprop_hidden_deltas(const Expression& deltas) {
-    assert(deltas.size() == hidden_size);
+  backprop_visible_deltas(const Expression& deltas) {
+
+    assert(deltas.size() == model.visibles_size());
 
     switch(model.activation_function()) {
     case activation_function::Sigmoid:
-      dH = deltas * H * (1 + -H);
+      padded_dv[seq<dimCount>(0), model.visibles_size()] =
+          deltas * visibles() * (1 + -visibles());
       break;
 
     case activation_function::ReLU:
-      dH = deltas * (H > 0);
+      padded_dv[seq<dimCount>(0), model.visibles_size()] =
+          deltas * (visibles() > 0);
       break;
 
     case activation_function::Linear:
-      dH = deltas;
+      padded_dv[seq<dimCount>(0), model.visibles_size()] =
+          deltas;
       break;
 
     default:
@@ -408,17 +514,13 @@ public:
     return 0;
   }
 
-//  void init_gradient_updates(value_t epsilon, value_t momentum, value_t weightcost) {
-//    for (size_t k = 0; k < cF.size(); ++k) {
-//      *cFinc[k] = momentum * *cFinc[k] + epsilon * weightcost * *cF[k];
-//      *cbinc[k] = momentum * *cbinc[k];
-//    }
-//  }
-
-  /// Requires hidden deltas and visibles
+  /// Requires visible deltas and hiddens
   void update_gradient() {
     if (!_memory_allocated)
       allocate_gpu_memory();
+
+    if (cbinc.size() != cb.size())
+      cbinc = zeros<complex_t>(cb.size(), cb.fullsize());
 
     if (!cFinc.size()) {
       cFinc.resize(cF.size());
@@ -426,23 +528,18 @@ public:
         cFinc[i] = boost::make_shared<ctensor_t>(zeros<complex_t>(cF[i]->size(), cF[i]->fullsize()));
     }
 
-    if (!cbinc.size()) {
-      cbinc.resize(cb.size());
-      for (size_t i = 0; i < cbinc.size(); ++i)
-        cbinc[i] = boost::make_shared<ctensor_t>(zeros<complex_t>(cb[i]->size(), cb[i]->fullsize()));
-    }
-
-    v = rearrange(padded_v, model.stride_size());
+    v = rearrange(padded_dv, model.stride_size());
     cv = tbblas::fft(v, dimCount - 1, plan_v);
+
+    cbinc = cbinc + value_t(1) / visible_size[dimCount - 1] * tbblas::mask<complex_t>(cv.size(), cv.fullsize(), vbMaskSize) * cv;
 
     for (size_t k = 0; k < cF.size(); ++k) {
 
       h = zeros<value_t>(visible_layer_batch_size);
-      h[hidden_topleft, hidden_layer_batch_size] = dH[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
+      h[hidden_topleft, hidden_layer_batch_size] = H[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
       ch = fft(h, dimCount - 1, plan_h);
 
       *cFinc[k] += conj_repeat_mult(cv, ch, value_t(1) / _voxel_count);
-      *cbinc[k] = *cbinc[k] + value_t(1) / model.visibles_size()[dimCount - 1] * tbblas::mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * ch;
     }
 
     ++_current_batch_size;
@@ -458,26 +555,24 @@ public:
         cFinc[i] = boost::make_shared<ctensor_t>(zeros<complex_t>(cF[i]->size(), cF[i]->fullsize()));
     }
 
-    if (!cbinc.size()) {
-      cbinc.resize(cb.size());
-      for (size_t i = 0; i < cbinc.size(); ++i)
-        cbinc[i] = boost::make_shared<ctensor_t>(zeros<complex_t>(cb[i]->size(), cb[i]->fullsize()));
-    }
+    if (cbinc.size() != cb.size())
+      cbinc = zeros<complex_t>(cb.size(), cb.fullsize());
 
-    this->v = rearrange(padded_v, model.stride_size());
+    this->v = rearrange(padded_dv, model.stride_size());
     cv = tbblas::fft(this->v, dimCount - 1, plan_v);
 
     // u part
     // dW += value_t(-1) * prod1 / v;
 
+    cbinc += value_t(-1) / v * tbblas::mask<complex_t>(cv.size(), cv.fullsize(), vbMaskSize) * cv;
+
     for (size_t k = 0; k < cF.size(); ++k) {
 
       h = zeros<value_t>(visible_layer_batch_size);
-      h[hidden_topleft, hidden_layer_batch_size] = dH[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
+      h[hidden_topleft, hidden_layer_batch_size] = H[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
       ch = fft(h, dimCount - 1, plan_h);
 
       *cFinc[k] += conj_repeat_mult(cv, ch, value_t(-1) / v);
-      *cbinc[k] += value_t(-1) / v * tbblas::mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * ch;
     }
   }
 
@@ -486,22 +581,22 @@ public:
       allocate_gpu_memory();
 
     assert(cFinc.size());
-    assert(cbinc.size());
 
-    this->v = rearrange(padded_v, model.stride_size());
+    this->v = rearrange(padded_dv, model.stride_size());
     cv = tbblas::fft(this->v, dimCount - 1, plan_v);
 
     // v part
     // dW += u * prods1 / (v * v);
 
+    cbinc = cbinc + u / (v * v) * tbblas::mask<complex_t>(cv.size(), cv.fullsize(), vbMaskSize) * cv;
+
     for (size_t k = 0; k < cF.size(); ++k) {
 
       h = zeros<value_t>(visible_layer_batch_size);
-      h[hidden_topleft, hidden_layer_batch_size] = dH[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
+      h[hidden_topleft, hidden_layer_batch_size] = H[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
       ch = fft(h, dimCount - 1, plan_h);
 
       *cFinc[k] += conj_repeat_mult(cv, ch, u / (v * v));
-      *cbinc[k] += u / (v * v) * tbblas::mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * ch;
     }
 
     ++_current_batch_size;
@@ -514,19 +609,16 @@ public:
     // to the model in the frequency domain. Afterwards, the
     // gradients are reset to zero
 
-    if (!cFinc.size() || !cbinc.size())
+    if (!cFinc.size())
       throw std::runtime_error("No gradient calculated.");
+
+    if (deltab.size() != visible_size)
+      deltab = zeros<value_t>(visible_size);
 
     if (!deltaF.size()) {
       deltaF.resize(model.filter_count());
       for (size_t k = 0; k < deltaF.size(); ++k)
         deltaF[k] = boost::make_shared<tensor_t>(zeros<value_t>(model.kernel_size()));
-    }
-
-    if (!deltab.size()) {
-      deltab.resize(cbinc.size());
-      for (size_t k = 0; k < deltab.size(); ++k)
-        deltab[k] = boost::make_shared<tensor_t>(zeros<value_t>(visible_layer_batch_size));
     }
 
     dim_t fullsize = cv.fullsize();
@@ -558,18 +650,20 @@ public:
         (*cFinc[k])[seq(0,0,0,j*cv.size()[dimCount - 1]), cv.size()] = cv;
       }
 
-      h = ifft(*cbinc[k], dimCount - 1, iplan_h);
-      *deltab[k] = momentum * *deltab[k] + h / _current_batch_size;
-      *cbinc[k] = fft(*deltab[k], dimCount - 1, plan_h);
-
       // Apply delta to current filters
       *cF[k] = *cF[k] - epsilon * *cFinc[k];
-      *cb[k] = *cb[k] - epsilon * *cbinc[k];
 
       // Reset filter gradient
       *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
-      *cbinc[k] = zeros<complex_t>(cbinc[k]->size(), cbinc[k]->fullsize());
     }
+
+    // TODO: masking of bias terms
+    padded_f = ifft(cbinc, dimCount - 1, iplan_v);
+    deltab = (momentum * deltab + padded_f / _current_batch_size);// * repeat(v_mask, deltab.size() / v_mask.size());
+    cbinc = fft(deltab, dimCount - 1, plan_v);
+
+    cb = cb - epsilon * cbinc;
+    cbinc = zeros<complex_t>(cbinc.size(), cbinc.fullsize());
 
     _current_batch_size = 0;
     _host_updated = false;
@@ -582,8 +676,12 @@ public:
     // to the model in the frequency domain. Afterwards, the
     // gradients are reset to zero
 
-    if (!cFinc.size() || !cbinc.size())
+    if (!cFinc.size())
       throw std::runtime_error("No gradient calculated.");
+
+    if (db2.size() != visible_size || deltab.size() != visible_size || deltab2.size() != visible_size) {
+      db2 = deltab = deltab2 = zeros<value_t>(visible_size);
+    }
 
     if (!dF2.size() || !deltaF.size() || !deltaF2.size()) {
       dF2.resize(model.filter_count());
@@ -593,17 +691,6 @@ public:
         dF2[k] = boost::make_shared<tensor_t>(zeros<value_t>(model.kernel_size()));
         deltaF[k] = boost::make_shared<tensor_t>(zeros<value_t>(model.kernel_size()));
         deltaF2[k] = boost::make_shared<tensor_t>(zeros<value_t>(model.kernel_size()));
-      }
-    }
-
-    if (!db2.size()|| !deltab.size() || !deltab2.size()) {
-      db2.resize(cbinc.size());
-      deltab.resize(cbinc.size());
-      deltab2.resize(cbinc.size());
-      for (size_t k = 0; k < db2.size(); ++k) {
-        db2[k] = boost::make_shared<tensor_t>(zeros<value_t>(visible_layer_batch_size));
-        deltab[k] = boost::make_shared<tensor_t>(zeros<value_t>(visible_layer_batch_size));
-        deltab2[k] = boost::make_shared<tensor_t>(zeros<value_t>(visible_layer_batch_size));
       }
     }
 
@@ -656,23 +743,24 @@ public:
         (*cFinc[k])[seq(0,0,0,j*cv.size()[dimCount - 1]), cv.size()] = cv;
       }
 
-      h = ifft(*cbinc[k], dimCount - 1, iplan_h);
-      h = h / _current_batch_size;
-
-      *db2[k] = momentum * *db2[k] + (1.0 - momentum) * h * h;
-      *deltab[k] = sqrt(*deltab2[k] + epsilon) / sqrt(*db2[k] + epsilon) * h;
-      *deltab2[k] = momentum * *deltab2[k] + (1.0 - momentum) * *deltab[k] * *deltab[k];
-
-      *cbinc[k] = fft(*deltab[k], dimCount - 1, plan_h);
-
       // Apply delta to current filters
       *cF[k] = *cF[k] - *cFinc[k];
-      *cb[k] = *cb[k] - *cbinc[k];
 
       // Reset filter gradient
       *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
-      *cbinc[k] = zeros<complex_t>(cbinc[k]->size(), cbinc[k]->fullsize());
     }
+
+    // TODO: masking of bias terms
+    padded_f = ifft(cbinc, dimCount - 1, iplan_v);
+    padded_f = padded_f / _current_batch_size;
+
+    db2 = momentum * db2 + (1.0 - momentum) * padded_f * padded_f;
+    deltab = sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * padded_f;
+    deltab2 = momentum * deltab2 + (1.0 - momentum) * deltab * deltab;
+    cbinc = fft(deltab, dimCount - 1, plan_v);
+
+    cb = cb - cbinc;
+    cbinc = zeros<complex_t>(cbinc.size(), cbinc.fullsize());
 
     _current_batch_size = 0;
     _host_updated = false;
@@ -691,10 +779,10 @@ public:
     return H;
   }
 
-  const proxy<tensor_t> visible_deltas() {
+  tensor_t& hidden_deltas() {
     if (!_memory_allocated)
       allocate_gpu_memory();
-    return padded_dv[seq<dimCount>(0), model.visibles_size()];
+    return dH;
   }
 
   void set_batch_length(int length) {
@@ -715,9 +803,6 @@ public:
     return _filter_batch_length;
   }
 };
-
-template<class T, unsigned dims>
-const T cnn_layer<T, dims>::tolerance;
 
 }
 

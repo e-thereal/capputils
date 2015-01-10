@@ -1,12 +1,12 @@
 /*
- * cnn_layer_model.hpp
+ * reverse_cnn_layer_model.hpp
  *
- *  Created on: Aug 18, 2014
+ *  Created on: Jan 05, 2015
  *      Author: tombr
  */
 
-#ifndef TBBLAS_DEEPLEARN_CNN_LAYER_MODEL_HPP_
-#define TBBLAS_DEEPLEARN_CNN_LAYER_MODEL_HPP_
+#ifndef TBBLAS_DEEPLEARN_REVERSE_CNN_LAYER_MODEL_HPP_
+#define TBBLAS_DEEPLEARN_REVERSE_CNN_LAYER_MODEL_HPP_
 
 #include <tbblas/tensor.hpp>
 #include <tbblas/util.hpp>
@@ -29,7 +29,7 @@ namespace tbblas {
 namespace deeplearn {
 
 template<class T, unsigned dims>
-class cnn_layer_model {
+class reverse_cnn_layer_model {
 public:
   const static unsigned dimCount = dims;
   typedef T value_t;
@@ -41,18 +41,20 @@ public:
   /**
    * Versions:
    * 0: initial version, already comes with a version number (no magic code needed)
-   * 1: Masks and filters are stored in it's original form. cnn_layer module takes care of rearranging things
+   * 1: Visible bias and filters are stored in it's original form. cnn_layer module takes care of rearranging things
    *    Kernel size is original kernel size before rearranging due to striding. Has a dedicated field for
    *    visibles size.
+   * 2: Mask added.
    */
-  static const uint16_t CURRENT_VERSION = 1;
+  static const uint16_t CURRENT_VERSION = 2;
 
 protected:
   uint16_t _version;
 
   // Model in CPU memory
-  v_host_tensor_t _filters, _biases;
-  dim_t _kernel_size, _stride_size, _pooling_size, _visibles_size;
+  v_host_tensor_t _filters;
+  host_tensor_t _bias, _mask;
+  dim_t _kernel_size, _stride_size, _pooling_size;
 
   tbblas::deeplearn::activation_function _activation_function;
   tbblas::deeplearn::convolution_type _convolution_type;
@@ -63,28 +65,28 @@ protected:
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
-  cnn_layer_model()
+  reverse_cnn_layer_model()
    : _version(CURRENT_VERSION),
      _stride_size(seq<dimCount>(1)), _pooling_size(seq<dimCount>(1)),
-     _visibles_size(seq<dimCount>(0)),
      _mean(0), _stddev(1), _shared_biases(false) { }
 
-  cnn_layer_model(const cnn_layer_model<T,dims>& model)
+  reverse_cnn_layer_model(const reverse_cnn_layer_model<T,dims>& model)
    : _version(model._version),
      _kernel_size(model.kernel_size()), _stride_size(model.stride_size()),
-     _pooling_size(model.pooling_size()), _visibles_size(model.visibles_size()),
+     _pooling_size(model.pooling_size()),
      _activation_function(model.activation_function()),
      _convolution_type(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
      _shared_biases(model.shared_bias())
   {
     set_filters(model.filters());
     set_bias(model.bias());
+    set_mask(model.mask());
   }
 
   template<class U>
-  cnn_layer_model(const cnn_layer_model<U,dims>& model)
+  reverse_cnn_layer_model(const reverse_cnn_layer_model<U,dims>& model)
    : _kernel_size(model.kernel_size()), _stride_size(model.stride_size()),
-     _pooling_size(model.pooling_size()), _visibles_size(model.visibles_size()),
+     _pooling_size(model.pooling_size()),
      _activation_function(model.activation_function()),
      _convolution_type(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
      _shared_biases(model.shared_bias())
@@ -93,12 +95,11 @@ public:
     for (size_t i = 0; i < model.filters().size(); ++i)
       _filters[i] = boost::make_shared<host_tensor_t>(*model.filters()[i]);
 
-    _biases.resize(model.bias().size());
-    for (size_t i = 0; i < model.bias().size(); ++i)
-      _biases[i] = boost::make_shared<host_tensor_t>(*model.bias()[i]);
+    _bias = model.bias();
+    _mask = model.mask();
   }
 
-  virtual ~cnn_layer_model() { }
+  virtual ~reverse_cnn_layer_model() { }
 
 public:
   void set_version(uint16_t version) {
@@ -125,14 +126,20 @@ public:
     return _filters.size();
   }
 
-  void set_bias(const v_host_tensor_t& bias) {
-    _biases.resize(bias.size());
-    for (size_t i = 0; i < bias.size(); ++i)
-      _biases[i] = boost::make_shared<host_tensor_t>(*bias[i]);
+  void set_bias(const host_tensor_t& bias) {
+    _bias = bias;
   }
 
-  const v_host_tensor_t& bias() const {
-    return _biases;
+  const host_tensor_t& bias() const {
+    return _bias;
+  }
+
+  void set_mask(const host_tensor_t& mask) {
+    _mask = mask;
+  }
+
+  const host_tensor_t& mask() const {
+    return _mask;
   }
 
   void set_kernel_size(const dim_t& size) {
@@ -159,41 +166,17 @@ public:
     return _activation_function;
   }
 
-//  dim_t input_size() const {
-//    dim_t size = visibles_size() * _stride_size;
-//
-//    size_t count = 1;
-//    for (size_t i = 0; i < dimCount; ++i)
-//      count *= _stride_size[i];
-//
-//    size[dimCount - 1] = size[dimCount - 1] / count;
-//    return size;
-//  }
-
-  void set_visibles_size(const dim_t& size) {
-    _visibles_size = size;
-  }
-
   dim_t visibles_size() const {
-//    if (_filters.size() == 0)
-//      throw std::runtime_error("A CNN layer must contain at least one filter.");
-//
-//    dim_t size = _mask.size();
-//    size[dimCount - 1] = _filters[0]->size()[dimCount - 1];
-
-    if (_visibles_size.prod() == 0)
-      throw std::runtime_error("Invalid visible size.");
-
-    return _visibles_size;
+    return _bias.size();
   }
 
   size_t visibles_count() const {
-    return _visibles_size.prod();
+    return _bias.count();
   }
 
   dim_t hiddens_size() const {
     // Initialize with rearranged size (ceil(visible size / stride size))
-    dim_t hidden_size = (_visibles_size + _stride_size - 1) / _stride_size;
+    dim_t hidden_size = (visibles_size() + _stride_size - 1) / _stride_size;
     if (convolution_type() == convolution_type::Valid){
       hidden_size = hidden_size - _kernel_size + 1;
     }
@@ -272,9 +255,7 @@ public:
 
   void set_shared_bias(bool shared) {
     if (!_shared_biases && shared) {
-      for (size_t i = 0; i < _biases.size(); ++i) {
-        *_biases[i] = ones<value_t>(_biases[i]->size()) * sum(*_biases[i]) / _biases[i]->count();
-      }
+      _bias = ones<value_t>(_bias.size()) * sum(_bias) / _bias.count();
     }
     _shared_biases = shared;
   }
@@ -284,7 +265,7 @@ public:
   }
 
   void change_size(dim_t size) {
-    throw std::runtime_error("Not implemented. use set_visibles_size() instead.");
+    throw std::runtime_error("Not implemented.");
 //    if (!_shared_biases)
 //      throw std::runtime_error("Changing the size of a CNN layer is only supported for shared bias terms.");
 //

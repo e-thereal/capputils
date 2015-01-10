@@ -340,8 +340,6 @@ public:
     // Calculate the total activation of the hidden and visible units
     hidact = sum(dH, 0);
 
-//    duW = prods / V.size()[0];
-//    dub = hidact / V.size()[0];
     duW = prods;
     dub = hidact;
   }
@@ -367,8 +365,6 @@ public:
     // TODO: decide the sign depending on the objective function
     // TODO: need to update the objective function for every layer in the nn class
 
-//    dW += -(duW * v - u * prods / V.size()[0]) / (v * v);
-//    db += -(dub * v - u * hidact / V.size()[0]) / (v * v);
     dW += value_t(-1) * (duW * v - u * prods) / (v * v);
     db += value_t(-1) * (dub * v - u * hidact) / (v * v);
 

@@ -57,7 +57,6 @@ public:
     _cnn_layers.resize(model.cnn_layers().size());
     for (size_t i = 0; i < _cnn_layers.size(); ++i) {
       _cnn_layers[i] = boost::make_shared<cnn_layer_t>(boost::ref(*model.cnn_layers()[i]));
-//      _cnn_layers[i]->set_batch_length(model.cnn_layers()[i]->filter_count());
     }
 
     _nn_layers.resize(model.nn_layers().size());
@@ -105,9 +104,8 @@ public:
       _cnn_layers[layer]->set_batch_length(length);
   }
 
-  void set_input(tensor_t& input) {
-    assert(_model.cnn_layers()[0]->input_size() == input.size());
-    _cnn_layers[0]->visibles() = rearrange(input, _model.cnn_layers()[0]->stride_size());
+  const proxy<tensor_t> visibles() {
+    return _cnn_layers[0]->visibles();
   }
 
   matrix_t& hiddens() {
@@ -123,7 +121,7 @@ protected:
 
       _cnn_layers[i]->infer_hiddens();
       if (iLayer + 1 < _cnn_layers.size()) {
-        _cnn_layers[i + 1]->visibles() = rearrange(_cnn_layers[i]->hiddens(), _model.cnn_layers()[i + 1]->stride_size());
+        _cnn_layers[i + 1]->visibles() = _cnn_layers[i]->hiddens();
         infer_hiddens(iLayer + 1);
       } else {
         // Transition from convolutional model to dense model
@@ -155,11 +153,11 @@ protected:
 
       _cnn_layers[i]->infer_hiddens();
       if (iLayer + 1 < _cnn_layers.size()) {
-        _cnn_layers[i + 1]->visibles() = rearrange(_cnn_layers[i]->hiddens(), _model.cnn_layers()[i + 1]->stride_size());
+        _cnn_layers[i + 1]->visibles() = _cnn_layers[i]->hiddens();
         update_gradient(iLayer + 1, target);
 
         _cnn_layers[i + 1]->backprop_visible_deltas();
-        _cnn_layers[i]->backprop_hidden_deltas(rearrange_r(_cnn_layers[i + 1]->visible_deltas(), _model.cnn_layers()[i + 1]->stride_size()));
+        _cnn_layers[i]->backprop_hidden_deltas(_cnn_layers[i + 1]->visible_deltas());
         _cnn_layers[i]->update_gradient();
       } else {
         // Transition from convolutional model to dense model

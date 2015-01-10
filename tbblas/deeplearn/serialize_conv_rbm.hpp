@@ -97,6 +97,10 @@ void deserialize(std::istream& in, tbblas::deeplearn::conv_rbm_model<T, dim>& mo
     count = magic;
     version = 0;
   }
+
+  if (version < 3)
+    throw std::runtime_error("This version of tbblas does not support conv_rbm versions older than 3.");
+
   model.set_version(version);
 
   v_host_tensor_t filters(count);

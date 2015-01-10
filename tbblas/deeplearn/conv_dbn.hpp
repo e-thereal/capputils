@@ -1,18 +1,19 @@
 /*
- * dbn_trainer.hpp
+ * conv_dbn.hpp
  *
- *  Created on: Jul 10, 2014
+ *  Created on: Dec 30, 2014
  *      Author: tombr
  */
 
-#ifndef TBBLAS_DEEPLEARN_DBN_TRAINER_HPP_
-#define TBBLAS_DEEPLEARN_DBN_TRAINER_HPP_
+#ifndef TBBLAS_DEEPLEARN_CONV_DBN_HPP_
+#define TBBLAS_DEEPLEARN_CONV_DBN_HPP_
 
-#include <tbblas/rearrange.hpp>
+// TODO: momentum_step and adadelta_step replace init_gradient and apply_gradient
 
-#include <tbblas/deeplearn/dbn_model.hpp>
-#include <tbblas/deeplearn/conv_rbm_trainer.hpp>
+#include <tbblas/deeplearn/conv_dbn_model.hpp>
+#include <tbblas/deeplearn/conv_rbm.hpp>
 #include <tbblas/deeplearn/rbm.hpp>
+#include <tbblas/reshape.hpp>
 
 #include <thrust/execution_policy.h>
 
@@ -26,7 +27,7 @@ namespace tbblas {
 namespace deeplearn {
 
 template<class T, unsigned dims>
-class dbn_trainer {
+class conv_dbn {
   const static unsigned dimCount = dims;
   typedef T value_t;
   typedef typename tbblas::tensor<value_t, dimCount>::dim_t dim_t;
@@ -39,8 +40,8 @@ class dbn_trainer {
   typedef tbblas::tensor<value_t, dimCount, true> tensor_t;
   typedef std::vector<boost::shared_ptr<tensor_t> > v_tensor_t;
 
-  typedef dbn_model<value_t, dimCount> model_t;
-  typedef conv_rbm_trainer<value_t, dimCount> crbm_t;
+  typedef conv_dbn_model<value_t, dimCount> model_t;
+  typedef conv_rbm<value_t, dimCount> crbm_t;
   typedef rbm<value_t> rbm_t;
 
 protected:
@@ -50,7 +51,7 @@ protected:
   std::vector<boost::shared_ptr<rbm_t> > _rbms;
 
 public:
-  dbn_trainer(model_t& model, size_t gpu_count = 1) : _model(model) {
+  conv_dbn(model_t& model) : _model(model) {
     _crbms.resize(model.crbms().size());
     for (size_t i = 0; i < _crbms.size(); ++i) {
       _crbms[i] = boost::make_shared<crbm_t>(boost::ref(*model.crbms()[i]));
@@ -62,10 +63,10 @@ public:
   }
 
 private:
-  dbn_trainer(const dbn_trainer<T, dims>&);
+  conv_dbn(const conv_dbn<T, dims>&);
 
 public:
-  virtual ~dbn_trainer() { }
+  virtual ~conv_dbn() { }
 
   void allocate_gpu_memory() {
     for (size_t i = 0; i < _crbms.size(); ++i)
@@ -75,21 +76,20 @@ public:
   }
 
   void normalize_visibles() {
-    if (_crbms.size()) {
-      _crbms[0]->normalize_visibles();
-    } else if (_rbms.size()) {
-      _rbms[0]->normalize_visibles();
-    }
+    if (_crbms.size() < 1)
+      throw std::runtime_error("A conv_dbn needs at least one convolutional layer.");
+
+    _crbms[0]->normalize_visibles();
   }
 
   void diversify_visibles() {
-    if (_crbms.size()) {
-      _crbms[0]->diversify_visibles();
-    } else if (_rbms.size()) {
-      _rbms[0]->diversify_visibles();
-    }
+    if (_crbms.size() < 1)
+      throw std::runtime_error("A conv_dbn needs at least one convolutional layer.");
+
+    _crbms[0]->diversify_visibles();
   }
 
+  // if it has a pooling layer, do it from the pooling layer
   void infer_visibles(int topLayer = -1, bool onlyFilters = false) {
     if (topLayer == -1)
       topLayer = _crbms.size() + _rbms.size();
@@ -106,23 +106,20 @@ public:
 
     // Transition from convolutional model to dense model
     if (_crbms.size() && _rbms.size() && topLayer > _crbms.size()) {
-      _crbms[_crbms.size() - 1]->allocate_hiddens();
-      thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream),
-          _rbms[0]->visibles().begin(), _rbms[0]->visibles().end(), _crbms[_crbms.size() - 1]->hiddens().begin());
+      _crbms[_crbms.size() - 1]->allocate_outputs();
+      _crbms[_crbms.size() - 1]->outputs() = reshape(_rbms[0]->visibles(), _crbms[_crbms.size() - 1]->outputs().size());
     }
 
     for (int i = std::min(topLayer, (int)_crbms.size()) - 1; i >= 0; --i) {
-      _crbms[i]->infer_visibles(onlyFilters);
+      _crbms[i]->infer_visibles_from_outputs(onlyFilters);
       if (i > 0) {
-        _crbms[i - 1]->allocate_hiddens();
-        _crbms[i - 1]->hiddens() = rearrange_r(_crbms[i]->visibles(), _model.stride_size(i));
+        _crbms[i - 1]->outputs() = _crbms[i]->visibles();
       }
     }
   }
 
   // -1 indicates the top-most layer
   void infer_hiddens(int maxLayer = -1) {
-
     int currentLayer = 0;
 
     if (maxLayer == -1)
@@ -132,18 +129,16 @@ public:
 
     // bottom-up inference
     for (size_t i = 0; i < _crbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
-      _crbms[i]->infer_hiddens();
+      _crbms[i]->infer_outputs();
       if (i + 1 < _crbms.size()) {
-        _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), _model.stride_size(i + 1));
+          _crbms[i + 1]->visibles() = _crbms[i]->outputs();
       }
     }
 
     // Transition from convolutional model to dense model
     if (_crbms.size() && _rbms.size() && maxLayer > _crbms.size()) {
-      _rbms[0]->visibles().resize(seq(1, (int)_crbms[_crbms.size() - 1]->hiddens().count()));
-
-      thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream), _crbms[_crbms.size() - 1]->hiddens().begin(),
-          _crbms[_crbms.size() - 1]->hiddens().end(), _rbms[0]->visibles().begin());
+      _rbms[0]->visibles().resize(seq(1, (int)_crbms[_crbms.size() - 1]->outputs().count()));
+      _rbms[0]->visibles() = reshape(_crbms[_crbms.size() - 1]->outputs(), _rbms[0]->visibles().size());
     }
 
     for (size_t i = 0; i < _rbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
@@ -170,16 +165,14 @@ public:
 
     // Transition from convolutional model to dense model
     if (_crbms.size() && _rbms.size() && topLayer > _crbms.size()) {
-      _crbms[_crbms.size() - 1]->allocate_hiddens();
-      thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream),
-          _rbms[0]->visibles().begin(), _rbms[0]->visibles().end(), _crbms[_crbms.size() - 1]->hiddens().begin());
+      _crbms[_crbms.size() - 1]->allocate_outputs();
+      _crbms[_crbms.size() - 1]->outputs() = reshape(_rbms[0]->visibles(), _crbms[_crbms.size() - 1]->outputs().size());
     }
 
     for (int i = std::min(topLayer, (int)_crbms.size()) - 1; i >= 0; --i) {
-      _crbms[i]->sample_visibles();
+      _crbms[i]->sample_visibles_from_outputs();
       if (i > 0) {
-        _crbms[i - 1]->allocate_hiddens();
-        _crbms[i - 1]->hiddens() = rearrange_r(_crbms[i]->visibles(), _model.stride_size(i));
+        _crbms[i - 1]->outputs() = _crbms[i]->visibles();
       }
     }
   }
@@ -195,18 +188,16 @@ public:
 
     // bottom-up inference
     for (size_t i = 0; i < _crbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
-      _crbms[i]->sample_hiddens();
+      _crbms[i]->sample_outputs();
       if (i + 1 < _crbms.size()) {
-        _crbms[i + 1]->visibles() = rearrange(_crbms[i]->hiddens(), _model.stride_size(i + 1));
+        _crbms[i + 1]->visibles() = _crbms[i]->outputs();
       }
     }
 
     // Transition from convolutional model to dense model
     if (_crbms.size() && _rbms.size() && maxLayer > _crbms.size()) {
-      _rbms[0]->visibles().resize(seq(1, (int)_crbms[_crbms.size() - 1]->hiddens().count()));
-
-      thrust::copy(thrust::cuda::par.on(tbblas::context::get().stream), _crbms[_crbms.size() - 1]->hiddens().begin(),
-          _crbms[_crbms.size() - 1]->hiddens().end(), _rbms[0]->visibles().begin());
+      _rbms[0]->visibles().resize(seq(1, (int)_crbms[_crbms.size() - 1]->outputs().count()));
+      _rbms[0]->visibles() = reshape(_crbms[_crbms.size() - 1]->outputs(), _rbms[0]->visibles().size());
     }
 
     for (size_t i = 0; i < _rbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
@@ -217,28 +208,45 @@ public:
     }
   }
 
+//  void init_gradient_updates(value_t momentum = 0, value_t weightcost = 0) {
+//    for (size_t i = 0; i < _crbms.size(); ++i)
+//      _crbms[i]->init_gradient_updates(momentum, weightcost);
+//
+//    for (size_t i = 0; i < _rbms.size(); ++i)
+//      _rbms[i]->init_gradient_updates(momentum, weightcost);
+//  }
+//
+//  void update_positive_gradient(value_t epsilonw, value_t epsilonvb, value_t epsilonhb) {
+//    for (size_t i = 0; i < _crbms.size(); ++i)
+//      _crbms[i]->update_positive_gradient(epsilonw, epsilonvb, epsilonhb);
+//
+//    for (size_t i = 0; i < _rbms.size(); ++i)
+//      _rbms[i]->update_positive_gradient(epsilonw, epsilonvb, epsilonhb);
+//  }
+//
+//  void update_negative_gradient(value_t epsilonw, value_t epsilonvb, value_t epsilonhb) {
+//    for (size_t i = 0; i < _crbms.size(); ++i)
+//      _crbms[i]->update_negative_gradient(epsilonw, epsilonvb, epsilonhb);
+//
+//    for (size_t i = 0; i < _rbms.size(); ++i)
+//      _rbms[i]->update_negative_gradient(epsilonw, epsilonvb, epsilonhb);
+//  }
+//
+//  void apply_gradient() {
+//    for (size_t i = 0; i < _crbms.size(); ++i)
+//      _crbms[i]->apply_gradient();
+//
+//    for (size_t i = 0; i < _rbms.size(); ++i)
+//      _rbms[i]->apply_gradient();
+//  }
+
   void set_batch_length(int layer, int length) {
     if (layer < _crbms.size())
       _crbms[layer]->set_batch_length(length);
   }
 
-  void set_input(tensor_t& input) {
-    if (!_crbms.size())
-      throw std::runtime_error("The DBN does not have a convolutional layer!");
-
-    assert(_model.crbms()[0]->input_size() == input.size());
-    _crbms[0]->visibles() = rearrange(input, _model.crbms()[0]->stride_size());
-  }
-
-  void get_input(tensor_t& input) {
-    if (!_crbms.size())
-      throw std::runtime_error("The DBN does not have a convolutional layer!");
-
-    input = rearrange_r(_crbms[0]->visibles(), _model.crbms()[0]->stride_size());
-  }
-
   // Access to model data
-  tensor_t& cvisibles(int layer = 0) {
+  const proxy<tensor_t> cvisibles(int layer = 0) {
     if (layer >= 0 && layer < _crbms.size())
       return _crbms[layer]->visibles();
 
@@ -250,6 +258,25 @@ public:
       layer = _crbms.size() - 1;
     if (layer >= 0 && layer < _crbms.size())
       return _crbms[layer]->hiddens();
+
+    throw std::runtime_error("The given layer is not part of the DBN!");
+  }
+
+  tensor_t& cpooled_units(int layer = -1) {
+    if (layer == -1)
+      layer = _crbms.size() - 1;
+    if (layer >= 0 && layer < _crbms.size())
+      return _crbms[layer]->pooled_units();
+
+    throw std::runtime_error("The given layer is not part of the DBN!");
+  }
+
+  tensor_t& coutputs(int layer = -1) {
+    if (layer == -1)
+      layer = _crbms.size() - 1;
+    if (layer >= 0 && layer < _crbms.size()) {
+      return _crbms[layer]->outputs();
+    }
 
     throw std::runtime_error("The given layer is not part of the DBN!");
   }
@@ -276,4 +303,4 @@ public:
 
 }
 
-#endif /* TBBLAS_DEEPLEARN_DBN_TRAINER_HPP_ */
+#endif /* TBBLAS_DEEPLEARN_CONV_DBN_HPP_ */

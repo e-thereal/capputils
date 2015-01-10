@@ -18,14 +18,9 @@ namespace tbblas {
 
 namespace deeplearn {
 
-template<class T, unsigned dims>
-void serialize(const tbblas::deeplearn::dbn_model<T, dims>& model, std::ostream& out) {
+template<class T>
+void serialize(const tbblas::deeplearn::dbn_model<T>& model, std::ostream& out) {
   unsigned count = 0;
-
-  count = model.crbms().size();
-  out.write((char*)&count, sizeof(count));
-  for (size_t i = 0; i < count; ++i)
-    serialize(*model.crbms()[i], out);
 
   count = model.rbms().size();
   out.write((char*)&count, sizeof(count));
@@ -33,32 +28,19 @@ void serialize(const tbblas::deeplearn::dbn_model<T, dims>& model, std::ostream&
     serialize(*model.rbms()[i], out);
 }
 
-template<class T, unsigned dims>
-void serialize(const tbblas::deeplearn::dbn_model<T, dims>& model, const std::string& filename) {
+template<class T>
+void serialize(const tbblas::deeplearn::dbn_model<T>& model, const std::string& filename) {
   std::ofstream out(filename.c_str(), std::ios_base::binary);
   serialize(model, out);
 }
 
-template<class T, unsigned dims>
-void deserialize(std::istream& in, tbblas::deeplearn::dbn_model<T, dims>& model) {
-
-  typedef conv_rbm_model<T, dims> crbm_t;
-  typedef std::vector<boost::shared_ptr<crbm_t> > v_crbm_t;
+template<class T>
+void deserialize(std::istream& in, tbblas::deeplearn::dbn_model<T>& model) {
 
   typedef rbm_model<T> rbm_t;
   typedef std::vector<boost::shared_ptr<rbm_t> > v_rbm_t;
 
   unsigned count = 0;
-  crbm_t crbm;
-
-  in.read((char*)&count, sizeof(count));
-  v_crbm_t crbms(count);
-  for (size_t i = 0; i < count; ++i) {
-    deserialize(in, crbm);
-    crbms[i] = boost::make_shared<crbm_t>(crbm);
-  }
-  model.set_crbms(crbms);
-
   rbm_t rbm;
 
   in.read((char*)&count, sizeof(count));
@@ -70,8 +52,8 @@ void deserialize(std::istream& in, tbblas::deeplearn::dbn_model<T, dims>& model)
   model.set_rbms(rbms);
 }
 
-template<class T, unsigned dims>
-void deserialize(const std::string& filename, tbblas::deeplearn::dbn_model<T, dims>& model) {
+template<class T>
+void deserialize(const std::string& filename, tbblas::deeplearn::dbn_model<T>& model) {
   std::ifstream in(filename.c_str(), std::ios_base::binary);
   deserialize(in, model);
 }

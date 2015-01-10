@@ -33,7 +33,7 @@ template<class Tensor>
 struct proxy;
 
 template<class T, unsigned dim, bool device>
-proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
+const proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
     const sequence<unsigned, dim>& start, const sequence<unsigned, dim>& size);
 
 template<class T, unsigned dim, bool device = false>

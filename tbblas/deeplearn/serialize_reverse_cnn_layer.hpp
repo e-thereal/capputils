@@ -1,24 +1,26 @@
 /*
- * serialize_cnn_layer.hpp
+ * serialize_reverse_cnn_layer.hpp
  *
  *  Created on: Aug 19, 2014
  *      Author: tombr
  */
 
-#ifndef TBBLAS_DEEPLEARN_SERIALIZE_CNN_LAYER_HPP_
-#define TBBLAS_DEEPLEARN_SERIALIZE_CNN_LAYER_HPP_
+#ifndef TBBLAS_DEEPLEARN_SERIALIZE_REVERSE_CNN_LAYER_HPP_
+#define TBBLAS_DEEPLEARN_SERIALIZE_REVERSE_CNN_LAYER_HPP_
 
-#include <tbblas/deeplearn/cnn_layer_model.hpp>
+#include <tbblas/deeplearn/reverse_cnn_layer_model.hpp>
 #include <tbblas/serialize.hpp>
+#include <tbblas/ones.hpp>
 #include <iostream>
 #include <fstream>
+
 
 namespace tbblas {
 
 namespace deeplearn {
 
 template<class T, unsigned dim>
-void serialize(const tbblas::deeplearn::cnn_layer_model<T, dim>& model, std::ostream& out) {
+void serialize(const tbblas::deeplearn::reverse_cnn_layer_model<T, dim>& model, std::ostream& out) {
   unsigned count = 0;
 
   uint16_t version = model.version();
@@ -30,21 +32,19 @@ void serialize(const tbblas::deeplearn::cnn_layer_model<T, dim>& model, std::ost
   for (size_t i = 0; i < count; ++i)
     serialize(*model.filters()[i], out);
 
-  count = model.bias().size();
-  out.write((char*)&count, sizeof(count));
-  for (size_t i = 0; i < count; ++i)
-    serialize(*model.bias()[i], out);
+  serialize(model.bias(), out);
 
-  typename tbblas::deeplearn::cnn_layer_model<T, dim>::dim_t size = model.kernel_size();
+  if (model.version() >= 2) {
+    serialize(model.mask(), out);
+  }
+
+  typename tbblas::deeplearn::reverse_cnn_layer_model<T, dim>::dim_t size = model.kernel_size();
   out.write((char*)&size, sizeof(size));
 
   size = model.stride_size();
   out.write((char*)&size, sizeof(size));
 
   size = model.pooling_size();
-  out.write((char*)&size, sizeof(size));
-
-  size = model.visibles_size();
   out.write((char*)&size, sizeof(size));
 
   T mean = model.mean();
@@ -62,16 +62,16 @@ void serialize(const tbblas::deeplearn::cnn_layer_model<T, dim>& model, std::ost
 }
 
 template<class T, unsigned dim>
-void serialize(const tbblas::deeplearn::cnn_layer_model<T, dim>& model, const std::string& filename) {
+void serialize(const tbblas::deeplearn::reverse_cnn_layer_model<T, dim>& model, const std::string& filename) {
   std::ofstream out(filename.c_str(), std::ios_base::binary);
   serialize(model, out);
 }
 
 template<class T, unsigned dim>
-void deserialize(std::istream& in, tbblas::deeplearn::cnn_layer_model<T, dim>& model) {
+void deserialize(std::istream& in, tbblas::deeplearn::reverse_cnn_layer_model<T, dim>& model) {
 
-  typedef typename cnn_layer_model<T, dim>::host_tensor_t host_tensor_t;
-  typedef typename cnn_layer_model<T, dim>::v_host_tensor_t v_host_tensor_t;
+  typedef typename reverse_cnn_layer_model<T, dim>::host_tensor_t host_tensor_t;
+  typedef typename reverse_cnn_layer_model<T, dim>::v_host_tensor_t v_host_tensor_t;
 
   unsigned count = 0;
   uint16_t version;
@@ -92,15 +92,19 @@ void deserialize(std::istream& in, tbblas::deeplearn::cnn_layer_model<T, dim>& m
   }
   model.set_filters(filters);
 
-  in.read((char*)&count, sizeof(count));
-  v_host_tensor_t biases(count);
-  for (size_t i = 0; i < count; ++i) {
-    deserialize(in, tensor);
-    biases[i] = boost::make_shared<host_tensor_t>(tensor);
-  }
-  model.set_bias(biases);
+  deserialize(in, tensor);
+  model.set_bias(tensor);
 
-  typename tbblas::deeplearn::cnn_layer_model<T, dim>::dim_t size;
+  if (model.version() >= 2) {
+    deserialize(in, tensor);
+  } else {
+    typename tbblas::deeplearn::reverse_cnn_layer_model<T, dim>::dim_t mask_size = model.visibles_size();
+    mask_size[dim - 1] = 1;
+    tensor = ones<T>(mask_size);
+  }
+  model.set_mask(tensor);
+
+  typename tbblas::deeplearn::reverse_cnn_layer_model<T, dim>::dim_t size;
   in.read((char*)&size, sizeof(size));
   model.set_kernel_size(size);
 
@@ -109,11 +113,6 @@ void deserialize(std::istream& in, tbblas::deeplearn::cnn_layer_model<T, dim>& m
 
   in.read((char*)&size, sizeof(size));
   model.set_pooling_size(size);
-
-  if (version >= 1) {
-    in.read((char*)&size, sizeof(size));
-    model.set_visibles_size(size);
-  }
 
   T mean = 0;
   in.read((char*)&mean, sizeof(mean));
@@ -141,7 +140,7 @@ void deserialize(std::istream& in, tbblas::deeplearn::cnn_layer_model<T, dim>& m
 }
 
 template<class T, unsigned dim>
-void deserialize(const std::string& filename, tbblas::deeplearn::cnn_layer_model<T, dim>& model) {
+void deserialize(const std::string& filename, tbblas::deeplearn::reverse_cnn_layer_model<T, dim>& model) {
   std::ifstream in(filename.c_str(), std::ios_base::binary);
   deserialize(in, model);
 }
@@ -150,4 +149,4 @@ void deserialize(const std::string& filename, tbblas::deeplearn::cnn_layer_model
 
 }
 
-#endif /* TBBLAS_DEEPLEARN_SERIALIZE_CONV_RBM_HPP_ */
+#endif /* TBBLAS_DEEPLEARN_SERIALIZE_REVERSE_CNN_LAYER_HPP_ */

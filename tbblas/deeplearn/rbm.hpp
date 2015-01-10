@@ -320,7 +320,7 @@ public:
     dc = dc + epsilonhb * hidact / V.size()[0];
 
     if (_sparsity_weight > 0) {
-      diffprobs = H - _sparsity_target;
+      diffprobs = -H + _sparsity_target;
 
       prods = prod(trans(V), diffprobs);
       hidact = sum(diffprobs, 0);

@@ -83,14 +83,13 @@ public:
     _nn_layers.push_back(boost::make_shared<nn_layer_t>(layer));
   }
 
-  dim_t input_size() const {
+  dim_t visibles_size() const {
     assert(_cnn_layers.size());
-    return _cnn_layers[0]->input_size();
+    return _cnn_layers[0]->visibles_size();
   }
 
   size_t visibles_count() const {
-    assert(_cnn_layers.size());
-    return _cnn_layers[0]->visibles_count();
+    return visibles_size().prod();
   }
 
   size_t hiddens_count() const {
