@@ -24,6 +24,7 @@
 #include <tbblas/mask.hpp>
 #include <tbblas/change_stream.hpp>
 #include <tbblas/context.hpp>
+#include <tbblas/sequence_iterator.hpp>
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/barrier.hpp>
@@ -103,15 +104,16 @@ protected:
         visible_layer_size, hidden_layer_size,
         visible_layer_batch_size, hidden_layer_batch_size,
         visible_batch_size, kernel_size, padded_kernel_size, hidden_topleft,
-        patch_count, patch_size, patch_batch_size, patch_layer_size, patch_layer_batch_size;
+        patch_count, patch_size, patch_batch_size, patch_layer_size, patch_layer_batch_size,
+        hidden_patch_layer_batch_size, step_size, step_count;
 //        vbMaskSize, hbMaskSize, spMaskSize;
 
   // one element per thread
-  tensor_t v, h, shifted_f, padded_f, f, padded_k, v_mask, h_mask;  // TODO: do I need shifted_f, padded_f, and f or can I replace some of them with v?
-  ctensor_t cv, ch, chdiff;
-  plan_t plan_v, iplan_v, plan_h, iplan_h;
-  uniform_t v_rand, h_rand;
-  normal_t v_noise, h_noise;
+  tensor_t v, vr, h, hr, shifted_f, padded_f, f, padded_k, v_mask, h_mask;  // TODO: do I need shifted_f, padded_f, and f or can I replace some of them with v?
+  ctensor_t cv, cvr, ch, chr, chdiff;
+  plan_t plan_v, plan_vr, iplan_v, iplan_vr, plan_h, plan_hr, iplan_h, iplan_hr;
+  uniform_t v_rand, h_rand, hr_rand;
+  normal_t v_noise, hr_noise;
 
   tensor_t _visibles, _hiddens, _pooled;  // interface tensors
 
@@ -161,11 +163,8 @@ public:
     kernel_size[dimCount - 1] = visible_size[dimCount - 1] = model.visibles_size()[dimCount - 1] * model.stride_size().prod();
     hidden_size = model.hiddens_size();
 
-    patch_size = (visible_size + patch_count - 1) / patch_count + kernel_size - 1;
+    patch_size = min((visible_size + patch_count - 1) / patch_count + kernel_size - 1, visible_size);
     patch_layer_size = patch_layer_batch_size = patch_batch_size = patch_size;
-    tbblas_print(visible_size);
-    tbblas_print(patch_count);
-    tbblas_print(patch_size);
 
     visible_batch_size = visible_layer_batch_size = visible_layer_size = visible_size;
     hidden_layer_size = hidden_layer_batch_size = hidden_size;
@@ -180,6 +179,12 @@ public:
     } else {
       hidden_topleft = seq<dimCount>(0);
     }
+
+    hidden_patch_layer_batch_size = patch_size - kernel_size + 1;
+    hidden_patch_layer_batch_size[dimCount - 1] = _filter_batch_length;
+
+    step_size = patch_size - kernel_size + 1;
+    step_count = (hidden_layer_size + step_size - 1) / step_size;
 
     _hiddens = zeros<value_t>(hidden_size);
 
@@ -292,7 +297,7 @@ public:
     }
 
     if (model.hiddens_type() == unit_type::Bernoulli)
-      h_rand.resize(visible_layer_batch_size);
+      hr_rand.resize(patch_layer_batch_size);
 
     if (model.hiddens_type() == unit_type::MyReLU ||
         model.hiddens_type() == unit_type::ReLU ||
@@ -300,7 +305,7 @@ public:
         model.hiddens_type() == unit_type::ReLU2 ||
         model.hiddens_type() == unit_type::ReLU4)
     {
-      h_noise.resize(visible_layer_batch_size);
+      hr_noise.resize(patch_layer_batch_size);
     }
 
     if (model.visibles_type() == unit_type::MyReLU ||
@@ -344,28 +349,28 @@ public:
     if (!_memory_allocated)
       allocate_gpu_memory();
 
-    dim_t fullsize = cv.fullsize();
+    dim_t fullsize = cvr.fullsize();
     for (size_t k = 0; k < cF.size(); ++k) {
       for (int j = 0; j < _filter_batch_length; ++j) {
 
         // Extract one filter from the filter batch
         dim_t topleft = patch_size / 2 - kernel_size / 2;
-        cv = (*cF[k])[seq(0,0,0,j*cv.size()[dimCount - 1]), cv.size()];
-        cv.set_fullsize(fullsize);
-        shifted_f = ifft(cv, dimCount - 1, iplan_v);
+        cvr = (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
+        cvr.set_fullsize(fullsize);
+        shifted_f = ifft(cvr, dimCount - 1, iplan_v);
         padded_f = fftshift(shifted_f, dimCount - 1);
         padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
         *model.filters()[k * _filter_batch_length + j] = padded_k[seq<dimCount>(0), model.kernel_size()];
+        tbblas::synchronize();
       }
-//      h = ifft(*cc[k], dimCount - 1, iplan_h);
       *_c[k] = *_c[k] * (abs(*_c[k]) > 1e-16);
 
       for (int j = 0; j < _filter_batch_length; ++j) {
         *model.hidden_bias()[k * _filter_batch_length + j] = (*_c[k])[seq(0,0,0,j), visible_layer_size];
+        tbblas::synchronize();
       }
     }
 
-//    f = ifft(cb, dimCount - 1, iplan_v);
     _b = _b * (abs(_b) > 1e-16);
     tensor_t padded = rearrange_r(_b, model.stride_size());
     host_tensor_t b = padded[seq<dimCount>(0), model.visibles_size()];
@@ -458,29 +463,30 @@ public:
 
     assert(_hiddens.size() == hidden_size);
 
-    // TODO: divide convolution into subregions
+    if (onlyFilters)
+      v = zeros<value_t>(visible_size);
+    else
+      v = _b;
 
-    // for each subregion
-    {
-      cv = zeros<complex_t>(cF[0]->size() / seq(1,1,1,_filter_batch_length), cF[0]->fullsize() / seq(1,1,1,_filter_batch_length));
+    // Iterate over sub-regions
+    for (sequence_iterator<dim_t> iter(seq<dimCount>(0), step_count); iter; ++iter) {
+      dim_t topleft = *iter * step_size;
+
+      dim_t overlap_size = min(patch_size, visible_size - topleft);
+      dim_t hidden_overlap_layer_batch_size = min(hidden_layer_batch_size - topleft, hidden_patch_layer_batch_size);// for each subregion
+
+      cvr = zeros<complex_t>(cF[0]->size() / seq(1,1,1,_filter_batch_length), cF[0]->fullsize() / seq(1,1,1,_filter_batch_length));
 
       for (size_t k = 0; k < cF.size(); ++k) {
-        h = zeros<value_t>(patch_layer_batch_size);
+        hr = zeros<value_t>(patch_layer_batch_size);
 
-        // TODO: use overlap size here
-        h[hidden_topleft, hidden_layer_batch_size] = _hiddens[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
-        if (!onlyFilters) // TODO: probably don't need to mask here
-          h = h * repeat(h_mask, h.size() / h_mask.size());
-        ch = fft(h, dimCount - 1, plan_h);
-        cv += repeat_mult_sum(ch, *cF[k]);
+        hr[hidden_topleft, hidden_overlap_layer_batch_size] = _hiddens[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+        chr = fft(hr, dimCount - 1, plan_hr);
+        cvr += repeat_mult_sum(chr, *cF[k]);
       }
-      v = ifft(cv, dimCount - 1, iplan_v);
-
-      // fill a patch
+      vr = ifft(cvr, dimCount - 1, iplan_vr);
+      v[topleft, overlap_size] = v[topleft, overlap_size] + vr[seq<dimCount>(0), overlap_size];
     }
-
-    if (!onlyFilters)
-      v += _b;
 
     if (!onlyFilters) {
       switch(model.visibles_type()) {
@@ -509,33 +515,49 @@ public:
 
     v = rearrange(_visibles, model.stride_size());
 
-    // TODO: iterate over subregions
-    // for each subregion
-    {
-      cv = tbblas::fft(v, dimCount - 1, plan_v);  // TODO: fft of a sub region
+    // Iterate over sub-regions
+    for (sequence_iterator<dim_t> iter(seq<dimCount>(0), step_count); iter; ++iter) {
+      dim_t topleft = *iter * step_size;
+
+      dim_t overlap_size = min(patch_size, visible_size - topleft);
+      dim_t overlap_layer_size = min(patch_layer_size, visible_layer_size - topleft);
+      dim_t overlap_layer_batch_size = min(patch_layer_batch_size, visible_layer_batch_size - topleft);
+      dim_t hidden_overlap_layer_batch_size = min(hidden_layer_batch_size - topleft, hidden_patch_layer_batch_size);
+
+      vr = zeros<value_t>(patch_size);
+      vr[seq<dimCount>(0), overlap_size] = v[topleft, overlap_size];
+      cvr = tbblas::fft(vr, dimCount - 1, plan_vr);
 
       for (size_t k = 0; k < cF.size(); ++k) {
-        ch = conj_mult_sum(cv, *cF[k]);
+        chr = conj_mult_sum(cvr, *cF[k]);
 
-        h = ifft(ch, dimCount - 1, iplan_h);
-        h += *_c[k];  // TODO: apply sub-region of bias terms
+        hr = ifft(chr, dimCount - 1, iplan_hr);
+        hr[seq<dimCount>(0), overlap_layer_batch_size] =
+            hr[seq<dimCount>(0), overlap_layer_batch_size] + (*_c[k])[topleft, overlap_layer_batch_size];  // apply sub-region of bias terms
 
         switch (model.hiddens_type()) {
-          case unit_type::Bernoulli: h = sigm(h); break;
-          case unit_type::ReLU:      h = max(0.0, h);  break;
-          case unit_type::MyReLU:    h = nrelu_mean(h); break;
-          case unit_type::ReLU1:     h = min(1.0, max(0.0, h));  break;
-          case unit_type::ReLU2:     h = min(2.0, max(0.0, h));  break;
-          case unit_type::ReLU4:     h = min(4.0, max(0.0, h));  break;
-          case unit_type::ReLU8:     h = min(8.0, max(0.0, h));  break;
+          case unit_type::Bernoulli: hr = sigm(hr); break;
+          case unit_type::ReLU:      hr = max(0.0, hr);  break;
+          case unit_type::MyReLU:    hr = nrelu_mean(hr); break;
+          case unit_type::ReLU1:     hr = min(1.0, max(0.0, hr));  break;
+          case unit_type::ReLU2:     hr = min(2.0, max(0.0, hr));  break;
+          case unit_type::ReLU4:     hr = min(4.0, max(0.0, hr));  break;
+          case unit_type::ReLU8:     hr = min(8.0, max(0.0, hr));  break;
         }
-        if (_dropout_rate > 0)
-          h = h * *drops[k] / (1. - _dropout_rate) * repeat(h_mask, h.size() / h_mask.size());
-        else
-          h = h * repeat(h_mask, h.size() / h_mask.size());
 
-        // TODO: fill a subregion of the hiddens
-        _hiddens[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size] = h[hidden_topleft, hidden_layer_batch_size];
+        if (_dropout_rate > 0) {
+          hr[seq<dimCount>(0), overlap_layer_batch_size] =
+              hr[seq<dimCount>(0), overlap_layer_batch_size] *
+              (*drops[k])[seq<dimCount>(0), overlap_layer_batch_size] / (1. - _dropout_rate) *
+              repeat(h_mask[topleft, overlap_layer_size], overlap_layer_batch_size / overlap_layer_size);
+        } else {
+          hr[seq<dimCount>(0), overlap_layer_batch_size] =
+              hr[seq<dimCount>(0), overlap_layer_batch_size] *
+              repeat(h_mask[topleft, overlap_layer_size], overlap_layer_batch_size / overlap_layer_size);
+        }
+
+        _hiddens[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size] =
+            hr[hidden_topleft, hidden_overlap_layer_batch_size];
       }
     }
   }
@@ -562,17 +584,26 @@ public:
 
     assert(_hiddens.size() == hidden_size);
 
-    cv = zeros<complex_t>(cF[0]->size() / seq(1,1,1,_filter_batch_length), cF[0]->fullsize() / seq(1,1,1,_filter_batch_length));
+    v = _b;
 
-    for (size_t k = 0; k < cF.size(); ++k) {
-      h = zeros<value_t>(visible_layer_batch_size);
-      h[hidden_topleft, hidden_layer_batch_size] = _hiddens[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
-      h = h * repeat(h_mask, h.size() / h_mask.size());
-      ch = fft(h, dimCount - 1, plan_h);
-      cv += repeat_mult_sum(ch, *cF[k]);
+    // Iterate over sub-regions
+    for (sequence_iterator<dim_t> iter(seq<dimCount>(0), step_count); iter; ++iter) {
+      dim_t topleft = *iter * step_size;
+
+      dim_t overlap_size = min(patch_size, visible_size - topleft);
+      dim_t hidden_overlap_layer_batch_size = min(hidden_layer_batch_size - topleft, hidden_patch_layer_batch_size);// for each subregion
+
+      cvr = zeros<complex_t>(cF[0]->size() / seq(1,1,1,_filter_batch_length), cF[0]->fullsize() / seq(1,1,1,_filter_batch_length));
+
+      for (size_t k = 0; k < cF.size(); ++k) {
+        hr = zeros<value_t>(patch_layer_batch_size);
+        hr[hidden_topleft, hidden_overlap_layer_batch_size] = _hiddens[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+        chr = fft(hr, dimCount - 1, plan_hr);
+        cvr += repeat_mult_sum(chr, *cF[k]);
+      }
+      vr = ifft(cvr, dimCount - 1, iplan_vr);
+      v[topleft, overlap_size] = v[topleft, overlap_size] + vr[seq<dimCount>(0), overlap_size];
     }
-    v = ifft(cv, dimCount - 1, iplan_v);
-    v += _b;
 
     switch(model.visibles_type()) {
       case unit_type::Gaussian:  break;
@@ -597,29 +628,51 @@ public:
     assert(_visibles.size() == padded_visible_size);
 
     v = rearrange(_visibles, model.stride_size());
-    cv = tbblas::fft(v, dimCount - 1, plan_v);
 
-    for (size_t k = 0; k < cF.size(); ++k) {
-      ch = conj_mult_sum(cv, *cF[k]);
+    // Iterate over sub-regions
+    for (sequence_iterator<dim_t> iter(seq<dimCount>(0), step_count); iter; ++iter) {
+      dim_t topleft = *iter * step_size;
 
-      h = ifft(ch, dimCount - 1, iplan_h);
-      h += *_c[k];
+      dim_t overlap_size = min(patch_size, visible_size - topleft);
+      dim_t overlap_layer_size = min(patch_layer_size, visible_layer_size - topleft);
+      dim_t overlap_layer_batch_size = min(patch_layer_batch_size, visible_layer_batch_size - topleft);
+      dim_t hidden_overlap_layer_batch_size = min(hidden_layer_batch_size - topleft, hidden_patch_layer_batch_size);
 
-      switch (model.hiddens_type()) {
-        case unit_type::Bernoulli: h = sigm(h) > h_rand(); break;
-        case unit_type::MyReLU:
-        case unit_type::ReLU:      h = max(0.0, h + sqrt(sigm(h)) * h_noise()); break;
-        case unit_type::ReLU1:     h = min(1.0, max(0.0, h + (h > 0) * (h < 1.0) * h_noise())); break;
-        case unit_type::ReLU2:     h = min(2.0, max(0.0, h + (h > 0) * (h < 2.0) * h_noise())); break;
-        case unit_type::ReLU4:     h = min(4.0, max(0.0, h + (h > 0) * (h < 4.0) * h_noise())); break;
-        case unit_type::ReLU8:     h = min(8.0, max(0.0, h + (h > 0) * (h < 8.0) * h_noise())); break;
+      vr = zeros<value_t>(patch_size);
+      vr[seq<dimCount>(0), overlap_size] = v[topleft, overlap_size];
+      cvr = tbblas::fft(vr, dimCount - 1, plan_vr);
+
+      for (size_t k = 0; k < cF.size(); ++k) {
+        chr = conj_mult_sum(cvr, *cF[k]);
+
+        hr = ifft(chr, dimCount - 1, iplan_hr);
+        hr[seq<dimCount>(0), overlap_layer_batch_size] =
+            hr[seq<dimCount>(0), overlap_layer_batch_size] + (*_c[k])[topleft, overlap_layer_batch_size];  // apply sub-region of bias terms
+
+        switch (model.hiddens_type()) {
+          case unit_type::Bernoulli: hr = sigm(hr) > hr_rand(); break;
+          case unit_type::MyReLU:
+          case unit_type::ReLU:      hr = max(0.0, hr + sqrt(sigm(hr)) * hr_noise()); break;
+          case unit_type::ReLU1:     hr = min(1.0, max(0.0, hr + (hr > 0) * (hr < 1.0) * hr_noise())); break;
+          case unit_type::ReLU2:     hr = min(2.0, max(0.0, hr + (hr > 0) * (hr < 2.0) * hr_noise())); break;
+          case unit_type::ReLU4:     hr = min(4.0, max(0.0, hr + (hr > 0) * (hr < 4.0) * hr_noise())); break;
+          case unit_type::ReLU8:     hr = min(8.0, max(0.0, hr + (hr > 0) * (hr < 8.0) * hr_noise())); break;
+        }
+
+        if (_dropout_rate > 0) {
+          hr[seq<dimCount>(0), overlap_layer_batch_size] =
+              hr[seq<dimCount>(0), overlap_layer_batch_size] *
+              (*drops[k])[seq<dimCount>(0), overlap_layer_batch_size] / (1. - _dropout_rate) *
+              repeat(h_mask[topleft, overlap_layer_size], overlap_layer_batch_size / overlap_layer_size);
+        } else {
+          hr[seq<dimCount>(0), overlap_layer_batch_size] =
+              hr[seq<dimCount>(0), overlap_layer_batch_size] *
+              repeat(h_mask[topleft, overlap_layer_size], overlap_layer_batch_size / overlap_layer_size);
+        }
+
+        _hiddens[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size] =
+            hr[hidden_topleft, hidden_overlap_layer_batch_size];
       }
-      // TODO: sub-mask and sub-drop required or do this stuff after the entire H was calculated
-      if (_dropout_rate > 0)
-        h = h * *drops[k] / (1. - _dropout_rate) * repeat(h_mask, h.size() / h_mask.size());
-      else
-        h = h * repeat(h_mask, h.size() / h_mask.size());
-      _hiddens[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size] = h[hidden_topleft, hidden_layer_batch_size];
     }
   }
 
@@ -650,6 +703,7 @@ public:
       h_rand.resize(visible_layer_batch_size);
 
     if (method == dropout_method::DropColumn) {
+      *drops[0] = h_rand() > _dropout_rate;
       *drops[0] = repeat((*drops[0])[seq(0,0,0,0), visible_layer_size], visible_layer_batch_size / visible_layer_size);
 
       for (size_t k = 1; k < drops.size(); ++k)
@@ -681,11 +735,9 @@ public:
         _cinc[i] = boost::make_shared<tensor_t>(zeros<value_t>(_c[i]->size()));
     }
 
-    // TODO: how much time does this take?
 
-    // TODO: do this on a sub-region and add up the results from all subregions
+    v = rearrange(_visibles, model.stride_size());
 
-//    _binc += value_t(1) / visible_size[dimCount - 1] * tbblas::mask<complex_t>(cv.size(), cv.fullsize(), vbMaskSize) * cv;
     if (model.shared_bias()) {
       // TODO: calculate shared bias per channel
       _binc = _binc + sum(v) / v.count();
@@ -693,43 +745,57 @@ public:
       _binc += v;
     }
 
-    v = rearrange(_visibles, model.stride_size());
-    cv = tbblas::fft(v, dimCount - 1, plan_v);
+    for (sequence_iterator<dim_t> iter(seq<dimCount>(0), step_count); iter; ++iter) {
+      dim_t topleft = *iter * step_size;
 
-    for (size_t k = 0; k < cFinc.size(); ++k) {
+      dim_t overlap_size = min(patch_size, visible_size - topleft);
+      dim_t overlap_layer_size = min(patch_layer_size, visible_layer_size - topleft);
+      dim_t overlap_layer_batch_size = min(patch_layer_batch_size, visible_layer_batch_size - topleft);
+      dim_t hidden_overlap_layer_batch_size = min(hidden_layer_batch_size - topleft, hidden_patch_layer_batch_size);
 
-      h = zeros<value_t>(visible_layer_batch_size);
-      h[hidden_topleft, hidden_layer_batch_size] = _hiddens[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
-      ch = fft(h, dimCount - 1, plan_h);
+      vr = zeros<value_t>(patch_size);
+      vr[seq<dimCount>(0), overlap_size] = v[topleft, overlap_size];
+      cvr = tbblas::fft(vr, dimCount - 1, plan_vr);
 
-      *cFinc[k] += conj_repeat_mult(cv, ch, value_t(1) / _voxel_count);
+      for (size_t k = 0; k < cFinc.size(); ++k) {
+        hr = zeros<value_t>(patch_layer_batch_size);
+        hr[hidden_topleft, hidden_overlap_layer_batch_size] = _hiddens[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+        chr = fft(hr, dimCount - 1, plan_hr);
 
-      if (model.shared_bias()) {
-        // TODO: calculate shared bias per channel
-        *_cinc[k] = *_cinc[k] + sum(h) / h.count();
-      } else {
-        *_cinc[k] += h;
-      }
-      switch(_sparsity_method) {
-      case sparsity_method::NoSparsity:
-        break;
+        *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(1) / _voxel_count);
 
-//      case sparsity_method::WeightsAndBias:
-//        chdiff = _sparsity_target * h.count() * mask<complex_t>(ch.size(), ch.fullsize(), spMaskSize) - ch;
-//        *cFinc[k] = *cFinc[k] + value_t(1) / _voxel_count * _sparsity_weight * repeat(conj(chdiff), cFinc[k]->size() / ch.size()) * repeat(cv, cFinc[k]->size() / cv.size());
-//        *ccinc[k] = *ccinc[k] + value_t(1) / visible_size[dimCount - 1] * _sparsity_weight * mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * chdiff;
-//        break;
+        if (model.shared_bias()) {
+          // TODO: calculate shared bias per channel
+          (*_cinc[k])[topleft, overlap_layer_batch_size] =
+              (*_cinc[k])[topleft, overlap_layer_batch_size] + sum(hr[seq<dimCount>(0), overlap_layer_batch_size]) / overlap_layer_batch_size.prod();
+        } else {
+          (*_cinc[k])[topleft, overlap_layer_batch_size] =
+              (*_cinc[k])[topleft, overlap_layer_batch_size] + hr[seq<dimCount>(0), overlap_layer_batch_size];
+        }
+        switch(_sparsity_method) {
+        case sparsity_method::NoSparsity:
+          break;
 
-      case sparsity_method::OnlyBias:
-        *_cinc[k] += _sparsity_weight * (_sparsity_target + -h);
-        break;
+  //      case sparsity_method::WeightsAndBias:
+  //        chdiff = _sparsity_target * h.count() * mask<complex_t>(ch.size(), ch.fullsize(), spMaskSize) - ch;
+  //        *cFinc[k] = *cFinc[k] + value_t(1) / _voxel_count * _sparsity_weight * repeat(conj(chdiff), cFinc[k]->size() / ch.size()) * repeat(cv, cFinc[k]->size() / cv.size());
+  //        *ccinc[k] = *ccinc[k] + value_t(1) / visible_size[dimCount - 1] * _sparsity_weight * mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * chdiff;
+  //        break;
 
-      case sparsity_method::OnlySharedBias:
-        *_cinc[k] = *_cinc[k] + _sparsity_weight * sum(_sparsity_target + -h) / h.count();
-        break;
+        case sparsity_method::OnlyBias:
+          (*_cinc[k])[topleft, overlap_layer_batch_size] =
+              (*_cinc[k])[topleft, overlap_layer_batch_size] + _sparsity_weight * (_sparsity_target + -hr[seq<dimCount>(0), overlap_layer_batch_size]);
+          break;
 
-      default:
-        throw std::runtime_error("Unsupported sparsity method.");
+        case sparsity_method::OnlySharedBias:
+          (*_cinc[k])[topleft, overlap_layer_batch_size] =
+              (*_cinc[k])[topleft, overlap_layer_batch_size] +
+              _sparsity_weight * sum(_sparsity_target + -hr[seq<dimCount>(0), overlap_layer_batch_size]) / overlap_layer_batch_size.prod();
+          break;
+
+        default:
+          throw std::runtime_error("Unsupported sparsity method.");
+        }
       }
     }
 
@@ -746,27 +812,41 @@ public:
     assert(cFinc.size());
     assert(_cinc.size());
 
+    v = rearrange(_visibles, model.stride_size());
+
     if (model.shared_bias()) {
       _binc = _binc - sum(v) / v.count();
     } else {
       _binc = _binc - v;
     }
 
-    v = rearrange(_visibles, model.stride_size());
-    cv = tbblas::fft(v, dimCount - 1, plan_v);
+    for (sequence_iterator<dim_t> iter(seq<dimCount>(0), step_count); iter; ++iter) {
+      dim_t topleft = *iter * step_size;
 
-    for (size_t k = 0; k < cF.size(); ++k) {
+      dim_t overlap_size = min(patch_size, visible_size - topleft);
+      dim_t overlap_layer_size = min(patch_layer_size, visible_layer_size - topleft);
+      dim_t overlap_layer_batch_size = min(patch_layer_batch_size, visible_layer_batch_size - topleft);
+      dim_t hidden_overlap_layer_batch_size = min(hidden_layer_batch_size - topleft, hidden_patch_layer_batch_size);
 
-      h = zeros<value_t>(visible_layer_batch_size);
-      h[hidden_topleft, hidden_layer_batch_size] = _hiddens[seq(0,0,0,(int)k * _filter_batch_length), hidden_layer_batch_size];
-      ch = fft(h, dimCount - 1, plan_h);
+      vr = zeros<value_t>(patch_size);
+      vr[seq<dimCount>(0), overlap_size] = v[topleft, overlap_size];
+      cvr = tbblas::fft(vr, dimCount - 1, plan_vr);
 
-      *cFinc[k] += conj_repeat_mult(cv, ch, value_t(-1) / _voxel_count);
+      for (size_t k = 0; k < cF.size(); ++k) {
 
-      if (model.shared_bias()) {
-        *_cinc[k] = *_cinc[k] - sum(h) / h.count();
-      } else {
-        *_cinc[k] = *_cinc[k] - h;
+        hr = zeros<value_t>(patch_layer_batch_size);
+        hr[hidden_topleft, hidden_overlap_layer_batch_size] = _hiddens[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+        chr = fft(hr, dimCount - 1, plan_hr);
+
+        *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(-1) / _voxel_count);
+
+        if (model.shared_bias()) {
+          (*_cinc[k])[topleft, overlap_layer_batch_size] =
+              (*_cinc[k])[topleft, overlap_layer_batch_size] - sum(hr[seq<dimCount>(0), overlap_layer_batch_size]) / overlap_layer_batch_size.prod();
+        } else {
+          (*_cinc[k])[topleft, overlap_layer_batch_size] =
+              (*_cinc[k])[topleft, overlap_layer_batch_size] - hr[seq<dimCount>(0), overlap_layer_batch_size];
+        }
       }
     }
 
@@ -799,7 +879,7 @@ public:
         deltac[k] = boost::make_shared<tensor_t>(zeros<value_t>(visible_layer_batch_size));
     }
 
-    dim_t fullsize = cv.fullsize();
+    dim_t fullsize = cvr.fullsize();
 
     for (size_t k = 0; k < cF.size(); ++k) {
       // Mask filters
@@ -807,11 +887,11 @@ public:
 
         // Extract filter
         const int iFilter = k * _filter_batch_length + j;
-        dim_t topleft = visible_size / 2 - kernel_size / 2;
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
 
-        cv = (*cFinc[k])[seq(0,0,0,j*cv.size()[dimCount - 1]), cv.size()] * (value_t(1) / _positive_batch_size) - weightcost * (*cF[k])[seq(0,0,0,j*cv.size()[dimCount - 1]), cv.size()];
-        cv.set_fullsize(fullsize);
-        shifted_f = ifft(cv, dimCount - 1, iplan_v);
+        cvr = (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] * (value_t(1) / _positive_batch_size) - weightcost * (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
+        cvr.set_fullsize(fullsize);
+        shifted_f = ifft(cvr, dimCount - 1, iplan_v);
         padded_f = fftshift(shifted_f, dimCount - 1);
         padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
 
@@ -825,15 +905,13 @@ public:
         padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
         shifted_f = ifftshift(padded_f, dimCount - 1);
 
-        cv = fft(shifted_f, dimCount - 1, plan_v);
-        (*cFinc[k])[seq(0,0,0,j*cv.size()[dimCount - 1]), cv.size()] = cv;
+        cvr = fft(shifted_f, dimCount - 1, plan_v);
+        (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] = cvr;
       }
 
-//      h = ifft(*ccinc[k], dimCount - 1, iplan_h);
       *deltac[k] = momentum * *deltac[k] + *_cinc[k] / _positive_batch_size;
-//      *cc[k] = fft(*deltac[k], dimCount - 1, plan_h);
 
-      // Apply delta to current filters
+      // TODO: Apply delta to current filters
       *cF[k] = *cF[k] + epsilon * *cFinc[k];
       *_c[k] = *_c[k] + epsilon * *deltac[k];
 
@@ -843,10 +921,9 @@ public:
     }
 
     // TODO: do masking
-//    padded_f = ifft(cbinc, dimCount - 1, iplan_v);
     deltab = (momentum * deltab + _binc / _positive_batch_size);// * repeat(v_mask, deltab.size() / v_mask.size());
-//    cbinc = fft(deltab, dimCount - 1, plan_v);
 
+    // TODO: apply
     _b += epsilon * deltab;
     _binc = zeros<value_t>(_binc.size());
 
@@ -893,7 +970,7 @@ public:
     }
 
 
-    dim_t fullsize = cv.fullsize();
+    dim_t fullsize = cvr.fullsize();
 
     for (size_t k = 0; k < cF.size(); ++k) {
       // Mask filters
@@ -901,11 +978,11 @@ public:
 
         // Extract filter
         const int iFilter = k * _filter_batch_length + j;
-        dim_t topleft = visible_size / 2 - kernel_size / 2;
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
 
-        cv = (*cFinc[k])[seq(0,0,0,j*cv.size()[dimCount - 1]), cv.size()] * (value_t(1) / _positive_batch_size) - weightcost * (*cF[k])[seq(0,0,0,j*cv.size()[dimCount - 1]), cv.size()];
-        cv.set_fullsize(fullsize);
-        shifted_f = ifft(cv, dimCount - 1, iplan_v);
+        cvr = (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] * (value_t(1) / _positive_batch_size) - weightcost * (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
+        cvr.set_fullsize(fullsize);
+        shifted_f = ifft(cvr, dimCount - 1, iplan_v);
         padded_f = fftshift(shifted_f, dimCount - 1);
         padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
 
@@ -921,8 +998,8 @@ public:
         padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
         shifted_f = ifftshift(padded_f, dimCount - 1);
 
-        cv = fft(shifted_f, dimCount - 1, plan_v);
-        (*cFinc[k])[seq(0,0,0,j*cv.size()[dimCount - 1]), cv.size()] = cv;
+        cvr = fft(shifted_f, dimCount - 1, plan_v);
+        (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] = cvr;
       }
 
 //      h = ifft(*ccinc[k], dimCount - 1, iplan_h);
