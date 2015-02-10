@@ -55,20 +55,21 @@ protected:
   v_nn_layer_t _nn_encoders, _nn_decoders;
   tbblas::deeplearn::objective_function _objective;
   value_t u, v;
+  tensor_t _inputs, _outputs;
 
 public:
-  encoder(model_t& model) : _model(model) {
+  encoder(model_t& model, const dim_t& patch_count = seq<dimCount>(1)) : _model(model) {
     if (model.cnn_encoders().size() == 0 || model.cnn_decoders().size() == 0)
       throw std::runtime_error("At least one convolutional encoder and decoder is required to build a convolutional encoder neural network.");
 
     _cnn_encoders.resize(model.cnn_encoders().size());
     for (size_t i = 0; i < _cnn_encoders.size(); ++i) {
-      _cnn_encoders[i] = boost::make_shared<cnn_layer_t>(boost::ref(*model.cnn_encoders()[i]));
+      _cnn_encoders[i] = boost::make_shared<cnn_layer_t>(boost::ref(*model.cnn_encoders()[i]), boost::ref(patch_count));
     }
 
     _cnn_decoders.resize(model.cnn_decoders().size());
     for (size_t i = 0; i < _cnn_decoders.size(); ++i) {
-      _cnn_decoders[i] = boost::make_shared<reverse_cnn_layer_t>(boost::ref(*model.cnn_decoders()[i]));
+      _cnn_decoders[i] = boost::make_shared<reverse_cnn_layer_t>(boost::ref(*model.cnn_decoders()[i]), boost::ref(patch_count));
     }
 
     _nn_encoders.resize(model.nn_encoders().size());
@@ -110,21 +111,40 @@ public:
     return _cnn_decoders[_cnn_decoders.size() - 1]->sensitivity_ratio();
   }
 
-  void normalize_inputs() {
-    _cnn_encoders[0]->normalize_visibles();
+  void write_model_to_host() {
+    for (size_t i = 0; i < _cnn_encoders.size(); ++i)
+      _cnn_encoders[i]->write_model_to_host();
+
+    for (size_t i = 0; i < _cnn_decoders.size(); ++i)
+      _cnn_decoders[i]->write_model_to_host();
+
+    for (size_t i = 0; i < _nn_encoders.size(); ++i)
+      _nn_encoders[i]->write_model_to_host();
+
+    for (size_t i = 0; i < _nn_decoders.size(); ++i)
+      _nn_decoders[i]->write_model_to_host();
   }
 
-  void diversify_outputs() {
-    _cnn_decoders[_cnn_decoders.size() - 1]->diversify_visibles();
-  }
+//  void normalize_inputs() {
+//    _cnn_encoders[0]->normalize_visibles();
+//  }
+//
+//  void diversify_outputs() {
+//    _cnn_decoders[_cnn_decoders.size() - 1]->diversify_visibles();
+//  }
 
   // Infer hidden units recursively
   void infer_outputs() {
+    _cnn_encoders[0]->visibles() = _inputs;
+    _cnn_encoders[0]->normalize_visibles();
     infer_outputs(0);
+    _outputs = _cnn_decoders[_cnn_decoders.size() - 1]->visibles();
   }
 
   // Does not require the hidden units to be inferred
   void update_gradient(tensor_t& target) {
+    _cnn_encoders[0]->visibles() = _inputs;
+    _cnn_encoders[0]->normalize_visibles();
     update_gradient(0, target);
   }
 
@@ -156,6 +176,21 @@ public:
       _nn_decoders[i]->adadelta_step(epsilon2, momentum, weightcost);
   }
 
+  void adam_step(value_t alpha = 0.0002, value_t beta1 = 0.1, value_t beta2 = 0.001, value_t epsilon = 1e-8, value_t betaDecay = 1e-8, value_t weightcost = 0.0002) {
+    for (size_t i = 0; i < _cnn_encoders.size(); ++i)
+      _cnn_encoders[i]->adam_step(alpha, beta1, beta2, epsilon, betaDecay, weightcost);
+
+    for (size_t i = 0; i < _cnn_decoders.size(); ++i)
+      _cnn_decoders[i]->adam_step(alpha, beta1, beta2, epsilon, betaDecay, weightcost);
+
+    // TODO: implement Adam for dense layers
+//    for (size_t i = 0; i < _nn_encoders.size(); ++i)
+//      _nn_encoders[i]->adadelta_step(epsilon2, momentum, weightcost);
+//
+//    for (size_t i = 0; i < _nn_decoders.size(); ++i)
+//      _nn_decoders[i]->adadelta_step(epsilon2, momentum, weightcost);
+  }
+
   void set_batch_length(int layer, int length) {
     if (layer < _cnn_encoders.size())
       _cnn_encoders[layer]->set_batch_length(length);
@@ -163,12 +198,14 @@ public:
       _cnn_decoders[layer - _cnn_encoders.size()]->set_batch_length(length);
   }
 
-  const proxy<tensor_t> inputs() {
-    return _cnn_encoders[0]->visibles();
+  tensor_t& inputs() {
+    return _inputs;
+//    return _cnn_encoders[0]->visibles();
   }
 
-  const proxy<tensor_t> outputs() {
-    return _cnn_decoders[_cnn_decoders.size() - 1]->visibles();
+  tensor_t& outputs() {
+    return _outputs;
+//    return _cnn_decoders[_cnn_decoders.size() - 1]->visibles();
   }
 
 protected:
@@ -280,25 +317,10 @@ protected:
         update_gradient(iLayer + 1, target);
 
         // Back-propagate errors
-        switch (_objective) {
-        case tbblas::deeplearn::objective_function::SSD:
-        case tbblas::deeplearn::objective_function::SenSpe:
-          _cnn_encoders[i + 1]->backprop_visible_deltas();
-          _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visible_deltas());
-          _cnn_encoders[i]->update_gradient();
-          break;
 
-        case tbblas::deeplearn::objective_function::DSC:
-          _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visible_deltas());
-          _cnn_encoders[i]->update_u_gradient(u, v);
-          if (iLayer)
-            _cnn_encoders[i]->backprop_visible_deltas();
-
-          _cnn_encoders[i + 1]->backprop_visible_deltas();
-          _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visible_deltas());
-          _cnn_encoders[i]->update_v_gradient(u, v);
-          break;
-        }
+        _cnn_encoders[i + 1]->backprop_visibles();
+        _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visibles());
+        _cnn_encoders[i]->update_gradient();
       } else {
 
         // If the model has dense encoding layers, ...
@@ -309,25 +331,9 @@ protected:
           update_gradient(iLayer + 1, target);
 
           // Transition back
-          switch (_objective) {
-          case tbblas::deeplearn::objective_function::SSD:
-          case tbblas::deeplearn::objective_function::SenSpe:
-            _nn_encoders[0]->backprop_visible_deltas();
-            _cnn_encoders[i]->backprop_hidden_deltas(reshape(_nn_encoders[0]->visible_deltas(), _model.cnn_encoders()[i]->hiddens_size()));
-            _cnn_encoders[i]->update_gradient();
-            break;
-
-          case tbblas::deeplearn::objective_function::DSC:
-            _cnn_encoders[i]->backprop_hidden_deltas(reshape(_nn_encoders[0]->visible_deltas(), _model.cnn_encoders()[i]->hiddens_size()));
-            _cnn_encoders[i]->update_u_gradient(u, v);
-            if (iLayer)
-              _cnn_encoders[i]->backprop_visible_deltas();
-
-            _nn_encoders[0]->backprop_visible_deltas();
-            _cnn_encoders[i]->backprop_hidden_deltas(reshape(_nn_encoders[0]->visible_deltas(), _model.cnn_encoders()[i]->hiddens_size()));
-            _cnn_encoders[i]->update_v_gradient(u, v);
-            break;
-          }
+          _nn_encoders[0]->backprop_visible_deltas();
+          _cnn_encoders[i]->backprop_hidden_deltas(reshape(_nn_encoders[0]->visible_deltas(), _model.cnn_encoders()[i]->hiddens_size()));
+          _cnn_encoders[i]->update_gradient();
         } else {
 
           // Transition to decoding layers
@@ -335,25 +341,9 @@ protected:
           update_gradient(iLayer + 1, target);
 
           // Transition back
-          switch (_objective) {
-          case tbblas::deeplearn::objective_function::SSD:
-          case tbblas::deeplearn::objective_function::SenSpe:
-            _cnn_decoders[0]->backprop_hidden_deltas();
-            _cnn_encoders[i]->backprop_hidden_deltas(_cnn_decoders[0]->hidden_deltas());
-            _cnn_encoders[i]->update_gradient();
-            break;
-
-          case tbblas::deeplearn::objective_function::DSC:
-            _cnn_encoders[i]->backprop_hidden_deltas(_cnn_decoders[0]->hidden_deltas());
-            _cnn_encoders[i]->update_u_gradient(u, v);
-            if (iLayer)
-              _cnn_encoders[i]->backprop_visible_deltas();
-
-            _cnn_decoders[0]->backprop_hidden_deltas();
-            _cnn_encoders[i]->backprop_hidden_deltas(_cnn_decoders[0]->hidden_deltas());
-            _cnn_encoders[i]->update_v_gradient(u, v);
-            break;
-          }
+          _cnn_decoders[0]->backprop_hiddens();
+          _cnn_encoders[i]->backprop_hidden_deltas(_cnn_decoders[0]->hiddens());
+          _cnn_encoders[i]->update_gradient();
         }
       }
     } else if (iLayer - _cnn_encoders.size() < _nn_encoders.size()) {
@@ -369,48 +359,18 @@ protected:
         _nn_encoders[i + 1]->visibles() = _nn_encoders[i]->hiddens();
         update_gradient(iLayer + 1, target);
 
-        switch (_objective) {
-        case tbblas::deeplearn::objective_function::SSD:
-        case tbblas::deeplearn::objective_function::SenSpe:
-          _nn_encoders[i + 1]->backprop_visible_deltas();
-          _nn_encoders[i]->backprop_hidden_deltas(_nn_encoders[i + 1]->visible_deltas());
-          _nn_encoders[i]->update_gradient();
-          break;
-
-        case tbblas::deeplearn::objective_function::DSC:
-          _nn_encoders[i]->backprop_hidden_deltas(_nn_encoders[i + 1]->visible_deltas());
-          _nn_encoders[i]->update_u_gradient();
-          _nn_encoders[i]->backprop_visible_deltas();
-
-          _nn_encoders[i + 1]->backprop_visible_deltas();
-          _nn_encoders[i]->backprop_hidden_deltas(_nn_encoders[i + 1]->visible_deltas());
-          _nn_encoders[i]->update_v_gradient(u, v);
-          break;
-        }
+        _nn_encoders[i + 1]->backprop_visible_deltas();
+        _nn_encoders[i]->backprop_hidden_deltas(_nn_encoders[i + 1]->visible_deltas());
+        _nn_encoders[i]->update_gradient();
       } else {
 
         // Transition to decoding layer and repeat
         _nn_decoders[0]->visibles() = _nn_encoders[i]->hiddens();
         update_gradient(iLayer + 1, target);
 
-        switch (_objective) {
-        case tbblas::deeplearn::objective_function::SSD:
-        case tbblas::deeplearn::objective_function::SenSpe:
-          _nn_decoders[0]->backprop_visible_deltas();
-          _nn_encoders[i]->backprop_hidden_deltas(_nn_decoders[0]->visible_deltas());
-          _nn_encoders[i]->update_gradient();
-          break;
-
-        case tbblas::deeplearn::objective_function::DSC:
-          _nn_encoders[i]->backprop_hidden_deltas(_nn_decoders[0]->visible_deltas());
-          _nn_encoders[i]->update_u_gradient();
-          _nn_encoders[i]->backprop_visible_deltas();
-
-          _nn_decoders[0]->backprop_visible_deltas();
-          _nn_encoders[i]->backprop_hidden_deltas(_nn_decoders[0]->visible_deltas());
-          _nn_encoders[i]->update_v_gradient(u, v);
-          break;
-        }
+        _nn_decoders[0]->backprop_visible_deltas();
+        _nn_encoders[i]->backprop_hidden_deltas(_nn_decoders[0]->visible_deltas());
+        _nn_encoders[i]->update_gradient();
       }
     } else if (iLayer - _cnn_encoders.size() - _nn_encoders.size() < _nn_decoders.size()) {
 
@@ -425,48 +385,18 @@ protected:
         _nn_decoders[i + 1]->visibles() = _nn_decoders[i]->hiddens();
         update_gradient(iLayer + 1, target);
 
-        switch (_objective) {
-        case tbblas::deeplearn::objective_function::SSD:
-        case tbblas::deeplearn::objective_function::SenSpe:
-          _nn_decoders[i + 1]->backprop_visible_deltas();
-          _nn_decoders[i]->backprop_hidden_deltas(_nn_decoders[i + 1]->visible_deltas());
-          _nn_decoders[i]->update_gradient();
-          break;
-
-        case tbblas::deeplearn::objective_function::DSC:
-          _nn_decoders[i]->backprop_hidden_deltas(_nn_decoders[i + 1]->visible_deltas());
-          _nn_decoders[i]->update_u_gradient();
-          _nn_decoders[i]->backprop_visible_deltas();
-
-          _nn_decoders[i + 1]->backprop_visible_deltas();
-          _nn_decoders[i]->backprop_hidden_deltas(_nn_decoders[i + 1]->visible_deltas());
-          _nn_decoders[i]->update_v_gradient(u, v);
-          break;
-        }
+        _nn_decoders[i + 1]->backprop_visible_deltas();
+        _nn_decoders[i]->backprop_hidden_deltas(_nn_decoders[i + 1]->visible_deltas());
+        _nn_decoders[i]->update_gradient();
       } else {
 
         // Transition to convolutional decoding layer and repeat
         _cnn_decoders[0]->hiddens() = reshape(_nn_decoders[i]->hiddens(), _cnn_decoders[0]->hiddens().size());
         update_gradient(iLayer + 1, target);
 
-        switch (_objective) {
-        case tbblas::deeplearn::objective_function::SSD:
-        case tbblas::deeplearn::objective_function::SenSpe:
-          _cnn_decoders[0]->backprop_hidden_deltas();
-          _nn_decoders[i]->backprop_hidden_deltas(reshape(_cnn_decoders[0]->hidden_deltas(), _nn_decoders[i]->hiddens().size()));
-          _nn_decoders[i]->update_gradient();
-          break;
-
-        case tbblas::deeplearn::objective_function::DSC:
-          _nn_decoders[i]->backprop_hidden_deltas(reshape(_cnn_decoders[0]->hidden_deltas(), _nn_decoders[i]->hiddens().size()));
-          _nn_decoders[i]->update_u_gradient();
-          _nn_decoders[0]->backprop_visible_deltas();
-
-          _cnn_decoders[0]->backprop_hidden_deltas();
-          _nn_decoders[i]->backprop_hidden_deltas(reshape(_cnn_decoders[0]->hidden_deltas(), _nn_decoders[i]->hiddens().size()));
-          _nn_decoders[i]->update_v_gradient(u, v);
-          break;
-        }
+        _cnn_decoders[0]->backprop_hiddens();
+        _nn_decoders[i]->backprop_hidden_deltas(reshape(_cnn_decoders[0]->hiddens(), _nn_decoders[i]->hiddens().size()));
+        _nn_decoders[i]->update_gradient();
       }
 
     } else if (iLayer - _cnn_encoders.size() - _nn_encoders.size() - _nn_decoders.size() < _cnn_decoders.size()) {
@@ -484,50 +414,16 @@ protected:
         update_gradient(iLayer + 1, target);
 
         // Back-propagate errors
-        switch (_objective) {
-        case tbblas::deeplearn::objective_function::SSD:
-        case tbblas::deeplearn::objective_function::SenSpe:
-          _cnn_decoders[i + 1]->backprop_hidden_deltas();
-          _cnn_decoders[i]->backprop_visible_deltas(_cnn_decoders[i + 1]->hidden_deltas());
-          _cnn_decoders[i]->update_gradient();
-          break;
-
-        case tbblas::deeplearn::objective_function::DSC:
-          _cnn_decoders[i]->backprop_visible_deltas(_cnn_decoders[i + 1]->hidden_deltas());
-          _cnn_decoders[i]->update_u_gradient(u, v);
-          _cnn_decoders[i]->backprop_hidden_deltas();
-
-          _cnn_decoders[i + 1]->backprop_hidden_deltas();
-          _cnn_decoders[i]->backprop_visible_deltas(_cnn_decoders[i + 1]->hidden_deltas());
-          _cnn_decoders[i]->update_v_gradient(u, v);
-          break;
-        }
+        _cnn_decoders[i + 1]->backprop_hiddens();
+        _cnn_decoders[i]->backprop_visible_deltas(_cnn_decoders[i + 1]->hiddens());
+        _cnn_decoders[i]->update_gradient();
       } else {
 
+        _outputs = _cnn_decoders[_cnn_decoders.size() - 1]->visibles();
+
         // Start back-propagation
-        switch (_objective) {
-        case tbblas::deeplearn::objective_function::SSD:
-        case tbblas::deeplearn::objective_function::SenSpe:
-          _cnn_decoders[i]->calculate_deltas(target);
-          _cnn_decoders[i]->update_gradient();
-          break;
-
-        case tbblas::deeplearn::objective_function::DSC:
-          u = 2 * sum(outputs() * target);
-          v = sum(outputs()) + sum(target);
-
-          // Update gradient and calculate hidden u deltas and visible v deltas
-          _cnn_decoders[i]->calculate_u_deltas(target);
-          _cnn_decoders[i]->update_u_gradient(u, v);
-          _cnn_decoders[i]->backprop_hidden_deltas();
-
-          _cnn_decoders[i]->calculate_v_deltas(target);
-          _cnn_decoders[i]->update_v_gradient(u, v);
-          break;
-
-        default:
-          throw std::runtime_error("Unsupported objective function in encoder::update_gradient(target)");
-        }
+        _cnn_decoders[i]->calculate_deltas(target);
+        _cnn_decoders[i]->update_gradient();
       }
     } else {
       assert(0); // should never happen

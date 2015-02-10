@@ -129,6 +129,14 @@ public:
     _nn_decoders.push_back(boost::make_shared<nn_layer_t>(layer));
   }
 
+  void set_shared_bias(bool shared) {
+    for (size_t i = 0; i < _cnn_encoders.size(); ++i)
+      _cnn_encoders[i]->set_shared_bias(shared);
+
+    for (size_t i = 0; i < _cnn_decoders.size(); ++i)
+      _cnn_decoders[i]->set_shared_bias(shared);
+  }
+
   dim_t inputs_size() const {
     assert(_cnn_encoders.size());
     return _cnn_encoders[0]->visibles_size();

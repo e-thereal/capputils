@@ -5,11 +5,11 @@
  *      Author: tombr
  */
 
-#include <tbblas/transform/warp.hpp>
+#include <tbblas/imgproc/warp.hpp>
 
 namespace tbblas {
 
-namespace transform {
+namespace imgproc {
 
 texture<float, 3, cudaReadModeElementType> warp_tex;  // 3D texture
 

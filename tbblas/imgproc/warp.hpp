@@ -5,8 +5,8 @@
  *      Author: tombr
  */
 
-#ifndef TBBLAS_TRANSFORM_WARP_HPP_
-#define TBBLAS_TRANSFORM_WARP_HPP_
+#ifndef TBBLAS_IMGPROC_WARP_HPP_
+#define TBBLAS_IMGPROC_WARP_HPP_
 
 #include <tbblas/tensor.hpp>
 #include <tbblas/type_traits.hpp>
@@ -14,7 +14,7 @@
 
 namespace tbblas {
 
-namespace transform {
+namespace imgproc {
 
 // TODO: introduce transform_plan to avoid multiple allocation and deallocation of the CUDA array
 //       since we don't know if the participating tensor has changed, we still need to copy
@@ -68,17 +68,17 @@ private:
 }
 
 template<class T, class D>
-struct is_operation<tbblas::transform::warp_operation<T, D> > {
+struct is_operation<tbblas::imgproc::warp_operation<T, D> > {
   static const bool value = true;
 };
 
-namespace transform {
+namespace imgproc {
 
 template<class Tensor, class Deformation>
 typename boost::enable_if<is_tensor<Tensor>,
     typename boost::enable_if<is_tensor<Deformation>,
       typename boost::enable_if_c<(Tensor::dimCount == 3 || Tensor::dimCount == 4) && Tensor::cuda_enabled && Deformation::dimCount == 4 && Deformation::cuda_enabled,
-        tbblas::transform::warp_operation<Tensor, Deformation>
+        warp_operation<Tensor, Deformation>
       >::type
     >::type
 >::type
@@ -87,11 +87,11 @@ warp(Tensor& tensor, Deformation& deformation, const sequence<typename Tensor::v
     assert(deformation.size()[i] == tensor.size()[i]);
   assert(deformation.size()[Deformation::dimCount - 1] == Deformation::dimCount - 1);
 
-  return tbblas::transform::warp_operation<Tensor, Deformation>(tensor, deformation, voxel_size);
+  return warp_operation<Tensor, Deformation>(tensor, deformation, voxel_size);
 }
 
 }
 
 }
 
-#endif /* TBBLAS_TRANSFORM_WARP_HPP_ */
+#endif /* TBBLAS_IMGPROC_WARP_HPP_ */

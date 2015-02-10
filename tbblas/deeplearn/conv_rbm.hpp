@@ -11,7 +11,6 @@
 #include <tbblas/tensor.hpp>
 #include <tbblas/fft.hpp>
 #include <tbblas/math.hpp>
-#include <tbblas/zeros.hpp>
 #include <tbblas/repeat.hpp>
 #include <tbblas/shift.hpp>
 #include <tbblas/ones.hpp>
@@ -47,6 +46,8 @@
 #include <vector>
 
 #include <stdexcept>
+
+#include <cstdio>
 
 namespace tbblas {
 
@@ -89,7 +90,7 @@ protected:
   // Model in CPU memory
   model_t& model;
 
-  // weights and bias terms in GPU memory
+  // weights and bias terms in GPU memory (for shared biases, the biases are of size 1x1x1x... and need to be repeated to fit the image size
   tensor_t _b, _binc;
   tensor_t deltab, db2, deltab2;
   v_ctensor_t cF, cFinc;
@@ -109,9 +110,9 @@ protected:
 //        vbMaskSize, hbMaskSize, spMaskSize;
 
   // one element per thread
-  tensor_t v, vr, h, hr, shifted_f, padded_f, f, padded_k, v_mask, h_mask;  // TODO: do I need shifted_f, padded_f, and f or can I replace some of them with v?
-  ctensor_t cv, cvr, ch, chr, chdiff;
-  plan_t plan_v, plan_vr, iplan_v, iplan_vr, plan_h, plan_hr, iplan_h, iplan_hr;
+  tensor_t v, vr, hr, padded_f, padded_k, v_mask, h_mask;  // TODO: do I need shifted_f, padded_f, and f or can I replace some of them with v?
+  ctensor_t cvr, chr, chdiff;
+  plan_t plan_vr, iplan_vr, plan_hr, iplan_hr;
   uniform_t v_rand, h_rand, hr_rand;
   normal_t v_noise, hr_noise;
 
@@ -155,6 +156,8 @@ public:
 
     _memory_allocated = true;
 
+    std::cout << "Start allocating convRBM memory." << std::endl;
+
     // Prepare sizes
     visible_size = (model.visibles_size() + model.stride_size() - 1) / model.stride_size();
     kernel_size = (model.kernel_size() + model.stride_size() - 1) / model.stride_size();
@@ -185,8 +188,6 @@ public:
 
     step_size = patch_size - kernel_size + 1;
     step_count = (hidden_layer_size + step_size - 1) / step_size;
-
-    _hiddens = zeros<value_t>(hidden_size);
 
 #ifndef TBBLAS_CONV_RBM_NO_SELFTEST
     // Test if the FFT bug is gonna bug us ;)
@@ -249,12 +250,16 @@ public:
       }
     }
 
-    _visibles = zeros<value_t>(padded_visible_size);
-    _visibles[seq<dimCount>(0), model.visibles_size()] = model.visible_bias();
-    _b = rearrange(_visibles, model.stride_size());
-//    cb = fft(v, dimCount - 1, plan_v);
+    if (model.shared_bias()) {
+      _b = sum(model.visible_bias()) / model.visibles_count() * ones<value_t>(seq<dimCount>(1));
+    } else {
+      _visibles = zeros<value_t>(padded_visible_size);
+      _visibles[seq<dimCount>(0), model.visibles_size()] = model.visible_bias();
+      _b = rearrange(_visibles, model.stride_size());
+    }
 
     _visibles = zeros<value_t>(padded_visible_size);
+    _hiddens = zeros<value_t>(hidden_size);
 
     // Copy filters to the device and pre-calculate the FFT
     {
@@ -284,17 +289,30 @@ public:
         cf = fft(f, dimCount - 1, plan_f);
         cF[k] = boost::make_shared<ctensor_t>(cf);
 
-        h = zeros<value_t>(visible_layer_batch_size);
-        for (int j = 0; j < _filter_batch_length; ++j) {
-          h[seq(0,0,0,j), visible_layer_size] = *model.hidden_bias()[k * _filter_batch_length + j];
+        if (model.shared_bias()) {
+          h = zeros<value_t>(visible_layer_batch_size / visible_layer_size);
+          for (int j = 0; j < _filter_batch_length; ++j) {
+            h[seq(0,0,0,j), seq<dimCount>(1)] = ones<value_t>(seq<dimCount>(1)) * (*model.hidden_bias()[k * _filter_batch_length + j])[hidden_topleft];
+          }
+        } else {
+          h = zeros<value_t>(visible_layer_batch_size);
+          for (int j = 0; j < _filter_batch_length; ++j) {
+            h[seq(0,0,0,j), visible_layer_size] = *model.hidden_bias()[k * _filter_batch_length + j];
+          }
         }
-//        ch = fft(h, dimCount - 1, plan_h);
-//        cc[k] = boost::make_shared<ctensor_t>(ch);
         _c[k] = boost::make_shared<tensor_t>(h);
-
         drops[k] = boost::make_shared<tensor_t>();
       }
     }
+
+    // Allocate cvr vr, chr hr
+//    vr = zeros<value_t>(patch_size);
+//    cvr = fft(vr, dimCount - 1, plan_vr);
+//    vr = ifft(cvr, dimCount - 1, iplan_vr);
+//
+//    hr = zeros<value_t>(patch_layer_batch_size);
+//    chr = fft(hr, dimCount - 1, plan_hr);
+//    hr = ifft(chr, dimCount - 1, iplan_hr);
 
     if (model.hiddens_type() == unit_type::Bernoulli)
       hr_rand.resize(patch_layer_batch_size);
@@ -320,22 +338,6 @@ public:
     if (model.visibles_type() == unit_type::Bernoulli) {
       v_rand.resize(visible_size);
     }
-
-//    vbMaskSize = cb.size();
-//    if (model.shared_bias()) {
-//      for (size_t i = 0; i < dimCount - 1; ++i)
-//        vbMaskSize[i] = 1;
-//    }
-
-//    hbMaskSize = cc[0]->size();
-//    if (model.shared_bias()) {
-//      for (size_t i = 0; i < dimCount - 1; ++i)
-//        hbMaskSize[i] = 1;
-//    }
-
-//    spMaskSize = cc[0]->size();
-//    for (size_t i = 0; i < dimCount - 1; ++i)
-//      spMaskSize[i] = 1;
   }
 
   void write_model_to_host() {
@@ -357,25 +359,37 @@ public:
         dim_t topleft = patch_size / 2 - kernel_size / 2;
         cvr = (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
         cvr.set_fullsize(fullsize);
-        shifted_f = ifft(cvr, dimCount - 1, iplan_v);
-        padded_f = fftshift(shifted_f, dimCount - 1);
+        vr = ifft(cvr, dimCount - 1, iplan_vr);
+        padded_f = fftshift(vr, dimCount - 1);
         padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
         *model.filters()[k * _filter_batch_length + j] = padded_k[seq<dimCount>(0), model.kernel_size()];
         tbblas::synchronize();
       }
       *_c[k] = *_c[k] * (abs(*_c[k]) > 1e-16);
 
-      for (int j = 0; j < _filter_batch_length; ++j) {
-        *model.hidden_bias()[k * _filter_batch_length + j] = (*_c[k])[seq(0,0,0,j), visible_layer_size];
-        tbblas::synchronize();
+      if (model.shared_bias()) {
+        for (int j = 0; j < _filter_batch_length; ++j) {
+          *model.hidden_bias()[k * _filter_batch_length + j] = ones<value_t>(visible_layer_size) * (*_c[k])[seq(0,0,0,j)];
+        }
+      } else {
+        for (int j = 0; j < _filter_batch_length; ++j) {
+          *model.hidden_bias()[k * _filter_batch_length + j] = (*_c[k])[seq(0,0,0,j), visible_layer_size];
+        }
       }
+      tbblas::synchronize();
     }
 
     _b = _b * (abs(_b) > 1e-16);
-    tensor_t padded = rearrange_r(_b, model.stride_size());
-    host_tensor_t b = padded[seq<dimCount>(0), model.visibles_size()];
-    tbblas::synchronize();
-    model.set_visible_bias(b);
+    if (model.shared_bias()) {
+      host_tensor_t b = ones<value_t>(model.visibles_size()) * _b[seq<dimCount>(0)];
+      tbblas::synchronize();
+      model.set_visible_bias(b);
+    } else {
+      tensor_t padded = rearrange_r(_b, model.stride_size());
+      host_tensor_t b = padded[seq<dimCount>(0), model.visibles_size()];
+      tbblas::synchronize();
+      model.set_visible_bias(b);
+    }
   }
 
   void free_gpu_memory() {
@@ -465,6 +479,8 @@ public:
 
     if (onlyFilters)
       v = zeros<value_t>(visible_size);
+    else if (model.shared_bias())
+      v = repeat(_b, visible_size / _b.size());
     else
       v = _b;
 
@@ -502,7 +518,9 @@ public:
     }
 
     _visibles = rearrange_r(v, model.stride_size());
-    _visibles = _visibles * repeat(v_mask, _visibles.size() / v_mask.size());
+
+    if (!onlyFilters)
+      _visibles = _visibles * repeat(v_mask, _visibles.size() / v_mask.size());
   }
 
   void infer_hiddens() {
@@ -532,8 +550,13 @@ public:
         chr = conj_mult_sum(cvr, *cF[k]);
 
         hr = ifft(chr, dimCount - 1, iplan_hr);
-        hr[seq<dimCount>(0), overlap_layer_batch_size] =
-            hr[seq<dimCount>(0), overlap_layer_batch_size] + (*_c[k])[topleft, overlap_layer_batch_size];  // apply sub-region of bias terms
+        if (model.shared_bias()) {
+          hr[seq<dimCount>(0), overlap_layer_batch_size] =
+              hr[seq<dimCount>(0), overlap_layer_batch_size] + repeat(*_c[k], overlap_layer_batch_size / _c[k]->size());  // apply sub-region of bias terms
+        } else {
+          hr[seq<dimCount>(0), overlap_layer_batch_size] =
+              hr[seq<dimCount>(0), overlap_layer_batch_size] + (*_c[k])[topleft, overlap_layer_batch_size];  // apply sub-region of bias terms
+        }
 
         switch (model.hiddens_type()) {
           case unit_type::Bernoulli: hr = sigm(hr); break;
@@ -584,7 +607,11 @@ public:
 
     assert(_hiddens.size() == hidden_size);
 
-    v = _b;
+    if (model.shared_bias()) {
+      v = repeat(_b, visible_size / _b.size());
+    } else {
+      v = _b;
+    }
 
     // Iterate over sub-regions
     for (sequence_iterator<dim_t> iter(seq<dimCount>(0), step_count); iter; ++iter) {
@@ -646,8 +673,13 @@ public:
         chr = conj_mult_sum(cvr, *cF[k]);
 
         hr = ifft(chr, dimCount - 1, iplan_hr);
-        hr[seq<dimCount>(0), overlap_layer_batch_size] =
-            hr[seq<dimCount>(0), overlap_layer_batch_size] + (*_c[k])[topleft, overlap_layer_batch_size];  // apply sub-region of bias terms
+        if (model.shared_bias()) {
+          hr[seq<dimCount>(0), overlap_layer_batch_size] =
+              hr[seq<dimCount>(0), overlap_layer_batch_size] + repeat(*_c[k], overlap_layer_batch_size / _c[k]->size());  // apply sub-region of bias terms
+        } else {
+          hr[seq<dimCount>(0), overlap_layer_batch_size] =
+              hr[seq<dimCount>(0), overlap_layer_batch_size] + (*_c[k])[topleft, overlap_layer_batch_size];  // apply sub-region of bias terms
+        }
 
         switch (model.hiddens_type()) {
           case unit_type::Bernoulli: hr = sigm(hr) > hr_rand(); break;
@@ -739,7 +771,6 @@ public:
     v = rearrange(_visibles, model.stride_size());
 
     if (model.shared_bias()) {
-      // TODO: calculate shared bias per channel
       _binc = _binc + sum(v) / v.count();
     } else {
       _binc += v;
@@ -765,13 +796,15 @@ public:
         *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(1) / _voxel_count);
 
         if (model.shared_bias()) {
-          // TODO: calculate shared bias per channel
-          (*_cinc[k])[topleft, overlap_layer_batch_size] =
-              (*_cinc[k])[topleft, overlap_layer_batch_size] + sum(hr[seq<dimCount>(0), overlap_layer_batch_size]) / overlap_layer_batch_size.prod();
+          for (int j = 0; j < _filter_batch_length; ++j) {
+            (*_cinc[k])[seq(0,0,0,j), seq<dimCount>(1)] =
+                (*_cinc[k])[seq(0,0,0,j), seq<dimCount>(1)] + sum(hr[seq<dimCount>(0), overlap_layer_batch_size]) / visible_layer_size.prod();
+          }
         } else {
           (*_cinc[k])[topleft, overlap_layer_batch_size] =
               (*_cinc[k])[topleft, overlap_layer_batch_size] + hr[seq<dimCount>(0), overlap_layer_batch_size];
         }
+
         switch(_sparsity_method) {
         case sparsity_method::NoSparsity:
           break;
@@ -782,16 +815,18 @@ public:
   //        *ccinc[k] = *ccinc[k] + value_t(1) / visible_size[dimCount - 1] * _sparsity_weight * mask<complex_t>(ch.size(), ch.fullsize(), hbMaskSize) * chdiff;
   //        break;
 
-        case sparsity_method::OnlyBias:
-          (*_cinc[k])[topleft, overlap_layer_batch_size] =
-              (*_cinc[k])[topleft, overlap_layer_batch_size] + _sparsity_weight * (_sparsity_target + -hr[seq<dimCount>(0), overlap_layer_batch_size]);
-          break;
+          // TODO: convert to use new shared bias model
+//        case sparsity_method::OnlyBias:
+//          (*_cinc[k])[topleft, overlap_layer_batch_size] =
+//              (*_cinc[k])[topleft, overlap_layer_batch_size] + _sparsity_weight * (_sparsity_target + -hr[seq<dimCount>(0), overlap_layer_batch_size]);
+//          break;
 
-        case sparsity_method::OnlySharedBias:
-          (*_cinc[k])[topleft, overlap_layer_batch_size] =
-              (*_cinc[k])[topleft, overlap_layer_batch_size] +
-              _sparsity_weight * sum(_sparsity_target + -hr[seq<dimCount>(0), overlap_layer_batch_size]) / overlap_layer_batch_size.prod();
-          break;
+          // TODO: conver to use new shared bias model
+//        case sparsity_method::OnlySharedBias:
+//          (*_cinc[k])[topleft, overlap_layer_batch_size] =
+//              (*_cinc[k])[topleft, overlap_layer_batch_size] +
+//              _sparsity_weight * sum(_sparsity_target + -hr[seq<dimCount>(0), overlap_layer_batch_size]) / overlap_layer_batch_size.prod();
+//          break;
 
         default:
           throw std::runtime_error("Unsupported sparsity method.");
@@ -841,8 +876,10 @@ public:
         *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(-1) / _voxel_count);
 
         if (model.shared_bias()) {
-          (*_cinc[k])[topleft, overlap_layer_batch_size] =
-              (*_cinc[k])[topleft, overlap_layer_batch_size] - sum(hr[seq<dimCount>(0), overlap_layer_batch_size]) / overlap_layer_batch_size.prod();
+          for (int j = 0; j < _filter_batch_length; ++j) {
+            (*_cinc[k])[seq(0,0,0,j), seq<dimCount>(1)] =
+                (*_cinc[k])[seq(0,0,0,j), seq<dimCount>(1)] - sum(hr[seq<dimCount>(0), overlap_layer_batch_size]) / visible_layer_size.prod();
+          }
         } else {
           (*_cinc[k])[topleft, overlap_layer_batch_size] =
               (*_cinc[k])[topleft, overlap_layer_batch_size] - hr[seq<dimCount>(0), overlap_layer_batch_size];
@@ -864,8 +901,8 @@ public:
     if (!_memory_allocated)
       allocate_gpu_memory();
 
-    if (deltab.size() != visible_size)
-      deltab = zeros<value_t>(visible_size);
+    if (deltab.size() != _b.size())
+      deltab = zeros<value_t>(_b.size());
 
     if (!deltaF.size()) {
       deltaF.resize(model.filter_count());
@@ -876,7 +913,7 @@ public:
     if (!deltac.size()) {
       deltac.resize(_cinc.size());
       for (size_t k = 0; k < deltac.size(); ++k)
-        deltac[k] = boost::make_shared<tensor_t>(zeros<value_t>(visible_layer_batch_size));
+        deltac[k] = boost::make_shared<tensor_t>(zeros<value_t>(_cinc[k]->size()));
     }
 
     dim_t fullsize = cvr.fullsize();
@@ -891,8 +928,8 @@ public:
 
         cvr = (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] * (value_t(1) / _positive_batch_size) - weightcost * (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
         cvr.set_fullsize(fullsize);
-        shifted_f = ifft(cvr, dimCount - 1, iplan_v);
-        padded_f = fftshift(shifted_f, dimCount - 1);
+        vr = ifft(cvr, dimCount - 1, iplan_vr);
+        padded_f = fftshift(vr, dimCount - 1);
         padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
 
         // update deltaF
@@ -903,15 +940,18 @@ public:
         padded_k[seq<dimCount>(0), model.kernel_size()] = *deltaF[iFilter];
         padded_f = zeros<value_t>(padded_f.size());
         padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
-        shifted_f = ifftshift(padded_f, dimCount - 1);
+        vr = ifftshift(padded_f, dimCount - 1);
 
-        cvr = fft(shifted_f, dimCount - 1, plan_v);
+        cvr = fft(vr, dimCount - 1, plan_vr);
         (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] = cvr;
+
+//        if (model.shared_bias())
+//          (*_cinc[k])[seq(0,0,0,j), visible_layer_size] = ones<value_t>(visible_layer_size) * sum((*_cinc[k])[seq(0,0,0,j), visible_layer_size]) / visible_layer_size.prod();
       }
 
       *deltac[k] = momentum * *deltac[k] + *_cinc[k] / _positive_batch_size;
 
-      // TODO: Apply delta to current filters
+      // Apply delta to current filters
       *cF[k] = *cF[k] + epsilon * *cFinc[k];
       *_c[k] = *_c[k] + epsilon * *deltac[k];
 
@@ -920,17 +960,17 @@ public:
       *_cinc[k] = zeros<value_t>(_cinc[k]->size());
     }
 
-    // TODO: do masking
+    // TODO: do masking (unless I'm using shared bias)
     deltab = (momentum * deltab + _binc / _positive_batch_size);// * repeat(v_mask, deltab.size() / v_mask.size());
 
-    // TODO: apply
     _b += epsilon * deltab;
     _binc = zeros<value_t>(_binc.size());
 
     _positive_batch_size = _negative_batch_size = 0;
   }
 
-  void adadelta_step(value_t epsilon, value_t momentum = 0, value_t weightcost = 0) {
+  /// If 'average_filter' is true, and average learning rate per filter is calculated
+  void adadelta_step(value_t epsilon, value_t momentum = 0, value_t weightcost = 0, bool average_filter = false) {
     _host_updated = false;
 
     using namespace tbblas;
@@ -943,8 +983,8 @@ public:
     if (!_memory_allocated)
       allocate_gpu_memory();
 
-    if (db2.size() != visible_size || deltab.size() != visible_size || deltab2.size() != visible_size) {
-      db2 = deltab = deltab2 = zeros<value_t>(visible_size);
+    if (db2.size() != _b.size() || deltab.size() != _b.size() || deltab2.size() != _b.size()) {
+      db2 = deltab = deltab2 = zeros<value_t>(_b.size());
     }
 
     if (!dF2.size() || !deltaF.size() || !deltaF2.size()) {
@@ -963,12 +1003,11 @@ public:
       deltac.resize(_cinc.size());
       deltac2.resize(_cinc.size());
       for (size_t k = 0; k < dc2.size(); ++k) {
-        dc2[k] = boost::make_shared<tensor_t>(zeros<value_t>(visible_layer_batch_size));
-        deltac[k] = boost::make_shared<tensor_t>(zeros<value_t>(visible_layer_batch_size));
-        deltac2[k] = boost::make_shared<tensor_t>(zeros<value_t>(visible_layer_batch_size));
+        dc2[k] = boost::make_shared<tensor_t>(zeros<value_t>(_cinc[k]->size()));
+        deltac[k] = boost::make_shared<tensor_t>(zeros<value_t>(_cinc[k]->size()));
+        deltac2[k] = boost::make_shared<tensor_t>(zeros<value_t>(_cinc[k]->size()));
       }
     }
-
 
     dim_t fullsize = cvr.fullsize();
 
@@ -982,33 +1021,40 @@ public:
 
         cvr = (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] * (value_t(1) / _positive_batch_size) - weightcost * (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
         cvr.set_fullsize(fullsize);
-        shifted_f = ifft(cvr, dimCount - 1, iplan_v);
-        padded_f = fftshift(shifted_f, dimCount - 1);
+        vr = ifft(cvr, dimCount - 1, iplan_vr);
+        padded_f = fftshift(vr, dimCount - 1);
         padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
 
         // update deltaF
         *dF2[iFilter] = momentum * *dF2[iFilter] + (1.0 - momentum) * padded_k[seq<dimCount>(0), model.kernel_size()] * padded_k[seq<dimCount>(0), model.kernel_size()];
+        if (average_filter)
+          *dF2[iFilter] = ones<value_t>(dF2[iFilter]->size()) * sum(*dF2[iFilter]) / dF2[iFilter]->count();
+
         *deltaF[iFilter] = sqrt(*deltaF2[iFilter] + epsilon) / sqrt(*dF2[iFilter] + epsilon) * padded_k[seq<dimCount>(0), model.kernel_size()];
+
         *deltaF2[iFilter] = momentum * *deltaF2[iFilter] + (1.0 - momentum) * *deltaF[iFilter] * *deltaF[iFilter];
+        if (average_filter)
+          *deltaF2[iFilter] = ones<value_t>(deltaF2[iFilter]->size()) * sum(*deltaF2[iFilter]) / deltaF2[iFilter]->count();
 
         // Put deltaF into cFinc to apply the delta to the current filter
         padded_k = zeros<value_t>(padded_k.size());
         padded_k[seq<dimCount>(0), model.kernel_size()] = *deltaF[iFilter];
         padded_f = zeros<value_t>(padded_f.size());
         padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
-        shifted_f = ifftshift(padded_f, dimCount - 1);
+        vr = ifftshift(padded_f, dimCount - 1);
 
-        cvr = fft(shifted_f, dimCount - 1, plan_v);
+        cvr = fft(vr, dimCount - 1, plan_vr);
         (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] = cvr;
+
+//        if (model.shared_bias())
+//          (*_cinc[k])[seq(0,0,0,j), visible_layer_size] = ones<value_t>(visible_layer_size) * sum((*_cinc[k])[seq(0,0,0,j), visible_layer_size]) / visible_layer_size.prod();
       }
 
-//      h = ifft(*ccinc[k], dimCount - 1, iplan_h);
       *_cinc[k] = *_cinc[k] / _positive_batch_size;
 
       *dc2[k] = momentum * *dc2[k] + (1.0 - momentum) * *_cinc[k] * *_cinc[k];
       *deltac[k] = sqrt(*deltac2[k] + epsilon) / sqrt(*dc2[k] + epsilon) * *_cinc[k];
       *deltac2[k] = momentum * *deltac2[k] + (1.0 - momentum) * *deltac[k] * *deltac[k];
-//      *cc[k] = fft(*deltac[k], dimCount - 1, plan_h);
 
       // Apply delta to current filters
       *cF[k] = *cF[k] + gradient_reduction * *cFinc[k];
@@ -1019,14 +1065,12 @@ public:
       *_cinc[k] = zeros<value_t>(_cinc[k]->size());
     }
 
-//    padded_f = ifft(cbinc, dimCount - 1, iplan_v);
     _binc = _binc / _positive_batch_size; // * repeat(v_mask, padded_f.size() / v_mask.size());
 
 
     db2 = momentum * db2 + (1.0 - momentum) * _binc * _binc;
     deltab = sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * _binc;
     deltab2 = momentum * deltab2 + (1.0 - momentum) * deltab * deltab;
-//    cbinc = fft(deltab, dimCount - 1, plan_v);
 
     _b += gradient_reduction * deltab;
     _binc = zeros<value_t>(_binc.size());

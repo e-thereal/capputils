@@ -5,12 +5,12 @@
  *      Author: tombr
  */
 
-#ifndef TBBLAS_TRANSFORM_FMATRIX4_HPP_
-#define TBBLAS_TRANSFORM_FMATRIX4_HPP_
+#ifndef TBBLAS_IMGPROC_FMATRIX4_HPP_
+#define TBBLAS_IMGPROC_FMATRIX4_HPP_
 
 namespace tbblas {
 
-namespace transform {
+namespace imgproc {
 
 struct fmatrix4 {
   union {

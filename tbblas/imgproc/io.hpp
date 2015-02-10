@@ -5,15 +5,15 @@
  *      Author: tombr
  */
 
-#ifndef TBBLAS_TRANSFORM_IO_HPP_
-#define TBBLAS_TRANSFORM_IO_HPP_
+#ifndef TBBLAS_IMGPROC_IO_HPP_
+#define TBBLAS_IMGPROC_IO_HPP_
 
 #include <iostream>
-#include <tbblas/transform/fmatrix4.hpp>
+#include <tbblas/imgproc/fmatrix4.hpp>
 
 namespace tbblas {
 
-namespace transform {
+namespace ip {
 
 std::ostream& operator<<(std::ostream& os, const fmatrix4& mat) {
   const int precision = 5;
@@ -46,4 +46,4 @@ std::ostream& operator<<(std::ostream& os, const fmatrix4& mat) {
 
 }
 
-#endif /* TBBLAS_TRANSFORM_IO_HPP_ */
+#endif /* TBBLAS_IMGPROC_IO_HPP_ */

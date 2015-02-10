@@ -109,7 +109,7 @@ struct proxy {
   }
 
   proxy(Tensor& tensor, const dim_t& start, const dim_t& stride, const dim_t& size)
-   : _data(tensor.shared_data()), _start(start), _size((size + stride - 1) / stride), _fullsize(size / stride), _pitch(tensor.size()), _stride(stride), _flipped(tbblas::seq<dimCount>(false))
+   : _data(tensor.shared_data()), _start(start), _size((size + stride - 1) / stride), _fullsize((size + stride - 1) / stride), _pitch(tensor.size()), _stride(stride), _flipped(tbblas::seq<dimCount>(false))
   {
     for (unsigned i = 0; i < dimCount; ++i) {
       assert(_start[i] + _size[i] * _stride[i] - _stride[i] < _pitch[i]);

@@ -177,8 +177,9 @@ public:
   dim_t hiddens_size() const {
     // Initialize with rearranged size (ceil(visible size / stride size))
     dim_t hidden_size = (visibles_size() + _stride_size - 1) / _stride_size;
-    if (convolution_type() == convolution_type::Valid){
-      hidden_size = hidden_size - _kernel_size + 1;
+    if (convolution_type() == convolution_type::Valid) {
+      dim_t kernel_size = (_kernel_size + _stride_size - 1) / _stride_size;
+      hidden_size = hidden_size - kernel_size + 1;
     }
     hidden_size[dimCount - 1] = filter_count();
 

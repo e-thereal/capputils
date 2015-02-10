@@ -55,6 +55,7 @@ protected:
 
   // weights and bias terms in GPU memory
   matrix_t W, b, c, dW, db, dc, m, mean, stddev;
+  matrix_t dW2, db2, dc2, deltaW2, deltab2, deltac2, deltaW, deltab, deltac;
 
   // visible and hidden units in GPU memory
   matrix_t V, H, h_drop;
@@ -66,13 +67,14 @@ protected:
 
   bool _memory_allocated, _double_weights, _host_updated;
 
-  value_t _sparsity_target, _sparsity_weight, _dropout_rate;
+  value_t _sparsity_target, _sparsity_weight, _dropout_rate, _positive_update_count, _negative_update_count;
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
   rbm(model_t& model) : model(model),
     _memory_allocated(false), _double_weights(false), _host_updated(true),
-    _sparsity_target(0.1), _sparsity_weight(0), _dropout_rate(0)
+    _sparsity_target(0.1), _sparsity_weight(0), _dropout_rate(0),
+    _positive_update_count(0), _negative_update_count(0)
   { }
 
 private:
@@ -106,9 +108,9 @@ public:
 
     W = W * repeat(trans(m), W.size() / trans(m).size());
 
-    dW = zeros<value_t>(W.size());
-    db = zeros<value_t>(b.size());
-    dc = zeros<value_t>(c.size());
+//    dW = zeros<value_t>(W.size());
+//    db = zeros<value_t>(b.size());
+//    dc = zeros<value_t>(c.size());
   }
 
   void write_model_to_host() {
@@ -293,20 +295,30 @@ public:
     h_drop = h_rand() > _dropout_rate;
   }
 
-  void init_gradient_updates(value_t epsilonw = 1, value_t momentum = 0, value_t weightcost = 0) {
-    if (!_memory_allocated)
-      allocate_gpu_memory();
+//  void init_gradient_updates(value_t epsilonw = 1, value_t momentum = 0, value_t weightcost = 0) {
+//    if (!_memory_allocated)
+//      allocate_gpu_memory();
+//
+//    dW = momentum * dW - epsilonw * weightcost * W;
+//    db = momentum * db;
+//    dc = momentum * dc;
+//  }
 
-    dW = momentum * dW - epsilonw * weightcost * W;
-    db = momentum * db;
-    dc = momentum * dc;
-  }
-
-  void update_positive_gradient(value_t epsilonw, value_t epsilonvb, value_t epsilonhb) {
+  void update_positive_gradient() {
     using namespace tbblas;
 
     if (!_memory_allocated)
       allocate_gpu_memory();
+
+    if (!H.count())
+      throw std::runtime_error("Hidden units not calculated.");
+
+    if (!dW.count())
+      dW = zeros<value_t>(W.size());
+    if (!db.count())
+      db = zeros<value_t>(b.size());
+    if (!dc.count())
+      dc = zeros<value_t>(c.size());
 
     // (x_n)(mu_n)'
     prods = tbblas::prod(trans(V), H);
@@ -315,9 +327,9 @@ public:
     hidact = sum(H, 0);
     visact = sum(V, 0);
 
-    dW = dW + epsilonw * prods / V.size()[0];
-    db = db + epsilonvb * visact / V.size()[0];
-    dc = dc + epsilonhb * hidact / V.size()[0];
+    dW += prods / V.size()[0];
+    db += visact / V.size()[0];
+    dc += hidact / V.size()[0];
 
     if (_sparsity_weight > 0) {
       diffprobs = -H + _sparsity_target;
@@ -325,12 +337,14 @@ public:
       prods = prod(trans(V), diffprobs);
       hidact = sum(diffprobs, 0);
 
-      dW = dW + epsilonw * _sparsity_weight * prods / V.size()[0];
-      dc = dc + epsilonhb * _sparsity_weight* hidact / V.size()[0];
+      dW += _sparsity_weight * prods / V.size()[0];
+      dc += _sparsity_weight* hidact / V.size()[0];
     }
+
+    ++_positive_update_count;
   }
 
-  void update_negative_gradient(value_t epsilonw, value_t epsilonvb, value_t epsilonhb) {
+  void update_negative_gradient() {
     using namespace tbblas;
 
     if (!_memory_allocated)
@@ -343,9 +357,11 @@ public:
     hidact = sum(H, 0);
     visact = sum(V, 0);
 
-    dW = dW - epsilonw * prods / V.size()[0];
-    db = db - epsilonvb * visact / V.size()[0];
-    dc = dc - epsilonhb * hidact / V.size()[0];
+    dW = dW - prods / V.size()[0];
+    db = db - visact / V.size()[0];
+    dc = dc - hidact / V.size()[0];
+
+    ++_negative_update_count;
   }
 
   // CAUTION: ONLY USE THIS FUNCTION IF YOU KNOW WHAT YOU ARE DOING
@@ -357,17 +373,82 @@ public:
     rbm.dc = dc = dc + rbm.dc;
   }
 
-  void apply_gradient() {
-    _host_updated = false;
-
-    using namespace tbblas;
-
+  void momentum_step(value_t epsilon, value_t momentum, value_t weightcost) {
     if (!_memory_allocated)
       allocate_gpu_memory();
 
-    W = W + dW;
-    b = b + db;
-    c = c + dc;
+    // Lazy initialization
+    if (!deltaW.count())
+      deltaW = zeros<value_t>(W.size());
+    if (!deltab.count())
+      deltab = zeros<value_t>(b.size());
+    if (!deltac.count())
+      deltac = zeros<value_t>(c.size());
+
+    if (_positive_update_count != _negative_update_count)
+      throw std::runtime_error("Number of positive gradient updates must be equal to the number of negative updates.");
+
+    if (_positive_update_count) {
+      deltaW = momentum * deltaW + dW / _positive_update_count - weightcost * W;
+      deltab = momentum * deltab + db / _positive_update_count;
+      deltac = momentum * deltac + dc / _positive_update_count;
+
+      W = W + epsilon * deltaW;
+      b = b + epsilon * deltab;
+      c = c + epsilon * deltac;
+
+      dW = zeros<value_t>(dW.size());
+      db = zeros<value_t>(db.size());
+      dc = zeros<value_t>(dc.size());
+    }
+
+    _positive_update_count = _negative_update_count = 0;
+
+    _host_updated = false;
+  }
+
+  void adadelta_step(value_t epsilon, value_t momentum, value_t weightcost) {
+    if (!dW2.count())
+      dW2 = zeros<value_t>(W.size());
+    if (!db2.count())
+      db2 = zeros<value_t>(b.size());
+    if (!dc2.count())
+      dc2 = zeros<value_t>(c.size());
+    if (!deltaW2.count())
+      deltaW2 = zeros<value_t>(W.size());
+    if (!deltab2.count())
+      deltab2 = zeros<value_t>(b.size());
+    if (!deltac2.count())
+      deltac2 = zeros<value_t>(c.size());
+
+    if (_positive_update_count != _negative_update_count)
+      throw std::runtime_error("Number of positive gradient updates must be equal to the number of negative updates.");
+
+    if (_positive_update_count) {
+      dW = dW / _positive_update_count - weightcost * W;
+      db = db / _positive_update_count;
+      dc = dc / _positive_update_count;
+
+      dW2 = momentum * dW2 + (1.0 - momentum) * dW * dW;
+      db2 = momentum * db2 + (1.0 - momentum) * db * db;
+
+      // note that deltaW = sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW;
+      W = W + sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW;
+      b = b + sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * db;
+      b = b + sqrt(deltac2 + epsilon) / sqrt(dc2 + epsilon) * dc;
+
+      deltaW2 = momentum * deltaW2 + (1.0 - momentum) * sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW * sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW;
+      deltab2 = momentum * deltab2 + (1.0 - momentum) * sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * db * sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * db;
+      deltac2 = momentum * deltac2 + (1.0 - momentum) * sqrt(deltac2 + epsilon) / sqrt(dc2 + epsilon) * dc * sqrt(deltac2 + epsilon) / sqrt(dc2 + epsilon) * dc;
+
+      dW = zeros<value_t>(dW.size());
+      db = zeros<value_t>(db.size());
+      dc = zeros<value_t>(dc.size());
+    }
+
+    _positive_update_count = _negative_update_count = 0;
+
+    _host_updated = false;
   }
 
   // Access to model data

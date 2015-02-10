@@ -45,5 +45,7 @@
 #endif
 
 #define TBBLAS_HAVE_CUBLAS
+#define TBBLAS_CNN_NO_SELFTEST
+#define TBBLAS_CONV_RBM_NO_SELFTEST
 
 #endif

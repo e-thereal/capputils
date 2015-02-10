@@ -5,18 +5,18 @@
  *      Author: tombr
  */
 
-#ifndef TBBLAS_TRANSFORM_TRANSFORM_HPP_
-#define TBBLAS_TRANSFORM_TRANSFORM_HPP_
+#ifndef TBBLAS_IMGPROC_TRANSFORM_HPP_
+#define TBBLAS_IMGPROC_TRANSFORM_HPP_
 
 #include <tbblas/tensor.hpp>
 #include <tbblas/type_traits.hpp>
 #include <tbblas/proxy.hpp>
 
-#include <tbblas/transform/fmatrix4.hpp>
+#include <tbblas/imgproc/fmatrix4.hpp>
 
 namespace tbblas {
 
-namespace transform {
+namespace imgproc {
 
 // TODO: introduce transform_plan to avoid multiple allocation and deallocation of the CUDA array
 //       since we don't know if the participating tensor has changed, we still need to copy
@@ -25,8 +25,14 @@ namespace transform {
 template<class T>
 void transform(tensor<T, 3, true>& input, const fmatrix4& matrix, tensor<T, 3, true>& output);
 
+template<class T>
+void transform(tensor<T, 4, true>& input, const fmatrix4& matrix, tensor<T, 4, true>& output);
+
 template<>
 void transform(tensor<float, 3, true>& input, const fmatrix4& matrix, tensor<float, 3, true>& output);
+
+template<>
+void transform(tensor<float, 4, true>& input, const fmatrix4& matrix, tensor<float, 4, true>& output);
 
 template<class Tensor>
 struct transform_operation {
@@ -37,8 +43,8 @@ struct transform_operation {
 
   typedef Tensor tensor_t;
 
-  transform_operation(Tensor& tensor, const fmatrix4& mat)
-   : _tensor(tensor), _mat(mat), _size(tensor.size()), _fullsize(tensor.fullsize())
+  transform_operation(Tensor& tensor, const fmatrix4& mat, dim_t outSize)
+   : _tensor(tensor), _mat(mat), _size(outSize), _fullsize(outSize)
   {
   }
 
@@ -63,20 +69,36 @@ private:
 }
 
 template<class T>
-struct is_operation<tbblas::transform::transform_operation<T> > {
+struct is_operation<tbblas::imgproc::transform_operation<T> > {
   static const bool value = true;
 };
 
-namespace transform {
+namespace imgproc {
 
 template<class Tensor>
 typename boost::enable_if<is_tensor<Tensor>,
     typename boost::enable_if_c<Tensor::dimCount == 3 && Tensor::cuda_enabled == true,
-      tbblas::transform::transform_operation<Tensor>
+      transform_operation<Tensor>
     >::type
 >::type
-transform(Tensor& tensor, const fmatrix4& mat) {
-  return tbblas::transform::transform_operation<Tensor>(tensor, mat);
+transform(Tensor& tensor, const fmatrix4& mat, typename Tensor::dim_t outSize = seq<3>(-1)) {
+  if (outSize == seq<3>(-1))
+    outSize = tensor.size();
+  return transform_operation<Tensor>(tensor, mat, outSize);
+}
+
+template<class Tensor>
+typename boost::enable_if<is_tensor<Tensor>,
+    typename boost::enable_if_c<Tensor::dimCount == 4 && Tensor::cuda_enabled == true,
+      transform_operation<Tensor>
+    >::type
+>::type
+transform(Tensor& tensor, const fmatrix4& mat, typename Tensor::dim_t outSize = seq<4>(-1)) {
+  if (outSize == seq<4>(-1))
+    outSize = tensor.size();
+
+  assert(tensor.size()[3] == outSize[3]);
+  return transform_operation<Tensor>(tensor, mat, outSize);
 }
 
 //void transform(tensor, matrix, skip, wrap);
