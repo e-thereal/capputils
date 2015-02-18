@@ -290,6 +290,11 @@ public:
     return _version;
   }
 
+  // TODO: check if the model is valid. Do the sizes match? Pooling_size must be 1 if no_pooling is selected
+  bool is_valid() const {
+    return true;
+  }
+
 //  void change_stride(dim_t stride) {
 //
 //    if (_stride_size == seq<dimCount>(1)) {

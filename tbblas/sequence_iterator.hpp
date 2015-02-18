@@ -20,12 +20,16 @@ class sequence_iterator {
   static const unsigned dimCount = T::dimCount;
 
 public:
+
+  __host__ __device__
   sequence_iterator(const sequence_t& start, const sequence_t& size) : _current(start), _start(start), _size(size) { }
 
+  __host__ __device__
   size_t count() {
     return _size.prod();
   }
 
+  __host__ __device__
   size_t current() {
     size_t curr = _current[dimCount - 1] - _start[dimCount - 1];
 
@@ -36,6 +40,7 @@ public:
     return curr;
   }
 
+  __host__ __device__
   sequence_iterator<T> operator++() {
     ++_current[0];
     for (size_t i = 0; i < dimCount - 1; ++i) {
@@ -50,6 +55,7 @@ public:
     return *this;
   }
 
+  __host__ __device__
   sequence_iterator<T> operator++(int) {
     sequence_iterator<T> old = *this;
 
@@ -66,7 +72,13 @@ public:
     return old;
   }
 
+  __host__ __device__
   operator bool() const {
+    return valid();
+  }
+
+  __host__ __device__
+  bool valid() const {
     for (size_t i = 0; i < dimCount; ++i) {
       if (_current[i] >= _start[i] + _size[i])
         return false;
@@ -74,6 +86,7 @@ public:
     return true;
   }
 
+  __host__ __device__
   sequence_t& operator*() {
     return _current;
   }

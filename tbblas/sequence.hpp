@@ -29,17 +29,20 @@ public:
 
   static const unsigned dimCount = size;
 
+  __host__ __device__
   sequence() {
     for (unsigned i = 0; i < size; ++i)
       _seq[i] = 0;
   }
 
+  __host__ __device__
   sequence(const seq_t& seq) {
     for (unsigned i = 0; i < size; ++i)
       _seq[i] = seq[i];
   }
 
   template<class T2>
+  __host__ __device__
   sequence(const sequence<T2, size>& seq) {
     for (unsigned i = 0; i < size; ++i)
       _seq[i] = seq[i];
@@ -80,6 +83,7 @@ public:
 
   /*** Scalar arithmetic operators ***/
 
+  __host__ __device__
   sequence_t operator*(const value_t& x) const {
     sequence_t result;
     for (unsigned i = 0; i < size; ++i)
@@ -89,6 +93,7 @@ public:
 
   /*** Binary arithmetic operators ***/
 
+  __host__ __device__
   sequence_t operator+(const sequence_t& seq) const {
     sequence_t result;
     for (unsigned i = 0; i < size; ++i)
@@ -96,6 +101,7 @@ public:
     return result;
   }
 
+  __host__ __device__
   sequence_t operator-(const sequence_t& seq) const {
     sequence_t result;
     for (unsigned i = 0; i < size; ++i)
@@ -103,6 +109,7 @@ public:
     return result;
   }
 
+  __host__ __device__
   sequence_t operator*(const sequence_t& seq) const {
     sequence_t result;
     for (unsigned i = 0; i < size; ++i)
@@ -110,6 +117,7 @@ public:
     return result;
   }
 
+  __host__ __device__
   sequence_t operator/(const sequence_t& seq) const {
     sequence_t result;
     for (unsigned i = 0; i < size; ++i)
@@ -117,6 +125,7 @@ public:
     return result;
   }
 
+  __host__ __device__
   sequence_t operator%(const sequence_t& seq) const {
     sequence_t result;
     for (unsigned i = 0; i < size; ++i)
@@ -142,6 +151,7 @@ public:
 
   /*** Comparison operators ***/
 
+  __host__ __device__
   bool operator<(const sequence_t& seq) const {
     for (unsigned i = 0; i < size; ++i)
       if (_seq[i] < seq[i])
@@ -151,6 +161,7 @@ public:
     return false;
   }
 
+  __host__ __device__
   bool operator>(const sequence_t& seq) const {
     for (unsigned i = 0; i < size; ++i)
       if (_seq[i] > seq[i])
@@ -160,6 +171,7 @@ public:
     return false;
   }
 
+  __host__ __device__
   bool operator==(const sequence_t& seq) const {
     for (unsigned i = 0; i < size; ++i)
       if (_seq[i] != seq[i])
@@ -167,6 +179,7 @@ public:
     return true;
   }
 
+  __host__ __device__
   bool operator!=(const sequence_t& seq) const {
     for (unsigned i = 0; i < size; ++i)
       if (_seq[i] != seq[i])
@@ -178,6 +191,7 @@ public:
     return dim_type_trait<T, size>::convert(*this);
   }
 
+  __host__ __device__
   value_t sum() const {
     value_t sum = 0;
     for (unsigned i = 0; i < size; ++i)
@@ -185,6 +199,7 @@ public:
     return sum;
   }
 
+  __host__ __device__
   value_t prod() const {
     value_t product = 1;
     for (unsigned i = 0; i < size; ++i)
@@ -242,8 +257,8 @@ struct dim_type_trait<T, 4> {
   }
 };
 
-
 template<unsigned dims, class T>
+__host__ __device__
 sequence<T, dims> seq(const T& x) {
   sequence<T, dims> s;
   for (unsigned i = 0; i < dims; ++i)
@@ -252,24 +267,28 @@ sequence<T, dims> seq(const T& x) {
 }
 
 template<class T>
+__host__ __device__
 sequence<T, 1u> seq(T x1) {
   T seq[] = {x1};
   return sequence<T, 1u>(seq);
 }
 
 template<class T>
+__host__ __device__
 sequence<T, 2u> seq(T x1, T x2) {
   T seq[] = {x1, x2};
   return sequence<T, 2u>(seq);
 }
 
 template<class T>
+__host__ __device__
 sequence<T, 3u> seq(T x1, T x2, T x3) {
   T seq[] = {x1, x2, x3};
   return sequence<T, 3u>(seq);
 }
 
 template<class T>
+__host__ __device__
 sequence<T, 4u> seq(T x1, T x2, T x3, T x4) {
   T seq[] = {x1, x2, x3, x4};
   return sequence<T, 4u>(seq);
@@ -278,6 +297,7 @@ sequence<T, 4u> seq(T x1, T x2, T x3, T x4) {
 /*** Useful functions ***/
 
 template<class T, unsigned size>
+__host__ __device__
 tbblas::sequence<T, size> abs(const tbblas::sequence<T, size>& seq)
 {
   tbblas::sequence<T, size> result;
@@ -287,6 +307,7 @@ tbblas::sequence<T, size> abs(const tbblas::sequence<T, size>& seq)
 }
 
 template<class T, unsigned size>
+__host__ __device__
 tbblas::sequence<T, size> max(const tbblas::sequence<T, size>& seq1,
     const tbblas::sequence<T, size>& seq2)
 {
@@ -297,6 +318,7 @@ tbblas::sequence<T, size> max(const tbblas::sequence<T, size>& seq1,
 }
 
 template<class T, unsigned size>
+__host__ __device__
 tbblas::sequence<T, size> min(const tbblas::sequence<T, size>& seq1,
     const tbblas::sequence<T, size>& seq2)
 {
@@ -345,6 +367,7 @@ std::istream& operator>>(std::istream& in, tbblas::sequence<T, size>& seq) {
 /*** Scalar operations ***/
 
 template<class T, unsigned size>
+__host__ __device__
 tbblas::sequence<T, size> operator+(const tbblas::sequence<T, size>& seq,
     const T& value)
 {
@@ -355,6 +378,7 @@ tbblas::sequence<T, size> operator+(const tbblas::sequence<T, size>& seq,
 }
 
 template<class T, unsigned size>
+__host__ __device__
 tbblas::sequence<T, size> operator-(const tbblas::sequence<T, size>& seq,
     const T& value)
 {
@@ -365,6 +389,7 @@ tbblas::sequence<T, size> operator-(const tbblas::sequence<T, size>& seq,
 }
 
 template<class T, unsigned size>
+__host__ __device__
 tbblas::sequence<T, size> operator*(const T& value, const tbblas::sequence<T, size>& seq)
 {
   tbblas::sequence<T, size> result;
@@ -374,6 +399,7 @@ tbblas::sequence<T, size> operator*(const T& value, const tbblas::sequence<T, si
 }
 
 template<class T, unsigned size>
+__host__ __device__
 tbblas::sequence<T, size> operator/(const tbblas::sequence<T, size>& seq,
     const T& value)
 {
