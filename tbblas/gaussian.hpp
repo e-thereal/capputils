@@ -28,20 +28,19 @@ struct gaussian_expression {
   struct index_functor : public thrust::unary_function<difference_type,value_t> {
 
     dim_t size;
-    double sigma;
-    const value_t factor;
+    tbblas::sequence<double, dimCount> sigma;
 
-    index_functor(dim_t size, double sigma)
-     : size(size), sigma(sigma), factor(1.0 / sigma / ::sqrt(2.0 * M_PI)) { }
+    index_functor(dim_t size, const tbblas::sequence<double, dimCount>& sigma)
+     : size(size), sigma(sigma) { }
 
     __host__ __device__
     value_t operator()(difference_type idx) const {
       value_t result = 1;
       const value_t x = ((idx % size[0]) + size[0] / 2) % size[0] - size[0] / 2;
-      result *= factor * ::exp(-x * x / (2.0 * sigma * sigma));
+      result *= 1.0 / sigma[0] / ::sqrt(2.0 * M_PI) * ::exp(-x * x / (2.0 * sigma[0] * sigma[0]));
       for (unsigned k = 1; k < dimCount; ++k) {
         const value_t y = (((idx /= size[k-1]) % size[k]) + size[k] / 2) % size[k] - size[k] / 2;
-        result *= factor * ::exp(-y * y / (2.0 * sigma * sigma));
+        result *= 1.0 / sigma[k] / ::sqrt(2.0 * M_PI) * ::exp(-y * y / (2.0 * sigma[k] * sigma[k]));
       }
       return result;
     }
@@ -51,7 +50,7 @@ struct gaussian_expression {
   typedef thrust::transform_iterator<index_functor, CountingIterator> TransformIterator;
   typedef TransformIterator const_iterator;
 
-  gaussian_expression(const dim_t& size, const dim_t& fullsize, double sigma)
+  gaussian_expression(const dim_t& size, const dim_t& fullsize, const tbblas::sequence<double, dimCount>& sigma)
    : _size(size), _fullsize(fullsize), _sigma(sigma) { }
 
   inline const_iterator begin() const {
@@ -82,7 +81,7 @@ struct gaussian_expression {
 
 private:
   dim_t _size, _fullsize;
-  double _sigma;
+  tbblas::sequence<double, dimCount> _sigma;
 };
 
 template<class T, unsigned dim>
@@ -90,13 +89,25 @@ struct is_expression<gaussian_expression<T, dim> > {
   static const bool value = true;
 };
 
+// const tbblas::sequence<double, dimCount>&
+
 template<class T, unsigned dim>
 gaussian_expression<T, dim> gaussian(const sequence<int, dim>& size, double sigma) {
-  return gaussian_expression<T, dim>(size, size, sigma);
+  return gaussian_expression<T, dim>(size, size, tbblas::seq<dim>(sigma));
 }
 
 template<class T, unsigned dim>
 gaussian_expression<T, dim> gaussian(const sequence<int, dim>& size, const sequence<int, dim>& fullsize, double sigma) {
+  return gaussian_expression<T, dim>(size, fullsize, tbblas::seq<dim>(sigma));
+}
+
+template<class T, unsigned dim>
+gaussian_expression<T, dim> gaussian(const sequence<int, dim>& size, const tbblas::sequence<double, dim>& sigma) {
+  return gaussian_expression<T, dim>(size, size, sigma);
+}
+
+template<class T, unsigned dim>
+gaussian_expression<T, dim> gaussian(const sequence<int, dim>& size, const sequence<int, dim>& fullsize, const tbblas::sequence<double, dim>& sigma) {
   return gaussian_expression<T, dim>(size, fullsize, sigma);
 }
 
