@@ -501,7 +501,7 @@ public:
     if (!_memory_allocated)
       allocate_gpu_memory();
 
-    assert(_hiddens.size() == hidden_size);
+    assert(_hiddens.size() == hidden_size / model.pooling_size());
 
     if (onlyFilters)
       v = zeros<value_t>(visible_size);
@@ -647,7 +647,7 @@ public:
     if (!_memory_allocated)
       allocate_gpu_memory();
 
-    assert(_hiddens.size() == hidden_size);
+    assert(_hiddens.size() == hidden_size / model.pooling_size());
 
     if (model.shared_bias()) {
       v = repeat(_b, visible_size / _b.size());
