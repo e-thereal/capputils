@@ -74,7 +74,9 @@ public:
      _kernel_size(model.kernel_size()), _stride_size(model.stride_size()),
      _pooling_size(model.pooling_size()), _visibles_size(model.visibles_size()),
      _activation_function(model.activation_function()),
-     _convolution_type(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
+     _convolution_type(model.convolution_type()),
+     _pooling_method(model.pooling_method()),
+     _mean(model.mean()), _stddev(model.stddev()),
      _shared_biases(model.shared_bias())
   {
     set_filters(model.filters());
@@ -86,7 +88,9 @@ public:
    : _kernel_size(model.kernel_size()), _stride_size(model.stride_size()),
      _pooling_size(model.pooling_size()), _visibles_size(model.visibles_size()),
      _activation_function(model.activation_function()),
-     _convolution_type(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
+     _convolution_type(model.convolution_type()),
+     _pooling_method(model.pooling_method()),
+     _mean(model.mean()), _stddev(model.stddev()),
      _shared_biases(model.shared_bias())
   {
     _filters.resize(model.filters().size());
@@ -175,12 +179,6 @@ public:
   }
 
   dim_t visibles_size() const {
-//    if (_filters.size() == 0)
-//      throw std::runtime_error("A CNN layer must contain at least one filter.");
-//
-//    dim_t size = _mask.size();
-//    size[dimCount - 1] = _filters[0]->size()[dimCount - 1];
-
     if (_visibles_size.prod() == 0)
       throw std::runtime_error("Invalid visible size.");
 
@@ -282,6 +280,11 @@ public:
 
   bool shared_bias() const {
     return _shared_biases;
+  }
+
+  bool is_valid() const {
+    return ((_kernel_size % _stride_size) == (visibles_size() % _stride_size)) &&
+        ((hiddens_size() % _pooling_size) == seq<dimCount>(0));
   }
 
   void change_size(dim_t size) {

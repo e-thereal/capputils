@@ -9,7 +9,7 @@
 #define TBBLAS_DEEPLEARN_ENCODER_MODEL_HPP_
 
 #include <tbblas/deeplearn/cnn_layer_model.hpp>
-#include <tbblas/deeplearn/reverse_cnn_layer_model.hpp>
+#include <tbblas/deeplearn/dnn_layer_model.hpp>
 #include <tbblas/deeplearn/nn_layer_model.hpp>
 
 namespace tbblas {
@@ -24,16 +24,16 @@ public:
   typedef typename tbblas::tensor<value_t, dimCount>::dim_t dim_t;
 
   typedef cnn_layer_model<T, dims> cnn_layer_t;
-  typedef reverse_cnn_layer_model<T, dims> reverse_cnn_layer_t;
+  typedef dnn_layer_model<T, dims> dnn_layer_t;
   typedef nn_layer_model<T> nn_layer_t;
 
   typedef std::vector<boost::shared_ptr<cnn_layer_t> > v_cnn_layer_t;
-  typedef std::vector<boost::shared_ptr<reverse_cnn_layer_t> > v_reverse_cnn_layer_t;
+  typedef std::vector<boost::shared_ptr<dnn_layer_t> > v_dnn_layer_t;
   typedef std::vector<boost::shared_ptr<nn_layer_t> > v_nn_layer_t;
 
 protected:
   v_cnn_layer_t _cnn_encoders;
-  v_reverse_cnn_layer_t _cnn_decoders;
+  v_dnn_layer_t _dnn_decoders, _dnn_shortcuts;
   v_nn_layer_t _nn_encoders, _nn_decoders;
 
 public:
@@ -41,7 +41,8 @@ public:
 
   encoder_model(const encoder_model<T, dims>& model) {
     set_cnn_encoders(model.cnn_encoders());
-    set_cnn_decoders(model.cnn_decoders());
+    set_dnn_decoders(model.dnn_decoders());
+    set_dnn_shortcuts(model.dnn_shortcuts());
     set_nn_encoders(model.nn_encoders());
     set_nn_decoders(model.nn_decoders());
   }
@@ -49,6 +50,9 @@ public:
   virtual ~encoder_model() { }
 
 public:
+
+  /*** CNN encoders ***/
+
   template<class U>
   void set_cnn_encoders(const std::vector<boost::shared_ptr<cnn_layer_model<U, dims> > >& layers) {
     _cnn_encoders.resize(layers.size());
@@ -69,24 +73,26 @@ public:
     _cnn_encoders.push_back(boost::make_shared<cnn_layer_t>(layer));
   }
 
+  /*** CNN decoders***/
+
   template<class U>
-  void set_cnn_decoders(const std::vector<boost::shared_ptr<reverse_cnn_layer_model<U, dims> > >& layers) {
-    _cnn_decoders.resize(layers.size());
+  void set_dnn_decoders(const std::vector<boost::shared_ptr<dnn_layer_model<U, dims> > >& layers) {
+    _dnn_decoders.resize(layers.size());
     for (size_t i = 0; i < layers.size(); ++i)
-      _cnn_decoders[i] = boost::make_shared<reverse_cnn_layer_t>(*layers[i]);
+      _dnn_decoders[i] = boost::make_shared<dnn_layer_t>(*layers[i]);
   }
 
-  v_reverse_cnn_layer_t& cnn_decoders() {
-    return _cnn_decoders;
+  v_dnn_layer_t& dnn_decoders() {
+    return _dnn_decoders;
   }
 
-  const v_reverse_cnn_layer_t& cnn_decoders() const {
-    return _cnn_decoders;
+  const v_dnn_layer_t& dnn_decoders() const {
+    return _dnn_decoders;
   }
 
   template<class U>
-  void append_cnn_decoder(const reverse_cnn_layer_model<U, dims>& layer) {
-    _cnn_decoders.push_back(boost::make_shared<reverse_cnn_layer_t>(layer));
+  void append_dnn_decoder(const dnn_layer_model<U, dims>& layer) {
+    _dnn_decoders.push_back(boost::make_shared<dnn_layer_t>(layer));
   }
 
   template<class U>
@@ -95,6 +101,30 @@ public:
     for (size_t i = 0; i < layers.size(); ++i)
       _nn_encoders[i] = boost::make_shared<nn_layer_t>(*layers[i]);
   }
+
+  /*** DNN shortcuts ***/
+
+  template<class U>
+  void set_dnn_shortcuts(const std::vector<boost::shared_ptr<dnn_layer_model<U, dims> > >& layers) {
+    _dnn_shortcuts.resize(layers.size());
+    for (size_t i = 0; i < layers.size(); ++i)
+      _dnn_shortcuts[i] = boost::make_shared<dnn_layer_t>(*layers[i]);
+  }
+
+  v_dnn_layer_t& dnn_shortcuts() {
+    return _dnn_shortcuts;
+  }
+
+  const v_dnn_layer_t& dnn_shortcuts() const {
+    return _dnn_shortcuts;
+  }
+
+  template<class U>
+  void append_dnn_shortcut(const dnn_layer_model<U, dims>& layer) {
+    _dnn_shortcuts.push_back(boost::make_shared<dnn_layer_t>(layer));
+  }
+
+  /*** NN layers ***/
 
   v_nn_layer_t& nn_encoders() {
     return _nn_encoders;
@@ -133,8 +163,8 @@ public:
     for (size_t i = 0; i < _cnn_encoders.size(); ++i)
       _cnn_encoders[i]->set_shared_bias(shared);
 
-    for (size_t i = 0; i < _cnn_decoders.size(); ++i)
-      _cnn_decoders[i]->set_shared_bias(shared);
+    for (size_t i = 0; i < _dnn_decoders.size(); ++i)
+      _dnn_decoders[i]->set_shared_bias(shared);
   }
 
   dim_t inputs_size() const {
@@ -147,12 +177,16 @@ public:
   }
 
   dim_t outputs_size() const {
-    assert(_cnn_decoders.size());
-    return _cnn_decoders[_cnn_decoders.size() - 1]->visibles_size();
+    assert(_dnn_decoders.size());
+    return _dnn_decoders[_dnn_decoders.size() - 1]->visibles_size();
   }
 
   size_t outputs_count() const {
     return outputs_size().prod();
+  }
+
+  bool has_shortcuts() const {
+    return _dnn_shortcuts.size();
   }
 };
 

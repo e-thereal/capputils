@@ -14,7 +14,7 @@ namespace tbblas {
 
 namespace deeplearn {
 
-CapputilsEnumerator(pooling_method, NoPooling, MaxPooling, MeanPooling, StridePooling);
+CapputilsEnumerator(pooling_method, NoPooling, MaxPooling, AvgPooling, StridePooling);
 
 }
 

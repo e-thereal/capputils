@@ -156,8 +156,8 @@ protected:
         _cnn_layers[i + 1]->visibles() = _cnn_layers[i]->hiddens();
         update_gradient(iLayer + 1, target);
 
-        _cnn_layers[i + 1]->backprop_visible_deltas();
-        _cnn_layers[i]->backprop_hidden_deltas(_cnn_layers[i + 1]->visible_deltas());
+        _cnn_layers[i + 1]->backprop_visibles();
+        _cnn_layers[i]->backprop_hidden_deltas(_cnn_layers[i + 1]->visibles());
         _cnn_layers[i]->update_gradient();
       } else {
         // Transition from convolutional model to dense model

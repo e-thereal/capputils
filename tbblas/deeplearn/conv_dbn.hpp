@@ -106,14 +106,13 @@ public:
 
     // Transition from convolutional model to dense model
     if (_crbms.size() && _rbms.size() && topLayer > _crbms.size()) {
-      _crbms[_crbms.size() - 1]->allocate_outputs();
-      _crbms[_crbms.size() - 1]->outputs() = reshape(_rbms[0]->visibles(), _crbms[_crbms.size() - 1]->outputs().size());
+      _crbms[_crbms.size() - 1]->hiddens() = reshape(_rbms[0]->visibles(), _crbms[_crbms.size() - 1]->hiddens().size());
     }
 
     for (int i = std::min(topLayer, (int)_crbms.size()) - 1; i >= 0; --i) {
-      _crbms[i]->infer_visibles_from_outputs(onlyFilters);
+      _crbms[i]->infer_visibles(onlyFilters);
       if (i > 0) {
-        _crbms[i - 1]->outputs() = _crbms[i]->visibles();
+        _crbms[i - 1]->hiddens() = _crbms[i]->visibles();
       }
     }
   }
@@ -129,16 +128,16 @@ public:
 
     // bottom-up inference
     for (size_t i = 0; i < _crbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
-      _crbms[i]->infer_outputs();
+      _crbms[i]->infer_hiddens();
       if (i + 1 < _crbms.size()) {
-          _crbms[i + 1]->visibles() = _crbms[i]->outputs();
+          _crbms[i + 1]->visibles() = _crbms[i]->hiddens();
       }
     }
 
     // Transition from convolutional model to dense model
     if (_crbms.size() && _rbms.size() && maxLayer > _crbms.size()) {
-      _rbms[0]->visibles().resize(seq(1, (int)_crbms[_crbms.size() - 1]->outputs().count()));
-      _rbms[0]->visibles() = reshape(_crbms[_crbms.size() - 1]->outputs(), _rbms[0]->visibles().size());
+      _rbms[0]->visibles().resize(seq(1, (int)_crbms[_crbms.size() - 1]->hiddens().count()));
+      _rbms[0]->visibles() = reshape(_crbms[_crbms.size() - 1]->hiddens(), _rbms[0]->visibles().size());
     }
 
     for (size_t i = 0; i < _rbms.size() && currentLayer < maxLayer; ++i, ++currentLayer) {
@@ -258,25 +257,6 @@ public:
       layer = _crbms.size() - 1;
     if (layer >= 0 && layer < _crbms.size())
       return _crbms[layer]->hiddens();
-
-    throw std::runtime_error("The given layer is not part of the DBN!");
-  }
-
-  tensor_t& cpooled_units(int layer = -1) {
-    if (layer == -1)
-      layer = _crbms.size() - 1;
-    if (layer >= 0 && layer < _crbms.size())
-      return _crbms[layer]->pooled_units();
-
-    throw std::runtime_error("The given layer is not part of the DBN!");
-  }
-
-  tensor_t& coutputs(int layer = -1) {
-    if (layer == -1)
-      layer = _crbms.size() - 1;
-    if (layer >= 0 && layer < _crbms.size()) {
-      return _crbms[layer]->outputs();
-    }
 
     throw std::runtime_error("The given layer is not part of the DBN!");
   }

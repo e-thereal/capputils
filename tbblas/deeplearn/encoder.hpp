@@ -11,7 +11,8 @@
 #include <tbblas/deeplearn/encoder_model.hpp>
 #include <tbblas/deeplearn/nn_layer.hpp>
 #include <tbblas/deeplearn/cnn_layer.hpp>
-#include <tbblas/deeplearn/reverse_cnn_layer.hpp>
+#include <tbblas/deeplearn/dnn_layer.hpp>
+#include <tbblas/deeplearn/cdnn_layer.hpp>
 
 #include <tbblas/context.hpp>
 #include <tbblas/rearrange.hpp>
@@ -43,15 +44,18 @@ class encoder {
   typedef cnn_layer<value_t, dimCount> cnn_layer_t;
   typedef std::vector<boost::shared_ptr<cnn_layer_t> > v_cnn_layer_t;
 
-  typedef reverse_cnn_layer<value_t, dimCount> reverse_cnn_layer_t;
-  typedef std::vector<boost::shared_ptr<reverse_cnn_layer_t> > v_reverse_cnn_layer_t;
+  typedef dnn_layer<value_t, dimCount> dnn_layer_t;
+  typedef std::vector<boost::shared_ptr<dnn_layer_t> > v_dnn_layer_t;
+
+  typedef cdnn_layer<value_t, dimCount> cdnn_layer_t;
+  typedef std::vector<boost::shared_ptr<cdnn_layer_t> > v_cdnn_layer_t;
 
   typedef encoder_model<value_t, dimCount> model_t;
 
 protected:
   model_t& _model;
   v_cnn_layer_t _cnn_encoders;
-  v_reverse_cnn_layer_t _cnn_decoders;
+  v_dnn_layer_t _dnn_decoders;
   v_nn_layer_t _nn_encoders, _nn_decoders;
   tbblas::deeplearn::objective_function _objective;
   value_t u, v;
@@ -59,17 +63,31 @@ protected:
 
 public:
   encoder(model_t& model, const dim_t& patch_count = seq<dimCount>(1)) : _model(model) {
-    if (model.cnn_encoders().size() == 0 || model.cnn_decoders().size() == 0)
+    if (model.cnn_encoders().size() == 0 || model.dnn_decoders().size() == 0)
       throw std::runtime_error("At least one convolutional encoder and decoder is required to build a convolutional encoder neural network.");
+
+    if (model.cnn_encoders().size() != model.dnn_decoders().size())
+      throw std::runtime_error("An encoder network needs to have the same number of encoders and decoders.");
+
+    if (model.dnn_shortcuts().size() && model.dnn_decoders().size() != model.dnn_shortcuts().size() + 1) {
+      throw std::runtime_error("An encoder network must have either no shortcut connections or one shortcut less than decoders.");
+    }
 
     _cnn_encoders.resize(model.cnn_encoders().size());
     for (size_t i = 0; i < _cnn_encoders.size(); ++i) {
       _cnn_encoders[i] = boost::make_shared<cnn_layer_t>(boost::ref(*model.cnn_encoders()[i]), boost::ref(patch_count));
     }
 
-    _cnn_decoders.resize(model.cnn_decoders().size());
-    for (size_t i = 0; i < _cnn_decoders.size(); ++i) {
-      _cnn_decoders[i] = boost::make_shared<reverse_cnn_layer_t>(boost::ref(*model.cnn_decoders()[i]), boost::ref(patch_count));
+    _dnn_decoders.resize(model.dnn_decoders().size());
+    for (size_t i = 0; i < _dnn_decoders.size(); ++i) {
+      if (i > 0 && model.dnn_shortcuts().size()) {
+        std::cout << "Adding shortcut connection" << std::endl;
+        _dnn_decoders[i] = boost::make_shared<cdnn_layer_t>(boost::ref(*model.dnn_shortcuts()[i - 1]), boost::ref(*model.dnn_decoders()[i]), boost::ref(*_cnn_encoders[_cnn_encoders.size() - i - 1]), boost::ref(patch_count));
+      } else {
+        std::cout << "Adding regular decoder" << std::endl;
+        _dnn_decoders[i] = boost::make_shared<dnn_layer_t>(boost::ref(*model.dnn_decoders()[i]), boost::ref(patch_count));
+        _dnn_decoders[i]->tie_switches(*_cnn_encoders[_cnn_encoders.size() - i - 1]);
+      }
     }
 
     _nn_encoders.resize(model.nn_encoders().size());
@@ -82,9 +100,6 @@ public:
       _nn_decoders[i] = boost::make_shared<nn_layer_t>(boost::ref(*model.nn_decoders()[i]));
     }
 
-    if (_cnn_encoders.size() != _cnn_decoders.size())
-      throw std::runtime_error("The model needs to have the same number of convolutional encoder and decoder layers.");
-
     if (_nn_encoders.size() != _nn_decoders.size())
       throw std::runtime_error("The model needs to have the same number of dense encoder and decoder layers.");
   }
@@ -93,30 +108,36 @@ private:
   encoder(const encoder<T, dims>&);
 
 public:
+//  virtual ~encoder() {
+//    _dnn_decoders.clear();
+//    _cnn_encoders.clear();
+//  }
+
+public:
   void set_objective_function(const tbblas::deeplearn::objective_function& objective) {
     _objective = objective;
-    _cnn_decoders[_cnn_decoders.size() - 1]->set_objective_function(objective);
+    _dnn_decoders[_dnn_decoders.size() - 1]->set_objective_function(objective);
   }
 
   tbblas::deeplearn::objective_function objective_function() const {
-    assert(_cnn_decoders[_cnn_decoders.size() - 1]->objective_function() == _objective);
+    assert(_dnn_decoders[_dnn_decoders.size() - 1]->objective_function() == _objective);
     return _objective;
   }
 
   void set_sensitivity_ratio(const value_t& ratio) {
-    _cnn_decoders[_cnn_decoders.size() - 1]->set_sensitivity_ratio(ratio);
+    _dnn_decoders[_dnn_decoders.size() - 1]->set_sensitivity_ratio(ratio);
   }
 
   value_t sensitivity_ratio() const {
-    return _cnn_decoders[_cnn_decoders.size() - 1]->sensitivity_ratio();
+    return _dnn_decoders[_dnn_decoders.size() - 1]->sensitivity_ratio();
   }
 
   void write_model_to_host() {
     for (size_t i = 0; i < _cnn_encoders.size(); ++i)
       _cnn_encoders[i]->write_model_to_host();
 
-    for (size_t i = 0; i < _cnn_decoders.size(); ++i)
-      _cnn_decoders[i]->write_model_to_host();
+    for (size_t i = 0; i < _dnn_decoders.size(); ++i)
+      _dnn_decoders[i]->write_model_to_host();
 
     for (size_t i = 0; i < _nn_encoders.size(); ++i)
       _nn_encoders[i]->write_model_to_host();
@@ -130,7 +151,7 @@ public:
 //  }
 //
 //  void diversify_outputs() {
-//    _cnn_decoders[_cnn_decoders.size() - 1]->diversify_visibles();
+//    _dnn_decoders[_dnn_decoders.size() - 1]->diversify_visibles();
 //  }
 
   // Infer hidden units recursively
@@ -138,7 +159,8 @@ public:
     _cnn_encoders[0]->visibles() = _inputs;
     _cnn_encoders[0]->normalize_visibles();
     infer_outputs(0);
-    _outputs = _cnn_decoders[_cnn_decoders.size() - 1]->visibles();
+    _dnn_decoders[_dnn_decoders.size() - 1]->diversify_visibles();
+    _outputs = _dnn_decoders[_dnn_decoders.size() - 1]->visibles();
   }
 
   // Does not require the hidden units to be inferred
@@ -152,8 +174,8 @@ public:
     for (size_t i = 0; i < _cnn_encoders.size(); ++i)
       _cnn_encoders[i]->momentum_step(epsilon1, momentum, weightcost);
 
-    for (size_t i = 0; i < _cnn_decoders.size(); ++i)
-      _cnn_decoders[i]->momentum_step(epsilon1, momentum, weightcost);
+    for (size_t i = 0; i < _dnn_decoders.size(); ++i)
+      _dnn_decoders[i]->momentum_step(epsilon1, momentum, weightcost);
 
     for (size_t i = 0; i < _nn_encoders.size(); ++i)
       _nn_encoders[i]->momentum_step(epsilon2, momentum, weightcost);
@@ -166,8 +188,8 @@ public:
     for (size_t i = 0; i < _cnn_encoders.size(); ++i)
       _cnn_encoders[i]->adadelta_step(epsilon1, momentum, weightcost);
 
-    for (size_t i = 0; i < _cnn_decoders.size(); ++i)
-      _cnn_decoders[i]->adadelta_step(epsilon1, momentum, weightcost);
+    for (size_t i = 0; i < _dnn_decoders.size(); ++i)
+      _dnn_decoders[i]->adadelta_step(epsilon1, momentum, weightcost);
 
     for (size_t i = 0; i < _nn_encoders.size(); ++i)
       _nn_encoders[i]->adadelta_step(epsilon2, momentum, weightcost);
@@ -180,8 +202,8 @@ public:
     for (size_t i = 0; i < _cnn_encoders.size(); ++i)
       _cnn_encoders[i]->adam_step(alpha, beta1, beta2, epsilon, betaDecay, weightcost);
 
-    for (size_t i = 0; i < _cnn_decoders.size(); ++i)
-      _cnn_decoders[i]->adam_step(alpha, beta1, beta2, epsilon, betaDecay, weightcost);
+    for (size_t i = 0; i < _dnn_decoders.size(); ++i)
+      _dnn_decoders[i]->adam_step(alpha, beta1, beta2, epsilon, betaDecay, weightcost);
 
     // TODO: implement Adam for dense layers
 //    for (size_t i = 0; i < _nn_encoders.size(); ++i)
@@ -194,18 +216,16 @@ public:
   void set_batch_length(int layer, int length) {
     if (layer < _cnn_encoders.size())
       _cnn_encoders[layer]->set_batch_length(length);
-    else if (layer - _cnn_encoders.size() < _cnn_decoders.size())
-      _cnn_decoders[layer - _cnn_encoders.size()]->set_batch_length(length);
+    else if (layer - _cnn_encoders.size() < _dnn_decoders.size())
+      _dnn_decoders[layer - _cnn_encoders.size()]->set_batch_length(length);
   }
 
   tensor_t& inputs() {
     return _inputs;
-//    return _cnn_encoders[0]->visibles();
   }
 
   tensor_t& outputs() {
     return _outputs;
-//    return _cnn_decoders[_cnn_decoders.size() - 1]->visibles();
   }
 
 protected:
@@ -235,7 +255,7 @@ protected:
         } else {
 
           // Transition to decoding layers
-          _cnn_decoders[0]->hiddens() = _cnn_encoders[i]->hiddens();
+          _dnn_decoders[0]->hiddens() = _cnn_encoders[i]->hiddens();
           infer_outputs(iLayer + 1);
         }
       }
@@ -275,22 +295,22 @@ protected:
       } else {
 
         // Transition to convolutional decoding layer
-        _cnn_decoders[0]->hiddens() = reshape(_nn_decoders[i]->hiddens(), _cnn_decoders[0]->hiddens().size());
+        _dnn_decoders[0]->hiddens() = reshape(_nn_decoders[i]->hiddens(), _dnn_decoders[0]->hiddens().size());
         infer_outputs(iLayer + 1);
       }
 
-    } else if (iLayer - _cnn_encoders.size() - _nn_encoders.size() - _nn_decoders.size() < _cnn_decoders.size()) {
+    } else if (iLayer - _cnn_encoders.size() - _nn_encoders.size() - _nn_decoders.size() < _dnn_decoders.size()) {
 
       // Infer convolutional layer
       const int i = iLayer - _cnn_encoders.size() - _nn_encoders.size() - _nn_decoders.size();
 
-      _cnn_decoders[i]->infer_visibles();
+      _dnn_decoders[i]->infer_visibles();
 
       // If more convolutional decoders, ...
-      if (i + 1 < _cnn_decoders.size()) {
+      if (i + 1 < _dnn_decoders.size()) {
 
         // Transition to next layer and repeat
-        _cnn_decoders[i + 1]->hiddens() = _cnn_decoders[i]->visibles();
+        _dnn_decoders[i + 1]->hiddens() = _dnn_decoders[i]->visibles();
         infer_outputs(iLayer + 1);
       }
     } else {
@@ -317,9 +337,15 @@ protected:
         update_gradient(iLayer + 1, target);
 
         // Back-propagate errors
-
         _cnn_encoders[i + 1]->backprop_visibles();
-        _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visibles());
+
+        if (_model.has_shortcuts()) {
+          boost::dynamic_pointer_cast<cdnn_layer_t>(_dnn_decoders[_dnn_decoders.size() - i - 1])->backprop_hidden_deltas();
+          _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visibles(), true);
+        } else {
+          _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visibles());
+        }
+
         _cnn_encoders[i]->update_gradient();
       } else {
 
@@ -337,12 +363,12 @@ protected:
         } else {
 
           // Transition to decoding layers
-          _cnn_decoders[0]->hiddens() = _cnn_encoders[i]->hiddens();
+          _dnn_decoders[0]->hiddens() = _cnn_encoders[i]->hiddens();
           update_gradient(iLayer + 1, target);
 
           // Transition back
-          _cnn_decoders[0]->backprop_hiddens();
-          _cnn_encoders[i]->backprop_hidden_deltas(_cnn_decoders[0]->hiddens());
+          _dnn_decoders[0]->backprop_hiddens();
+          _cnn_encoders[i]->backprop_hidden_deltas(_dnn_decoders[0]->hiddens());
           _cnn_encoders[i]->update_gradient();
         }
       }
@@ -391,39 +417,39 @@ protected:
       } else {
 
         // Transition to convolutional decoding layer and repeat
-        _cnn_decoders[0]->hiddens() = reshape(_nn_decoders[i]->hiddens(), _cnn_decoders[0]->hiddens().size());
+        _dnn_decoders[0]->hiddens() = reshape(_nn_decoders[i]->hiddens(), _dnn_decoders[0]->hiddens().size());
         update_gradient(iLayer + 1, target);
 
-        _cnn_decoders[0]->backprop_hiddens();
-        _nn_decoders[i]->backprop_hidden_deltas(reshape(_cnn_decoders[0]->hiddens(), _nn_decoders[i]->hiddens().size()));
+        _dnn_decoders[0]->backprop_hiddens();
+        _nn_decoders[i]->backprop_hidden_deltas(reshape(_dnn_decoders[0]->hiddens(), _nn_decoders[i]->hiddens().size()));
         _nn_decoders[i]->update_gradient();
       }
 
-    } else if (iLayer - _cnn_encoders.size() - _nn_encoders.size() - _nn_decoders.size() < _cnn_decoders.size()) {
+    } else if (iLayer - _cnn_encoders.size() - _nn_encoders.size() - _nn_decoders.size() < _dnn_decoders.size()) {
 
       // Infer convolutional layer
       const int i = iLayer - _cnn_encoders.size() - _nn_encoders.size() - _nn_decoders.size();
 
-      _cnn_decoders[i]->infer_visibles();
+      _dnn_decoders[i]->infer_visibles();
 
       // If more convolutional decoders, ...
-      if (i + 1 < _cnn_decoders.size()) {
+      if (i + 1 < _dnn_decoders.size()) {
 
         // Transition to next layer and repeat
-        _cnn_decoders[i + 1]->hiddens() = _cnn_decoders[i]->visibles();
+        _dnn_decoders[i + 1]->hiddens() = _dnn_decoders[i]->visibles();
         update_gradient(iLayer + 1, target);
 
         // Back-propagate errors
-        _cnn_decoders[i + 1]->backprop_hiddens();
-        _cnn_decoders[i]->backprop_visible_deltas(_cnn_decoders[i + 1]->hiddens());
-        _cnn_decoders[i]->update_gradient();
+        _dnn_decoders[i + 1]->backprop_hiddens();
+        _dnn_decoders[i]->backprop_visible_deltas(_dnn_decoders[i + 1]->hiddens());
+        _dnn_decoders[i]->update_gradient();
       } else {
-
-        _outputs = _cnn_decoders[_cnn_decoders.size() - 1]->visibles();
+        _dnn_decoders[_dnn_decoders.size() - 1]->diversify_visibles();
+        _outputs = _dnn_decoders[_dnn_decoders.size() - 1]->visibles();
 
         // Start back-propagation
-        _cnn_decoders[i]->calculate_deltas(target);
-        _cnn_decoders[i]->update_gradient();
+        _dnn_decoders[i]->calculate_deltas(target);
+        _dnn_decoders[i]->update_gradient();
       }
     } else {
       assert(0); // should never happen

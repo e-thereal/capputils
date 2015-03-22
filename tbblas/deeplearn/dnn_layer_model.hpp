@@ -1,12 +1,12 @@
 /*
- * reverse_cnn_layer_model.hpp
+ * dnn_layer_model.hpp
  *
  *  Created on: Jan 05, 2015
  *      Author: tombr
  */
 
-#ifndef TBBLAS_DEEPLEARN_REVERSE_CNN_LAYER_MODEL_HPP_
-#define TBBLAS_DEEPLEARN_REVERSE_CNN_LAYER_MODEL_HPP_
+#ifndef TBBLAS_DEEPLEARN_DNN_LAYER_MODEL_HPP_
+#define TBBLAS_DEEPLEARN_DNN_LAYER_MODEL_HPP_
 
 #include <tbblas/tensor.hpp>
 #include <tbblas/util.hpp>
@@ -29,7 +29,7 @@ namespace tbblas {
 namespace deeplearn {
 
 template<class T, unsigned dims>
-class reverse_cnn_layer_model {
+class dnn_layer_model {
 public:
   const static unsigned dimCount = dims;
   typedef T value_t;
@@ -65,17 +65,19 @@ protected:
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
-  reverse_cnn_layer_model()
+  dnn_layer_model()
    : _version(CURRENT_VERSION),
      _stride_size(seq<dimCount>(1)), _pooling_size(seq<dimCount>(1)),
      _mean(0), _stddev(1), _shared_biases(false) { }
 
-  reverse_cnn_layer_model(const reverse_cnn_layer_model<T,dims>& model)
+  dnn_layer_model(const dnn_layer_model<T,dims>& model)
    : _version(model._version),
      _kernel_size(model.kernel_size()), _stride_size(model.stride_size()),
      _pooling_size(model.pooling_size()),
      _activation_function(model.activation_function()),
-     _convolution_type(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
+     _convolution_type(model.convolution_type()),
+     _pooling_method(model.pooling_method()),
+     _mean(model.mean()), _stddev(model.stddev()),
      _shared_biases(model.shared_bias())
   {
     set_filters(model.filters());
@@ -84,11 +86,13 @@ public:
   }
 
   template<class U>
-  reverse_cnn_layer_model(const reverse_cnn_layer_model<U,dims>& model)
+  dnn_layer_model(const dnn_layer_model<U,dims>& model)
    : _kernel_size(model.kernel_size()), _stride_size(model.stride_size()),
      _pooling_size(model.pooling_size()),
      _activation_function(model.activation_function()),
-     _convolution_type(model.convolution_type()), _mean(model.mean()), _stddev(model.stddev()),
+     _convolution_type(model.convolution_type()),
+     _pooling_method(model.pooling_method()),
+     _mean(model.mean()), _stddev(model.stddev()),
      _shared_biases(model.shared_bias())
   {
     _filters.resize(model.filters().size());
@@ -99,7 +103,7 @@ public:
     _mask = model.mask();
   }
 
-  virtual ~reverse_cnn_layer_model() { }
+  virtual ~dnn_layer_model() { }
 
 public:
   void set_version(uint16_t version) {
@@ -265,6 +269,11 @@ public:
     return _shared_biases;
   }
 
+  bool is_valid() const {
+    return ((_kernel_size % _stride_size) == (visibles_size() % _stride_size)) &&
+        ((hiddens_size() % _pooling_size) == seq<dimCount>(0));
+  }
+
   void change_size(dim_t size) {
     throw std::runtime_error("Not implemented.");
 //    if (!_shared_biases)
@@ -283,4 +292,4 @@ public:
 
 }
 
-#endif /* TBBLAS_DEEPLEARN_CNN_LAYER_MODEL_HPP_ */
+#endif /* TBBLAS_DEEPLEARN_DNN_LAYER_MODEL_HPP_ */

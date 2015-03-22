@@ -10,7 +10,7 @@
 
 #include <tbblas/deeplearn/encoder_model.hpp>
 #include <tbblas/deeplearn/serialize_cnn_layer.hpp>
-#include <tbblas/deeplearn/serialize_reverse_cnn_layer.hpp>
+#include <tbblas/deeplearn/serialize_dnn_layer.hpp>
 #include <tbblas/deeplearn/serialize_nn_layer.hpp>
 #include <iostream>
 #include <fstream>
@@ -28,10 +28,12 @@ void serialize(const tbblas::deeplearn::encoder_model<T, dims>& model, std::ostr
   for (size_t i = 0; i < count; ++i)
     serialize(*model.cnn_encoders()[i], out);
 
-  count = model.cnn_decoders().size();
+  count = model.dnn_decoders().size() + model.dnn_shortcuts().size();
   out.write((char*)&count, sizeof(count));
-  for (size_t i = 0; i < count; ++i)
-    serialize(*model.cnn_decoders()[i], out);
+  for (size_t i = 0; i < model.dnn_decoders().size(); ++i)
+    serialize(*model.dnn_decoders()[i], out);
+  for (size_t i = 0; i < model.dnn_shortcuts().size(); ++i)
+    serialize(*model.dnn_shortcuts()[i], out);
 
   count = model.nn_encoders().size();
   out.write((char*)&count, sizeof(count));
@@ -54,7 +56,7 @@ template<class T, unsigned dims>
 void deserialize(std::istream& in, tbblas::deeplearn::encoder_model<T, dims>& model) {
 
   typedef cnn_layer_model<T, dims> cnn_layer_t;
-  typedef reverse_cnn_layer_model<T, dims> reverse_cnn_layer_t;
+  typedef dnn_layer_model<T, dims> dnn_layer_t;
   typedef nn_layer_model<T> nn_layer_t;
 
   unsigned count = 0;
@@ -68,13 +70,23 @@ void deserialize(std::istream& in, tbblas::deeplearn::encoder_model<T, dims>& mo
     model.append_cnn_encoder(cnn_layer);
   }
 
-  model.cnn_decoders().clear();
+  model.dnn_decoders().clear();
+  model.dnn_shortcuts().clear();
   in.read((char*)&count, sizeof(count));
 
-  reverse_cnn_layer_t rcnn_layer;
-  for (size_t i = 0; i < count; ++i) {
-    deserialize(in, rcnn_layer);
-    model.append_cnn_decoder(rcnn_layer);
+  assert(count == model.cnn_encoders().size() || count == 2 * model.cnn_encoders().size() - 1);
+
+  dnn_layer_t dnn_layer;
+  for (size_t i = 0; i < model.cnn_encoders().size(); ++i) {
+    deserialize(in, dnn_layer);
+    model.append_dnn_decoder(dnn_layer);
+  }
+
+  if (count > model.dnn_decoders().size()) {
+    for (size_t i = 0; i < model.cnn_encoders().size() - 1; ++i) {
+      deserialize(in, dnn_layer);
+      model.append_dnn_shortcut(dnn_layer);
+    }
   }
 
   model.nn_encoders().clear();

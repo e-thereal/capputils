@@ -21,11 +21,14 @@
 #include <tbblas/random.hpp>
 #include <tbblas/mask.hpp>
 #include <tbblas/sequence_iterator.hpp>
+#include <tbblas/io.hpp>
 
 #include <tbblas/deeplearn/math.hpp>
 #include <tbblas/deeplearn/mult_sum.hpp>
 #include <tbblas/deeplearn/repeat_mult.hpp>
 #include <tbblas/deeplearn/repeat_mult_sum.hpp>
+#include <tbblas/deeplearn/max_pooling.hpp>
+#include <tbblas/deeplearn/avg_pooling.hpp>
 
 #include <tbblas/deeplearn/cnn_layer_model.hpp>
 
@@ -36,13 +39,27 @@
 #include <stdexcept>
 #include <cstdio>
 
+#define CNN_LAYER_KEEP_HIDDENS
+
 namespace tbblas {
 
 namespace deeplearn {
 
 template<class T, unsigned dims>
+class dnn_layer;
+
+template<class T, unsigned dims>
+class cdnn_layer;
+
+template<class T, unsigned dims>
 class cnn_layer {
+
+  //template<class U, unsigned dims2>
+  friend class dnn_layer<T, dims>;
+  friend class cdnn_layer<T, dims>;
+
   const static unsigned dimCount = dims;
+  typedef uint8_t switches_t;
   typedef T value_t;
   typedef typename tbblas::tensor<value_t, dimCount>::dim_t dim_t;
   typedef tbblas::complex<value_t> complex_t;
@@ -56,6 +73,8 @@ class cnn_layer {
 
   typedef tbblas::tensor<complex_t, dimCount, true> ctensor_t;
   typedef std::vector<boost::shared_ptr<ctensor_t> > v_ctensor_t;
+
+  typedef tensor<switches_t, dimCount, true> stensor_t;
 
   typedef cnn_layer_model<value_t, dimCount> model_t;
 
@@ -82,11 +101,18 @@ protected:
         patch_count, patch_size, patch_batch_size, patch_layer_size, patch_layer_batch_size,
         hidden_patch_layer_batch_size, step_size, step_count;
 
-  tensor_t vp, vr, hr, padded_f, padded_k, v_mask, h_mask;
-  tensor_t padded_v, H;
+  tensor_t vp, vr, hr, hpr, pr, padded_f, padded_k, v_mask, h_mask;
   ctensor_t cvr, chr, chrdiff;
   plan_t plan_vr, iplan_vr, plan_hr, iplan_hr;
   uniform_t hr_rand;
+
+  tensor_t padded_v, H;
+#ifdef CNN_LAYER_KEEP_HIDDENS
+  tensor_t _pooled, dH;
+#endif
+
+  boost::shared_ptr<stensor_t> _p_switches;
+  stensor_t &_switches, sr;
 
   int _filter_batch_length, _voxel_count;
   bool _memory_allocated, _host_updated;
@@ -95,6 +121,7 @@ protected:
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
   cnn_layer(model_t& model, dim_t patch_count = seq<dimCount>(1)) : model(model),
+      _p_switches(new stensor_t()), _switches(*_p_switches),
       patch_count(patch_count), _filter_batch_length(1),
       _memory_allocated(false), _host_updated(true), _current_batch_size(0), _dropout_rate(0), _current_iteration(0)
   {
@@ -134,7 +161,16 @@ public:
     kernel_size[dimCount - 1] = visible_size[dimCount - 1] = model.visibles_size()[dimCount - 1] * model.stride_size().prod();
     hidden_size = model.hiddens_size();
 
-    patch_size = min((visible_size + patch_count - 1) / patch_count + kernel_size - 1, visible_size);
+    // TODO: Choose patch_size such that step_size is a multiple of pooling size
+    step_size = min((hidden_size + patch_count - 1) / patch_count, hidden_size);
+    step_size[dimCount - 1] = 1;
+
+    if (model.has_pooling_layer()) {
+      step_size = min((step_size + model.pooling_size() - 1) / model.pooling_size() * model.pooling_size(), hidden_size);
+    }
+
+    patch_size = step_size + kernel_size - 1;
+//    patch_size = min((visible_size + patch_count - 1) / patch_count + kernel_size - 1, visible_size);
     patch_layer_size = patch_layer_batch_size = patch_batch_size = patch_size;
 
     visible_batch_size = visible_layer_batch_size = visible_layer_size = visible_size;
@@ -154,7 +190,6 @@ public:
     hidden_patch_layer_batch_size = patch_size - kernel_size + 1;
     hidden_patch_layer_batch_size[dimCount - 1] = _filter_batch_length;
 
-    step_size = patch_size - kernel_size + 1;
     step_count = (hidden_layer_size + step_size - 1) / step_size;
 
 #ifndef TBBLAS_CNN_NO_SELFTEST
@@ -208,7 +243,20 @@ public:
     }
 
     padded_v = zeros<value_t>(padded_visible_size);
+
+#ifdef CNN_LAYER_KEEP_HIDDENS
     H = zeros<value_t>(hidden_size);
+#else
+    H = zeros<value_t>(hidden_size / model.pooling_size());
+#endif
+
+    if (model.has_pooling_layer()) {
+      _switches = zeros<switches_t>(H.size());
+
+      hpr = zeros<value_t>(hidden_patch_layer_batch_size);
+      pr = zeros<value_t>(hidden_patch_layer_batch_size / model.pooling_size());
+      sr = zeros<value_t>(hidden_patch_layer_batch_size / model.pooling_size());
+    }
 
     // Copy filters to the device and pre-calculate the FFT
     {
@@ -332,6 +380,9 @@ public:
       dim_t overlap_layer_batch_size = min(patch_layer_batch_size, visible_layer_batch_size - topleft);
       dim_t hidden_overlap_layer_batch_size = min(hidden_layer_batch_size - topleft, hidden_patch_layer_batch_size);
 
+      if (model.has_pooling_layer())
+        assert(hidden_overlap_layer_batch_size % model.pooling_size() == seq<dimCount>(0));
+
       vr = zeros<value_t>(patch_size);
       vr[seq<dimCount>(0), overlap_size] = vp[topleft, overlap_size];
       cvr = fft(vr, dimCount - 1, plan_vr);
@@ -363,40 +414,118 @@ public:
           hr = hr * (hr_rand() > _dropout_rate) / (1. - _dropout_rate);
         }
 
+#ifndef CNN_LAYER_KEEP_HIDDENS
+        if (model.has_pooling_layer()) {
+          hpr[seq<dimCount>(0), hidden_overlap_layer_batch_size] = hr[hidden_topleft, hidden_overlap_layer_batch_size];
+
+          switch (model.pooling_method()) {
+          case pooling_method::StridePooling:
+            pr = hpr[seq<dimCount>(0), model.pooling_size(), hpr.size()];
+            break;
+
+          case pooling_method::MaxPooling:
+            sr = get_max_pooling_switches(hpr, model.pooling_size());
+            pr = max_pooling(hpr, sr, model.pooling_size());
+            _switches[topleft / model.pooling_size() + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size / model.pooling_size()] =
+                sr[seq<dimCount>(0), hidden_overlap_layer_batch_size / model.pooling_size()];
+            break;
+
+          case pooling_method::AvgPooling:
+            pr = avg_pooling(hpr, model.pooling_size());
+            break;
+
+          default:
+            throw std::runtime_error("Unsupported pooling method.");
+          }
+
+          H[topleft / model.pooling_size() + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size / model.pooling_size()] =
+              pr[seq<dimCount>(0), hidden_overlap_layer_batch_size / model.pooling_size()];
+        } else {
+          H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size] =
+              hr[hidden_topleft, hidden_overlap_layer_batch_size];
+        }
+#else
         H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size] =
             hr[hidden_topleft, hidden_overlap_layer_batch_size];
+#endif
       }
     }
-  }
+#ifdef CNN_LAYER_KEEP_HIDDENS
+    if (model.has_pooling_layer()) {
 
-  /// Requires hidden activation and hidden total activation
-  void calculate_deltas(tensor_t& target) {
-    // this is used for the output layer
-    // Needs target values as input
-    // Need to know the objective function
+      switch (model.pooling_method()) {
+      case pooling_method::StridePooling:
+        _pooled = H[seq<dimCount>(0), model.pooling_size(), H.size()];
+        break;
 
-    // delta = (hidden - target) * f'(X)
-    switch (model.activation_function()) {
-    case activation_function::Sigmoid:
-      H = (H - target) * H * (1 + -H);
-      break;
+      case pooling_method::MaxPooling:
+        _switches = get_max_pooling_switches(H, model.pooling_size());
+        _pooled = max_pooling(H, _switches, model.pooling_size());
+        break;
 
-    case activation_function::ReLU:
-      H = (H - target) * (H > 0);
-      break;
+      case pooling_method::AvgPooling:
+        _pooled = avg_pooling(H, model.pooling_size());
+        break;
 
-    case activation_function::Softmax:
-    case activation_function::Linear:
-      H = H - target;
-      break;
-
-    default:
-      throw std::runtime_error("Undefined objective function for cnn_layer::calculate_deltas(target).");
+      default:
+        throw std::runtime_error("Unsupported pooling method.");
+      }
     }
+#endif
   }
+
+//  /// Requires hidden activation and hidden total activation
+//  void calculate_deltas(tensor_t& target) {
+//    // this is used for the output layer
+//    // Needs target values as input
+//    // Need to know the objective function
+//
+//    // delta = (hidden - target) * f'(X)
+//    switch (model.activation_function()) {
+//    case activation_function::Sigmoid:
+//      H = (H - target) * H * (1 + -H);
+//      break;
+//
+//    case activation_function::ReLU:
+//      H = (H - target) * (H > 0);
+//      break;
+//
+//    case activation_function::Softmax:
+//    case activation_function::Linear:
+//      H = H - target;
+//      break;
+//
+//    default:
+//      throw std::runtime_error("Undefined objective function for cnn_layer::calculate_deltas(target).");
+//    }
+//  }
 
   void backprop_visibles() {
+#ifdef CNN_LAYER_KEEP_HIDDENS
     assert(H.size() == hidden_size);
+
+    if (model.has_pooling_layer()) {
+      switch (model.pooling_method()) {
+      case pooling_method::StridePooling:
+        H = zeros<value_t>(H.size());
+        H[seq<dimCount>(0), model.pooling_size(), H.size()] = _pooled;
+        break;
+
+      case pooling_method::MaxPooling:
+        H = unpooling(_pooled, _switches, model.pooling_size());
+        break;
+
+      case pooling_method::AvgPooling:
+        H = unpooling(_pooled, model.pooling_size());
+        break;
+
+      default:
+        throw std::runtime_error("Unsupported pooling method.");
+      }
+    }
+#else
+    assert(H.size() == hidden_size / model.pooling_size());
+#endif
 
     vp = zeros<value_t>(visible_size);
 
@@ -411,7 +540,40 @@ public:
 
       for (size_t k = 0; k < cF.size(); ++k) {
         hr = zeros<value_t>(patch_layer_batch_size);
-        hr[hidden_topleft, hidden_overlap_layer_batch_size] = H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+
+#ifdef CNN_LAYER_KEEP_HIDDENS
+      hr[hidden_topleft, hidden_overlap_layer_batch_size] = H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+#else
+        if (model.has_pooling_layer()) {
+          pr[seq<dimCount>(0), hidden_overlap_layer_batch_size / model.pooling_size()] =
+              H[topleft / model.pooling_size() + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size / model.pooling_size()];
+
+          switch (model.pooling_method()) {
+          case pooling_method::StridePooling:
+            hpr = zeros<value_t>(hpr.size());
+            hpr[seq<dimCount>(0), model.pooling_size(), hpr.size()] = pr;
+            break;
+
+          case pooling_method::MaxPooling:
+            sr[seq<dimCount>(0), hidden_overlap_layer_batch_size / model.pooling_size()] =
+                _switches[topleft / model.pooling_size() + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size / model.pooling_size()];
+            hpr = unpooling(pr, sr, model.pooling_size());
+            break;
+
+          case pooling_method::AvgPooling:
+            hpr = unpooling(pr, model.pooling_size());
+            break;
+
+          default:
+            throw std::runtime_error("Unsupported pooling method.");
+          }
+
+          hr[hidden_topleft, hidden_overlap_layer_batch_size] = hpr[seq<dimCount>(0), hidden_overlap_layer_batch_size];
+        } else {
+          hr[hidden_topleft, hidden_overlap_layer_batch_size] = H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+        }
+#endif
+
         chr = fft(hr, dimCount - 1, plan_hr);
         cvr += repeat_mult_sum(chr, *cF[k]);
       }
@@ -426,25 +588,69 @@ public:
   template<class Expression>
   typename boost::enable_if<tbblas::is_expression<Expression>,
     typename boost::enable_if_c<Expression::dimCount == dimCount, int>::type >::type
-  backprop_hidden_deltas(const Expression& deltas) {
-    assert(deltas.size() == hidden_size);
+  backprop_hidden_deltas(const Expression& deltas, bool accumulate = false) {
+    assert(deltas.size() == hiddens().size());
+
+#ifdef CNN_LAYER_KEEP_HIDDENS
+    if (!accumulate)
+      dH = zeros<value_t>(H.size());
+
+    if (model.has_pooling_layer()) {
+      switch (model.pooling_method()) {
+      case pooling_method::StridePooling:
+        dH[seq<dimCount>(0), model.pooling_size(), H.size()] = dH[seq<dimCount>(0), model.pooling_size(), H.size()] + _pooled;
+        break;
+
+      case pooling_method::MaxPooling:
+        dH = dH + unpooling(_pooled, _switches, model.pooling_size());
+        break;
+
+      case pooling_method::AvgPooling:
+        dH = dH + unpooling(_pooled, model.pooling_size());
+        break;
+
+      default:
+        throw std::runtime_error("Unsupported pooling method.");
+      }
+    } else {
+      dH += deltas;
+    }
 
     switch(model.activation_function()) {
     case activation_function::Sigmoid:
-      H = deltas * H * (1 + -H);
+      H = dH * H * (1 + -H);
       break;
 
     case activation_function::ReLU:
-      H = deltas * (H > 0);
+      H = dH * (H > 0);
       break;
 
     case activation_function::Linear:
-      H = deltas;
       break;
 
     default:
       throw std::runtime_error("Unsupported activation function.");
     }
+#else
+    assert(accumulate == false);
+    switch(model.activation_function()) {
+    case activation_function::Sigmoid:
+      hiddens() = deltas * hiddens() * (1 + -hiddens());
+      break;
+
+    case activation_function::ReLU:
+      hiddens() = deltas * (hiddens() > 0);
+      break;
+
+    case activation_function::Linear:
+      hiddens() = deltas;
+      break;
+
+    default:
+      throw std::runtime_error("Unsupported activation function.");
+    }
+#endif
+
     return 0;
   }
 
@@ -481,9 +687,41 @@ public:
 
       for (size_t k = 0; k < cF.size(); ++k) {
         hr = zeros<value_t>(patch_layer_batch_size);
-        hr[hidden_topleft, hidden_overlap_layer_batch_size] = H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
-        chr = fft(hr, dimCount - 1, plan_hr);
 
+#ifdef CNN_LAYER_KEEP_HIDDENS
+      hr[hidden_topleft, hidden_overlap_layer_batch_size] = H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+#else
+        if (model.has_pooling_layer()) {
+          pr[seq<dimCount>(0), hidden_overlap_layer_batch_size / model.pooling_size()] =
+              H[topleft / model.pooling_size() + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size / model.pooling_size()];
+
+          switch (model.pooling_method()) {
+          case pooling_method::StridePooling:
+            hpr = zeros<value_t>(hpr.size());
+            hpr[seq<dimCount>(0), model.pooling_size(), hpr.size()] = pr;
+            break;
+
+          case pooling_method::MaxPooling:
+            sr[seq<dimCount>(0), hidden_overlap_layer_batch_size / model.pooling_size()] =
+                _switches[topleft / model.pooling_size() + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size / model.pooling_size()];
+            hpr = unpooling(pr, sr, model.pooling_size());
+            break;
+
+          case pooling_method::AvgPooling:
+            hpr = unpooling(pr, model.pooling_size());
+            break;
+
+          default:
+            throw std::runtime_error("Unsupported pooling method.");
+          }
+
+          hr[hidden_topleft, hidden_overlap_layer_batch_size] = hpr[seq<dimCount>(0), hidden_overlap_layer_batch_size];
+        } else {
+          hr[hidden_topleft, hidden_overlap_layer_batch_size] = H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+        }
+#endif
+
+        chr = fft(hr, dimCount - 1, plan_hr);
         *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(1) / _voxel_count);
 
         if (model.shared_bias()) {
@@ -772,7 +1010,11 @@ public:
   tensor_t& hiddens() {
     if (!_memory_allocated)
       allocate_gpu_memory();
-    return H;
+
+    if (model.has_pooling_layer())
+      return _pooled;
+    else
+      return H;
   }
 
   void set_batch_length(int length) {
