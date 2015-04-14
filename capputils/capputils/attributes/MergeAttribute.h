@@ -43,9 +43,11 @@ struct merge_trait<boost::shared_ptr<std::vector<T> > > {
 
   static void deleteValueAt(collection_t& collection, int position) {
     // tickle down values and shrink collection size
-    for (size_t i = position; i < collection->size() - 1; ++i)
-      collection->at(position) = collection->at(position + 1);
-    collection->resize(collection->size() - 1);
+    if ((int)collection->size() > position) {
+      for (int i = position; i < (int)collection->size() - 1; ++i)
+        collection->at(position) = collection->at(position + 1);
+      collection->resize(collection->size() - 1);
+    }
   }
 };
 
@@ -64,9 +66,11 @@ struct merge_trait<std::vector<T> > {
 
   static void deleteValueAt(collection_t& collection, int position) {
     // tickle down values and shrink collection size
-    for (size_t i = position; i < collection.size() - 1; ++i)
-      collection.at(position) = collection.at(position + 1);
-    collection.resize(collection.size() - 1);
+    if ((int)collection.size() > position) {
+      for (int i = position; i < (int)collection.size() - 1; ++i)
+        collection.at(position) = collection.at(position + 1);
+      collection.resize(collection.size() - 1);
+    }
   }
 };
 
