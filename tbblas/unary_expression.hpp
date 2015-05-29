@@ -76,10 +76,26 @@ struct is_expression<unary_expression<T, Operation> > {
 };
 
 template<class T, class Operation>
-struct scalar_operation {
+struct scalar_first_operation {
   typedef T value_t;
 
-  scalar_operation(const T& scalar, const Operation& op) : scalar(scalar), op(op) { }
+  scalar_first_operation(const T& scalar, const Operation& op) : scalar(scalar), op(op) { }
+
+  __host__ __device__
+  T operator()(const T& x) const {
+    return op(scalar, x);
+  }
+
+private:
+  T scalar;
+  Operation op;
+};
+
+template<class T, class Operation>
+struct scalar_last_operation {
+  typedef T value_t;
+
+  scalar_last_operation(const T& scalar, const Operation& op) : scalar(scalar), op(op) { }
 
   __host__ __device__
   T operator()(const T& x) const {

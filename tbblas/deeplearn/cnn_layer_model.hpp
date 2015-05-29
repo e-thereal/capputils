@@ -121,6 +121,10 @@ public:
       _filters[i] = boost::make_shared<host_tensor_t>(*filters[i]);
   }
 
+  v_host_tensor_t& filters() {
+    return _filters;
+  }
+
   const v_host_tensor_t& filters() const {
     return _filters;
   }
@@ -133,6 +137,10 @@ public:
     _biases.resize(bias.size());
     for (size_t i = 0; i < bias.size(); ++i)
       _biases[i] = boost::make_shared<host_tensor_t>(*bias[i]);
+  }
+
+  v_host_tensor_t& bias() {
+    return _biases;
   }
 
   const v_host_tensor_t& bias() const {

@@ -11,6 +11,10 @@
 #include <tbblas/deeplearn/cnn_model.hpp>
 #include <tbblas/deeplearn/nn_layer.hpp>
 #include <tbblas/deeplearn/cnn_layer.hpp>
+#include <tbblas/deeplearn/cnn_base.hpp>
+
+#include <tbblas/deeplearn/opt/type_traits.hpp>
+#include <tbblas/deeplearn/opt/void_trainer.hpp>
 
 #include <tbblas/context.hpp>
 #include <tbblas/rearrange.hpp>
@@ -22,11 +26,12 @@ namespace tbblas {
 
 namespace deeplearn {
 
-template<class T, unsigned dims>
-class cnn {
+template<class T, unsigned dims, class Trainer = opt::void_trainer<T>, class Enable = typename boost::enable_if<opt::is_trainer<Trainer> >::type>
+class cnn : public virtual cnn_base<T, dims>, public Trainer {
   const static unsigned dimCount = dims;
   typedef T value_t;
   typedef typename tbblas::tensor<value_t, dimCount>::dim_t dim_t;
+  typedef Trainer trainer_t;
 
   typedef tbblas::tensor<value_t, 2> host_matrix_t;
   typedef tbblas::tensor<value_t, dimCount> host_tensor_t;
@@ -36,10 +41,10 @@ class cnn {
   typedef tbblas::tensor<value_t, dimCount, true> tensor_t;
   typedef std::vector<boost::shared_ptr<tensor_t> > v_tensor_t;
 
-  typedef nn_layer<value_t> nn_layer_t;
+  typedef nn_layer<value_t, trainer_t> nn_layer_t;
   typedef std::vector<boost::shared_ptr<nn_layer_t> > v_nn_layer_t;
 
-  typedef cnn_layer<value_t, dimCount> cnn_layer_t;
+  typedef cnn_layer<value_t, dimCount, trainer_t> cnn_layer_t;
   typedef std::vector<boost::shared_ptr<cnn_layer_t> > v_cnn_layer_t;
 
   typedef cnn_model<value_t, dimCount> model_t;
@@ -56,12 +61,12 @@ public:
 
     _cnn_layers.resize(model.cnn_layers().size());
     for (size_t i = 0; i < _cnn_layers.size(); ++i) {
-      _cnn_layers[i] = boost::make_shared<cnn_layer_t>(boost::ref(*model.cnn_layers()[i]));
+      _cnn_layers[i] = boost::make_shared<cnn_layer_t>(boost::ref(*model.cnn_layers()[i]), this);
     }
 
     _nn_layers.resize(model.nn_layers().size());
     for (size_t i = 0; i < _nn_layers.size(); ++i) {
-      _nn_layers[i] = boost::make_shared<nn_layer_t>(boost::ref(*model.nn_layers()[i]));
+      _nn_layers[i] = boost::make_shared<nn_layer_t>(boost::ref(*model.nn_layers()[i]), this);
     }
   }
 
@@ -69,46 +74,38 @@ private:
   cnn(const cnn<T, dims>&);
 
 public:
-  void normalize_visibles() {
+  virtual void normalize_visibles() {
     _cnn_layers[0]->normalize_visibles();
   }
 
   // Infer hidden units recursively
-  void infer_hiddens() {
+  virtual void infer_hiddens() {
     infer_hiddens(0);
   }
 
   // Does not require the hidden units to be inferred
-  void update_gradient(matrix_t& target) {
+  virtual void update_gradient(matrix_t& target) {
     update_gradient(0, target);
   }
 
-  void momentum_step(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
+  virtual void update_model(value_t weightcost) {
     for (size_t i = 0; i < _cnn_layers.size(); ++i)
-      _cnn_layers[i]->momentum_step(epsilon1, momentum, weightcost);
+      _cnn_layers[i]->update_model(weightcost);
 
     for (size_t i = 0; i < _nn_layers.size(); ++i)
-      _nn_layers[i]->momentum_step(epsilon2, momentum, weightcost);
+      _nn_layers[i]->update_model(weightcost);
   }
 
-  void adadelta_step(value_t epsilon1, value_t epsilon2, value_t momentum, value_t weightcost) {
-    for (size_t i = 0; i < _cnn_layers.size(); ++i)
-      _cnn_layers[i]->adadelta_step(epsilon1, momentum, weightcost);
-
-    for (size_t i = 0; i < _nn_layers.size(); ++i)
-      _nn_layers[i]->adadelta_step(epsilon2, momentum, weightcost);
-  }
-
-  void set_batch_length(int layer, int length) {
+  virtual void set_batch_length(int layer, int length) {
     if (layer < _cnn_layers.size())
       _cnn_layers[layer]->set_batch_length(length);
   }
 
-  const proxy<tensor_t> visibles() {
+  virtual const proxy<tensor_t> visibles() {
     return _cnn_layers[0]->visibles();
   }
 
-  matrix_t& hiddens() {
+  virtual matrix_t& hiddens() {
     return _nn_layers[_nn_layers.size() - 1]->hiddens();
   }
 

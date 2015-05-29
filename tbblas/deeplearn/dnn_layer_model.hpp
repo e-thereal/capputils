@@ -122,6 +122,10 @@ public:
       _filters[i] = boost::make_shared<host_tensor_t>(*filters[i]);
   }
 
+  v_host_tensor_t& filters() {
+    return _filters;
+  }
+
   const v_host_tensor_t& filters() const {
     return _filters;
   }

@@ -185,6 +185,10 @@ public:
     return outputs_size().prod();
   }
 
+  size_t layer_count() const {
+    return _cnn_encoders.size() + _nn_encoders.size() + _nn_decoders.size() + _dnn_decoders.size();
+  }
+
   bool has_shortcuts() const {
     return _dnn_shortcuts.size();
   }

@@ -21,6 +21,9 @@
 #include <tbblas/util.hpp>
 #include <tbblas/linalg.hpp>
 
+#include <tbblas/deeplearn/opt/type_traits.hpp>
+#include <tbblas/deeplearn/opt/void_trainer.hpp>
+
 #include <tbblas/deeplearn/math.hpp>
 #include <tbblas/deeplearn/nn_layer_model.hpp>
 #include <tbblas/deeplearn/objective_function.hpp>
@@ -32,8 +35,8 @@ namespace tbblas {
 
 namespace deeplearn {
 
-template<class T>
-class nn_layer {
+template<class T, class Trainer = opt::void_trainer<T>, class Enable = typename boost::enable_if<opt::is_trainer<Trainer > >::type>
+class nn_layer : public Trainer {
   typedef T value_t;
   typedef tbblas::tensor<value_t, 2, true> matrix_t;
   typedef tbblas::tensor<value_t, 2> host_matrix_t;
@@ -51,7 +54,7 @@ protected:
 
   // weights and bias terms in GPU memory
   matrix_t W, b, dW, db, mean, stddev;
-  matrix_t dW2, db2, deltaW2, deltab2, deltaW, deltab, duW, dub;
+//  matrix_t dW2, db2, deltaW2, deltab2, deltaW, deltab, duW, dub;
 
   // visible and hidden units in GPU memory
   matrix_t V, H, dV, dH;
@@ -67,7 +70,7 @@ protected:
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
-  nn_layer(model_t& model) : model(model),
+  nn_layer(model_t& model, const Trainer* parameters = NULL) : Trainer(parameters), model(model),
     _memory_allocated(false), _host_updated(true), _current_batch_size(0), _sensitivity_ratio(0.5), _dropout_rate(0)
   { }
 
@@ -214,59 +217,6 @@ public:
     }
   }
 
-  /// Requires hidden activation and hidden total activation
-  void calculate_u_deltas(matrix_t& target) {
-    // this is used for the output layer
-    // Needs target values as input
-    // Need to know the objective function
-
-    switch (_objective_function) {
-    case tbblas::deeplearn::objective_function::DSC:
-      if (model.activation_function() != activation_function::Sigmoid)
-        throw std::runtime_error("Activation function for objective function 'DSC' must be 'Sigmoid'.");
-
-      dH = 2 * target * H * (1 + -H);
-      break;
-
-    case tbblas::deeplearn::objective_function::DSC2:
-      if (model.activation_function() != activation_function::Sigmoid)
-        throw std::runtime_error("Activation function for objective function 'DSC2' must be 'Sigmoid'.");
-
-      dH = 4 * target * (H - target) * H * (1 + -H);
-      break;
-
-    default:
-      throw std::runtime_error("Undefined objective function for calculate_u_deltas(target).");
-    }
-  }
-
-  /// Requires hidden activation and hidden total activation
-  void calculate_v_deltas(matrix_t& target) {
-    // this is used for the output layer
-    // Needs target values as input
-    // Need to know the objective function
-
-    switch (_objective_function) {
-    case tbblas::deeplearn::objective_function::DSC:
-      if (model.activation_function() != activation_function::Sigmoid)
-        throw std::runtime_error("Activation function for objective function 'DSC' must be 'Sigmoid'.");
-
-      dH = H * (1 + -H);
-      break;
-
-    case tbblas::deeplearn::objective_function::DSC2:
-      if (model.activation_function() != activation_function::Sigmoid)
-        throw std::runtime_error("Activation function for objective function 'DSC2' must be 'Sigmoid'.");
-
-      // delta = 2 * y_j * f'(X)
-      dH = 2 * H * H * (1 + -H);
-      break;
-
-    default:
-      throw std::runtime_error("Undefined objective function for calculate_v_deltas(target).");
-    }
-  }
-
   void backprop_visible_deltas() {
     if (!dH.count())
       throw std::runtime_error("You need to calculate the deltas before bproping them.");
@@ -327,66 +277,66 @@ public:
     ++_current_batch_size;
   }
 
-  void update_u_gradient() {
-    if (!_memory_allocated)
-      allocate_gpu_memory();
+//  void update_u_gradient() {
+//    if (!_memory_allocated)
+//      allocate_gpu_memory();
+//
+//    if (!dH.count())
+//      throw std::runtime_error("Hidden deltas not calculated.");
+//
+//    // (x_n)(mu_n)'
+//    prods = tbblas::prod(trans(V), dH);
+//
+//    // Calculate the total activation of the hidden and visible units
+//    hidact = sum(dH, 0);
+//
+//    duW = prods;
+//    dub = hidact;
+//  }
+//
+//  void update_v_gradient(value_t u, value_t v) {
+//    if (!_memory_allocated)
+//      allocate_gpu_memory();
+//
+//    if (!dH.count())
+//      throw std::runtime_error("Hidden deltas not calculated.");
+//
+//    if (!dW.count())
+//      dW = zeros<value_t>(W.size());
+//    if (!db.count())
+//      db = zeros<value_t>(b.size());
+//
+//    // (x_n)(mu_n)'
+//    prods = tbblas::prod(trans(V), dH);
+//
+//    // Calculate the total activation of the hidden and visible units
+//    hidact = sum(dH, 0);
+//
+//    // TODO: decide the sign depending on the objective function
+//    // TODO: need to update the objective function for every layer in the nn class
+//
+//    dW += value_t(-1) * (duW * v - u * prods) / (v * v);
+//    db += value_t(-1) * (dub * v - u * hidact) / (v * v);
+//
+//    ++_current_batch_size;
+//  }
 
-    if (!dH.count())
-      throw std::runtime_error("Hidden deltas not calculated.");
-
-    // (x_n)(mu_n)'
-    prods = tbblas::prod(trans(V), dH);
-
-    // Calculate the total activation of the hidden and visible units
-    hidact = sum(dH, 0);
-
-    duW = prods;
-    dub = hidact;
-  }
-
-  void update_v_gradient(value_t u, value_t v) {
-    if (!_memory_allocated)
-      allocate_gpu_memory();
-
-    if (!dH.count())
-      throw std::runtime_error("Hidden deltas not calculated.");
-
-    if (!dW.count())
-      dW = zeros<value_t>(W.size());
-    if (!db.count())
-      db = zeros<value_t>(b.size());
-
-    // (x_n)(mu_n)'
-    prods = tbblas::prod(trans(V), dH);
-
-    // Calculate the total activation of the hidden and visible units
-    hidact = sum(dH, 0);
-
-    // TODO: decide the sign depending on the objective function
-    // TODO: need to update the objective function for every layer in the nn class
-
-    dW += value_t(-1) * (duW * v - u * prods) / (v * v);
-    db += value_t(-1) * (dub * v - u * hidact) / (v * v);
-
-    ++_current_batch_size;
-  }
-
-  void momentum_step(value_t epsilon, value_t momentum, value_t weightcost) {
+  void update_model(value_t weightcost) {
     if (!_memory_allocated)
       allocate_gpu_memory();
 
     // Lazy initialization
-    if (!deltaW.count())
-      deltaW = zeros<value_t>(W.size());
-    if (!deltab.count())
-      deltab = zeros<value_t>(b.size());
+
 
     if (_current_batch_size) {
-      deltaW = momentum * deltaW + dW / _current_batch_size + weightcost * W;
-      deltab = momentum * deltab + db / _current_batch_size;
+//      deltaW = momentum * deltaW + dW / _current_batch_size + weightcost * W;
+//      deltab = momentum * deltab + db / _current_batch_size;
 
-      W = W - epsilon * deltaW;
-      b = b - epsilon * deltab;
+      this->update_delta(dW / _current_batch_size + weightcost * W, 0);
+      this->update_delta(db / _current_batch_size, 1);
+
+      W = W - reshape(this->delta(0), W.size());
+      b = b - reshape(this->delta(1), b.size());
 
       dW = zeros<value_t>(dW.size());
       db = zeros<value_t>(db.size());
@@ -397,38 +347,64 @@ public:
     _host_updated = false;
   }
 
-  void adadelta_step(value_t epsilon, value_t momentum, value_t weightcost) {
-    if (!dW2.count())
-      dW2 = zeros<value_t>(W.size());
-    if (!db2.count())
-      db2 = zeros<value_t>(b.size());
-    if (!deltaW2.count())
-      deltaW2 = zeros<value_t>(W.size());
-    if (!deltab2.count())
-      deltab2 = zeros<value_t>(b.size());
-
-    if (_current_batch_size) {
-      dW = dW / _current_batch_size + weightcost * W;
-      db = db / _current_batch_size;
-
-      dW2 = momentum * dW2 + (1.0 - momentum) * dW * dW;
-      db2 = momentum * db2 + (1.0 - momentum) * db * db;
-
-      // note that deltaW = - sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW;
-      W = W - sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW;
-      b = b - sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * db;
-
-      deltaW2 = momentum * deltaW2 + (1.0 - momentum) * sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW * sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW;
-      deltab2 = momentum * deltab2 + (1.0 - momentum) * sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * db * sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * db;
-
-      dW = zeros<value_t>(dW.size());
-      db = zeros<value_t>(db.size());
-    }
-
-    _current_batch_size = 0;
-
-    _host_updated = false;
-  }
+//  void momentum_step(value_t epsilon, value_t momentum, value_t weightcost) {
+//    if (!_memory_allocated)
+//      allocate_gpu_memory();
+//
+//    // Lazy initialization
+//    if (!deltaW.count())
+//      deltaW = zeros<value_t>(W.size());
+//    if (!deltab.count())
+//      deltab = zeros<value_t>(b.size());
+//
+//    if (_current_batch_size) {
+//      deltaW = momentum * deltaW + dW / _current_batch_size + weightcost * W;
+//      deltab = momentum * deltab + db / _current_batch_size;
+//
+//      W = W - epsilon * deltaW;
+//      b = b - epsilon * deltab;
+//
+//      dW = zeros<value_t>(dW.size());
+//      db = zeros<value_t>(db.size());
+//    }
+//
+//    _current_batch_size = 0;
+//
+//    _host_updated = false;
+//  }
+//
+//  void adadelta_step(value_t epsilon, value_t momentum, value_t weightcost) {
+//    if (!dW2.count())
+//      dW2 = zeros<value_t>(W.size());
+//    if (!db2.count())
+//      db2 = zeros<value_t>(b.size());
+//    if (!deltaW2.count())
+//      deltaW2 = zeros<value_t>(W.size());
+//    if (!deltab2.count())
+//      deltab2 = zeros<value_t>(b.size());
+//
+//    if (_current_batch_size) {
+//      dW = dW / _current_batch_size + weightcost * W;
+//      db = db / _current_batch_size;
+//
+//      dW2 = momentum * dW2 + (1.0 - momentum) * dW * dW;
+//      db2 = momentum * db2 + (1.0 - momentum) * db * db;
+//
+//      // note that deltaW = - sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW;
+//      W = W - sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW;
+//      b = b - sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * db;
+//
+//      deltaW2 = momentum * deltaW2 + (1.0 - momentum) * sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW * sqrt(deltaW2 + epsilon) / sqrt(dW2 + epsilon) * dW;
+//      deltab2 = momentum * deltab2 + (1.0 - momentum) * sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * db * sqrt(deltab2 + epsilon) / sqrt(db2 + epsilon) * db;
+//
+//      dW = zeros<value_t>(dW.size());
+//      db = zeros<value_t>(db.size());
+//    }
+//
+//    _current_batch_size = 0;
+//
+//    _host_updated = false;
+//  }
 
   // Access to model data
   matrix_t& visibles() {
@@ -451,8 +427,8 @@ public:
   }
 };
 
-template<class T>
-const T nn_layer<T>::tolerance;
+template<class T, class Trainer, class Enable>
+const T nn_layer<T, Trainer, Enable>::tolerance;
 
 }
 

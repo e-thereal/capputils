@@ -31,6 +31,8 @@
 #include <tbblas/deeplearn/dnn_layer.hpp>
 #include <tbblas/deeplearn/objective_function.hpp>
 
+#include <tbblas/deeplearn/opt/type_traits.hpp>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <vector>
@@ -41,10 +43,10 @@ namespace tbblas {
 
 namespace deeplearn {
 
-template<class T, unsigned dims>
-class cdnn_layer : public dnn_layer<T, dims> {
+template<class T, unsigned dims, class Trainer, class Enable = typename boost::enable_if<opt::is_trainer<Trainer> >::type>
+class cdnn_layer : public dnn_layer<T, dims, Trainer> {
 
-  typedef dnn_layer<T, dims> base_t;
+  typedef dnn_layer<T, dims, Trainer> base_t;
 
   const static unsigned dimCount = dims;
   typedef uint8_t switches_t;
@@ -66,8 +68,8 @@ class cdnn_layer : public dnn_layer<T, dims> {
 
   typedef dnn_layer_model<value_t, dimCount> model_t;
 
-  typedef cnn_layer<value_t, dimCount> cnn_layer_t;
-  typedef dnn_layer<value_t, dimCount> dnn_layer_t;
+  typedef cnn_layer<value_t, dimCount, Trainer> cnn_layer_t;
+  typedef dnn_layer<value_t, dimCount, Trainer> dnn_layer_t;
 
   typedef tbblas::random_tensor2<value_t, 4, true, tbblas::uniform<value_t> > uniform_t;
 
@@ -77,8 +79,6 @@ protected:
 
   // weights and bias terms in GPU memory
   v_ctensor_t cF, cFinc;
-  v_tensor_t deltaF, dF2, deltaF2;
-  tensor_t deltaF_hat, deltaF2_hat;
 
   using base_t::padded_visible_size;
   using base_t::visible_size;
@@ -134,12 +134,11 @@ protected:
   using base_t::_current_batch_size;
   using base_t::_dropout_rate;
   using base_t::_sensitivity_ratio;
-  using base_t::_current_iteration;
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
-  cdnn_layer(model_t& shortcut_model, model_t& decoder_model, cnn_layer_t& cnn_layer, dim_t patch_count = seq<dimCount>(1))
-    : base_t(decoder_model, patch_count),
+  cdnn_layer(model_t& shortcut_model, model_t& decoder_model, cnn_layer_t& cnn_layer, const Trainer* parameters, dim_t patch_count = seq<dimCount>(1))
+    : base_t(decoder_model, parameters, patch_count),
       model(shortcut_model), cnn_layer(cnn_layer)
   {
     base_t::_p_switches = cnn_layer._p_switches;
@@ -255,7 +254,7 @@ public:
     base_t::infer_visibles(dropout, true);
   }
 
-  void backprop_hidden_deltas() {
+  virtual void backprop_hidden_deltas() {
     if (!_memory_allocated)
       allocate_gpu_memory();
 
@@ -321,7 +320,7 @@ public:
     }
   }
 
-  virtual void momentum_step(value_t epsilon, value_t momentum, value_t weightcost) {
+  virtual void update_model(value_t weightcost) {
 
     // This function temporarily puts the deltas into the
     // gradient in frequency domain just to apply the deltas
@@ -331,13 +330,9 @@ public:
     if (!cFinc.size())
       throw std::runtime_error("No gradient calculated.");
 
-    if (!deltaF.size()) {
-      deltaF.resize(model.filter_count());
-      for (size_t k = 0; k < deltaF.size(); ++k)
-        deltaF[k] = boost::make_shared<tensor_t>(zeros<value_t>(model.kernel_size()));
-    }
-
     dim_t fullsize = cvr.fullsize();
+
+    const int param_offset = model.filter_count() + 1;
 
     for (size_t k = 0; k < cF.size(); ++k) {
       for (int j = 0; j < _filter_batch_length; ++j) {
@@ -353,73 +348,11 @@ public:
         padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
 
         // update deltaF
-        *deltaF[iFilter] = momentum * *deltaF[iFilter] + padded_k[seq<dimCount>(0), model.kernel_size()];
+        this->update_delta(padded_k[seq<dimCount>(0), model.kernel_size()], iFilter + param_offset);
 
         // Put deltaF into cFinc to apply the delta to the current filter
         padded_k = zeros<value_t>(padded_k.size());
-        padded_k[seq<dimCount>(0), model.kernel_size()] = *deltaF[iFilter];
-        padded_f = zeros<value_t>(padded_f.size());
-        padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
-        shifted_f = ifftshift(padded_f, dimCount - 1);
-
-        cvr = fft(shifted_f, dimCount - 1, plan_vr);
-        (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] = cvr;
-      }
-
-      // Apply delta to current filters
-      *cF[k] = *cF[k] - epsilon * *cFinc[k];
-
-      // Reset filter gradient
-      *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
-    }
-
-    base_t::momentum_step(epsilon, momentum, weightcost);
-  }
-
-  virtual void adadelta_step(value_t epsilon, value_t momentum, value_t weightcost) {
-
-    // This function temporarily puts the deltas into the
-    // gradient in frequency domain just to apply the deltas
-    // to the model in the frequency domain. Afterwards, the
-    // gradients are reset to zero
-
-    if (!cFinc.size())
-      throw std::runtime_error("No gradient calculated.");
-
-    if (!dF2.size() || !deltaF.size() || !deltaF2.size()) {
-      dF2.resize(model.filter_count());
-      deltaF.resize(model.filter_count());
-      deltaF2.resize(model.filter_count());
-      for (size_t k = 0; k < dF2.size(); ++k) {
-        dF2[k] = boost::make_shared<tensor_t>(zeros<value_t>(model.kernel_size()));
-        deltaF[k] = boost::make_shared<tensor_t>(zeros<value_t>(model.kernel_size()));
-        deltaF2[k] = boost::make_shared<tensor_t>(zeros<value_t>(model.kernel_size()));
-      }
-    }
-
-    dim_t fullsize = cvr.fullsize();
-
-    for (size_t k = 0; k < cF.size(); ++k) {
-      for (int j = 0; j < _filter_batch_length; ++j) {
-
-        // Extract filter
-        const int iFilter = k * _filter_batch_length + j;
-        dim_t topleft = patch_size / 2 - kernel_size / 2;
-
-        cvr = (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] * (value_t(1) / _current_batch_size) + weightcost * (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
-        cvr.set_fullsize(fullsize);
-        shifted_f = ifft(cvr, dimCount - 1, iplan_vr);
-        padded_f = fftshift(shifted_f, dimCount - 1);
-        padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
-
-        // update deltaF
-        *dF2[iFilter] = momentum * *dF2[iFilter] + (1.0 - momentum) * padded_k[seq<dimCount>(0), model.kernel_size()] * padded_k[seq<dimCount>(0), model.kernel_size()];
-        *deltaF[iFilter] = sqrt(*deltaF2[iFilter] + epsilon) / sqrt(*dF2[iFilter] + epsilon) * padded_k[seq<dimCount>(0), model.kernel_size()];
-        *deltaF2[iFilter] = momentum * *deltaF2[iFilter] + (1.0 - momentum) * *deltaF[iFilter] * *deltaF[iFilter];
-
-        // Put deltaF into cFinc to apply the delta to the current filter
-        padded_k = zeros<value_t>(padded_k.size());
-        padded_k[seq<dimCount>(0), model.kernel_size()] = *deltaF[iFilter];
+        padded_k[seq<dimCount>(0), model.kernel_size()] = reshape(this->delta(iFilter + param_offset), model.kernel_size());
         padded_f = zeros<value_t>(padded_f.size());
         padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
         shifted_f = ifftshift(padded_f, dimCount - 1);
@@ -435,72 +368,7 @@ public:
       *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
     }
 
-    base_t::adadelta_step(epsilon, momentum, weightcost);
-  }
-
-  virtual void adam_step(value_t alpha, value_t beta1, value_t beta2, value_t epsilon, value_t betaDecay, value_t weightcost) {
-    // This function temporarily puts the deltas into the
-    // gradient in frequency domain just to apply the deltas
-    // to the model in the frequency domain. Afterwards, the
-    // gradients are reset to zero
-
-    if (!cFinc.size())
-      throw std::runtime_error("No gradient calculated.");
-
-    if (!deltaF.size() || !deltaF2.size()) {
-      deltaF.resize(model.filter_count());
-      deltaF2.resize(model.filter_count());
-      for (size_t k = 0; k < deltaF.size(); ++k) {
-        deltaF[k] = boost::make_shared<tensor_t>(zeros<value_t>(model.kernel_size()));
-        deltaF2[k] = boost::make_shared<tensor_t>(zeros<value_t>(model.kernel_size()));
-      }
-    }
-
-    dim_t fullsize = cvr.fullsize();
-    const value_t beta1t = 1.0 - (1.0 - beta1) * ::pow(betaDecay, _current_iteration);
-    ++_current_iteration;
-
-    for (size_t k = 0; k < cF.size(); ++k) {
-      for (int j = 0; j < _filter_batch_length; ++j) {
-
-        // Extract filter
-        const int iFilter = k * _filter_batch_length + j;
-        dim_t topleft = patch_size / 2 - kernel_size / 2;
-
-        cvr = (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] * (value_t(1) / _current_batch_size) + weightcost * (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
-        cvr.set_fullsize(fullsize);
-        shifted_f = ifft(cvr, dimCount - 1, iplan_vr);
-        padded_f = fftshift(shifted_f, dimCount - 1);
-        padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
-
-        // update deltaF
-        *deltaF[iFilter] = beta1t * padded_k[seq<dimCount>(0), model.kernel_size()] + (1. - beta1t) * *deltaF[iFilter];
-        *deltaF2[iFilter] = beta2 * padded_k[seq<dimCount>(0), model.kernel_size()] * padded_k[seq<dimCount>(0), model.kernel_size()]
-                               + (1. - beta2) * *deltaF2[iFilter];
-
-        deltaF_hat = *deltaF[iFilter] / (value_t(1) - ::pow(value_t(1) - beta1, _current_iteration));
-        deltaF2_hat = *deltaF2[iFilter] / (value_t(1) - ::pow(value_t(1) - beta2, _current_iteration));
-
-        // Put deltaF into cFinc to apply the delta to the current filter
-        padded_k = zeros<value_t>(padded_k.size());
-        padded_k[seq<dimCount>(0), model.kernel_size()] = deltaF_hat / (sqrt(deltaF2_hat) + epsilon);
-        padded_f = zeros<value_t>(padded_f.size());
-        padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
-        shifted_f = ifftshift(padded_f, dimCount - 1);
-
-        cvr = fft(shifted_f, dimCount - 1, plan_vr);
-        (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] = cvr;
-      }
-
-      // Apply delta to current filters
-      *cF[k] = *cF[k] - alpha * *cFinc[k];
-
-      // Reset filter gradient
-      *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
-    }
-
-    --_current_iteration;
-    base_t::adam_step(alpha, beta1, beta2, epsilon, betaDecay, weightcost);
+    base_t::update_model(weightcost);
   }
 };
 

@@ -17,20 +17,20 @@ namespace tbblas {
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::equal_to<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_last_operation<typename Expression::value_t, thrust::equal_to<typename Expression::value_t> > >
 >::type
 operator==(const Expression& expr, const typename Expression::value_t& scalar) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::equal_to<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::equal_to<typename Expression::value_t> >(scalar, thrust::equal_to<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_last_operation<typename Expression::value_t, thrust::equal_to<typename Expression::value_t> > >(
+      expr, scalar_last_operation<typename Expression::value_t, thrust::equal_to<typename Expression::value_t> >(scalar, thrust::equal_to<typename Expression::value_t>()));
 }
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::equal_to<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_first_operation<typename Expression::value_t, thrust::equal_to<typename Expression::value_t> > >
 >::type
 operator==(const typename Expression::value_t& scalar, const Expression& expr) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::equal_to<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::equal_to<typename Expression::value_t> >(scalar, thrust::equal_to<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_first_operation<typename Expression::value_t, thrust::equal_to<typename Expression::value_t> > >(
+      expr, scalar_first_operation<typename Expression::value_t, thrust::equal_to<typename Expression::value_t> >(scalar, thrust::equal_to<typename Expression::value_t>()));
 }
 
 template<class Expression1, class Expression2>
@@ -50,20 +50,20 @@ operator==(const Expression1& expr1, const Expression2& expr2) {
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::not_equal_to<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_last_operation<typename Expression::value_t, thrust::not_equal_to<typename Expression::value_t> > >
 >::type
 operator!=(const Expression& expr, const typename Expression::value_t& scalar) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::not_equal_to<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::not_equal_to<typename Expression::value_t> >(scalar, thrust::not_equal_to<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_last_operation<typename Expression::value_t, thrust::not_equal_to<typename Expression::value_t> > >(
+      expr, scalar_last_operation<typename Expression::value_t, thrust::not_equal_to<typename Expression::value_t> >(scalar, thrust::not_equal_to<typename Expression::value_t>()));
 }
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::not_equal_to<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_first_operation<typename Expression::value_t, thrust::not_equal_to<typename Expression::value_t> > >
 >::type
 operator!=(const typename Expression::value_t& scalar, const Expression& expr) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::not_equal_to<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::not_equal_to<typename Expression::value_t> >(scalar, thrust::not_equal_to<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_first_operation<typename Expression::value_t, thrust::not_equal_to<typename Expression::value_t> > >(
+      expr, scalar_first_operation<typename Expression::value_t, thrust::not_equal_to<typename Expression::value_t> >(scalar, thrust::not_equal_to<typename Expression::value_t>()));
 }
 
 template<class Expression1, class Expression2>
@@ -83,20 +83,20 @@ operator!=(const Expression1& expr1, const Expression2& expr2) {
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::greater<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_last_operation<typename Expression::value_t, thrust::greater<typename Expression::value_t> > >
 >::type
 operator>(const Expression& expr, const typename Expression::value_t& scalar) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::greater<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::greater<typename Expression::value_t> >(scalar, thrust::greater<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_last_operation<typename Expression::value_t, thrust::greater<typename Expression::value_t> > >(
+      expr, scalar_last_operation<typename Expression::value_t, thrust::greater<typename Expression::value_t> >(scalar, thrust::greater<typename Expression::value_t>()));
 }
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::greater<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_first_operation<typename Expression::value_t, thrust::greater<typename Expression::value_t> > >
 >::type
 operator>(const typename Expression::value_t& scalar, const Expression& expr) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::greater<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::greater<typename Expression::value_t> >(scalar, thrust::greater<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_first_operation<typename Expression::value_t, thrust::greater<typename Expression::value_t> > >(
+      expr, scalar_first_operation<typename Expression::value_t, thrust::greater<typename Expression::value_t> >(scalar, thrust::greater<typename Expression::value_t>()));
 }
 
 template<class Expression1, class Expression2>
@@ -116,20 +116,20 @@ operator>(const Expression1& expr1, const Expression2& expr2) {
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::less<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_last_operation<typename Expression::value_t, thrust::less<typename Expression::value_t> > >
 >::type
 operator<(const Expression& expr, const typename Expression::value_t& scalar) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::less<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::less<typename Expression::value_t> >(scalar, thrust::less<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_last_operation<typename Expression::value_t, thrust::less<typename Expression::value_t> > >(
+      expr, scalar_last_operation<typename Expression::value_t, thrust::less<typename Expression::value_t> >(scalar, thrust::less<typename Expression::value_t>()));
 }
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::less<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_first_operation<typename Expression::value_t, thrust::less<typename Expression::value_t> > >
 >::type
 operator<(const typename Expression::value_t& scalar, const Expression& expr) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::less<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::less<typename Expression::value_t> >(scalar, thrust::less<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_first_operation<typename Expression::value_t, thrust::less<typename Expression::value_t> > >(
+      expr, scalar_first_operation<typename Expression::value_t, thrust::less<typename Expression::value_t> >(scalar, thrust::less<typename Expression::value_t>()));
 }
 
 template<class Expression1, class Expression2>
@@ -149,20 +149,20 @@ operator<(const Expression1& expr1, const Expression2& expr2) {
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::greater_equal<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_last_operation<typename Expression::value_t, thrust::greater_equal<typename Expression::value_t> > >
 >::type
 operator>=(const Expression& expr, const typename Expression::value_t& scalar) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::greater_equal<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::greater_equal<typename Expression::value_t> >(scalar, thrust::greater_equal<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_last_operation<typename Expression::value_t, thrust::greater_equal<typename Expression::value_t> > >(
+      expr, scalar_last_operation<typename Expression::value_t, thrust::greater_equal<typename Expression::value_t> >(scalar, thrust::greater_equal<typename Expression::value_t>()));
 }
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::greater_equal<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_first_operation<typename Expression::value_t, thrust::greater_equal<typename Expression::value_t> > >
 >::type
 operator>=(const typename Expression::value_t& scalar, const Expression& expr) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::greater_equal<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::greater_equal<typename Expression::value_t> >(scalar, thrust::greater_equal<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_first_operation<typename Expression::value_t, thrust::greater_equal<typename Expression::value_t> > >(
+      expr, scalar_first_operation<typename Expression::value_t, thrust::greater_equal<typename Expression::value_t> >(scalar, thrust::greater_equal<typename Expression::value_t>()));
 }
 
 template<class Expression1, class Expression2>
@@ -182,20 +182,20 @@ operator>=(const Expression1& expr1, const Expression2& expr2) {
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::less_equal<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_last_operation<typename Expression::value_t, thrust::less_equal<typename Expression::value_t> > >
 >::type
 operator<=(const Expression& expr, const typename Expression::value_t& scalar) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::less_equal<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::less_equal<typename Expression::value_t> >(scalar, thrust::less_equal<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_last_operation<typename Expression::value_t, thrust::less_equal<typename Expression::value_t> > >(
+      expr, scalar_last_operation<typename Expression::value_t, thrust::less_equal<typename Expression::value_t> >(scalar, thrust::less_equal<typename Expression::value_t>()));
 }
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::less_equal<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_first_operation<typename Expression::value_t, thrust::less_equal<typename Expression::value_t> > >
 >::type
 operator<=(const typename Expression::value_t& scalar, const Expression& expr) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, thrust::less_equal<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, thrust::less_equal<typename Expression::value_t> >(scalar, thrust::less_equal<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_first_operation<typename Expression::value_t, thrust::less_equal<typename Expression::value_t> > >(
+      expr, scalar_first_operation<typename Expression::value_t, thrust::less_equal<typename Expression::value_t> >(scalar, thrust::less_equal<typename Expression::value_t>()));
 }
 
 template<class Expression1, class Expression2>

@@ -41,20 +41,20 @@ struct min_operation {
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, min_operation<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_last_operation<typename Expression::value_t, min_operation<typename Expression::value_t> > >
 >::type
 min(const Expression& expr, const typename Expression::value_t& scalar) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, min_operation<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, min_operation<typename Expression::value_t> >(scalar, min_operation<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_last_operation<typename Expression::value_t, min_operation<typename Expression::value_t> > >(
+      expr, scalar_last_operation<typename Expression::value_t, min_operation<typename Expression::value_t> >(scalar, min_operation<typename Expression::value_t>()));
 }
 
 template<class Expression>
 inline typename boost::enable_if<is_expression<Expression>,
-  unary_expression<Expression, scalar_operation<typename Expression::value_t, min_operation<typename Expression::value_t> > >
+  unary_expression<Expression, scalar_first_operation<typename Expression::value_t, min_operation<typename Expression::value_t> > >
 >::type
 min(const typename Expression::value_t& scalar, const Expression& expr) {
-  return unary_expression<Expression, scalar_operation<typename Expression::value_t, min_operation<typename Expression::value_t> > >(
-      expr, scalar_operation<typename Expression::value_t, min_operation<typename Expression::value_t> >(scalar, min_operation<typename Expression::value_t>()));
+  return unary_expression<Expression, scalar_first_operation<typename Expression::value_t, min_operation<typename Expression::value_t> > >(
+      expr, scalar_first_operation<typename Expression::value_t, min_operation<typename Expression::value_t> >(scalar, min_operation<typename Expression::value_t>()));
 }
 
 template<class Expression1, class Expression2>
