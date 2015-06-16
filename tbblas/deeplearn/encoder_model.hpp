@@ -159,6 +159,23 @@ public:
     _nn_decoders.push_back(boost::make_shared<nn_layer_t>(layer));
   }
 
+  /*** General properties ***/
+
+  size_t parameter_count() const {
+    // Get number of parameters
+    size_t count = 0;
+    for (size_t i = 0; i < _cnn_encoders.size(); ++i)
+      count += _cnn_encoders[i]->parameter_count();
+
+    for (size_t i = 0; i < _dnn_decoders.size(); ++i)
+      count += _dnn_decoders[i]->parameter_count();
+
+    for (size_t i = 0; i < _dnn_shortcuts.size(); ++i)
+      count += _dnn_shortcuts[i]->parameter_count(true);
+
+    return count;
+  }
+
   void set_shared_bias(bool shared) {
     for (size_t i = 0; i < _cnn_encoders.size(); ++i)
       _cnn_encoders[i]->set_shared_bias(shared);

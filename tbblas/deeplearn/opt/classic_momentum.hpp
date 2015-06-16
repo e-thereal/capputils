@@ -52,7 +52,7 @@ public:
     }
 
     // Update delta with momentum and epsilon parameter
-    *_delta[index] =  get_momentum() * *_delta[index] + get_learning_rate() * reshape(gradient, _delta[index]->size());
+    *_delta[index] =  get_momentum() * *_delta[index] - get_learning_rate() * reshape(gradient, _delta[index]->size());
   }
 
   vector_t& delta(int index) {

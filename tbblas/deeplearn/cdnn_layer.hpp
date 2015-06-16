@@ -73,6 +73,15 @@ class cdnn_layer : public dnn_layer<T, dims, Trainer> {
 
   typedef tbblas::random_tensor2<value_t, 4, true, tbblas::uniform<value_t> > uniform_t;
 
+public:
+  enum flags_t {
+    APPLY_NONLINEARITY = 1,
+    APPLY_BIAS = 2,
+    ACCUMULATE = 4,
+    DROPOUT = 8,
+    DEFAULT = APPLY_NONLINEARITY | APPLY_BIAS
+  };
+
 protected:
   model_t& model;
   cnn_layer_t& cnn_layer;
@@ -126,7 +135,7 @@ protected:
   using base_t::sr;
 
   using base_t::_filter_batch_length;
-  using base_t::_voxel_count;
+  using base_t::_layer_voxel_count;
 
   using base_t::_memory_allocated;
   using base_t::_host_updated;
@@ -224,14 +233,15 @@ public:
     }
   }
 
-  virtual void infer_visibles(bool dropout = false, bool accumulateActivation = false) {
+  virtual void infer_visibles(int flags = DEFAULT) {
 
     if (!_memory_allocated)
       allocate_gpu_memory();
 
     assert(cnn_layer.H.size() == hidden_size);
 
-    vp = zeros<value_t>(visible_size);
+    if (!(flags & ACCUMULATE))
+      vp = zeros<value_t>(visible_size);
 
     // Iterate over sub-regions
     for (sequence_iterator<dim_t> iter(seq<dimCount>(0), step_count); iter; ++iter) {
@@ -251,7 +261,7 @@ public:
       vp[topleft, overlap_size] = vp[topleft, overlap_size] + vr[seq<dimCount>(0), overlap_size];
     }
 
-    base_t::infer_visibles(dropout, true);
+    base_t::infer_visibles(flags | ACCUMULATE);
   }
 
   virtual void backprop_hidden_deltas() {
@@ -312,12 +322,171 @@ public:
 
       for (size_t k = 0; k < cF.size(); ++k) {
         hr = zeros<value_t>(patch_layer_batch_size);
-        hr[hidden_topleft, hidden_overlap_layer_batch_size] = cnn_layer.H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+        // TODO: make this aH vs. H decision more transparent
+//        if (cnn_layer.aH.size() == cnn_layer.H.size())
+//          hr[hidden_topleft, hidden_overlap_layer_batch_size] = cnn_layer.aH[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+//        else
+          hr[hidden_topleft, hidden_overlap_layer_batch_size] = cnn_layer.H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
 
         chr = fft(hr, dimCount - 1, plan_hr);
-        *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(1) / _voxel_count);
+        // Changed from 1 / _layer_voxel_count
+        *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(1));
       }
     }
+  }
+
+  // TODO: Implement get and set parameters (should be a warning)
+
+  virtual size_t gradient_length() const {
+    return model.kernel_size().prod() * cF.size() * _filter_batch_length + base_t::gradient_length();
+  }
+
+  // Writes the gradient of the current layer to the vector gradient starting at offset. Returns the index of the last component + 1 (the new offset)
+  virtual int collect_gradient(tensor<value_t, 1, true>& gradient, int offset, value_t weightcost) {
+    if (!cFinc.size())
+      throw std::runtime_error("No gradient calculated.");
+
+    dim_t fullsize = cvr.fullsize();
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+
+        // Extract filter
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
+
+        cvr = (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] * (value_t(1) / _current_batch_size) + weightcost * (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
+        cvr.set_fullsize(fullsize);
+        shifted_f = ifft(cvr, dimCount - 1, iplan_vr);
+        padded_f = fftshift(shifted_f, dimCount - 1);
+        padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
+
+        gradient[seq(offset), seq(model.kernel_size().prod())] = reshape(padded_k[seq<dimCount>(0), model.kernel_size()], seq(model.kernel_size().prod()));
+        offset += model.kernel_size().prod();
+      }
+    }
+
+    return base_t::collect_gradient(gradient, offset, weightcost);
+  }
+
+  virtual void reset_gradient() {
+    if (!cFinc.size())
+      return;
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
+    }
+
+    base_t::reset_gradient();
+  }
+
+  virtual int set_parameters(tensor<value_t, 1, true>& parameters, int offset) {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    dim_t fullsize = cvr.fullsize();
+
+    // Get filters first
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+
+        // Extract filter
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
+
+        // Put weights into cF
+        padded_k = zeros<value_t>(padded_kernel_size);
+        padded_k[seq<dimCount>(0), model.kernel_size()] = reshape(parameters[seq(offset), seq(model.kernel_size().prod())], model.kernel_size());
+        offset += model.kernel_size().prod();
+
+        padded_f = zeros<value_t>(vr.size());
+        padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
+        vr = ifftshift(padded_f, dimCount - 1);
+
+        cvr = fft(vr, dimCount - 1, plan_vr);
+        (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] = cvr;
+      }
+    }
+
+    return base_t::set_parameters(parameters, offset);
+  }
+
+  virtual int get_parameters(tensor<value_t, 1, true>& parameters, int offset) {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    dim_t fullsize = cvr.fullsize();
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+
+        // Extract filter
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
+
+        cvr = (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
+        cvr.set_fullsize(fullsize);
+        vr = ifft(cvr, dimCount - 1, iplan_vr);
+        padded_f = fftshift(vr, dimCount - 1);
+        padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
+
+        assert(padded_k.size() == padded_kernel_size);
+
+        parameters[seq(offset), seq(model.kernel_size().prod())] = reshape(padded_k[seq<dimCount>(0), model.kernel_size()], seq(model.kernel_size().prod()));
+        offset += model.kernel_size().prod();
+      }
+    }
+
+    return base_t::get_parameters(parameters, offset);
+  }
+
+  virtual int get_weight_mask(tensor<value_t, 1, true>& weight_mask, int offset) {
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+        weight_mask[seq(offset), seq(model.kernel_size().prod())] = ones<value_t>(seq(model.kernel_size().prod()));
+        offset += model.kernel_size().prod();
+      }
+    }
+
+    return base_t::get_weight_mask(weight_mask, offset);
+  }
+
+  virtual int update_model(tensor<value_t, 1, true>& delta, int offset) {
+
+    // This function temporarily puts the deltas into the
+    // gradient in frequency domain just to apply the deltas
+    // to the model in the frequency domain. Afterwards, the
+    // gradients are reset to zero
+
+    if (!cF.size())
+      throw std::runtime_error("No gradient calculated.");
+
+    dim_t fullsize = cvr.fullsize();
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+
+        // Extract filter
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
+
+        // Put deltaF into cFinc to apply the delta to the current filter
+        padded_k = zeros<value_t>(padded_kernel_size);
+        padded_k[seq<dimCount>(0), model.kernel_size()] = reshape(delta[seq(offset), seq(model.kernel_size().prod())], model.kernel_size());
+        offset += model.kernel_size().prod();
+
+        padded_f = zeros<value_t>(padded_f.size());
+        padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
+        shifted_f = ifftshift(padded_f, dimCount - 1);
+
+        cvr = fft(shifted_f, dimCount - 1, plan_vr);
+        (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] = cvr;
+      }
+
+      // Apply delta to current filters
+      *cF[k] = *cF[k] + *cFinc[k];
+
+      // Reset filter gradient
+      *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
+    }
+
+    return base_t::update_model(delta, offset);
   }
 
   virtual void update_model(value_t weightcost) {
@@ -362,7 +531,7 @@ public:
       }
 
       // Apply delta to current filters
-      *cF[k] = *cF[k] - *cFinc[k];
+      *cF[k] = *cF[k] + *cFinc[k];
 
       // Reset filter gradient
       *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());

@@ -56,7 +56,7 @@ public:
 
     // Perform adadelta updates
     *_cache[index] = *_cache[index] + reshape(gradient, _delta[index]->size()) * reshape(gradient, _delta[index]->size());
-    *_delta[index] = get_learning_rate() * reshape(gradient, _delta[index]->size()) / sqrt(*_cache[index] + get_epsilon());
+    *_delta[index] = -get_learning_rate() * reshape(gradient, _delta[index]->size()) / sqrt(*_cache[index] + get_epsilon());
   }
 
   vector_t& delta(int index) {

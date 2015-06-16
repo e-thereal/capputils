@@ -29,7 +29,7 @@ public:
   virtual void set_sensitivity_ratio(const value_t& ratio) = 0;
   virtual value_t sensitivity_ratio() const = 0;
   virtual void set_dropout_rate(int iLayer, const value_t& rate) = 0;
-  virtual void normalize_visibles() = 0;
+//  virtual void normalize_visibles() = 0;
   virtual void infer_hiddens(bool dropout = false) = 0;
   virtual void update_gradient(matrix_t& target) = 0;
   virtual void update_model(value_t weightcost) = 0;

@@ -9,6 +9,7 @@
 #define TBBLAS_SERIALIZE_HPP_
 
 #include <tbblas/tensor.hpp>
+#include <tbblas/util.hpp>
 #include <iostream>
 #include <fstream>
 
@@ -28,6 +29,7 @@ void serialize(const tbblas::tensor<T, dim, device>& tensor, std::ostream& out) 
   if (device) {
     std::vector<T> buffer(tensor.count());
     thrust::copy(tensor.begin(), tensor.end(), buffer.begin());
+    tbblas::synchronize();
     out.write((char*)&buffer[0], sizeof(T) * tensor.count());
   } else {
     out.write((char*)thrust::raw_pointer_cast(tensor.data().data()), sizeof(T) * tensor.count());

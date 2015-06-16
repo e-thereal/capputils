@@ -31,7 +31,7 @@ public:
   virtual void write_model_to_host() = 0;
   virtual void infer_outputs() = 0;
   virtual void infer_layer(const size_t maxLayer) = 0;
-  virtual void update_gradient(tensor_t& target) = 0;
+  virtual value_t update_gradient(tensor_t& target) = 0;
   virtual void update_model(value_t weightcost) = 0;
   virtual void set_batch_length(int layer, int length) = 0;
   virtual tensor_t& inputs() = 0;

@@ -10,6 +10,8 @@
 
 #include <tbblas/deeplearn/nn_layer_model.hpp>
 
+#include <boost/make_shared.hpp>
+
 namespace tbblas {
 
 namespace deeplearn {
@@ -63,6 +65,13 @@ public:
   size_t hiddens_count() const {
     assert(_layers.size());
     return _layers[_layers.size() - 1]->hiddens_count();
+  }
+
+  size_t parameter_count() const {
+    size_t count = 0;
+    for (size_t i = 0; i < _layers.size(); ++i)
+      count += _layers[i]->parameter_count();
+    return count;
   }
 };
 

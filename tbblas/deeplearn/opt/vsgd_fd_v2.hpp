@@ -105,7 +105,7 @@ public:
         *_h2[index] = *_h2[index] * get_c();
       }
 
-      *_delta[index] = *_h[index] * *_g[index] * *_g[index] / (*_h2[index] * *_g2[index] + get_epsilon()) * reshape(gradient, _delta[index]->size());
+      *_delta[index] = -*_h[index] * *_g[index] * *_g[index] / (*_h2[index] * *_g2[index] + get_epsilon()) * reshape(gradient, _delta[index]->size());
     } else {
       *_delta[index] = get_epsilon() * *_g[index];
     }

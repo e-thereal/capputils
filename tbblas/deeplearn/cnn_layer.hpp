@@ -85,6 +85,17 @@ class cnn_layer : public Trainer
 
   typedef tbblas::random_tensor2<value_t, 4, true, tbblas::uniform<value_t> > uniform_t;
 
+public:
+  enum flags_t {
+    APPLY_NONLINEARITY = 1,
+    APPLY_BIAS = 2,
+    ACCUMULATE = 4,
+    DROPOUT = 8,
+    BACKUP_ACTIVATION = 16,
+    APPLY_DERIVATIVE = 32,
+    DEFAULT = APPLY_NONLINEARITY | APPLY_BIAS
+  };
+
 protected:
   // Model in CPU memory
   model_t& model;
@@ -109,13 +120,13 @@ protected:
 
   tensor_t padded_v, H;
 #ifdef CNN_LAYER_KEEP_HIDDENS
-  tensor_t _pooled, dH;
+  tensor_t _pooled, dH, aH;     // aH saves a copy of the hidden activation. This is need for calculating the the Gv product
 #endif
 
   boost::shared_ptr<stensor_t> _p_switches;
   stensor_t &_switches, sr;
 
-  int _filter_batch_length, _voxel_count;
+  int _filter_batch_length, _layer_voxel_count;
   bool _memory_allocated, _host_updated;
   value_t _current_batch_size, _dropout_rate, _current_iteration;
 
@@ -126,7 +137,7 @@ public:
       patch_count(patch_count), _filter_batch_length(1),
       _memory_allocated(false), _host_updated(true), _current_batch_size(0), _dropout_rate(0), _current_iteration(0)
   {
-    _voxel_count = model.visibles_count();
+    _layer_voxel_count = model.visibles_count() / model.visibles_size()[dimCount-1];
   }
 
   cnn_layer(model_t& model, const Trainer* parameters, dim_t patch_count = seq<dimCount>(1)) : Trainer(parameters), model(model),
@@ -134,7 +145,7 @@ public:
       patch_count(patch_count), _filter_batch_length(1),
       _memory_allocated(false), _host_updated(true), _current_batch_size(0), _dropout_rate(0), _current_iteration(0)
   {
-    _voxel_count = model.visibles_count();
+    _layer_voxel_count = model.visibles_count() / model.visibles_size()[dimCount-1];
   }
 
 private:
@@ -313,13 +324,13 @@ public:
     }
 
     // Allocate cvr vr, chr hr
-//    vr = zeros<value_t>(patch_size);
-//    cvr = fft(vr, dimCount - 1, plan_vr);
-//    vr = ifft(cvr, dimCount - 1, iplan_vr);
-//
-//    hr = zeros<value_t>(patch_layer_batch_size);
-//    chr = fft(hr, dimCount - 1, plan_hr);
-//    hr = ifft(chr, dimCount - 1, iplan_hr);
+    vr = zeros<value_t>(patch_size);
+    cvr = fft(vr, dimCount - 1, plan_vr);
+    vr = ifft(cvr, dimCount - 1, iplan_vr);
+
+    hr = zeros<value_t>(patch_layer_batch_size);
+    chr = fft(hr, dimCount - 1, plan_hr);
+    hr = ifft(chr, dimCount - 1, iplan_hr);
   }
 
   void write_model_to_host() {
@@ -371,7 +382,7 @@ public:
     padded_v = (padded_v - model.mean()) / model.stddev() * repeat(v_mask, padded_v.size() / v_mask.size());
   }
 
-  void infer_hiddens(bool dropout = false) {
+  void infer_hiddens(int flags = DEFAULT) {
     using namespace tbblas;
 
     if (!_memory_allocated)
@@ -400,23 +411,28 @@ public:
         chr = conj_mult_sum(cvr, *cF[k]);
 
         hr = ifft(chr, dimCount - 1, iplan_hr);
-        if (model.shared_bias()) {
-          hr[seq<dimCount>(0), overlap_layer_batch_size] =
-              hr[seq<dimCount>(0), overlap_layer_batch_size] + repeat(*_b[k], overlap_layer_batch_size / _b[k]->size());  // apply sub-region of bias terms
-        } else {
-          hr[seq<dimCount>(0), overlap_layer_batch_size] =
-              hr[seq<dimCount>(0), overlap_layer_batch_size] + (*_b[k])[topleft, overlap_layer_batch_size];  // apply sub-region of bias terms
+
+        if (flags & APPLY_BIAS) {
+          if (model.shared_bias()) {
+            hr[seq<dimCount>(0), overlap_layer_batch_size] =
+                hr[seq<dimCount>(0), overlap_layer_batch_size] + repeat(*_b[k], overlap_layer_batch_size / _b[k]->size());  // apply sub-region of bias terms
+          } else {
+            hr[seq<dimCount>(0), overlap_layer_batch_size] =
+                hr[seq<dimCount>(0), overlap_layer_batch_size] + (*_b[k])[topleft, overlap_layer_batch_size];  // apply sub-region of bias terms
+          }
         }
 
-        switch (model.activation_function()) {
-          case activation_function::Sigmoid: hr = sigm(hr); break;
-          case activation_function::ReLU:    hr = max(0.0, hr);  break;
-          case activation_function::Linear:  break;
-          default:
-            throw std::runtime_error("Unsupported activation function.");
+        if (flags & APPLY_NONLINEARITY) {
+          switch (model.activation_function()) {
+            case activation_function::Sigmoid: hr = sigm(hr); break;
+            case activation_function::ReLU:    hr = max(0.0, hr);  break;
+            case activation_function::Linear:  break;
+            default:
+              throw std::runtime_error("Unsupported activation function.");
+          }
         }
 
-        if (dropout && _dropout_rate > 0) {
+        if ((flags & DROPOUT) && _dropout_rate > 0) {
           if (hr_rand.size() != hr.size())
             hr_rand.resize(hr.size());
 
@@ -454,14 +470,34 @@ public:
               hr[hidden_topleft, hidden_overlap_layer_batch_size];
         }
 #else
-        H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size] =
-            hr[hidden_topleft, hidden_overlap_layer_batch_size];
+        if (flags & ACCUMULATE) {
+          H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size] =
+              H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size] + hr[hidden_topleft, hidden_overlap_layer_batch_size];
+        } else {
+          H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size] =
+              hr[hidden_topleft, hidden_overlap_layer_batch_size];
+        }
+
 #endif
       }
     }
 #ifdef CNN_LAYER_KEEP_HIDDENS
-    if (model.has_pooling_layer()) {
+    if (flags & BACKUP_ACTIVATION) {
+      aH = H;
+    }
 
+    if (flags & APPLY_DERIVATIVE) {
+      assert(aH.size() == H.size());
+      switch (model.activation_function()) {
+        case activation_function::Sigmoid: H = H * aH * (value_t(1) - aH); break;
+        case activation_function::ReLU:    H = H * (aH > 0);  break;
+        case activation_function::Linear:  break;
+        default:
+          throw std::runtime_error("Unsupported activation function.");
+      }
+    }
+
+    if (model.has_pooling_layer()) {
       switch (model.pooling_method()) {
       case pooling_method::StridePooling:
         _pooled = H[seq<dimCount>(0), model.pooling_size(), H.size()];
@@ -481,6 +517,32 @@ public:
       }
     }
 #endif
+  }
+
+  // Requires hidden activation to be pre-calculated
+  void restore_hiddens() {
+    assert(H.size() == aH.size());
+    H = aH;
+
+    if (model.has_pooling_layer()) {
+      switch (model.pooling_method()) {
+      case pooling_method::StridePooling:
+        _pooled = H[seq<dimCount>(0), model.pooling_size(), H.size()];
+        break;
+
+      case pooling_method::MaxPooling:
+        _switches = get_max_pooling_switches(H, model.pooling_size());
+        _pooled = max_pooling(H, _switches, model.pooling_size());
+        break;
+
+      case pooling_method::AvgPooling:
+        _pooled = avg_pooling(H, model.pooling_size());
+        break;
+
+      default:
+        throw std::runtime_error("Unsupported pooling method.");
+      }
+    }
   }
 
 //  /// Requires hidden activation and hidden total activation
@@ -593,6 +655,77 @@ public:
     padded_v = padded_v * repeat(v_mask, padded_v.size() / v_mask.size());
   }
 
+  /// Takes visible activation of successive layer as input
+  template<class Expression>
+  typename boost::enable_if<tbblas::is_expression<Expression>,
+    typename boost::enable_if_c<Expression::dimCount == dimCount, int>::type >::type
+  infer_hidden_Ra(const Expression& visibles, bool accumulate = false) {
+    assert(visibles.size() == hiddens().size());
+
+#ifdef CNN_LAYER_KEEP_HIDDENS
+    if (!accumulate)
+      dH = zeros<value_t>(H.size());
+
+    if (model.has_pooling_layer()) {
+      switch (model.pooling_method()) {
+      case pooling_method::StridePooling:
+        dH[seq<dimCount>(0), model.pooling_size(), H.size()] = dH[seq<dimCount>(0), model.pooling_size(), H.size()] + visibles;
+        break;
+
+      case pooling_method::MaxPooling:
+        _pooled = visibles;
+        dH = dH + unpooling(_pooled, _switches, model.pooling_size());
+        break;
+
+      case pooling_method::AvgPooling:
+        _pooled = visibles;
+        dH = dH + unpooling(_pooled, model.pooling_size());
+        break;
+
+      default:
+        throw std::runtime_error("Unsupported pooling method.");
+      }
+    } else {
+      dH += visibles;
+    }
+
+    switch(model.activation_function()) {
+    case activation_function::Sigmoid:
+      H = H * dH * (1 - dH);
+      break;
+
+    case activation_function::ReLU:
+      H = H * (dH > 0);
+      break;
+
+    case activation_function::Linear:
+      break;
+
+    default:
+      throw std::runtime_error("Unsupported activation function.");
+    }
+#else
+    assert(accumulate == false);
+    switch(model.activation_function()) {
+    case activation_function::Sigmoid:
+      hiddens() = hiddens() * visibles * (1.0 - visibles);
+      break;
+
+    case activation_function::ReLU:
+      hiddens() = hiddens() * (visibles > 0);
+      break;
+
+    case activation_function::Linear:
+      break;
+
+    default:
+      throw std::runtime_error("Unsupported activation function.");
+    }
+#endif
+
+    return 0;
+  }
+
   /// Takes visible deltas of successive layer as input
   template<class Expression>
   typename boost::enable_if<tbblas::is_expression<Expression>,
@@ -603,7 +736,6 @@ public:
 #ifdef CNN_LAYER_KEEP_HIDDENS
     if (!accumulate)
       dH = zeros<value_t>(H.size());
-
 
     if (model.has_pooling_layer()) {
       switch (model.pooling_method()) {
@@ -618,7 +750,7 @@ public:
 
       case pooling_method::AvgPooling:
         _pooled = deltas;
-        dH = dH + unpooling(_pooled, model.pooling_size());
+        dH = dH + unpooling(_pooled, model.pooling_size()) / (value_t)model.pooling_size().prod();
         break;
 
       default:
@@ -627,6 +759,10 @@ public:
     } else {
       dH += deltas;
     }
+
+//    // if I have saved the activation, restore it
+//    if (H.size() == aH.size())
+//      H = aH;
 
     switch(model.activation_function()) {
     case activation_function::Sigmoid:
@@ -735,12 +871,14 @@ public:
 #endif
 
         chr = fft(hr, dimCount - 1, plan_hr);
-        *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(1) / _voxel_count);
+        // TODO: changed the weighting to 1 (no weighting at all) from 1 / _layer_voxel_count
+        *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(1));
 
         if (model.shared_bias()) {
           for (int j = 0; j < _filter_batch_length; ++j) {
+            // changed the weighting from 1 / visible_layer_size.prod() to 1
             (*_binc[k])[seq(0,0,0,j), seq<dimCount>(1)] =
-                (*_binc[k])[seq(0,0,0,j), seq<dimCount>(1)] + sum(hr[seq<dimCount>(0), overlap_layer_batch_size]) / visible_layer_size.prod();
+                (*_binc[k])[seq(0,0,0,j), seq<dimCount>(1)] + sum(hr[seq<dimCount>(0), overlap_layer_batch_size]);
           }
         } else {
           (*_binc[k])[topleft, overlap_layer_batch_size] =
@@ -750,6 +888,187 @@ public:
     }
 
     ++_current_batch_size;
+  }
+
+  size_t gradient_length() const {
+    return model.kernel_size().prod() * cF.size() * _filter_batch_length + _b[0]->count() * cF.size();
+  }
+
+  // Writes the gradient of the current layer to the vector gradient starting at offset. Returns the index of the last component + 1 (the new offset)
+  int collect_gradient(tensor<value_t, 1, true>& gradient, int offset, value_t weightcost) {
+    if (!cFinc.size() || !_binc.size())
+      throw std::runtime_error("No gradient calculated.");
+
+    dim_t fullsize = cvr.fullsize();
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+
+        // Extract filter
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
+
+        cvr = (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] * (value_t(1) / _current_batch_size) + weightcost * (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
+        cvr.set_fullsize(fullsize);
+        vr = ifft(cvr, dimCount - 1, iplan_vr);
+        padded_f = fftshift(vr, dimCount - 1);
+        padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
+
+        assert(padded_k.size() == padded_kernel_size);
+
+        gradient[seq(offset), seq(model.kernel_size().prod())] = reshape(padded_k[seq<dimCount>(0), model.kernel_size()], seq(model.kernel_size().prod()));
+        offset += model.kernel_size().prod();
+      }
+    }
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      gradient[seq(offset), seq(_binc[k]->size().prod())] = reshape(*_binc[k] / _current_batch_size, seq(_binc[k]->size().prod()));
+      offset += _binc[k]->count();
+    }
+
+    return offset;
+  }
+
+  void reset_gradient() {
+    if (!cFinc.size() || !_binc.size())
+      return;
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+
+      // Reset filter gradient
+      *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
+      *_binc[k] = zeros<value_t>(_binc[k]->size());
+    }
+
+    _current_batch_size = 0;
+  }
+
+  int set_parameters(tensor<value_t, 1, true>& parameters, int offset) {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    dim_t fullsize = cvr.fullsize();
+
+    // Get filters first
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+
+        // Extract filter
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
+
+        // Put weights into cF
+        padded_k = zeros<value_t>(padded_kernel_size);
+        padded_k[seq<dimCount>(0), model.kernel_size()] = reshape(parameters[seq(offset), seq(model.kernel_size().prod())], model.kernel_size());
+        offset += model.kernel_size().prod();
+
+        padded_f = zeros<value_t>(vr.size());
+        padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
+        vr = ifftshift(padded_f, dimCount - 1);
+
+        cvr = fft(vr, dimCount - 1, plan_vr);
+        (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] = cvr;
+      }
+    }
+
+    // Then the biases
+    for (size_t k = 0; k < cF.size(); ++k) {
+      *_b[k] = reshape(parameters[seq(offset), seq(_b[k]->size().prod())], _b[k]->size());
+      offset += _b[k]->size().prod();
+    }
+
+    return offset;
+  }
+
+  int get_parameters(tensor<value_t, 1, true>& parameters, int offset) {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    dim_t fullsize = cvr.fullsize();
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+
+        // Extract filter
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
+
+        cvr = (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
+        cvr.set_fullsize(fullsize);
+        vr = ifft(cvr, dimCount - 1, iplan_vr);
+        padded_f = fftshift(vr, dimCount - 1);
+        padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
+
+        assert(padded_k.size() == padded_kernel_size);
+
+        parameters[seq(offset), seq(model.kernel_size().prod())] = reshape(padded_k[seq<dimCount>(0), model.kernel_size()], seq(model.kernel_size().prod()));
+        offset += model.kernel_size().prod();
+      }
+    }
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      parameters[seq(offset), seq(_b[k]->size().prod())] = reshape(*_b[k], seq(_b[k]->size().prod()));
+      offset += _b[k]->count();
+    }
+
+    return offset;
+  }
+
+  int get_weight_mask(tensor<value_t, 1, true>& weight_mask, int offset) {
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+        weight_mask[seq(offset), seq(model.kernel_size().prod())] = ones<value_t>(seq(model.kernel_size().prod()));
+        offset += model.kernel_size().prod();
+      }
+    }
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      weight_mask[seq(offset), seq(_b[k]->size().prod())] = zeros<value_t>(seq(_b[k]->size().prod()));
+      offset += _b[k]->count();
+    }
+
+    return offset;
+  }
+
+  int update_model(tensor<value_t, 1, true>& delta, int offset) {
+    if (!cFinc.size() || !_binc.size())
+      throw std::runtime_error("No gradient calculated.");
+
+    dim_t fullsize = cvr.fullsize();
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+
+        // Extract filter
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
+
+        // Put delta into cFinc to apply the delta to the current filter
+        padded_k = zeros<value_t>(padded_kernel_size);
+        padded_k[seq<dimCount>(0), model.kernel_size()] = reshape(delta[seq(offset), seq(model.kernel_size().prod())], model.kernel_size());
+        offset += model.kernel_size().prod();
+
+        padded_f = zeros<value_t>(vr.size());
+        padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
+        vr = ifftshift(padded_f, dimCount - 1);
+
+        cvr = fft(vr, dimCount - 1, plan_vr);
+        (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] = cvr;
+      }
+
+      // Apply delta to current filters
+      *cF[k] = *cF[k] + *cFinc[k];
+
+      // Reset filter gradient
+      *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
+    }
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      *_b[k] = *_b[k] + reshape(delta[seq(offset), seq(_b[k]->size().prod())], _b[k]->size());
+      offset += _b[k]->size().prod();
+      *_binc[k] = zeros<value_t>(_binc[k]->size());
+    }
+
+    _current_batch_size = 0;
+    _host_updated = false;
+
+    return offset;
   }
 
   // trainer will have an update method to pass on the step parameters
@@ -793,8 +1112,8 @@ public:
       this->update_delta(*_binc[k] / _current_batch_size, model.filter_count() + k);
 
       // Apply delta to current filters
-      *cF[k] = *cF[k] - *cFinc[k];
-      *_b[k] = *_b[k] - reshape(this->delta(model.filter_count() + k), _b[k]->size());
+      *cF[k] = *cF[k] + *cFinc[k];
+      *_b[k] = *_b[k] + reshape(this->delta(model.filter_count() + k), _b[k]->size());
 
       // Reset filter gradient
       *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());

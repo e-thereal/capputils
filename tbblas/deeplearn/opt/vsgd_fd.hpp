@@ -89,12 +89,12 @@ public:
         *_h[index] = *_h[index] * get_c();
       }
 
-      *_delta[index] = *_g[index] * *_g[index] / (*_h[index] * *_g2[index] + get_epsilon()) * reshape(gradient, _delta[index]->size());
+      *_delta[index] = -*_g[index] * *_g[index] / (*_h[index] * *_g2[index] + get_epsilon()) * reshape(gradient, _delta[index]->size());
     } else {
-      *_delta[index] = get_epsilon() * *_g[index];
+      *_delta[index] = -get_epsilon() * *_g[index];
     }
 
-    *_tau[index] = (1.0 - *_g[index] * *_g[index] / (*_g2[index] + get_epsilon())) * *_tau[index] + 1;
+    *_tau[index] = (1.0 - *_g[index] * *_g[index] / (*_g2[index] + get_epsilon())) * *_tau[index] + 1.0;
 
     *_old_grad[index] = reshape(gradient, _delta[index]->size());
   }

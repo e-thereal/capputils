@@ -68,6 +68,20 @@ struct prod_operation {
         value_t(0), &output.data()[0], _size[0]);
   }
 
+  void apply_inc(tensor_t& output) const {
+    bool trans1 = _proxy1.order()[0] == 1;
+    bool trans2 = _proxy2.order()[0] == 1;
+
+    dim_t size1 = _proxy1.size(), size2 = _proxy2.size();
+    dim_t start1 = _proxy1.start(), start2 = _proxy2.start();
+    dim_t pitch1 = _proxy1.pitch(), pitch2 = _proxy2.pitch();
+
+    gemm(trans1, trans2, size1[0], size2[1], size1[1], value_t(1),
+        &_proxy1.data()[0] + start1[1] * pitch1[0] + start1[0], pitch1[0],
+        &_proxy2.data()[0] + start2[1] * pitch2[0] + start2[0], pitch2[0],
+        value_t(1), &output.data()[0], _size[0]);
+  }
+
   inline dim_t size() const {
     return _size;
   }
@@ -83,6 +97,11 @@ private:
 
 template<class T>
 struct is_operation<prod_operation<T> > {
+  static const bool value = true;
+};
+
+template<class T>
+struct is_inc_operation<prod_operation<T> > {
   static const bool value = true;
 };
 

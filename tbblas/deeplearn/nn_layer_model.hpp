@@ -95,6 +95,10 @@ public:
     return _weights.size()[1];
   }
 
+  size_t parameter_count() const {
+    return _weights.count() + _biases.count();
+  }
+
   template<class U>
   void set_mean(const tensor<U, 2>& mean) {
     _mean = mean;

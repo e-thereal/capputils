@@ -55,7 +55,7 @@ public:
 
     // Update delta with momentum and epsilon parameter
     *_cache[index] = get_decay_rate() * *_cache[index] + (1.0 - get_decay_rate()) * reshape(gradient, _delta[index]->size()) * reshape(gradient, _delta[index]->size());
-    *_delta[index] = get_learning_rate() * reshape(gradient, _delta[index]->size()) / sqrt(*_cache[index] + 1e-8);
+    *_delta[index] = -get_learning_rate() * reshape(gradient, _delta[index]->size()) / sqrt(*_cache[index] + 1e-8);
   }
 
   vector_t& delta(int index) {

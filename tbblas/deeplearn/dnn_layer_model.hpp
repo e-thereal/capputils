@@ -114,7 +114,8 @@ public:
     return _version;
   }
 
-  void set_filters(const v_host_tensor_t& filters) {
+  template<class T2>
+  void set_filters(const std::vector<boost::shared_ptr<tbblas::tensor<T2, dimCount> > >& filters) {
     if (filters.size() == 0)
       throw std::runtime_error("A CNN layer must contain at least one filter.");
     _filters.resize(filters.size());
@@ -156,6 +157,15 @@ public:
 
   const dim_t& kernel_size() const {
     return _kernel_size;
+  }
+
+  size_t parameter_count(bool is_shortcut = false) const {
+    if (is_shortcut)
+      return _kernel_size.prod() * filter_count();
+    else if (_shared_biases)
+      return _kernel_size.prod() * filter_count() + 1;
+    else
+      return _kernel_size.prod() * filter_count()  + _bias.count();
   }
 
   void set_stride_size(const dim_t& size) {

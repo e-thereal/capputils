@@ -67,7 +67,7 @@ public:
     *_first_moment[index] = get_beta1() * reshape(gradient, _delta[index]->size()) + (1.0 - get_beta1()) * *_first_moment[index];
     *_second_moment[index] = get_beta2() * reshape(gradient, _delta[index]->size()) * reshape(gradient, _delta[index]->size()) + (1.0 - get_beta2()) * *_second_moment[index];
 
-    *_delta[index] = get_alpha() * *_first_moment[index] / (value_t(1) - ::pow(value_t(1) - get_beta1(), _current_iteration[index])) /
+    *_delta[index] = -get_alpha() * *_first_moment[index] / (value_t(1) - ::pow(value_t(1) - get_beta1(), _current_iteration[index])) /
         (sqrt(*_second_moment[index] / (value_t(1) - ::pow(value_t(1) - get_beta2(), _current_iteration[index]))) + get_epsilon());
   }
 

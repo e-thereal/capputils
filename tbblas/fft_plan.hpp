@@ -83,7 +83,10 @@ public:
         type, batch)) != CUFFT_SUCCESS)
     {
       std::stringstream s;
-      s << "Could not create FFT plan. Error code: " << result;
+      s << "Could not create FFT plan. Error code: " << result << "; size: " << size << "; n:";
+      for (size_t i = 0; i < rank; ++i)
+        s << " " << n[i];
+
       throw std::runtime_error(s.str().c_str());
     }
 

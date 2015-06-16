@@ -58,7 +58,7 @@ public:
 
     // Perform adadelta updates
     *_d2[index] = get_decay_rate() * *_d2[index] + (1.0 - get_decay_rate()) * reshape(gradient, _d2[index]->size()) * reshape(gradient, _d2[index]->size());
-    *_delta[index] = sqrt(*_delta2[index] + get_epsilon()) / sqrt(*_d2[index] + get_epsilon()) * reshape(gradient, _d2[index]->size());
+    *_delta[index] = -sqrt(*_delta2[index] + get_epsilon()) / sqrt(*_d2[index] + get_epsilon()) * reshape(gradient, _d2[index]->size());
     *_delta2[index] = get_decay_rate() * *_delta2[index] + (1.0 - get_decay_rate()) * *_delta[index] * *_delta[index];
   }
 

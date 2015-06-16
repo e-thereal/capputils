@@ -69,6 +69,15 @@ class dnn_layer : public Trainer {
 
   typedef tbblas::random_tensor2<value_t, 4, true, tbblas::uniform<value_t> > uniform_t;
 
+public:
+  enum flags_t {
+    APPLY_NONLINEARITY = 1,
+    APPLY_BIAS = 2,
+    ACCUMULATE = 4,
+    DROPOUT = 8,
+    DEFAULT = APPLY_NONLINEARITY | APPLY_BIAS
+  };
+
 protected:
   // Model in CPU memory
   model_t& model;
@@ -95,7 +104,7 @@ protected:
   boost::shared_ptr<stensor_t> _p_switches;
   stensor_t sr;
 
-  int _filter_batch_length, _voxel_count;
+  int _filter_batch_length, _layer_voxel_count;
   bool _memory_allocated, _host_updated;
   value_t _current_batch_size, _dropout_rate, _sensitivity_ratio;
 
@@ -108,7 +117,7 @@ public:
     _p_switches(new stensor_t()),
     _filter_batch_length(1), _memory_allocated(false), _host_updated(true), _current_batch_size(0), _dropout_rate(0), _sensitivity_ratio(0.5)
   {
-    _voxel_count = model.visibles_count();
+    _layer_voxel_count = model.visibles_count() / model.visibles_size()[dimCount - 1];
   }
 
 private:
@@ -246,7 +255,7 @@ public:
       v_mask = zeros<value_t>(padded_mask_size);
       v_mask[seq<dimCount>(0), model.mask().size()] = model.mask();
 
-      _voxel_count = sum(v_mask) * padded_visible_size[dimCount - 1];
+//      _layer_voxel_count = sum(v_mask) * padded_visible_size[dimCount - 1];
     }
 
     // pad h mask according to convolution shrinkage
@@ -298,6 +307,14 @@ public:
         cF[k] = boost::make_shared<ctensor_t>(cf);
       }
     }
+
+    vr = zeros<value_t>(patch_size);
+    cvr = fft(vr, dimCount - 1, plan_vr);
+    vr = ifft(cvr, dimCount - 1, iplan_vr);
+
+    hr = zeros<value_t>(patch_layer_batch_size);
+    chr = fft(hr, dimCount - 1, plan_hr);
+    hr = ifft(chr, dimCount - 1, iplan_hr);
   }
 
   virtual void write_model_to_host() {
@@ -358,7 +375,7 @@ public:
     padded_v = ((padded_v * model.stddev()) + model.mean()) * repeat(v_mask, padded_v.size() / v_mask.size());
   }
 
-  virtual void infer_visibles(bool dropout = false, bool accumulateActivation = false) {
+  virtual void infer_visibles(int flags = DEFAULT) {
     stensor_t& _switches = *_p_switches;
 
     if (!_memory_allocated)
@@ -366,16 +383,24 @@ public:
 
     assert(H.size() == hidden_size / model.pooling_size());
 
-    if (accumulateActivation) {
-      if (model.shared_bias())
-        vp += repeat(_b, visible_size / _b.size());
-      else
-        vp += _b;
+//    bool dropout = false, accumulateActivation = false;
+
+    if (flags & ACCUMULATE) {
+      if (flags & APPLY_BIAS) {
+        if (model.shared_bias())
+          vp += repeat(_b, visible_size / _b.size());
+        else
+          vp += _b;
+      }
     } else {
-      if (model.shared_bias())
-        vp = repeat(_b, visible_size / _b.size());
-      else
-        vp = _b;
+      if (flags & APPLY_BIAS) {
+        if (model.shared_bias())
+          vp = repeat(_b, visible_size / _b.size());
+        else
+          vp = _b;
+      } else {
+        vp = zeros<value_t>(visible_size);
+      }
     }
 
     // Iterate over sub-regions
@@ -425,15 +450,17 @@ public:
       vp[topleft, overlap_size] = vp[topleft, overlap_size] + vr[seq<dimCount>(0), overlap_size];
     }
 
-    switch (model.activation_function()) {
-      case activation_function::Sigmoid: vp = sigm(vp); break;
-      case activation_function::ReLU:    vp = max(0.0, vp);  break;
-      case activation_function::Linear:  break;
-      default:
-        throw std::runtime_error("Unsupported activation function.");
+    if (flags & APPLY_NONLINEARITY) {
+      switch (model.activation_function()) {
+        case activation_function::Sigmoid: vp = sigm(vp); break;
+        case activation_function::ReLU:    vp = max(0.0, vp);  break;
+        case activation_function::Linear:  break;
+        default:
+          throw std::runtime_error("Unsupported activation function.");
+      }
     }
 
-    if (dropout && _dropout_rate > 0) {
+    if ((flags & DROPOUT) && _dropout_rate > 0) {
       if (v_rand.size() != vp.size())
         v_rand.resize(vp.size());
 
@@ -461,21 +488,21 @@ public:
       switch (model.activation_function()) {
       case activation_function::Sigmoid:
         padded_v[seq<dimCount>(0), model.visibles_size()] =
-            (visibles() - target) * visibles() * (1 + -visibles());
+            (visibles() - target) * visibles() * (1 + -visibles()) / (value_t)target.count();
         break;
 
       case activation_function::ReLU:
         padded_v[seq<dimCount>(0), model.visibles_size()] =
-            (visibles() - target) * (visibles() > 0);
+            (visibles() - target) * (visibles() > 0) / (value_t)target.count();
         break;
 
-      case activation_function::Softmax:
+//      case activation_function::Softmax:
       case activation_function::Linear:
         padded_v[seq<dimCount>(0), model.visibles_size()] =
-            (visibles() - target);
+            (visibles() - target) / (value_t)target.count();
 
         // Apply normalization
-        padded_v = padded_v / model.stddev() * repeat(v_mask, padded_v.size() / v_mask.size());
+//        padded_v = padded_v / model.stddev() * repeat(v_mask, padded_v.size() / v_mask.size());
         break;
       }
       break;
@@ -488,11 +515,64 @@ public:
         // delta = (-alpha* target - beta * target + beta) * f'(X)
 
         const value_t positive_ratio = sum(target) / (value_t)target.count();
-        const value_t alpha = _sensitivity_ratio / (positive_ratio + value_t(1e-8));
-        const value_t beta = (value_t(1) - _sensitivity_ratio) / (value_t(1) - positive_ratio + value_t(1e-8));
+        const value_t alpha = value_t(2) * _sensitivity_ratio / (positive_ratio + value_t(1e-8));
+        const value_t beta =  value_t(2) * (value_t(1) - _sensitivity_ratio) / (value_t(1) - positive_ratio + value_t(1e-8));
 
         padded_v[seq<dimCount>(0), model.visibles_size()] =
-            (alpha * target + beta * (1 + -target)) * (visibles() - target) * visibles() * (1 + -visibles());
+            (alpha * target + beta * (value_t(1) - target)) * (visibles() - target) * visibles() * (value_t(1) - visibles()) / (value_t)target.count();
+      }
+      break;
+
+    default:
+      throw std::runtime_error("Undefined objective function for calculate_deltas(target).");
+    }
+  }
+
+  /// Requires visible Ra
+  void calculate_RDs(tensor_t& target, tensor_t& activation) {
+    // this is used for the output layer
+    // Needs target values as input
+    // Need to know the objective function
+
+    assert(target.size() == model.visibles_size());
+
+    switch (_objective_function) {
+    case tbblas::deeplearn::objective_function::SSD:
+
+      // delta = (visible - target) * f'(X)
+      // RDa = I*Ra * f'(X)
+      switch (model.activation_function()) {
+      case activation_function::Sigmoid:
+        padded_v[seq<dimCount>(0), model.visibles_size()] = visibles() * activation * (1 - activation) / (value_t)target.count();
+        break;
+
+      case activation_function::ReLU:
+        padded_v[seq<dimCount>(0), model.visibles_size()] = visibles() * (activation > 0) / (value_t)target.count();
+        break;
+
+//      case activation_function::Softmax:
+      case activation_function::Linear:
+        padded_v[seq<dimCount>(0), model.visibles_size()] = visibles() / (value_t)target.count();
+
+        // Apply normalization
+//        padded_v = padded_v / model.stddev() * repeat(v_mask, padded_v.size() / v_mask.size());
+        break;
+      }
+      break;
+
+    case tbblas::deeplearn::objective_function::SenSpe:
+      {
+        if (model.activation_function() != activation_function::Sigmoid)
+          throw std::runtime_error("Activation function for objective function 'Sensitivity + Specificity' must be 'Sigmoid'.");
+
+        // delta = (-alpha* target - beta * target + beta) * f'(X)
+
+        const value_t positive_ratio = sum(target) / (value_t)target.count();
+        const value_t alpha = value_t(2) * _sensitivity_ratio / (positive_ratio + value_t(1e-8));
+        const value_t beta =  value_t(2) * (value_t(1) - _sensitivity_ratio) / (value_t(1) - positive_ratio + value_t(1e-8));
+
+        padded_v[seq<dimCount>(0), model.visibles_size()] =
+            (alpha * target + beta * (value_t(1) - target)) * visibles() * activation * (value_t(1) - activation) / (value_t)target.count();
       }
       break;
 
@@ -544,7 +624,7 @@ public:
             break;
 
           case pooling_method::AvgPooling:
-            pr = avg_pooling(hpr, model.pooling_size());
+            pr = avg_pooling(hpr, model.pooling_size()) * (value_t)model.pooling_size().prod();
             break;
 
           default:
@@ -557,9 +637,36 @@ public:
           H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size] =
               hr[hidden_topleft, hidden_overlap_layer_batch_size];
         }
-
       }
     }
+  }
+
+  /// Takes hidden activation of successive layer as input
+  template<class Expression>
+  typename boost::enable_if<tbblas::is_expression<Expression>,
+    typename boost::enable_if_c<Expression::dimCount == dimCount, int>::type >::type
+  infer_visible_Ra(const Expression& hiddens) {
+
+   assert(hiddens.size() == model.visibles_size());
+
+   switch(model.activation_function()) {
+   case activation_function::Sigmoid:
+     padded_v[seq<dimCount>(0), model.visibles_size()] =
+         visibles() * hiddens * (1.0 - hiddens);
+     break;
+
+   case activation_function::ReLU:
+     padded_v[seq<dimCount>(0), model.visibles_size()] =
+         visibles() * (hiddens > 0);
+     break;
+
+   case activation_function::Linear:
+     break;
+
+   default:
+     throw std::runtime_error("Unsupported activation function.");
+   }
+   return 0;
   }
 
   /// Takes hidden deltas of successive layer as input
@@ -609,8 +716,9 @@ public:
     }
 
     vp = rearrange(padded_v, model.stride_size());
+    // changed the weighting from 1 / vp.count() to 1
     if (model.shared_bias()) {
-      _binc = _binc + sum(vp) / vp.count();
+      _binc = _binc + sum(vp);
     } else {
       _binc += vp;
     }
@@ -660,11 +768,197 @@ public:
         }
 
         chr = fft(hr, dimCount - 1, plan_hr);
-        *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(1) / _voxel_count);
+        // TODO: changed the weighting to 1 from 1 / _layer_voxel_count
+        *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(1));
       }
     }
 
     ++_current_batch_size;
+  }
+
+  virtual size_t gradient_length() const {
+    return model.kernel_size().prod() * cF.size() * _filter_batch_length + _b.count();
+  }
+
+  // Writes the gradient of the current layer to the vector gradient starting at offset. Returns the index of the last component + 1 (the new offset)
+  virtual int collect_gradient(tensor<value_t, 1, true>& gradient, int offset, value_t weightcost) {
+    if (!cFinc.size())
+      throw std::runtime_error("No gradient calculated.");
+
+    dim_t fullsize = cvr.fullsize();
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+
+        // Extract filter
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
+
+        cvr = (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] * (value_t(1) / _current_batch_size) + weightcost * (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
+        cvr.set_fullsize(fullsize);
+        shifted_f = ifft(cvr, dimCount - 1, iplan_vr);
+        padded_f = fftshift(shifted_f, dimCount - 1);
+        padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
+
+        gradient[seq(offset), seq(model.kernel_size().prod())] = reshape(padded_k[seq<dimCount>(0), model.kernel_size()], seq(model.kernel_size().prod()));
+        offset += model.kernel_size().prod();
+      }
+    }
+
+    // TODO: masking of bias terms
+    gradient[seq(offset), seq(_binc.size().prod())] = reshape(_binc / _current_batch_size, seq(_binc.size().prod()));
+    offset += _binc.count();
+
+    return offset;
+  }
+
+  virtual void reset_gradient() {
+    if (!cFinc.size())
+      return;
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
+    }
+
+    _binc = zeros<value_t>(_binc.size());
+
+    _current_batch_size = 0;
+  }
+
+  // Writes the gradient of the current layer to the vector gradient starting at offset. Returns the index of the last component + 1 (the new offset)
+  virtual int get_parameters(tensor<value_t, 1, true>& parameters, int offset) {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    dim_t fullsize = cvr.fullsize();
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+
+        // Extract filter
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
+
+        cvr = (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()];
+        cvr.set_fullsize(fullsize);
+        shifted_f = ifft(cvr, dimCount - 1, iplan_vr);
+        padded_f = fftshift(shifted_f, dimCount - 1);
+        padded_k = rearrange_r(padded_f[topleft, kernel_size], model.stride_size());
+
+        parameters[seq(offset), seq(model.kernel_size().prod())] = reshape(padded_k[seq<dimCount>(0), model.kernel_size()], seq(model.kernel_size().prod()));
+        offset += model.kernel_size().prod();
+      }
+    }
+
+    // TODO: masking of bias terms
+    parameters[seq(offset), seq(_b.size().prod())] = reshape(_b, seq(_b.size().prod()));
+    offset += _b.count();
+
+    return offset;
+  }
+
+  virtual int get_weight_mask(tensor<value_t, 1, true>& weight_mask, int offset) {
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+        weight_mask[seq(offset), seq(model.kernel_size().prod())] = ones<value_t>(seq(model.kernel_size().prod()));
+        offset += model.kernel_size().prod();
+      }
+    }
+
+    // TODO: masking of bias terms
+    weight_mask[seq(offset), seq(_b.size().prod())] = zeros<value_t>(seq(_b.size().prod()));
+    offset += _b.count();
+
+    return offset;
+  }
+
+  virtual int set_parameters(tensor<value_t, 1, true>& parameters, int offset) {
+
+    // This function temporarily puts the deltas into the
+    // gradient in frequency domain just to apply the deltas
+    // to the model in the frequency domain. Afterwards, the
+    // gradients are reset to zero
+
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+
+    dim_t fullsize = cvr.fullsize();
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+
+        // Extract filter
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
+
+        // Put deltaF into cFinc to apply the delta to the current filter
+        padded_k = zeros<value_t>(padded_kernel_size);
+        padded_k[seq<dimCount>(0), model.kernel_size()] = reshape(parameters[seq(offset), seq(model.kernel_size().prod())], model.kernel_size());
+        offset += model.kernel_size().prod();
+
+        padded_f = zeros<value_t>(padded_f.size());
+        padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
+        shifted_f = ifftshift(padded_f, dimCount - 1);
+
+        cvr = fft(shifted_f, dimCount - 1, plan_vr);
+        (*cF[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] = cvr;
+      }
+    }
+
+    // TODO: masking of bias terms
+    _b = reshape(parameters[seq(offset), seq(_b.size().prod())], _b.size());
+    offset += _b.size().prod();
+
+    return offset;
+  }
+
+  virtual int update_model(tensor<value_t, 1, true>& delta, int offset) {
+
+    // This function temporarily puts the deltas into the
+    // gradient in frequency domain just to apply the deltas
+    // to the model in the frequency domain. Afterwards, the
+    // gradients are reset to zero
+
+    if (!cFinc.size())
+      throw std::runtime_error("No gradient calculated.");
+
+
+    dim_t fullsize = cvr.fullsize();
+
+    for (size_t k = 0; k < cF.size(); ++k) {
+      for (int j = 0; j < _filter_batch_length; ++j) {
+
+        // Extract filter
+        dim_t topleft = patch_size / 2 - kernel_size / 2;
+
+        // Put deltaF into cFinc to apply the delta to the current filter
+        padded_k = zeros<value_t>(padded_kernel_size);
+        padded_k[seq<dimCount>(0), model.kernel_size()] = reshape(delta[seq(offset), seq(model.kernel_size().prod())], model.kernel_size());
+        offset += model.kernel_size().prod();
+
+        padded_f = zeros<value_t>(padded_f.size());
+        padded_f[topleft, kernel_size] = rearrange(padded_k, model.stride_size());
+        shifted_f = ifftshift(padded_f, dimCount - 1);
+
+        cvr = fft(shifted_f, dimCount - 1, plan_vr);
+        (*cFinc[k])[seq(0,0,0,j*cvr.size()[dimCount - 1]), cvr.size()] = cvr;
+      }
+
+      // Apply delta to current filters
+      *cF[k] = *cF[k] + *cFinc[k];
+
+      // Reset filter gradient
+      *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
+    }
+
+    // TODO: masking of bias terms
+    _b = _b + reshape(delta[seq(offset), seq(_b.size().prod())], _b.size());
+    offset += _b.size().prod();
+
+    _binc = zeros<value_t>(_binc.size());
+
+    _current_batch_size = 0;
+    _host_updated = false;
+
+    return offset;
   }
 
   virtual void update_model(value_t weightcost) {
@@ -708,7 +1002,7 @@ public:
       }
 
       // Apply delta to current filters
-      *cF[k] = *cF[k] - *cFinc[k];
+      *cF[k] = *cF[k] + *cFinc[k];
 
       // Reset filter gradient
       *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
@@ -716,7 +1010,7 @@ public:
 
     // TODO: masking of bias terms
     this->update_delta(_binc / _current_batch_size, model.filter_count());
-    _b = _b - reshape(this->delta(model.filter_count()), _b.size());
+    _b = _b + reshape(this->delta(model.filter_count()), _b.size());
 
     _binc = zeros<value_t>(_binc.size());
 

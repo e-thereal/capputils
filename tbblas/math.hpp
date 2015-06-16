@@ -14,11 +14,29 @@
 #include <tbblas/flip.hpp>
 #include <tbblas/min.hpp>
 #include <tbblas/max.hpp>
+#include <tbblas/dot.hpp>
 
 namespace tbblas {
 
 // wrapper around the boost version
 double binomial(int n, int k);
+
+template<class Expression1, class Expression2>
+typename boost::enable_if<is_expression<Expression1>,
+  typename boost::enable_if<is_expression<Expression2>,
+    typename Expression1::value_t
+  >::type
+>::type
+cor(const Expression1& expr1, const Expression2& expr2) {
+  typedef typename Expression1::value_t value_t;
+
+  assert(expr1.count() == expr2.count());
+
+  value_t mean1 = sum(expr1) / expr1.count();
+  value_t mean2 = sum(expr2) / expr2.count();
+
+  return dot(expr1 - mean1, expr2 - mean2) / ::sqrt(dot(expr1 - mean1, expr1 - mean1) * dot(expr2 - mean2, expr2 - mean2));
+}
 
 template<class T>
 struct p_norm_operation {

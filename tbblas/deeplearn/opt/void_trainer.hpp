@@ -13,6 +13,8 @@
 #include <tbblas/tensor.hpp>
 #include <tbblas/reshape.hpp>
 
+#include <boost/make_shared.hpp>
+
 #include <stdexcept>
 
 namespace tbblas {
