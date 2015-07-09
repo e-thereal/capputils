@@ -13,9 +13,23 @@
 
 int i = 1;
 
+template<class T>
+class Test1 {
+protected:
+  bool test;
+};
+
+template<class T>
+class Test2 : Test1<T> {
+public:
+  void test2() {
+    this->test = 1;
+  }
+};
+
 int main(int argc, char** argv) {
 
-  transformtest();
+//  randomtest();
 //  synctest();
 //  ompsegfault();
 //  helloworld();
@@ -44,6 +58,10 @@ int main(int argc, char** argv) {
 
 //  trainertests(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
 //  fasttrainer(atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
+
+//  poolingtest();
+  encodertest();
+//  swaptest();
 
   return 0;
 }

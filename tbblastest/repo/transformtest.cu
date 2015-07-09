@@ -10,16 +10,16 @@
 #include <tbblas/tensor.hpp>
 #include <tbblas/io.hpp>
 
-#include <tbblas/transform/fmatrix4.hpp>
-#include <tbblas/transform/io.hpp>
-#include <tbblas/transform/transform.hpp>
-#include <tbblas/transform/warp.hpp>
+#include <tbblas/imgproc/fmatrix4.hpp>
+#include <tbblas/imgproc/io.hpp>
+#include <tbblas/imgproc/transform.hpp>
+#include <tbblas/imgproc/warp.hpp>
 
 typedef tbblas::tensor<float, 3, true> volume_t;
 typedef tbblas::tensor<float, 4, true> tensor_t;
 
 void transformtest() {
-  using namespace tbblas::transform;
+  using namespace tbblas::imgproc;
 
   std::cout << "Transform Test" << std::endl;
 

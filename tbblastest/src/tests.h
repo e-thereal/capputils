@@ -30,6 +30,9 @@ void rearrangetest();
 void trainertests(int filterCount, int channelCount, int reps, int convnetReps);
 void fasttrainer(int size, int channelCount, int filterCount, int reps);
 void synctest();
-void transformtest();
+void randomtest();
+void poolingtest();
+void encodertest();
+void swaptest();
 
 #endif /* TESTS_H_ */

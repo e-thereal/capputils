@@ -11,6 +11,7 @@
 #include <tbblas/random.hpp>
 #include <tbblas/io.hpp>
 #include <tbblas/serialize.hpp>
+#include <tbblas/deeplearn/conv_rbm.hpp>
 
 typedef tbblas::tensor<double, 2, false> matrix;
 
@@ -38,4 +39,7 @@ void convrbmtests() {
   std::cout << "C = " << C << std::endl;
   //C = randu;
   //std::cout << "C = " << C << std::endl;
+
+  deeplearn::conv_rbm_model<float, 4> model;
+  deeplearn::conv_rbm<float, 4> crbm(model);
 }
