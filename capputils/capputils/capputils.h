@@ -23,6 +23,8 @@
 #define CAPPUTILS_UNUSED(a) (void)a
 #endif
 
+// Test modification.
+
 /**
  * \mainpage \c capputils - A \c C++ toolkit for console applications
  *
