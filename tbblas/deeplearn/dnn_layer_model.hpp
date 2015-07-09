@@ -45,8 +45,9 @@ public:
    *    Kernel size is original kernel size before rearranging due to striding. Has a dedicated field for
    *    visibles size.
    * 2: Mask added.
+   * 3: Visible pooling added as a parameter.
    */
-  static const uint16_t CURRENT_VERSION = 2;
+  static const uint16_t CURRENT_VERSION = 3;
 
 protected:
   uint16_t _version;
@@ -61,14 +62,14 @@ protected:
   tbblas::deeplearn::pooling_method _pooling_method;
 
   value_t _mean, _stddev;
-  bool _shared_biases;
+  bool _shared_biases, _visible_pooling;  // _visible_pooling is true if pooling is done in the visible layer
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
   dnn_layer_model()
    : _version(CURRENT_VERSION),
      _stride_size(seq<dimCount>(1)), _pooling_size(seq<dimCount>(1)),
-     _mean(0), _stddev(1), _shared_biases(false) { }
+     _mean(0), _stddev(1), _shared_biases(false), _visible_pooling(false) { }
 
   dnn_layer_model(const dnn_layer_model<T,dims>& model)
    : _version(model._version),
@@ -78,7 +79,7 @@ public:
      _convolution_type(model.convolution_type()),
      _pooling_method(model.pooling_method()),
      _mean(model.mean()), _stddev(model.stddev()),
-     _shared_biases(model.shared_bias())
+     _shared_biases(model.shared_bias()), _visible_pooling(model._visible_pooling)
   {
     set_filters(model.filters());
     set_bias(model.bias());
@@ -93,7 +94,7 @@ public:
      _convolution_type(model.convolution_type()),
      _pooling_method(model.pooling_method()),
      _mean(model.mean()), _stddev(model.stddev()),
-     _shared_biases(model.shared_bias())
+     _shared_biases(model.shared_bias()), _visible_pooling(model._visible_pooling)
   {
     _filters.resize(model.filters().size());
     for (size_t i = 0; i < model.filters().size(); ++i)
@@ -209,15 +210,25 @@ public:
   }
 
   dim_t pooled_size() const {
-    return hiddens_size() / _pooling_size;
+    if (_visible_pooling)
+      return visibles_size() * _pooling_size;
+    else
+      return hiddens_size() / _pooling_size;
   }
 
   size_t pooled_count() const {
     return pooled_size().prod();
   }
 
+  dim_t inputs_size() const {
+    if (visible_pooling())
+      return pooled_size();
+    else
+      return visibles_size();
+  }
+
   dim_t outputs_size() const {
-    if (has_pooling_layer())
+    if (has_pooling_layer() && !visible_pooling())
       return pooled_size();
     else
       return hiddens_size();
@@ -281,6 +292,14 @@ public:
 
   bool shared_bias() const {
     return _shared_biases;
+  }
+
+  void set_visible_pooling(bool visible_pooling) {
+    _visible_pooling = visible_pooling;
+  }
+
+  bool visible_pooling() const {
+    return _visible_pooling && has_pooling_layer();
   }
 
   bool is_valid() const {

@@ -332,10 +332,12 @@ struct random_tensor2
   }
 
   void resize(const dim_t& size) {
+    _size = size;
     _values.resize(size);
   }
 
   void resize(const dim_t& size, unsigned seed) {
+    _size = size;
     _values.resize(size);
     reset(seed);
   }

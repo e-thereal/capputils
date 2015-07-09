@@ -99,12 +99,12 @@ protected:
   plan_t plan_vr, iplan_vr, plan_hr, iplan_hr;
   uniform_t v_rand;
 
-  tensor_t padded_v, H;
+  tensor_t padded_v, H, _pooled_v;  // Pooled units strictly for the visibles
 
   boost::shared_ptr<stensor_t> _p_switches;
   stensor_t sr;
 
-  int _filter_batch_length, _layer_voxel_count;
+  int _filter_batch_length;
   bool _memory_allocated, _host_updated;
   value_t _current_batch_size, _dropout_rate, _sensitivity_ratio;
 
@@ -117,7 +117,6 @@ public:
     _p_switches(new stensor_t()),
     _filter_batch_length(1), _memory_allocated(false), _host_updated(true), _current_batch_size(0), _dropout_rate(0), _sensitivity_ratio(0.5)
   {
-    _layer_voxel_count = model.visibles_count() / model.visibles_size()[dimCount - 1];
   }
 
 private:
@@ -178,7 +177,7 @@ public:
     step_size = min((hidden_size + patch_count - 1) / patch_count, hidden_size);
     step_size[dimCount - 1] = 1;
 
-    if (model.has_pooling_layer()) {
+    if (model.has_pooling_layer() && !model.visible_pooling()) {
       step_size = min((step_size + model.pooling_size() - 1) / model.pooling_size() * model.pooling_size(), hidden_size);
     }
 
@@ -208,7 +207,10 @@ public:
     padded_v = zeros<value_t>(padded_visible_size);
     H = zeros<value_t>(hidden_size / model.pooling_size());
 
-    if (model.has_pooling_layer()) {
+    if (model.visible_pooling())
+      _pooled_v = zeros<value_t>(model.pooled_size());
+
+    if (model.has_pooling_layer() && !model.visible_pooling()) {
       if (_switches.size() != H.size())
         _switches = zeros<switches_t>(H.size());
       hpr = zeros<value_t>(hidden_patch_layer_batch_size);
@@ -254,8 +256,6 @@ public:
 
       v_mask = zeros<value_t>(padded_mask_size);
       v_mask[seq<dimCount>(0), model.mask().size()] = model.mask();
-
-//      _layer_voxel_count = sum(v_mask) * padded_visible_size[dimCount - 1];
     }
 
     // pad h mask according to convolution shrinkage
@@ -356,6 +356,23 @@ public:
       tbblas::synchronize();
       model.set_bias(b);
     }
+
+    tbblas::synchronize();
+  }
+
+  void reinitialize_dropout() {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    if (_dropout_rate == 0)
+      return;
+
+    if (v_rand.size() != vp.size())
+      v_rand.resize(vp.size());
+
+    std::cout << "Reinitialize DNN dropout." << std::endl;
+
+    v_rand();
   }
 
   void normalize_visibles() {
@@ -381,11 +398,13 @@ public:
     if (!_memory_allocated)
       allocate_gpu_memory();
 
-    assert(H.size() == hidden_size / model.pooling_size());
+    if (model.visible_pooling())
+      assert(H.size() == hidden_size);
+    else
+      assert(H.size() == hidden_size / model.pooling_size());
 
-//    bool dropout = false, accumulateActivation = false;
-
-    if (flags & ACCUMULATE) {
+    // TODO: with visible pooling do the accumulation with the pooling later
+    if ((flags & ACCUMULATE) && !model.visible_pooling()) {
       if (flags & APPLY_BIAS) {
         if (model.shared_bias())
           vp += repeat(_b, visible_size / _b.size());
@@ -414,7 +433,7 @@ public:
       for (size_t k = 0; k < cF.size(); ++k) {
         hr = zeros<value_t>(patch_layer_batch_size);
 
-        if (model.has_pooling_layer()) {
+        if (model.has_pooling_layer() && !model.visible_pooling()) {
           pr[seq<dimCount>(0), hidden_overlap_layer_batch_size / model.pooling_size()] =
               H[topleft / model.pooling_size() + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size / model.pooling_size()];
 
@@ -450,7 +469,8 @@ public:
       vp[topleft, overlap_size] = vp[topleft, overlap_size] + vr[seq<dimCount>(0), overlap_size];
     }
 
-    if (flags & APPLY_NONLINEARITY) {
+    // If hidden pooling or no pooling apply non-linearity right here
+    if ((flags & APPLY_NONLINEARITY) && !model.visible_pooling()) {
       switch (model.activation_function()) {
         case activation_function::Sigmoid: vp = sigm(vp); break;
         case activation_function::ReLU:    vp = max(0.0, vp);  break;
@@ -460,17 +480,50 @@ public:
       }
     }
 
-    if ((flags & DROPOUT) && _dropout_rate > 0) {
+    if (_dropout_rate > 0) {
       if (v_rand.size() != vp.size())
-        v_rand.resize(vp.size());
-
-      vp = vp * (v_rand() > _dropout_rate) / (1. - _dropout_rate);
+        reinitialize_dropout();
+      vp = vp * (v_rand(false) > _dropout_rate);// / (1. - _dropout_rate);
     }
 
     padded_v = rearrange_r(vp, model.stride_size());
     padded_v = padded_v * repeat(v_mask, padded_v.size() / v_mask.size());
-  }
 
+    // If visible pooling do the pooling here, accumulate the pooled response if necessary and apply non-linearity
+    if (model.visible_pooling()) {
+      if (!(flags & ACCUMULATE))
+        _pooled_v = zeros<value_t>(_pooled_v.size());
+
+      switch (model.pooling_method()) {
+      case pooling_method::StridePooling:
+        _pooled_v[seq<dimCount>(0), model.pooling_size(), _pooled_v.size()] = _pooled_v[seq<dimCount>(0), model.pooling_size(), _pooled_v.size()] +
+            padded_v[seq<dimCount>(0), model.visibles_size()];
+        break;
+
+      case pooling_method::MaxPooling:
+        _pooled_v = _pooled_v + unpooling(padded_v, _switches, model.pooling_size());
+        break;
+
+      case pooling_method::AvgPooling:
+        assert(model.stride_size() == seq<dimCount>(1));
+        _pooled_v = _pooled_v + unpooling(padded_v, model.pooling_size());
+        break;
+
+      default:
+        throw std::runtime_error("Unsupported pooling method.");
+      }
+
+      if (flags & APPLY_NONLINEARITY) {
+        switch (model.activation_function()) {
+          case activation_function::Sigmoid: _pooled_v = sigm(_pooled_v); break;
+          case activation_function::ReLU:    _pooled_v = max(0.0, _pooled_v);  break;
+          case activation_function::Linear:  break;
+          default:
+            throw std::runtime_error("Unsupported activation function.");
+        }
+      }
+    }
+  }
 
   /// Requires visible activation and hidden total activation
   void calculate_deltas(tensor_t& target) {
@@ -478,8 +531,9 @@ public:
     // Needs target values as input
     // Need to know the objective function
 
-
+    assert(!model.visible_pooling());
     assert(target.size() == model.visibles_size());
+//    assert(_dropout_rate == 0); // No dropout in the final layer
 
     switch (_objective_function) {
     case tbblas::deeplearn::objective_function::SSD:
@@ -534,6 +588,7 @@ public:
     // Needs target values as input
     // Need to know the objective function
 
+    assert(!model.visible_pooling());
     assert(target.size() == model.visibles_size());
 
     switch (_objective_function) {
@@ -579,6 +634,12 @@ public:
     default:
       throw std::runtime_error("Undefined objective function for calculate_deltas(target).");
     }
+
+//    if (_dropout_rate > 0) {
+//      if (v_rand.size() != vp.size())
+//        reinitialize_dropout();
+//      padded_v = padded_v * rearrange_r(v_rand(false), model.stride_size());
+//    }
   }
 
   void backprop_hiddens() {
@@ -587,10 +648,30 @@ public:
     if (!_memory_allocated)
       allocate_gpu_memory();
 
+    // If visible pooling, pool the visible units here
+    if (model.visible_pooling()) {
+      switch (model.pooling_method()) {
+      case pooling_method::StridePooling:
+        padded_v = _pooled_v[seq<dimCount>(0), model.pooling_size(), _pooled_v.size()];
+        break;
+
+      case pooling_method::MaxPooling:
+        padded_v = max_pooling(_pooled_v, _switches, model.pooling_size());
+        break;
+
+      case pooling_method::AvgPooling:
+        padded_v = avg_pooling(_pooled_v, model.pooling_size()) * (value_t)model.pooling_size().prod();
+        break;
+
+      default:
+        throw std::runtime_error("Unsupported pooling method.");
+      }
+    }
+
     assert(padded_v.size() == padded_visible_size);
 
     vp = rearrange(padded_v, model.stride_size());
-    H = zeros<value_t>(hidden_size / model.pooling_size());
+    H = zeros<value_t>(H.size());
 
     // Iterate over sub-regions
     for (sequence_iterator<dim_t> iter(seq<dimCount>(0), step_count); iter; ++iter) {
@@ -609,7 +690,7 @@ public:
         chr = conj_mult_sum(cvr, *cF[k]);
         hr = ifft(chr, dimCount - 1, iplan_hr);
 
-        if (model.has_pooling_layer()) {
+        if (model.has_pooling_layer() && !model.visible_pooling()) {
           hpr[seq<dimCount>(0), hidden_overlap_layer_batch_size] = hr[hidden_topleft, hidden_overlap_layer_batch_size];
 
           switch (model.pooling_method()) {
@@ -647,17 +728,16 @@ public:
     typename boost::enable_if_c<Expression::dimCount == dimCount, int>::type >::type
   infer_visible_Ra(const Expression& hiddens) {
 
-   assert(hiddens.size() == model.visibles_size());
+   assert(hiddens.size() == model.inputs_size());
 
    switch(model.activation_function()) {
    case activation_function::Sigmoid:
-     padded_v[seq<dimCount>(0), model.visibles_size()] =
-         visibles() * hiddens * (1.0 - hiddens);
+//     padded_v[seq<dimCount>(0), model.visibles_size()] = visibles() * hiddens * (1.0 - hiddens);
+     visibles() = visibles() * hiddens * (1.0 - hiddens);
      break;
 
    case activation_function::ReLU:
-     padded_v[seq<dimCount>(0), model.visibles_size()] =
-         visibles() * (hiddens > 0);
+     visibles() = visibles() * (hiddens > 0);
      break;
 
    case activation_function::Linear:
@@ -666,6 +746,13 @@ public:
    default:
      throw std::runtime_error("Unsupported activation function.");
    }
+
+//   if (_dropout_rate > 0) {
+//     if (v_rand.size() != vp.size())
+//       reinitialize_dropout();
+//     padded_v = padded_v * rearrange_r(v_rand(false), model.stride_size());
+//   }
+
    return 0;
   }
 
@@ -675,27 +762,31 @@ public:
     typename boost::enable_if_c<Expression::dimCount == dimCount, int>::type >::type
   backprop_visible_deltas(const Expression& deltas) {
 
-    assert(deltas.size() == model.visibles_size());
+    assert(deltas.size() == model.inputs_size());
 
     switch(model.activation_function()) {
     case activation_function::Sigmoid:
-      padded_v[seq<dimCount>(0), model.visibles_size()] =
-          deltas * visibles() * (1 + -visibles());
+      visibles() = deltas * visibles() * (1.0 - visibles());
       break;
 
     case activation_function::ReLU:
-      padded_v[seq<dimCount>(0), model.visibles_size()] =
-          deltas * (visibles() > 0);
+      visibles() = deltas * (visibles() > 0);
       break;
 
     case activation_function::Linear:
-      padded_v[seq<dimCount>(0), model.visibles_size()] =
-          deltas;
+      visibles() = deltas;
       break;
 
     default:
       throw std::runtime_error("Unsupported activation function.");
     }
+
+//    if (_dropout_rate > 0) {
+//      if (v_rand.size() != vp.size())
+//        reinitialize_dropout();
+//      padded_v = padded_v * rearrange_r(v_rand(false), model.stride_size());
+//    }
+
     return 0;
   }
 
@@ -713,6 +804,26 @@ public:
       cFinc.resize(cF.size());
       for (size_t i = 0; i < cFinc.size(); ++i)
         cFinc[i] = boost::make_shared<ctensor_t>(zeros<complex_t>(cF[i]->size(), cF[i]->fullsize()));
+    }
+
+    // If visible pooling, pool the visible units
+    if (model.visible_pooling()) {
+      switch (model.pooling_method()) {
+      case pooling_method::StridePooling:
+        padded_v = _pooled_v[seq<dimCount>(0), model.pooling_size(), _pooled_v.size()];
+        break;
+
+      case pooling_method::MaxPooling:
+        padded_v = max_pooling(_pooled_v, _switches, model.pooling_size());
+        break;
+
+      case pooling_method::AvgPooling:
+        padded_v = avg_pooling(_pooled_v, model.pooling_size()) * (value_t)model.pooling_size().prod();
+        break;
+
+      default:
+        throw std::runtime_error("Unsupported pooling method.");
+      }
     }
 
     vp = rearrange(padded_v, model.stride_size());
@@ -738,7 +849,7 @@ public:
       for (size_t k = 0; k < cF.size(); ++k) {
         hr = zeros<value_t>(patch_layer_batch_size);
 
-        if (model.has_pooling_layer()) {
+        if (model.has_pooling_layer() && !model.visible_pooling()) {
           pr[seq<dimCount>(0), hidden_overlap_layer_batch_size / model.pooling_size()] =
               H[topleft / model.pooling_size() + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size / model.pooling_size()];
 
@@ -768,7 +879,6 @@ public:
         }
 
         chr = fft(hr, dimCount - 1, plan_hr);
-        // TODO: changed the weighting to 1 from 1 / _layer_voxel_count
         *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(1));
       }
     }
@@ -848,7 +958,6 @@ public:
       }
     }
 
-    // TODO: masking of bias terms
     parameters[seq(offset), seq(_b.size().prod())] = reshape(_b, seq(_b.size().prod()));
     offset += _b.count();
 
@@ -863,7 +972,6 @@ public:
       }
     }
 
-    // TODO: masking of bias terms
     weight_mask[seq(offset), seq(_b.size().prod())] = zeros<value_t>(seq(_b.size().prod()));
     offset += _b.count();
 
@@ -903,9 +1011,10 @@ public:
       }
     }
 
-    // TODO: masking of bias terms
     _b = reshape(parameters[seq(offset), seq(_b.size().prod())], _b.size());
     offset += _b.size().prod();
+
+    _host_updated = false;
 
     return offset;
   }
@@ -949,7 +1058,6 @@ public:
       *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
     }
 
-    // TODO: masking of bias terms
     _b = _b + reshape(delta[seq(offset), seq(_b.size().prod())], _b.size());
     offset += _b.size().prod();
 
@@ -1008,7 +1116,6 @@ public:
       *cFinc[k] = zeros<complex_t>(cFinc[k]->size(), cFinc[k]->fullsize());
     }
 
-    // TODO: masking of bias terms
     this->update_delta(_binc / _current_batch_size, model.filter_count());
     _b = _b + reshape(this->delta(model.filter_count()), _b.size());
 
@@ -1022,7 +1129,11 @@ public:
   const proxy<tensor_t> visibles() {
     if (!_memory_allocated)
       allocate_gpu_memory();
-    return padded_v[seq<dimCount>(0), model.visibles_size()];
+
+    if (model.visible_pooling())
+      return _pooled_v[seq<dimCount>(0), model.pooled_size()];
+    else
+      return padded_v[seq<dimCount>(0), model.visibles_size()];
   }
 
   tensor_t& hiddens() {

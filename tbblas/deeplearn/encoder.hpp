@@ -14,6 +14,7 @@
 #include <tbblas/deeplearn/cnn_layer.hpp>
 #include <tbblas/deeplearn/dnn_layer.hpp>
 #include <tbblas/deeplearn/cdnn_layer.hpp>
+#include <tbblas/deeplearn/ddnn_layer.hpp>
 
 #include <tbblas/deeplearn/opt/type_traits.hpp>
 #include <tbblas/deeplearn/opt/void_trainer.hpp>
@@ -68,7 +69,7 @@ class encoder : public virtual encoder_base<T, dims>, public Trainer {
   typedef std::vector<boost::shared_ptr<dnn_layer_t> > v_dnn_layer_t;
 
   typedef cdnn_layer<value_t, dimCount, trainer_t> cdnn_layer_t;
-  typedef std::vector<boost::shared_ptr<cdnn_layer_t> > v_cdnn_layer_t;
+  typedef ddnn_layer<value_t, dimCount, trainer_t> ddnn_layer_t;
 
   typedef encoder_model<value_t, dimCount> model_t;
 
@@ -104,9 +105,12 @@ public:
 
     _dnn_decoders.resize(model.dnn_decoders().size());
     for (size_t i = 0; i < _dnn_decoders.size(); ++i) {
-      if (i > 0 && model.dnn_shortcuts().size()) {
-        std::cout << "Adding shortcut connection" << std::endl;
-        _dnn_decoders[i] = boost::make_shared<cdnn_layer_t>(boost::ref(*model.dnn_shortcuts()[i - 1]), boost::ref(*model.dnn_decoders()[i]), boost::ref(*_cnn_encoders[_cnn_encoders.size() - i - 1]), this, boost::ref(patch_count));
+      if (i < model.cnn_shortcuts().size()) {
+        std::cout << "Adding cdnn shortcut connection" << std::endl;
+        _dnn_decoders[i] = boost::make_shared<cdnn_layer_t>(boost::ref(*model.cnn_shortcuts()[_cnn_encoders.size() - i - 2]), boost::ref(*model.dnn_decoders()[i]), boost::ref(*_cnn_encoders[_cnn_encoders.size() - i - 2]), this, boost::ref(patch_count));
+      } else if (i > 0 && model.dnn_shortcuts().size()) {
+        std::cout << "Adding ddnn shortcut connection" << std::endl;
+        _dnn_decoders[i] = boost::make_shared<ddnn_layer_t>(boost::ref(*model.dnn_shortcuts()[i - 1]), boost::ref(*model.dnn_decoders()[i]), boost::ref(*_cnn_encoders[_cnn_encoders.size() - i - 1]), this, boost::ref(patch_count));
       } else {
         std::cout << "Adding regular decoder" << std::endl;
         _dnn_decoders[i] = boost::make_shared<dnn_layer_t>(boost::ref(*model.dnn_decoders()[i]), this, boost::ref(patch_count));
@@ -154,6 +158,22 @@ public:
 
   virtual value_t sensitivity_ratio() const {
     return _dnn_decoders[_dnn_decoders.size() - 1]->sensitivity_ratio();
+  }
+
+  void set_dropout_rate(value_t rate) {
+    for (size_t i = 0; i < _cnn_encoders.size(); ++i)
+      _cnn_encoders[i]->set_dropout_rate(rate);
+
+    for (size_t i = 0; i < _dnn_decoders.size(); ++i)
+      _dnn_decoders[i]->set_dropout_rate(rate);
+  }
+
+  void reinitialize_dropout() {
+    for (size_t i = 0; i < _cnn_encoders.size(); ++i)
+      _cnn_encoders[i]->reinitialize_dropout();
+
+    for (size_t i = 0; i < _dnn_decoders.size() - 1; ++i)
+      _dnn_decoders[i]->reinitialize_dropout();
   }
 
   virtual void write_model_to_host() {
@@ -595,9 +615,12 @@ protected:
         _cnn_encoders[i + 1]->backprop_visibles();                                  // Back-propagate errors
 
         // Handle shortcuts
-        if (_model.has_shortcuts()) {
-          boost::dynamic_pointer_cast<cdnn_layer_t>(_dnn_decoders[_dnn_decoders.size() - i - 1])->backprop_hidden_deltas();
+        if (_model.has_dnn_shortcuts()) {
+          boost::dynamic_pointer_cast<ddnn_layer_t>(_dnn_decoders[_dnn_decoders.size() - i - 1])->backprop_hidden_deltas();
           _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visibles(), true);
+        } else if ((int)_dnn_decoders.size() - i - 3 >= 0 &&_model.has_cnn_shortcuts()) {
+          boost::dynamic_pointer_cast<cdnn_layer_t>(_dnn_decoders[_dnn_decoders.size() - i - 3])->backprop_hidden_deltas(); // this accumulates it with _cnn_encoders[i + 1] visibles
+          _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visibles());
         } else {
           _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visibles());
         }
@@ -829,21 +852,12 @@ protected:
       _cnn_encoders[i]->infer_hiddens(cnn_layer_t::ACCUMULATE | cnn_layer_t::APPLY_DERIVATIVE);
 
       if (i + 1 < _cnn_encoders.size()) {                                           // If more convolutional encoders exists, ...
-//        _cnn_encoders[i]->infer_hidden_Ra(_cnn_encoders[i + 1]->visibles());        // Get activation from the visible units of the next layer
-        // TODO: do not swap it since I need the hidden activation for the shortcut layers
-        // rather rely on restore_hiddesn, which also does the pooling
         _cnn_encoders[i + 1]->visibles() = _cnn_encoders[i]->hiddens();
-//        swap(_cnn_encoders[i + 1]->visibles(), _cnn_encoders[i]->hiddens());        // Swap hidden Ra, visible activation -> visible Ra and hidden activation and restore H
       } else {
         if (_nn_encoders.size()) {                                                  // If the model has dense encoding layers, ...
-//          _cnn_encoders[i]->infer_hidden_Ra(reshape(_nn_encoders[0]->visible_deltas(),
-//              _model.cnn_encoders()[i]->hiddens_size()));
-          // TODO: swap activations
-//          _nn_encoders[0]->visibles() = reshape(_cnn_encoders[i]->hiddens(), 1,     // Transition from convolutional model to dense model
-//              _cnn_encoders[i]->hiddens().count());
+          _nn_encoders[0]->visibles() = reshape(_cnn_encoders[i]->hiddens(), 1,     // Transition from convolutional model to dense model
+              _cnn_encoders[i]->hiddens().count());
         } else {
-//          _cnn_encoders[i]->infer_hidden_Ra(_dnn_decoders[0]->hiddens());           // Get activation from the visible units of the next layer
-//          swap(_dnn_decoders[0]->hiddens(), _cnn_encoders[i]->hiddens());           // Swap hidden Ra, visible activation -> hidden activation, visible Ra
           _dnn_decoders[0]->hiddens() = _cnn_encoders[i]->hiddens();
         }
       }
@@ -947,9 +961,12 @@ protected:
         _cnn_encoders[i + 1]->backprop_visibles();                                  // Back-propagate RDa
 
         // Handle shortcuts
-        if (_model.has_shortcuts()) {
-          boost::dynamic_pointer_cast<cdnn_layer_t>(_dnn_decoders[_dnn_decoders.size() - i - 1])->backprop_hidden_deltas();
+        if (_model.has_dnn_shortcuts()) {
+          boost::dynamic_pointer_cast<ddnn_layer_t>(_dnn_decoders[_dnn_decoders.size() - i - 1])->backprop_hidden_deltas();
           _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visibles(), true);
+        } else if ((int)_dnn_decoders.size() - i - 3 >= 0 &&_model.has_cnn_shortcuts()) {
+          boost::dynamic_pointer_cast<cdnn_layer_t>(_dnn_decoders[_dnn_decoders.size() - i - 3])->backprop_hidden_deltas(); // this accumulates it with _cnn_encoders[i + 1] visibles
+          _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visibles());
         } else {
           _cnn_encoders[i]->backprop_hidden_deltas(_cnn_encoders[i + 1]->visibles());
         }

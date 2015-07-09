@@ -32,7 +32,7 @@ public:
   typedef std::vector<boost::shared_ptr<nn_layer_t> > v_nn_layer_t;
 
 protected:
-  v_cnn_layer_t _cnn_encoders;
+  v_cnn_layer_t _cnn_encoders, _cnn_shortcuts;
   v_dnn_layer_t _dnn_decoders, _dnn_shortcuts;
   v_nn_layer_t _nn_encoders, _nn_decoders;
 
@@ -42,6 +42,7 @@ public:
   encoder_model(const encoder_model<T, dims>& model) {
     set_cnn_encoders(model.cnn_encoders());
     set_dnn_decoders(model.dnn_decoders());
+    set_cnn_shortcuts(model.cnn_shortcuts());
     set_dnn_shortcuts(model.dnn_shortcuts());
     set_nn_encoders(model.nn_encoders());
     set_nn_decoders(model.nn_decoders());
@@ -100,6 +101,28 @@ public:
     _nn_encoders.resize(layers.size());
     for (size_t i = 0; i < layers.size(); ++i)
       _nn_encoders[i] = boost::make_shared<nn_layer_t>(*layers[i]);
+  }
+
+  /*** CNN shortcuts ***/
+
+  template<class U>
+  void set_cnn_shortcuts(const std::vector<boost::shared_ptr<cnn_layer_model<U, dims> > >& layers) {
+    _cnn_shortcuts.resize(layers.size());
+    for (size_t i = 0; i < layers.size(); ++i)
+      _cnn_shortcuts[i] = boost::make_shared<cnn_layer_t>(*layers[i]);
+  }
+
+  v_cnn_layer_t& cnn_shortcuts() {
+    return _cnn_shortcuts;
+  }
+
+  const v_cnn_layer_t& cnn_shortcuts() const {
+    return _cnn_shortcuts;
+  }
+
+  template<class U>
+  void append_cnn_shortcut(const cnn_layer_model<U, dims>& layer) {
+    _cnn_shortcuts.push_back(boost::make_shared<cnn_layer_t>(layer));
   }
 
   /*** DNN shortcuts ***/
@@ -167,6 +190,9 @@ public:
     for (size_t i = 0; i < _cnn_encoders.size(); ++i)
       count += _cnn_encoders[i]->parameter_count();
 
+    for (size_t i = 0; i < _cnn_shortcuts.size(); ++i)
+      count += _cnn_shortcuts[i]->parameter_count(true);
+
     for (size_t i = 0; i < _dnn_decoders.size(); ++i)
       count += _dnn_decoders[i]->parameter_count();
 
@@ -195,7 +221,7 @@ public:
 
   dim_t outputs_size() const {
     assert(_dnn_decoders.size());
-    return _dnn_decoders[_dnn_decoders.size() - 1]->visibles_size();
+    return _dnn_decoders[_dnn_decoders.size() - 1]->inputs_size();
   }
 
   size_t outputs_count() const {
@@ -206,7 +232,11 @@ public:
     return _cnn_encoders.size() + _nn_encoders.size() + _nn_decoders.size() + _dnn_decoders.size();
   }
 
-  bool has_shortcuts() const {
+  bool has_cnn_shortcuts() const {
+    return _cnn_shortcuts.size();
+  }
+
+  bool has_dnn_shortcuts() const {
     return _dnn_shortcuts.size();
   }
 };

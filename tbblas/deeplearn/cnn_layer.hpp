@@ -52,6 +52,9 @@ template<class T, unsigned dims, class Trainer, class Enable>
 class dnn_layer;
 
 template<class T, unsigned dims, class Trainer, class Enable>
+class ddnn_layer;
+
+template<class T, unsigned dims, class Trainer, class Enable>
 class cdnn_layer;
 
 template<class T, unsigned dims, class Trainer = opt::void_trainer<T>, class Enable = typename boost::enable_if<opt::is_trainer<Trainer > >::type>
@@ -59,6 +62,7 @@ class cnn_layer : public Trainer
 {
 
   friend class dnn_layer<T, dims, Trainer, Enable>;
+  friend class ddnn_layer<T, dims, Trainer, Enable>;
   friend class cdnn_layer<T, dims, Trainer, Enable>;
 
   const static unsigned dimCount = dims;
@@ -118,7 +122,7 @@ protected:
   plan_t plan_vr, iplan_vr, plan_hr, iplan_hr;
   uniform_t hr_rand;
 
-  tensor_t padded_v, H;
+  tensor_t padded_v, H, drop;   // Drop does not contains the rescaling required to compensate for the dropout
 #ifdef CNN_LAYER_KEEP_HIDDENS
   tensor_t _pooled, dH, aH;     // aH saves a copy of the hidden activation. This is need for calculating the the Gv product
 #endif
@@ -382,6 +386,33 @@ public:
     padded_v = (padded_v - model.mean()) / model.stddev() * repeat(v_mask, padded_v.size() / v_mask.size());
   }
 
+  void reinitialize_dropout() {
+    if (!_memory_allocated)
+      allocate_gpu_memory();
+
+    if (_dropout_rate == 0)
+      return;
+
+    if (hr_rand.size() != hr.size())
+      hr_rand.resize(hr.size());
+
+    if (drop.size() != H.size())
+      drop.resize(H.size());
+
+    std::cout << "Reinitialize CNN dropout." << std::endl;
+
+    for (sequence_iterator<dim_t> iter(seq<dimCount>(0), step_count); iter; ++iter) {
+      dim_t topleft = *iter * step_size;
+      dim_t hidden_overlap_layer_batch_size = min(hidden_layer_batch_size - topleft, hidden_patch_layer_batch_size);
+
+      for (size_t k = 0; k < cF.size(); ++k) {
+        hr = (hr_rand() > _dropout_rate);
+        drop[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size] =
+            hr[hidden_topleft, hidden_overlap_layer_batch_size];
+      }
+    }
+  }
+
   void infer_hiddens(int flags = DEFAULT) {
     using namespace tbblas;
 
@@ -432,12 +463,12 @@ public:
           }
         }
 
-        if ((flags & DROPOUT) && _dropout_rate > 0) {
-          if (hr_rand.size() != hr.size())
-            hr_rand.resize(hr.size());
-
-          hr = hr * (hr_rand() > _dropout_rate) / (1. - _dropout_rate);
-        }
+//        if ((flags & DROPOUT) && _dropout_rate > 0) {
+//          if (hr_rand.size() != hr.size())
+//            hr_rand.resize(hr.size());
+//
+//          hr = hr * (hr_rand() > _dropout_rate) / (1. - _dropout_rate);
+//        }
 
 #ifndef CNN_LAYER_KEEP_HIDDENS
         if (model.has_pooling_layer()) {
@@ -482,10 +513,6 @@ public:
       }
     }
 #ifdef CNN_LAYER_KEEP_HIDDENS
-    if (flags & BACKUP_ACTIVATION) {
-      aH = H;
-    }
-
     if (flags & APPLY_DERIVATIVE) {
       assert(aH.size() == H.size());
       switch (model.activation_function()) {
@@ -495,6 +522,16 @@ public:
         default:
           throw std::runtime_error("Unsupported activation function.");
       }
+    }
+
+    if (_dropout_rate > 0) {
+      if (drop.size() != H.size())
+        reinitialize_dropout();
+      H = H * drop; // / (1. - _dropout_rate);
+    }
+
+    if (flags & BACKUP_ACTIVATION) {
+      aH = H;
     }
 
     if (model.has_pooling_layer()) {
@@ -571,7 +608,7 @@ public:
 //    }
 //  }
 
-  void backprop_visibles() {
+  void backprop_visibles(bool accumulate = false) {
 #ifdef CNN_LAYER_KEEP_HIDDENS
     assert(H.size() == hidden_size);
 
@@ -588,6 +625,11 @@ public:
 
       case pooling_method::AvgPooling:
         H = unpooling(_pooled, model.pooling_size());
+//        if (_dropout_rate > 0) {
+//          if (H.size() != drop.size())
+//            reinitialize_dropout();
+//          H = H * drop / (1. - _dropout_rate);
+//        }
         break;
 
       default:
@@ -598,7 +640,8 @@ public:
     assert(H.size() == hidden_size / model.pooling_size());
 #endif
 
-    vp = zeros<value_t>(visible_size);
+    if (!accumulate)
+      vp = zeros<value_t>(visible_size);
 
     // Iterate over sub-regions
     for (sequence_iterator<dim_t> iter(seq<dimCount>(0), step_count); iter; ++iter) {
@@ -655,77 +698,6 @@ public:
     padded_v = padded_v * repeat(v_mask, padded_v.size() / v_mask.size());
   }
 
-  /// Takes visible activation of successive layer as input
-  template<class Expression>
-  typename boost::enable_if<tbblas::is_expression<Expression>,
-    typename boost::enable_if_c<Expression::dimCount == dimCount, int>::type >::type
-  infer_hidden_Ra(const Expression& visibles, bool accumulate = false) {
-    assert(visibles.size() == hiddens().size());
-
-#ifdef CNN_LAYER_KEEP_HIDDENS
-    if (!accumulate)
-      dH = zeros<value_t>(H.size());
-
-    if (model.has_pooling_layer()) {
-      switch (model.pooling_method()) {
-      case pooling_method::StridePooling:
-        dH[seq<dimCount>(0), model.pooling_size(), H.size()] = dH[seq<dimCount>(0), model.pooling_size(), H.size()] + visibles;
-        break;
-
-      case pooling_method::MaxPooling:
-        _pooled = visibles;
-        dH = dH + unpooling(_pooled, _switches, model.pooling_size());
-        break;
-
-      case pooling_method::AvgPooling:
-        _pooled = visibles;
-        dH = dH + unpooling(_pooled, model.pooling_size());
-        break;
-
-      default:
-        throw std::runtime_error("Unsupported pooling method.");
-      }
-    } else {
-      dH += visibles;
-    }
-
-    switch(model.activation_function()) {
-    case activation_function::Sigmoid:
-      H = H * dH * (1 - dH);
-      break;
-
-    case activation_function::ReLU:
-      H = H * (dH > 0);
-      break;
-
-    case activation_function::Linear:
-      break;
-
-    default:
-      throw std::runtime_error("Unsupported activation function.");
-    }
-#else
-    assert(accumulate == false);
-    switch(model.activation_function()) {
-    case activation_function::Sigmoid:
-      hiddens() = hiddens() * visibles * (1.0 - visibles);
-      break;
-
-    case activation_function::ReLU:
-      hiddens() = hiddens() * (visibles > 0);
-      break;
-
-    case activation_function::Linear:
-      break;
-
-    default:
-      throw std::runtime_error("Unsupported activation function.");
-    }
-#endif
-
-    return 0;
-  }
-
   /// Takes visible deltas of successive layer as input
   template<class Expression>
   typename boost::enable_if<tbblas::is_expression<Expression>,
@@ -751,6 +723,11 @@ public:
       case pooling_method::AvgPooling:
         _pooled = deltas;
         dH = dH + unpooling(_pooled, model.pooling_size()) / (value_t)model.pooling_size().prod();
+//        if (_dropout_rate > 0) {
+//          if (dH.size() != drop.size())
+//            reinitialize_dropout();
+//          dH = dH * drop / (1. - _dropout_rate);
+//        }
         break;
 
       default:
@@ -766,11 +743,11 @@ public:
 
     switch(model.activation_function()) {
     case activation_function::Sigmoid:
-      H = dH * H * (1 + -H);
+      H = dH * H * (1.0 - H);
       break;
 
     case activation_function::ReLU:
-      H = dH * (H > 0);
+      H = dH * (H > 0.0);
       break;
 
     case activation_function::Linear:
@@ -780,6 +757,10 @@ public:
     default:
       throw std::runtime_error("Unsupported activation function.");
     }
+
+//    if (_dropout_rate > 0)
+//      H = H * drop;
+
 #else
     assert(accumulate == false);
     switch(model.activation_function()) {
@@ -871,12 +852,10 @@ public:
 #endif
 
         chr = fft(hr, dimCount - 1, plan_hr);
-        // TODO: changed the weighting to 1 (no weighting at all) from 1 / _layer_voxel_count
         *cFinc[k] += conj_repeat_mult(cvr, chr, value_t(1));
 
         if (model.shared_bias()) {
           for (int j = 0; j < _filter_batch_length; ++j) {
-            // changed the weighting from 1 / visible_layer_size.prod() to 1
             (*_binc[k])[seq(0,0,0,j), seq<dimCount>(1)] =
                 (*_binc[k])[seq(0,0,0,j), seq<dimCount>(1)] + sum(hr[seq<dimCount>(0), overlap_layer_batch_size]);
           }
@@ -974,6 +953,8 @@ public:
       *_b[k] = reshape(parameters[seq(offset), seq(_b[k]->size().prod())], _b[k]->size());
       offset += _b[k]->size().prod();
     }
+
+    _host_updated = false;
 
     return offset;
   }

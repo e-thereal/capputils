@@ -157,8 +157,10 @@ public:
     return _kernel_size;
   }
 
-  size_t parameter_count() const {
-    if (_shared_biases)
+  size_t parameter_count(bool is_shortcut = false) const {
+    if (is_shortcut)
+      return _kernel_size.prod() * filter_count();
+    else if (_shared_biases)
       return (_kernel_size.prod() + 1) * filter_count();
     else
       return (_kernel_size.prod() + _biases[0]->count()) * filter_count();

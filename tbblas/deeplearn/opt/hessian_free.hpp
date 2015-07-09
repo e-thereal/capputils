@@ -63,14 +63,14 @@ protected:
   value_t val;
 
   // Temporary variables used by update
-  vector_t b, b2, parameters, precon, weight_mask;
+  vector_t b, b2, parameters, precon, weight_mask, old_parameters;
 #ifdef COMPARE_TO_NN
   vector_t nn_parameters, conv_parameters;
 #endif
-  int _iteration_count;
+  int _iteration_count, _backtracking_iterations;
 
 public:
-  hessian_free(encoder_t& encoder) : base_t(encoder), _lambda(45), _zeta(0.9), error(0), oldError(0), _iteration_count(10) {
+  hessian_free(encoder_t& encoder) : base_t(encoder), _lambda(45), _zeta(0.9), error(0), oldError(0), _iteration_count(10), _backtracking_iterations(5) {
     parameters = _delta = zeros<value_t>(_encoder._model.parameter_count());
 
 #ifdef COMPARE_TO_NN
@@ -163,12 +163,24 @@ public:
       _encoder.update_gv(v, label);
     }
 
-    // TODO: incorporate weight mask
     gv = _encoder.gradient() + _weightcost * weight_mask * v;
     if (damping)
       gv += _lambda * v;
 
     return gv;
+  }
+
+  template<class T2>
+  value_t computeLoss(std::vector<boost::shared_ptr<tensor<T2, dims> > >& samples, std::vector<boost::shared_ptr<tensor<T2, dims> > >& labels) {
+    value_t error = 0;
+    for (size_t iSample = 0; iSample < samples.size(); ++iSample) {
+      sample = *samples[iSample];
+      label = *labels[iSample];
+      _encoder.inputs() = sample;
+
+      error += _encoder.loss(label);
+    }
+    return error / samples.size() + 0.5 * _weightcost * dot(weight_mask * parameters, weight_mask * parameters);
   }
 
   // Preconditioned conjugate gradients
@@ -248,8 +260,9 @@ public:
 #endif
 
   template<class T2>
-  void check_gradient(std::vector<boost::shared_ptr<tensor<T2, dims> > >& samples, std::vector<boost::shared_ptr<tensor<T2, dims> > >& labels, value_t epsilon) {
+  void check_gradient(std::vector<boost::shared_ptr<tensor<T2, dims> > >& samples, std::vector<boost::shared_ptr<tensor<T2, dims> > >& labels) {
     value_t dloss = 0;
+    value_t epsilon = _zeta;
 #ifdef COMPARE_TO_NN
     value_t nn_dloss = 0;
     matrix_t m_samples, m_labels;
@@ -364,8 +377,9 @@ public:
 
   // Check the Gv product using Gv = J'(H_L(Jv))
   template<class T2>
-  void check_Gv(std::vector<boost::shared_ptr<tensor<T2, dims> > >& samples, std::vector<boost::shared_ptr<tensor<T2, dims> > >& labels, value_t epsilon, bool randomVector) {
+  void check_Gv(std::vector<boost::shared_ptr<tensor<T2, dims> > >& samples, std::vector<boost::shared_ptr<tensor<T2, dims> > >& labels, bool randomVector) {
     vector_t dparam;
+    value_t epsilon = _zeta;
 
     vector_t v, Jv, HJv, JHJv, e, Je;
 #ifdef COMPARE_TO_NN
@@ -641,23 +655,17 @@ public:
     precon = pow(b2 + _lambda, 0.75);
     _delta = _zeta * _delta;
     _delta = pcg(samples, labels, b, _delta, precon);
-    _encoder.update_model(_delta);
-    parameters = parameters + _delta;
+
+    // Calculate Rho and update lambda
+    old_parameters = parameters;
+    parameters = old_parameters + _delta;
+    _encoder.set_parameters(parameters);
 
     oldError = error;
     val = 0.5 * dot(_delta, computeGV(samples, labels, _delta, false)) - dot(b, _delta);
 
     // Calculate new error
-    value_t newError = 0;
-    for (size_t iSample = 0; iSample < samples.size(); ++iSample) {
-      sample = *samples[iSample];
-      label = *labels[iSample];
-      _encoder.inputs() = sample;
-
-      newError += _encoder.loss(label);
-    }
-    newError = newError / samples.size() + 0.5 * _weightcost * dot(weight_mask * parameters, weight_mask * parameters);
-
+    value_t newError = computeLoss(samples, labels);
     value_t rho = (newError - error) / val;
     tbblas_print(newError - error);
     tbblas_print(val);
@@ -669,6 +677,34 @@ public:
       _lambda *= 3./2.;
       tbblas_print(_lambda);
     }
+
+    // bog-standard back-tracking line-search implementation:
+    value_t rate = 1.0;
+    value_t c = 1e-2;
+
+    for (size_t j = 0; j < _backtracking_iterations; ++j) {
+      if (newError < error && newError <= error - c * rate * dot(b, _delta)) {
+        break;
+      } else {
+        rate *= 0.8;
+      }
+
+      // this is computed on the whole dataset.  If this is not possible you can
+      // use another set such the test set or a seperate validation set
+      parameters = old_parameters + rate * _delta;
+      _encoder.set_parameters(parameters);
+      newError = computeLoss(samples, labels);
+
+      if (j + 1 >= _backtracking_iterations) {
+        // completely reject the step
+        rate = 0;
+      }
+    }
+    tbblas_print(rate);
+
+    _delta = rate * _delta;
+    parameters = old_parameters + _delta;
+    _encoder.set_parameters(parameters);
 
 //    _lambda = max(_lambda, minLambda);
   }

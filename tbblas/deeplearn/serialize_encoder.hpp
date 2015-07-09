@@ -23,10 +23,17 @@ template<class T, unsigned dims>
 void serialize(const tbblas::deeplearn::encoder_model<T, dims>& model, std::ostream& out) {
   unsigned count = 0;
 
-  count = model.cnn_encoders().size();
+  count = model.cnn_encoders().size() + model.cnn_shortcuts().size();
+
+  if (model.cnn_shortcuts().size()) {
+    count |= 0x8000;    // CNN shortcut code
+  }
+
   out.write((char*)&count, sizeof(count));
-  for (size_t i = 0; i < count; ++i)
+  for (size_t i = 0; i < model.cnn_encoders().size(); ++i)
     serialize(*model.cnn_encoders()[i], out);
+  for (size_t i = 0; i < model.cnn_shortcuts().size(); ++i)
+    serialize(*model.cnn_shortcuts()[i], out);
 
   count = model.dnn_decoders().size() + model.dnn_shortcuts().size();
   out.write((char*)&count, sizeof(count));
@@ -62,12 +69,29 @@ void deserialize(std::istream& in, tbblas::deeplearn::encoder_model<T, dims>& mo
   unsigned count = 0;
 
   model.cnn_encoders().clear();
+  model.cnn_shortcuts().clear();
   in.read((char*)&count, sizeof(count));
 
   cnn_layer_t cnn_layer;
-  for (size_t i = 0; i < count; ++i) {
-    deserialize(in, cnn_layer);
-    model.append_cnn_encoder(cnn_layer);
+  if (count & 0x8000) {
+    // has CNN shortcut
+    count &= 0x7FFF;
+
+    assert(count % 2 == 1);
+    for (size_t i = 0; i < count / 2 + 1; ++i) {
+      deserialize(in, cnn_layer);
+      model.append_cnn_encoder(cnn_layer);
+    }
+    for (size_t i = 0; i < count / 2; ++i) {
+      deserialize(in, cnn_layer);
+      model.append_cnn_shortcut(cnn_layer);
+    }
+  } else {
+    // no short cuts
+    for (size_t i = 0; i < count; ++i) {
+      deserialize(in, cnn_layer);
+      model.append_cnn_encoder(cnn_layer);
+    }
   }
 
   model.dnn_decoders().clear();
@@ -75,6 +99,8 @@ void deserialize(std::istream& in, tbblas::deeplearn::encoder_model<T, dims>& mo
   in.read((char*)&count, sizeof(count));
 
   assert(count == model.cnn_encoders().size() || count == 2 * model.cnn_encoders().size() - 1);
+
+  // if has CNN shortcuts, set dnn_layer.set_visible_pooling(true);
 
   dnn_layer_t dnn_layer;
   for (size_t i = 0; i < model.cnn_encoders().size(); ++i) {

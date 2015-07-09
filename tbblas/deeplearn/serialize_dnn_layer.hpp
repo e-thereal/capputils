@@ -56,9 +56,15 @@ void serialize(const tbblas::deeplearn::dnn_layer_model<T, dim>& model, std::ost
   bool shared = model.shared_bias();
   out.write((char*)&shared, sizeof(shared));
 
+  if (model.version() >= 3) {
+    bool visible_pooling = model.visible_pooling();
+    out.write((char*)&visible_pooling, sizeof(visible_pooling));
+  }
+
   capputils::attributes::serialize_trait<activation_function>::writeToFile(model.activation_function(), out);
   capputils::attributes::serialize_trait<convolution_type>::writeToFile(model.convolution_type(), out);
   capputils::attributes::serialize_trait<pooling_method>::writeToFile(model.pooling_method(), out);
+
 }
 
 template<class T, unsigned dim>
@@ -125,6 +131,11 @@ void deserialize(std::istream& in, tbblas::deeplearn::dnn_layer_model<T, dim>& m
   bool shared = false;
   in.read((char*)&shared, sizeof(shared));
   model.set_shared_bias(shared);
+
+  bool visible_pooling = false;
+  if (model.version() >= 3)
+    in.read((char*)&visible_pooling, sizeof(visible_pooling));
+  model.set_visible_pooling(visible_pooling);
 
   activation_function function;
   capputils::attributes::serialize_trait<activation_function>::readFromFile(function, in);

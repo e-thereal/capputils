@@ -73,6 +73,7 @@ public:
     return _seq;
   }
 
+  // TODO: this function is obsolete and prod() should be used instead.
   __host__ __device__
   T count() const {
     T result = 1;
