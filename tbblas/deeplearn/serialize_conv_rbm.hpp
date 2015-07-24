@@ -114,6 +114,7 @@ void deserialize(std::istream& in, tbblas::deeplearn::conv_rbm_model<T, dim>& mo
   model.set_visible_bias(tensor);
 
   in.read((char*)&count, sizeof(count));
+
   v_host_tensor_t hiddenBiases(count);
   for (size_t i = 0; i < count; ++i) {
     deserialize(in, tensor);

@@ -28,7 +28,7 @@ struct repeat_expression {
   struct index_functor : public thrust::unary_function<difference_type,difference_type> {
 
     dim_t inSize, outSize, pitch;
-    bool optimized;
+    bool optimized, trivial;
     unsigned mask;
 
     unsigned int upper_power_of_two(unsigned int v) {
@@ -51,9 +51,14 @@ struct repeat_expression {
           optimized = false;
         mask *= inSize[i];
       }
+
+      trivial = optimized;
+
       if (upper_power_of_two(mask) != mask)
-        optimized = false;
-      --mask;
+        trivial = false;
+
+      if (trivial)
+        --mask;
     }
 
     __host__ __device__
@@ -62,8 +67,11 @@ struct repeat_expression {
       // calculate % inSize[i]
       // calculate new index
 
-      if (optimized)
+      if (trivial)
         return idx & mask;
+
+      if (optimized)
+        return idx % mask;
 
       difference_type index;
       index = (idx % inSize[0]) * pitch[0];

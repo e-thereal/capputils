@@ -8,6 +8,8 @@
 #ifndef TBBLAS_IMGPROC_FMATRIX4_HPP_
 #define TBBLAS_IMGPROC_FMATRIX4_HPP_
 
+#include <cuda_runtime.h>
+
 namespace tbblas {
 
 namespace imgproc {

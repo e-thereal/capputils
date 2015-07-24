@@ -18,6 +18,8 @@
 #include <tbblas/detail/copy.hpp>
 #include <tbblas/detail/system.hpp>
 
+#include <tbblas/io.hpp>
+
 #include <cassert>
 
 namespace tbblas {
@@ -43,12 +45,26 @@ struct proxy {
     typedef sequence<bool,dimCount> flipped_t;
 
     dim_t _size;
-    dim_t _pitch;
+    dim_t _pitch, _opitch;
     size_t _first;
     flipped_t _flipped;
     dim_t _stride;
+    bool trivial, only_different_size;
 
     index_functor(const dim_t& start, const dim_t& size, const dim_t& pitch, const flipped_t& flipped, const dim_t& order, const dim_t& stride)  {
+      trivial = true;
+      only_different_size = true;
+
+      for (int i = 0; i < (int)dimCount; ++i) {
+        if ((i < (int)dimCount - 1 && size[i] != pitch[i]) || flipped[i] || order[i] != i || stride[i] != 1)
+          trivial = false;
+
+        if (flipped[i] || order[i] != i || stride[i] != 1) {
+          only_different_size = false;
+          break;
+        }
+      }
+
       for (unsigned i = 0; i < dimCount; ++i) {
         _size[i] = size[i];
         _flipped[i] = flipped[i];
@@ -57,8 +73,11 @@ struct proxy {
 
       dim_t originalPitch;
       originalPitch[0] = 1;
-      for (unsigned k = 1; k < dimCount; ++k)
+      _opitch[0] = 1;
+      for (unsigned k = 1; k < dimCount; ++k) {
         originalPitch[k] = originalPitch[k-1] * pitch[k-1];
+        _opitch[k] = _opitch[k - 1] * _size[k - 1];
+      }
 
       _first = 0;
       for (unsigned k = 0; k < dimCount; ++k) {
@@ -70,11 +89,36 @@ struct proxy {
     __host__ __device__
     difference_type operator()(difference_type i) const
     {
+      if (trivial)
+        return i + _first;
+
+      if (only_different_size) {
+        difference_type index, x;
+        index = (x = i / _opitch[dimCount - 1]) * _pitch[dimCount - 1];
+        for (int k = dimCount - 1; k > 1; --k)
+          index += (x = (i -= x * _opitch[k]) / _opitch[k - 1]) * _pitch[k - 1];
+
+        if (dimCount > 1)
+          index += i - x * _opitch[1];
+
+        return index + _first;
+      }
+
       difference_type index;
       index = (_flipped[0] ? _size[0] - (i % _size[0]) - 1 : i % _size[0]) * _stride[0] * _pitch[0];
       for (unsigned k = 1; k < dimCount; ++k) {
         index += (_flipped[k] ? _size[k] - ((i /=  _size[k-1]) % _size[k]) - 1 : (i /= _size[k-1]) % _size[k]) * _stride[k] * _pitch[k];
       }
+
+      // TODO: incorporate flipping. Don't want to do it now because I don't have test code and I'm afraid to make a mistake
+//      difference_type index, x;
+//      index = (x = i / _opitch[dimCount - 1]) * _stride[dimCount - 1] * _pitch[dimCount - 1];
+//      for (int k = dimCount - 1; k > 1; --k)
+//        index += (x = (i -= x * _opitch[k]) / _opitch[k - 1]) * _stride[k - 1] * _pitch[k - 1];
+//
+//      if (dimCount > 1)
+//        index += (i - x * _opitch[1]) * _stride[0] * _pitch[0];
+
       return index + _first;
     }
   };
