@@ -101,7 +101,7 @@ public:
       _cnn_layers[layer]->set_batch_length(length);
   }
 
-  virtual const proxy<tensor_t> visibles() {
+  virtual proxy<tensor_t> visibles() {
     return _cnn_layers[0]->visibles();
   }
 

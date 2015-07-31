@@ -25,7 +25,7 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.lib.debug.1108083634." name="/" resourcePath="">
 						<toolChain id="cuda.toolchain.exe.debug.1904300894" name="CUDA Toolchain" superClass="cuda.toolchain.exe.debug">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="cuda.toolchain.targetplatform.exe.debug.1656544268" isAbstract="false" name="Linux Release Platform" osList="linux" superClass="cuda.toolchain.targetplatform.exe.debug"/>
-							<builder buildPath="${workspace_loc:/tbblas/Debug}" enableAutoBuild="true" id="cuda.toolchain.builder.exe.debug.1086022573" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cuda.toolchain.builder.exe.debug"/>
+							<builder buildPath="${workspace_loc:/tbblas/Debug}" enableAutoBuild="true" id="cuda.toolchain.builder.exe.debug.1086022573" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cuda.toolchain.builder.exe.debug"/>
 							<tool id="cuda.toolchain.compiler.exe.debug.517277848" name="NVIDIA CUDA Compiler" superClass="cuda.toolchain.compiler.exe.debug">
 								<option defaultValue="gnu.c.optimization.level.none" id="cuda.toolchain.compiler.option.optimization.level.376808668" name="Optimization Level" superClass="cuda.toolchain.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="cuda.toolchain.compiler.option.debugging.level.904796731" name="Debug Level" superClass="cuda.toolchain.compiler.option.debugging.level"/>
@@ -116,7 +116,7 @@
 									<listOptionValue builtIn="false" value="&quot;/${RESPROG_INC_PATH}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;/${CUDASDK_INC_PATH}&quot;"/>
 								</option>
-								<option id="cuda.toolchain.compiler.option.misc.other.20254432" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fmessage-length=0 -gencode=arch=compute_${COMPUTE_CAPABILITY},code=\&quot;sm_${COMPUTE_CAPABILITY},compute_${COMPUTE_CAPABILITY}\&quot; -Xcompiler -fpic -Xcompiler -fopenmp" valueType="string"/>
+								<option id="cuda.toolchain.compiler.option.misc.other.20254432" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fmessage-length=0 ${CUDA_GENCODE} -Xcompiler -fpic -Xcompiler -fopenmp" valueType="string"/>
 								<option id="cuda.toolchain.compiler.option.preprocessor.def.1000073077" name="Defined symbols (-D)" superClass="cuda.toolchain.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="TBBLAS_DISABLE_CBLAS"/>
 								</option>

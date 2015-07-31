@@ -1106,7 +1106,7 @@ public:
   }
 
   // Access to model data
-  const proxy<tensor_t> visibles() {
+  proxy<tensor_t> visibles() {
     if (!_memory_allocated)
       allocate_gpu_memory();
     return padded_v[seq<dimCount>(0), model.visibles_size()];

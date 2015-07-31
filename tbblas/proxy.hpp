@@ -129,21 +129,28 @@ struct proxy {
   typedef PermutationIterator iterator;
   typedef iterator const_iterator;
 
-  proxy(Tensor& tensor)
+//  proxy(const proxy_t& p)
+//    : _data(p._data), _start(p._start), _size(p._size), _fullsize(p._fullsize), _pitch(p._pitch), _order(p._order), _stride(p._stride), _flipped(p._flipped)
+//  {
+//    std::cout << "Proxy copy ctor." << std::endl;
+//  }
+
+  explicit proxy(const Tensor& tensor)
    : _data(tensor.shared_data()), _size(tensor.size()), _fullsize(tensor.fullsize()), _pitch(tensor.size()), _stride(tbblas::seq<dimCount>(1)), _flipped(tbblas::seq<dimCount>(false))
   {
     for (unsigned i = 0; i < dimCount; ++i)
       _order[i] = i;
   }
 
-  proxy(Tensor& tensor, const dim_t& size)
+  // used for reshaping
+  explicit proxy(Tensor& tensor, const dim_t& size)
    : _data(tensor.shared_data()), _size(size), _fullsize(size), _pitch(size), _stride(tbblas::seq<dimCount>(1)), _flipped(false)
   {
     for (unsigned i = 0; i < dimCount; ++i)
       _order[i] = i;
   }
 
-  proxy(Tensor& tensor, const dim_t& start, const dim_t& size)
+  proxy(const Tensor& tensor, const dim_t& start, const dim_t& size)
    : _data(tensor.shared_data()), _start(start), _size(size), _fullsize(size), _pitch(tensor.size()), _stride(tbblas::seq<dimCount>(1)), _flipped(tbblas::seq<dimCount>(false))
   {
     for (unsigned i = 0; i < dimCount; ++i) {
@@ -152,7 +159,7 @@ struct proxy {
     }
   }
 
-  proxy(Tensor& tensor, const dim_t& start, const dim_t& stride, const dim_t& size)
+  proxy(const Tensor& tensor, const dim_t& start, const dim_t& stride, const dim_t& size)
    : _data(tensor.shared_data()), _start(start), _size((size + stride - 1) / stride), _fullsize((size + stride - 1) / stride), _pitch(tensor.size()), _stride(stride), _flipped(tbblas::seq<dimCount>(false))
   {
     for (unsigned i = 0; i < dimCount; ++i) {
@@ -229,13 +236,19 @@ struct proxy {
     return *_data;
   }
 
+  proxy_t& operator=(const proxy_t& p) {
+    assert(p.size() == _size);
+    tbblas::detail::copy(typename tbblas::detail::select_system<cuda_enabled>::system(), p.begin(), p.end(), begin());
+    return *this;
+  }
+
   template<class Expression>
   inline const typename boost::enable_if<is_expression<Expression>,
     typename boost::enable_if_c<Expression::dimCount == dimCount,
       proxy_t
     >::type
   >::type&
-  operator=(const Expression& expr) const {
+  operator=(const Expression& expr) {
     const dim_t& size = expr.size();
     for (unsigned i = 0; i < dimCount; ++i) {
       assert(size[i] == _size[i]);
@@ -244,7 +257,6 @@ struct proxy {
     return *this;
   }
 
-  // todo: create a proxy that maps row,cols,depth,... to col,row,depth,...
   proxy_filler<proxy_t> operator=(const value_t& value) const {
     proxy_t p = *this;
     if (dimCount > 1) {
@@ -277,21 +289,35 @@ struct is_expression<proxy<T> > {
 };
 
 template<class T, unsigned dim, bool device>
-const proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
+proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
     const sequence<unsigned, dim>& start, const sequence<unsigned, dim>& size)
 {
   return proxy<tensor<T, dim, device> >(t, start, size);
 }
 
 template<class T, unsigned dim, bool device>
-const proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
+proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
     const sequence<int, dim>& start, const sequence<int, dim>& size)
 {
   return proxy<tensor<T, dim, device> >(t, start, size);
 }
 
 template<class T, unsigned dim, bool device>
-const proxy<tensor<T, dim, device> > slice(tensor<T, dim, device>& t,
+const proxy<tensor<T, dim, device> > subrange(const tensor<T, dim, device>& t,
+    const sequence<unsigned, dim>& start, const sequence<unsigned, dim>& size)
+{
+  return proxy<tensor<T, dim, device> >(t, start, size);
+}
+
+template<class T, unsigned dim, bool device>
+const proxy<tensor<T, dim, device> > subrange(const tensor<T, dim, device>& t,
+    const sequence<int, dim>& start, const sequence<int, dim>& size)
+{
+  return proxy<tensor<T, dim, device> >(t, start, size);
+}
+
+template<class T, unsigned dim, bool device>
+proxy<tensor<T, dim, device> > slice(tensor<T, dim, device>& t,
     const sequence<int, dim>& start, const sequence<int, dim>& stride, const sequence<int, dim>& size)
 {
   return proxy<tensor<T, dim, device> >(t, start, stride, size);

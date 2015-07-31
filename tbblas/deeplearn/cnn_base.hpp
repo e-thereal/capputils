@@ -30,7 +30,7 @@ public:
   virtual void update_gradient(matrix_t& target) = 0;
   virtual void update_model(value_t weightcost) = 0;
   virtual void set_batch_length(int layer, int length) = 0;
-  virtual const proxy<tensor_t> visibles() = 0;
+  virtual proxy<tensor_t> visibles() = 0;
   virtual matrix_t& hiddens() = 0;
 };
 

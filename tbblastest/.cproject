@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?fileVersion 4.0.0?>
-
-<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="cdt.managedbuild.config.gnu.exe.debug.1862065465">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.exe.debug.1862065465" moduleId="org.eclipse.cdt.core.settings" name="Debug">
@@ -74,9 +72,11 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="cublas"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gomp"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="tbblasd"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="blas"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_thread"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="capputilsd"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_signals"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_system"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_filesystem"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.cuda.2029110645" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths.cuda" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tbblas/Debug}&quot;"/>
@@ -137,7 +137,7 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.279225839." name="/" resourcePath="">
 						<toolChain id="cuda.toolchain.exe.debug.2025085933" name="CUDA Toolchain" superClass="cuda.toolchain.exe.debug">
 							<targetPlatform binaryParser="org.eclipse.cdt.core.ELF" id="cuda.toolchain.targetplatform.exe.debug.342280628" isAbstract="false" name="Linux Release Platform" osList="linux" superClass="cuda.toolchain.targetplatform.exe.debug"/>
-							<builder buildPath="${workspace_loc:/tbblastest/Release}" id="cuda.toolchain.builder.exe.debug.2083157846" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cuda.toolchain.builder.exe.debug"/>
+							<builder buildPath="${workspace_loc:/tbblastest/Release}" id="cuda.toolchain.builder.exe.debug.2083157846" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="cuda.toolchain.builder.exe.debug"/>
 							<tool id="cuda.toolchain.compiler.exe.debug.460090257" name="NVIDIA CUDA Compiler" superClass="cuda.toolchain.compiler.exe.debug">
 								<option id="cuda.toolchain.compiler.general.incpath.992490745" name="Include paths (-I)" superClass="cuda.toolchain.compiler.general.incpath" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/}&quot;"/>
@@ -148,7 +148,7 @@
 								</option>
 								<option defaultValue="gnu.c.optimization.level.most" id="cuda.toolchain.compiler.option.optimization.level.70631186" name="Optimization Level" superClass="cuda.toolchain.compiler.option.optimization.level" valueType="enumerated"/>
 								<option id="cuda.toolchain.compiler.option.debugging.level.1371945401" name="Debug Level" superClass="cuda.toolchain.compiler.option.debugging.level" value="cuda.toolchain.compiler.option.debugging.level.none" valueType="enumerated"/>
-								<option id="cuda.toolchain.compiler.option.misc.other.638362504" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fopenmp -Xcompiler -fmessage-length=0 -gencode=arch=compute_${COMPUTE_CAPABILITY},code=\&quot;sm_${COMPUTE_CAPABILITY},compute_${COMPUTE_CAPABILITY}\&quot;" valueType="string"/>
+								<option id="cuda.toolchain.compiler.option.misc.other.638362504" name="Other flags" superClass="cuda.toolchain.compiler.option.misc.other" value="-c -Xcompiler -fopenmp -Xcompiler -fmessage-length=0 -gencode arch=compute_20,code=\&quot;compute_20\&quot; -gencode arch=compute_30,code=\&quot;compute_30,sm_30,sm_52\&quot;" valueType="string"/>
 								<inputType id="cuda.toolchain.compiler.input.154128504" superClass="cuda.toolchain.compiler.input"/>
 							</tool>
 							<tool id="cuda.toolchain.gnu.cpp.compiler.55856132" name="GCC C++ Compiler" superClass="cuda.toolchain.gnu.cpp.compiler">
@@ -184,9 +184,11 @@
 									<listOptionValue builtIn="false" value="curand"/>
 									<listOptionValue builtIn="false" value="cublas"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gomp"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="blas"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_thread"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="capputils"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_system"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_signals"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_filesystem"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1987775841" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
 //  Tage tag = Tage::Montag; // tag = 0; tag = "Montag";
 //
   Car car;
-//  car.Changed.connect(changeHandler);
+  car.Changed.connect(changeHandler);
 //
 //  std::cout << car << std::endl;
 //

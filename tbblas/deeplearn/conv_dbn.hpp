@@ -245,7 +245,7 @@ public:
   }
 
   // Access to model data
-  const proxy<tensor_t> cvisibles(int layer = 0) {
+  proxy<tensor_t> cvisibles(int layer = 0) {
     if (layer >= 0 && layer < _crbms.size())
       return _crbms[layer]->visibles();
 

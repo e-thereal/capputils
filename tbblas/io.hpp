@@ -13,7 +13,7 @@
 #include <vector>
 
 #include <tbblas/tensor.hpp>
-
+#include <tbblas/util.hpp>
 #include <thrust/copy.h>
 
 namespace tbblas {
@@ -50,6 +50,7 @@ void print(const tbblas::tensor<T, 1u, device>& tensor, int precision = 5,
 
   std::vector<T> data(count);
   thrust::copy(tensor.begin(), tensor.end(), data.begin());
+  tbblas::synchronize();
   out << "[" << count << "]" << std::endl;
 
   for (size_t i = 0; i < count; ++i) {
@@ -67,6 +68,7 @@ void print(const tbblas::tensor<T, 2u, device>& tensor, int precision = 5,
 
   std::vector<T> data(count);
   thrust::copy(tensor.begin(), tensor.end(), data.begin());
+  tbblas::synchronize();
   out << "[" << rowCount << " x " << columnCount << "]" << std::endl;
 
   for (size_t i = 0; i < rowCount; ++i) {
@@ -99,6 +101,7 @@ void print(const tbblas::tensor<T, 3u, device>& tensor, int precision = 5,
 
   std::vector<T> data(count);
   thrust::copy(tensor.begin(), tensor.end(), data.begin());
+  tbblas::synchronize();
   out << "[" << rowCount << " x " << columnCount << " x " << depth << "]" << std::endl;
 
   int indent = numDigits(depth) + 4;
@@ -132,6 +135,7 @@ void print(const tbblas::tensor<T, 4u, device>& tensor, int precision = 5,
 
   std::vector<T> data(count);
   thrust::copy(tensor.begin(), tensor.begin() + count, data.begin());
+  tbblas::synchronize();
   out << "[" << rowCount << " x " << columnCount << " x " << depth << "]" << std::endl;
 
   int indent = numDigits(depth) + 4;

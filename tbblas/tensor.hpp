@@ -33,7 +33,11 @@ template<class Tensor>
 struct proxy;
 
 template<class T, unsigned dim, bool device>
-const proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
+proxy<tensor<T, dim, device> > subrange(tensor<T, dim, device>& t,
+    const sequence<unsigned, dim>& start, const sequence<unsigned, dim>& size);
+
+template<class T, unsigned dim, bool device>
+const proxy<tensor<T, dim, device> > subrange(const tensor<T, dim, device>& t,
     const sequence<unsigned, dim>& start, const sequence<unsigned, dim>& size);
 
 template<class T, unsigned dim, bool device = false>
@@ -80,7 +84,7 @@ public:
     _data = boost::shared_ptr<data_t>(new data_t(count));
   }
 
-  tensor(const dim_t& size) {
+  explicit tensor(const dim_t& size) {
     TBBLAS_ALLOC_WARNING
 
     size_t count = 1;
@@ -110,7 +114,7 @@ public:
   }
 
   template<bool device2>
-  tensor(const tensor<T, dim, device2>& tensor, typename boost::enable_if_c<device != device2, int>::type = 0) {
+  explicit tensor(const tensor<T, dim, device2>& tensor, typename boost::enable_if_c<device != device2, int>::type = 0) {
     TBBLAS_ALLOC_WARNING
 
     const dim_t& size = tensor.size();
@@ -130,7 +134,7 @@ public:
   }
 
   template<class T2, bool device2>
-  tensor(const tensor<T2, dim, device2>& tensor) {
+  explicit tensor(const tensor<T2, dim, device2>& tensor) {
     TBBLAS_ALLOC_WARNING
 
     const dim_t& size = tensor.size();
@@ -152,6 +156,7 @@ public:
       typename boost::enable_if<boost::is_same<typename Operation::tensor_t, tensor_t>, int>::type>::type = 0)
   {
     TBBLAS_ALLOC_WARNING
+
     const dim_t& size = op.size();
     for (unsigned i = 0; i < dimCount; ++i) {
       _size[i] = size[i];
@@ -164,7 +169,8 @@ public:
 
   template<class Expression>
   tensor(const Expression& expr, typename boost::enable_if<is_expression<Expression>,
-      typename boost::enable_if_c<Expression::dimCount == dimCount, int>::type>::type = 0)
+      typename boost::disable_if<is_tensor<Expression>,
+        typename boost::enable_if_c<Expression::dimCount == dimCount, int>::type>::type>::type = 0)
   {
     TBBLAS_ALLOC_WARNING
 
@@ -255,6 +261,10 @@ public:
     return _data;
   }
 
+  boost::shared_ptr<data_t> shared_data() const {
+    return _data;
+  }
+
   inline iterator begin() {
     return _data->begin();
   }
@@ -288,15 +298,23 @@ public:
   }
 
   // returning const proxy in order to avoid copy constructors when assigning values to returned proxy
-  const proxy<tensor_t> operator[](const std::pair<sequence<unsigned, dim>, sequence<unsigned, dim> >& pair) {
+  proxy<tensor_t> operator[](const std::pair<sequence<unsigned, dim>, sequence<unsigned, dim> >& pair) {
     return subrange(*this, pair.first, pair.second);
   }
 
-  const proxy<tensor_t> operator[](const std::pair<sequence<int, dim>, sequence<int, dim> >& pair) {
+  proxy<tensor_t> operator[](const std::pair<sequence<int, dim>, sequence<int, dim> >& pair) {
     return subrange(*this, pair.first, pair.second);
   }
 
-  const proxy<tensor_t> operator[](const std::pair<std::pair<sequence<int, dim>, sequence<int, dim> >, sequence<int, dim> >& pair) {
+  const proxy<tensor_t> operator[](const std::pair<sequence<unsigned, dim>, sequence<unsigned, dim> >& pair) const {
+    return subrange(*this, pair.first, pair.second);
+  }
+
+  const proxy<tensor_t> operator[](const std::pair<sequence<int, dim>, sequence<int, dim> >& pair) const {
+    return subrange(*this, pair.first, pair.second);
+  }
+
+  proxy<tensor_t> operator[](const std::pair<std::pair<sequence<int, dim>, sequence<int, dim> >, sequence<int, dim> >& pair) {
     return slice(*this, pair.first.first, pair.first.second, pair.second);
   }
 

@@ -17,10 +17,21 @@ namespace tbblas {
 template<class Tensor>
 typename boost::enable_if<is_tensor<Tensor>,
   typename boost::enable_if_c<Tensor::dimCount == 2,
-    const proxy<Tensor>
+    proxy<Tensor>
   >::type
 >::type
 column(Tensor& tensor, unsigned columnIdx) {
+  assert((int)columnIdx < tensor.size()[1]);
+  return tensor[seq(0, (int)columnIdx), seq(tensor.size()[0], 1)];
+}
+
+template<class Tensor>
+typename boost::enable_if<is_tensor<Tensor>,
+  typename boost::enable_if_c<Tensor::dimCount == 2,
+    const proxy<Tensor>
+  >::type
+>::type
+column(const Tensor& tensor, unsigned columnIdx) {
   assert((int)columnIdx < tensor.size()[1]);
   return tensor[seq(0, (int)columnIdx), seq(tensor.size()[0], 1)];
 }
