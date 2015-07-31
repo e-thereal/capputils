@@ -150,7 +150,7 @@ bool Verifier::UpToDate(const ReflectableClass& object) {
 //    if (oldestOutputId > -1)
 //      cout << "  Oldest Output: " << properties[oldestOutputId]->getName() << endl;
 //  }
-  return newestInput <= oldestOutput;
+  return (newestInput <= oldestOutput);
 }
 
 }

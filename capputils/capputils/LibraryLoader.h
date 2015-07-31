@@ -11,7 +11,7 @@
 #include <string>
 #include <map>
 
-#include <boost/signals.hpp>
+//#include <boost/signals.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include <capputils/EventHandler.h>

@@ -14,7 +14,6 @@
 #else
 #include <Windows.h>
 #include <strsafe.h>
-#define BOOST_FILESYSTEM_VERSION 3
 #endif
 #include <iostream>
 #include <boost/filesystem.hpp>

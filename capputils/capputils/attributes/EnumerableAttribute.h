@@ -116,7 +116,7 @@ struct collection_trait<boost::shared_ptr<T> > {
   }
 
   static bool valid(const boost::shared_ptr<T>& collection) {
-    return collection;
+    return collection.get();
   }
 
   static boost::shared_ptr<T> newInstance() {

@@ -11256,6 +11256,7 @@ namespace exprtk
          const std::string symbol = current_token_.value;
          expression_node_ptr result = symbol_table_.get_stringvar(symbol);
          bool string_literal = false;
+         (void)string_literal;
 
          if (symbol_name_caching_)
          {

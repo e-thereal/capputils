@@ -8,7 +8,7 @@
 #ifndef CAPPUTILS_OBSERVABLECLASS_H_
 #define CAPPUTILS_OBSERVABLECLASS_H_
 
-#include <boost/signal.hpp>
+#include <boost/signals2/signal.hpp>
 #include <capputils/reflection/IClassProperty.h>
 
 #include <set>
@@ -17,7 +17,7 @@ namespace capputils {
 
 class ObservableClass {
 public:
-  boost::signal<void (ObservableClass* sender, int eventId)> Changed;
+  boost::signals2::signal<void (ObservableClass* sender, int eventId)> Changed;
 
 private:
   std::map<ObservableClass*, int> parents;
