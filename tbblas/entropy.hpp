@@ -9,7 +9,7 @@
 #define TBBLAS_ENTROPY_HPP_
 
 #include <tbblas/tensor.hpp>
-#include <thrust/transform_reduce.h>
+#include <tbblas/detail/transform_reduce.hpp>
 #include <thrust/functional.h>
 
 namespace tbblas {

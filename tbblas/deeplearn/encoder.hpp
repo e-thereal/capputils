@@ -612,7 +612,7 @@ protected:
       if (i + 1 < _cnn_encoders.size()) {                                           // If more convolutional encoders exists, ...
         _cnn_encoders[i + 1]->visibles() = _cnn_encoders[i]->hiddens();             // Transition to next layer and repeat
         update_gradient(iLayer + 1, target, infer_only_deltas);
-        _cnn_encoders[i + 1]->backprop_visibles();                                  // Back-propagate errors
+        _cnn_encoders[i + 1]->backprop_visible_deltas();                            // Back-propagate errors from hidden states
 
         // Handle shortcuts
         if (_model.has_dnn_shortcuts()) {
@@ -958,7 +958,7 @@ protected:
       if (i + 1 < _cnn_encoders.size()) {                                           // If more convolutional encoders exists, ...
         _cnn_encoders[i + 1]->visibles() = _cnn_encoders[i]->hiddens();             // Transfer activation to the next layer
         update_gv_part3(iLayer + 1);
-        _cnn_encoders[i + 1]->backprop_visibles();                                  // Back-propagate RDa
+        _cnn_encoders[i + 1]->backprop_visible_deltas();                            // Back-propagate RDa
 
         // Handle shortcuts
         if (_model.has_dnn_shortcuts()) {

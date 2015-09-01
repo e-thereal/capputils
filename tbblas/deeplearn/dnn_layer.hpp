@@ -34,6 +34,7 @@
 #include <tbblas/deeplearn/objective_function.hpp>
 
 #include <tbblas/deeplearn/opt/type_traits.hpp>
+#include <tbblas/deeplearn/opt/void_trainer.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -45,7 +46,7 @@ namespace tbblas {
 
 namespace deeplearn {
 
-template<class T, unsigned dims, class Trainer, class Enable = typename boost::enable_if<opt::is_trainer<Trainer> >::type>
+template<class T, unsigned dims, class Trainer = opt::void_trainer<T>, class Enable = typename boost::enable_if<opt::is_trainer<Trainer> >::type>
 class dnn_layer : public Trainer {
   const static unsigned dimCount = dims;
   typedef uint8_t switches_t;
@@ -112,12 +113,16 @@ protected:
 
 public:
   /// Creates a new conv_rbm layer (called from non-parallel code)
+  dnn_layer(model_t& model, dim_t patch_count = seq<dimCount>(1)) : Trainer(NULL),
+    model(model), patch_count(patch_count), _p_switches(new stensor_t()),
+    _filter_batch_length(1), _memory_allocated(false), _host_updated(true), _current_batch_size(0), _dropout_rate(0), _sensitivity_ratio(0.5)
+  { }
+
   dnn_layer(model_t& model, const Trainer* parameters, dim_t patch_count = seq<dimCount>(1)) : Trainer(parameters),
     model(model), patch_count(patch_count),
     _p_switches(new stensor_t()),
     _filter_batch_length(1), _memory_allocated(false), _host_updated(true), _current_batch_size(0), _dropout_rate(0), _sensitivity_ratio(0.5)
-  {
-  }
+  { }
 
 private:
   dnn_layer(const dnn_layer&);

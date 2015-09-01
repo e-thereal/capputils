@@ -41,7 +41,7 @@ public:
 
   virtual void update(v_host_tensor_t& samples, v_host_tensor_t& labels) {
     tensor_t v, target;
-    vector_t parameters;
+//    vector_t parameters;
 
     // Calculate gradient
     for (size_t iSample = 0; iSample < samples.size(); ++iSample) {
@@ -50,14 +50,15 @@ public:
       _encoder.inputs() = v;
       _encoder.update_gradient(target);
     }
-    parameters = _encoder.parameters();
 
     // Update model
     this->update_delta(_encoder.gradient(_weightcost), 0);
 
-    parameters += this->delta(0);
-    _encoder.set_parameters(parameters);
-    _encoder.reset_gradient();
+    _encoder.update_model(this->delta(0));
+//    parameters = _encoder.parameters();
+//    parameters += this->delta(0);
+//    _encoder.set_parameters(parameters);
+//    _encoder.reset_gradient();
   }
 };
 

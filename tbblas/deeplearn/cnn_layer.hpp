@@ -656,6 +656,74 @@ public:
         hr = zeros<value_t>(patch_layer_batch_size);
 
 #ifdef CNN_LAYER_KEEP_HIDDENS
+        hr[hidden_topleft, hidden_overlap_layer_batch_size] = H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+#else
+        if (model.has_pooling_layer()) {
+          pr[seq<dimCount>(0), hidden_overlap_layer_batch_size / model.pooling_size()] =
+              H[topleft / model.pooling_size() + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size / model.pooling_size()];
+
+          switch (model.pooling_method()) {
+          case pooling_method::StridePooling:
+            hpr = zeros<value_t>(hpr.size());
+            hpr[seq<dimCount>(0), model.pooling_size(), hpr.size()] = pr;
+            break;
+
+          case pooling_method::MaxPooling:
+            sr[seq<dimCount>(0), hidden_overlap_layer_batch_size / model.pooling_size()] =
+                _switches[topleft / model.pooling_size() + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size / model.pooling_size()];
+            hpr = unpooling(pr, sr, model.pooling_size());
+            break;
+
+          case pooling_method::AvgPooling:
+            hpr = unpooling(pr, model.pooling_size());
+            break;
+
+          default:
+            throw std::runtime_error("Unsupported pooling method.");
+          }
+
+          hr[hidden_topleft, hidden_overlap_layer_batch_size] = hpr[seq<dimCount>(0), hidden_overlap_layer_batch_size];
+        } else {
+          hr[hidden_topleft, hidden_overlap_layer_batch_size] = H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
+        }
+#endif
+
+        chr = fft(hr, dimCount - 1, plan_hr);
+        cvr += repeat_mult_sum(chr, *cF[k]);
+      }
+      vr = ifft(cvr, dimCount - 1, iplan_vr);
+      vp[topleft, overlap_size] = vp[topleft, overlap_size] + vr[seq<dimCount>(0), overlap_size];
+    }
+
+    padded_v = rearrange_r(vp, model.stride_size());
+    padded_v = padded_v * repeat(v_mask, padded_v.size() / v_mask.size());
+  }
+
+  // This function assumes that the hidden deltas were already calculated
+  // Hence, the backpropagation is started from the hidden units and not from the pooled units.
+  void backprop_visible_deltas(bool accumulate = false) {
+#ifdef CNN_LAYER_KEEP_HIDDENS
+    assert(H.size() == hidden_size);
+#else
+    assert(H.size() == hidden_size / model.pooling_size());
+#endif
+
+    if (!accumulate)
+      vp = zeros<value_t>(visible_size);
+
+    // Iterate over sub-regions
+    for (sequence_iterator<dim_t> iter(seq<dimCount>(0), step_count); iter; ++iter) {
+      dim_t topleft = *iter * step_size;
+
+      dim_t overlap_size = min(patch_size, visible_size - topleft);
+      dim_t hidden_overlap_layer_batch_size = min(hidden_layer_batch_size - topleft, hidden_patch_layer_batch_size);// for each subregion
+
+      cvr = zeros<complex_t>(cF[0]->size() / seq(1,1,1,_filter_batch_length), cF[0]->fullsize() / seq(1,1,1,_filter_batch_length));
+
+      for (size_t k = 0; k < cF.size(); ++k) {
+        hr = zeros<value_t>(patch_layer_batch_size);
+
+#ifdef CNN_LAYER_KEEP_HIDDENS
       hr[hidden_topleft, hidden_overlap_layer_batch_size] = H[topleft + seq(0,0,0,(int)k * _filter_batch_length), hidden_overlap_layer_batch_size];
 #else
         if (model.has_pooling_layer()) {

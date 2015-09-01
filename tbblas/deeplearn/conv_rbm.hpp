@@ -329,7 +329,6 @@ public:
           for (size_t j = 0; j < _filter_batch_length; ++j) {
             _sc[k * _filter_batch_length + j] = sum(*model.hidden_bias()[k * _filter_batch_length + j]) / model.hidden_bias()[k * _filter_batch_length + j]->count();
           }
-
         } else {
           h = zeros<value_t>(visible_layer_batch_size);
           for (int j = 0; j < _filter_batch_length; ++j) {
