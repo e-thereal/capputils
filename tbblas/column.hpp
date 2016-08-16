@@ -9,8 +9,9 @@
 #define TBBLAS_COLUMN_HPP_
 
 #include <tbblas/proxy.hpp>
+#include <tbblas/assert.hpp>
+
 #include <boost/utility/enable_if.hpp>
-#include <cassert>
 
 namespace tbblas {
 
@@ -21,7 +22,7 @@ typename boost::enable_if<is_tensor<Tensor>,
   >::type
 >::type
 column(Tensor& tensor, unsigned columnIdx) {
-  assert((int)columnIdx < tensor.size()[1]);
+  tbblas_assert((int)columnIdx < tensor.size()[1]);
   return tensor[seq(0, (int)columnIdx), seq(tensor.size()[0], 1)];
 }
 
@@ -32,7 +33,7 @@ typename boost::enable_if<is_tensor<Tensor>,
   >::type
 >::type
 column(const Tensor& tensor, unsigned columnIdx) {
-  assert((int)columnIdx < tensor.size()[1]);
+  tbblas_assert((int)columnIdx < tensor.size()[1]);
   return tensor[seq(0, (int)columnIdx), seq(tensor.size()[0], 1)];
 }
 

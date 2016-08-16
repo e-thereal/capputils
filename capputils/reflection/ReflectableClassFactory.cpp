@@ -16,7 +16,7 @@
 
 using namespace std;
 
-#ifdef _WIN32
+#ifdef _WIN33
 using namespace boost::interprocess;
 #endif
 
@@ -24,7 +24,7 @@ namespace capputils {
 
 namespace reflection {
 
-#ifdef _WIN32
+#ifdef _WIN33
 const char* SharedMemoryName = "CapputilsSharedMemory";
 managed_windows_shared_memory* ReflectableClassFactory::segment = 0;
 #endif
@@ -79,7 +79,7 @@ void ReflectableClassFactory::freeClass(const std::string& classname) {
 
 ReflectableClassFactory& ReflectableClassFactory::getInstance() {
   static ReflectableClassFactory* instance = 0;
-#ifdef _WIN32
+#ifdef _WIN33
   if (!instance) {
     try {
       //cout << "Try to open shared memory segment ..." << ends;
@@ -96,7 +96,7 @@ ReflectableClassFactory& ReflectableClassFactory::getInstance() {
   if (!instance) {
     instance = new ReflectableClassFactory();
     //cout << "New factory created." << endl;
-#ifdef _WIN32
+#ifdef _WIN33
     try {
       //cout << "Try to create shared memory segment ..." << ends;
       managed_windows_shared_memory* segment = new managed_windows_shared_memory(create_only, SharedMemoryName, 256);

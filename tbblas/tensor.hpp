@@ -21,6 +21,7 @@
 #include <tbblas/sequence.hpp>
 #include <tbblas/fill.hpp>
 #include <tbblas/context.hpp>
+#include <tbblas/assert.hpp>
 
 #include <iostream>
 
@@ -200,34 +201,24 @@ public:
   inline void resize(const dim_t& size) {
     // README: use 'void resize(const dim_t& size, const dim_t fullsize)' instead for complex value types!
     BOOST_STATIC_ASSERT(!tbblas::is_complex<value_t>::value);
-    bool realloc = false;
 
-    for (unsigned i = 0; i < dim; ++i) {
-      if (size[i] != _size[i]) {
-        realloc = true;
-        _size[i] = size[i];
-      }
-    }
+    size_t old_size = count();
+    _size = size;
     _fullsize = size;
 
-    if (realloc) {
+    if (count() != old_size) {
       TBBLAS_ALLOC_WARNING
       _data = boost::shared_ptr<data_t>(new data_t(count()));
     }
   }
 
   inline void resize(const dim_t& size, const dim_t fullsize) {
-    bool realloc = false;
-
-    for (unsigned i = 0; i < dim; ++i) {
-      if (size[i] != _size[i]) {
-        realloc = true;
-        _size[i] = size[i];
-      }
-    }
+    size_t old_size = count();
+    
+    _size = size;
     _fullsize = fullsize;
 
-    if (realloc) {
+    if (count() != old_size) {
       TBBLAS_ALLOC_WARNING
       _data = boost::shared_ptr<data_t>(new data_t(count()));
     }
@@ -242,11 +233,7 @@ public:
   }
 
   inline size_t count() const {
-    size_t count = 1;
-    for (unsigned i = 0; i < dim; ++i) {
-      count *= _size[i];
-    }
-    return count;
+    return _size.prod();
   }
 
   inline data_t& data() {
@@ -367,8 +354,8 @@ public:
   >::type&
   operator+=(const Operation& op) {
     for (int i = 0; i < dimCount; ++i) {
-      assert(op.size()[i] == size()[i]);
-      assert(op.fullsize()[i] == fullsize()[i]);
+      tbblas_assert(op.size()[i] == size()[i]);
+      tbblas_assert(op.fullsize()[i] == fullsize()[i]);
     }
     op.apply_inc(*this);
     return *this;

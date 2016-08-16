@@ -12,6 +12,7 @@
 #include <tbblas/proxy.hpp>
 #include <tbblas/complex.hpp>
 #include <tbblas/context.hpp>
+#include <tbblas/assert.hpp>
 
 #include <thrust/reduce.h>
 #include <thrust/iterator/counting_iterator.h>
@@ -120,7 +121,7 @@ typename boost::enable_if<is_proxy<Proxy>,
     >::type
 >::type
 sum(const Proxy& proxy, unsigned dimIdx) {
-  assert(dimIdx < Proxy::dimCount);
+  tbblas_assert(dimIdx < Proxy::dimCount);
   return sum_operation<Proxy>(proxy, dimIdx);
 }
 
@@ -133,7 +134,7 @@ typename boost::enable_if<is_tensor<Tensor>,
     >::type
 >::type
 sum(Tensor& tensor, unsigned dimIdx) {
-  assert(dimIdx < Tensor::dimCount);
+  tbblas_assert(dimIdx < Tensor::dimCount);
   return sum(proxy<Tensor>(tensor), dimIdx);
 }
 
@@ -360,7 +361,7 @@ typename boost::enable_if<is_tensor<Tensor>,
   >::type
 >::type
 sum(Tensor& tensor, unsigned dimIdx) {
-  assert(dimIdx < Tensor::dimCount);
+  tbblas_assert(dimIdx < Tensor::dimCount);
   return sum_operation<Tensor>(tensor, dimIdx);
 }
 

@@ -13,6 +13,7 @@
 #include <tbblas/sequence.hpp>
 #include <tbblas/fft_plan.hpp>
 #include <tbblas/context.hpp>
+#include <tbblas/assert.hpp>
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/utility.hpp>
@@ -20,7 +21,6 @@
 
 #include <cufft.h>
 
-#include <cassert>
 #include <stdexcept>
 #include <sstream>
 
@@ -150,7 +150,7 @@ struct fft_operation
           ) != CUFFT_SUCCESS)
       {
         std::cout << result << std::endl;
-        assert(0);
+        tbblas_assert(0);
       }
     }
 #endif
@@ -196,8 +196,8 @@ typename boost::enable_if<is_tensor<Tensor>,
   >::type
 >::type
 fft(Tensor& tensor, unsigned dimension, const fft_plan<Tensor::dimCount>& plan = fft_plan<Tensor::dimCount>()) {
-  assert(dimension <= Tensor::dimCount);
-  assert(dimension <= 3);
+  tbblas_assert(dimension <= Tensor::dimCount);
+  tbblas_assert(dimension <= 3);
   return fft_operation<Tensor>(tensor, dimension, plan);
 }
 

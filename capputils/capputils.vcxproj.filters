@@ -1,0 +1,422 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\attributes">
+      <UniqueIdentifier>{62e553a8-8507-4f2b-975e-95bf85840048}</UniqueIdentifier>
+      <Extensions>
+      </Extensions>
+    </Filter>
+    <Filter Include="Source Files\attributes">
+      <UniqueIdentifier>{e7da0511-82dc-462a-b210-b760b5ccc4aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\exceptions">
+      <UniqueIdentifier>{be1db383-acfc-4151-8954-2aac687c6cc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\reflection">
+      <UniqueIdentifier>{12b99b7b-e0e8-489e-abf6-bcfabf822775}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\reflection">
+      <UniqueIdentifier>{796afa52-fdbe-412c-8666-a1f93b52fa68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\exceptions">
+      <UniqueIdentifier>{9354eedc-d0e1-4de5-9782-300c6bd96fa8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AbstractEnumerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractLogbookModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ArgumentsParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="arithmetic_expression.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AttributeExecuter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Executer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GenerateBashCompletion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LibraryLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Logbook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ObservableClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertyMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Serializer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TimedClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Variant.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Verifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Xmlizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\AndAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\DeprecatedAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\DescriptionAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\DummyAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\FileExistsAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\FilenameAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\FlagAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\FromEnumerableAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\HideAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\IAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\InputAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\NoParameterAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\NotAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\ObserveAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\OperandAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\OrAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\OutputAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\ParameterAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\RenamedAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\ReuseAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\ScalarAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\SerializeAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\ShortNameAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\TimeStampAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\ToEnumerableAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="attributes\VolatileAttribute.cpp">
+      <Filter>Source Files\attributes</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\AssertionException.cpp">
+      <Filter>Source Files\exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\FactoryException.cpp">
+      <Filter>Source Files\exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\LibraryException.cpp">
+      <Filter>Source Files\exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\ReflectionException.cpp">
+      <Filter>Source Files\exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="reflection\ReflectableClass.cpp">
+      <Filter>Source Files\reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="reflection\ReflectableClassFactory.cpp">
+      <Filter>Source Files\reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="reflection\RegisterClass.cpp">
+      <Filter>Source Files\reflection</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AbstractEnumerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractLogbookModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArgumentsParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="arithmetic_expression.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AttributeExecuter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="capputils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Enumerators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Executer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="exprtk.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GenerateBashCompletion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LibraryLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Logbook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObservableClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertyMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serializer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TimedClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeTraits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Variant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Verifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Xmlizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\AndAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\DeprecatedAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\DescriptionAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\DummyAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\EmptyAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\EnumerableAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\EnumeratorAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\EqualAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\FileExistsAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\FilenameAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\FlagAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\FromEnumerableAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\GreaterThanAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\HideAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\IAssertionAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\IAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\IEnumerableAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\IExecutableAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\InputAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\IReflectableAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\IsNullAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\IXmlableAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\LessThanAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\MergeAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\NoParameterAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\NotAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\NotEmptyAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\NotEqualAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\NotNullAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\ObserveAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\OperandAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\OrAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\OutputAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\ParameterAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\ReflectableAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\RenamedAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\ReuseAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\ScalarAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\SerializeAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\ShortNameAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\TimeStampAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\ToEnumerableAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\VolatileAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="attributes\WithinRangeAttribute.h">
+      <Filter>Header Files\attributes</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\AssertionException.h">
+      <Filter>Header Files\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\FactoryException.h">
+      <Filter>Header Files\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\LibraryException.h">
+      <Filter>Header Files\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\ReflectionException.h">
+      <Filter>Header Files\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ClassProperty.h">
+      <Filter>Header Files\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\IClassProperty.h">
+      <Filter>Header Files\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\IPropertyIterator.h">
+      <Filter>Header Files\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ReflectableClass.h">
+      <Filter>Header Files\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\ReflectableClassFactory.h">
+      <Filter>Header Files\reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="reflection\RegisterClass.h">
+      <Filter>Header Files\reflection</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

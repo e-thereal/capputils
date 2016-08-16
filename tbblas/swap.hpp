@@ -9,6 +9,7 @@
 #define TBBLAS_SWAP_HPP_
 
 #include <tbblas/tensor.hpp>
+#include <tbblas/assert.hpp>
 #include <thrust/swap.h>
 
 namespace tbblas {
@@ -18,7 +19,7 @@ typename boost::enable_if<is_proxy<Proxy>,
   void
 >::type
 swap(Proxy proxy1, Proxy proxy2) {
-  assert(proxy1.size() == proxy2.size());
+  tbblas_assert(proxy1.size() == proxy2.size());
   thrust::swap_ranges(proxy1.begin(), proxy1.end(), proxy2.begin());
 }
 
@@ -31,7 +32,7 @@ typename boost::enable_if<is_proxy<Proxy>,
   >::type
 >::type
 swap(Proxy proxy1, Tensor& tensor2) {
-  assert(proxy1.size() == tensor2.size());
+  tbblas_assert(proxy1.size() == tensor2.size());
   thrust::swap_ranges(proxy1.begin(), proxy1.end(), tensor2.begin());
 }
 
@@ -44,7 +45,7 @@ typename boost::enable_if<is_tensor<Tensor>,
   >::type
 >::type
 swap(Tensor& tensor1, Proxy proxy2) {
-  assert(tensor1.size() == proxy2.size());
+  tbblas_assert(tensor1.size() == proxy2.size());
   thrust::swap_ranges(tensor1.begin(), tensor1.end(), proxy2.begin());
 }
 
@@ -53,7 +54,7 @@ typename boost::enable_if<is_tensor<Tensor>,
   void
 >::type
 swap(Tensor& tensor1, Tensor& tensor2) {
-  assert(tensor1.size() == tensor2.size());
+  tbblas_assert(tensor1.size() == tensor2.size());
   thrust::swap_ranges(tensor1.begin(), tensor1.end(), tensor2.begin());
 }
 

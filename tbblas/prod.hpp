@@ -11,6 +11,7 @@
 #include <tbblas/tensor.hpp>
 #include <tbblas/proxy.hpp>
 #include <tbblas/type_traits.hpp>
+#include <tbblas/assert.hpp>
 
 namespace tbblas {
 
@@ -47,8 +48,8 @@ struct prod_operation {
   prod_operation(const Proxy& proxy1, const Proxy& proxy2)
    : _proxy1(proxy1), _proxy2(proxy2)
   {
-    assert(proxy1.size() == proxy1.fullsize());
-    assert(proxy2.size() == proxy2.fullsize());
+    tbblas_assert(proxy1.size() == proxy1.fullsize());
+    tbblas_assert(proxy2.size() == proxy2.fullsize());
 
     _size[0] = proxy1.size()[0];
     _size[1] = proxy2.size()[1];
@@ -112,7 +113,7 @@ typename boost::enable_if<is_proxy<Proxy>,
     >::type
 >::type
 prod(const Proxy& proxy1, const Proxy& proxy2) {
-  assert(proxy1.size()[1] == proxy2.size()[0]);
+  tbblas_assert(proxy1.size()[1] == proxy2.size()[0]);
   return prod_operation<Proxy>(proxy1, proxy2);
 }
 

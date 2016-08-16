@@ -9,7 +9,7 @@
 #define TBBLAS_FLIP_HPP_
 
 #include <tbblas/proxy.hpp>
-#include <cassert>
+#include <tbblas/assert.hpp>
 
 namespace tbblas {
 
@@ -35,7 +35,7 @@ proxy<tensor<T, dim, device> > flip(tensor<T, dim, device>& t) {
 
 template<class T, unsigned dim, bool device>
 proxy<tensor<T, dim, device> > flip(const proxy<tensor<T, dim, device> >& p, size_t idx) {
-  assert(idx < dim);
+  tbblas_assert(idx < dim);
 
   proxy<tensor<T, dim, device> > proxy = p;
   sequence<bool, dim> flipped = proxy.flipped();
@@ -46,7 +46,7 @@ proxy<tensor<T, dim, device> > flip(const proxy<tensor<T, dim, device> >& p, siz
 
 template<class T, unsigned dim, bool device>
 proxy<tensor<T, dim, device> > flip(tensor<T, dim, device>& t, size_t idx) {
-  assert(idx < dim);
+  tbblas_assert(idx < dim);
 
   proxy<tensor<T, dim, device> > proxy(t);
   sequence<bool, dim> flipped = proxy.flipped();

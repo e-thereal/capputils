@@ -45,7 +45,11 @@ struct complex_type<double> {
 
 template<class T, bool device = false>
 struct vector_type {
+#ifdef TBBLAS_CPU_ONLY
+  typedef thrust::host_vector<T> vector_t;
+#else
   typedef thrust::host_vector<T, thrust::cuda::experimental::pinned_allocator<T> > vector_t;
+#endif
 };
 
 template<class T>

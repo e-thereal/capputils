@@ -44,7 +44,10 @@
 #define TBBLAS_HAVE_CBLAS
 #endif
 
-#define TBBLAS_HAVE_CUBLAS
+// I need a better way to configure tbblas
+
+//#define TBBLAS_HAVE_CUBLAS
+#define TBBLAS_CPU_ONLY
 #define TBBLAS_CNN_NO_SELFTEST
 #define TBBLAS_CONV_RBM_NO_SELFTEST
 

@@ -9,8 +9,7 @@
 
 #include <cuda_runtime.h>
 #include <tbblas/context.hpp>
-
-#include <cassert>
+#include <tbblas/assert.hpp>
 
 namespace tbblas {
 
@@ -26,8 +25,8 @@ void enable_peer_access(int gpu_count) {
   int deviceCount = 0;
   cudaGetDeviceCount(&deviceCount);
 
-  assert(gpu_count > 0);
-  assert(gpu_count <= deviceCount);
+  tbblas_assert(gpu_count > 0);
+  tbblas_assert(gpu_count <= deviceCount);
 
   for (int tid = 0; tid < gpu_count; ++tid) {
     cudaSetDevice(tid);
@@ -50,8 +49,8 @@ void disable_peer_access(int gpu_count) {
   int deviceCount = 0;
   cudaGetDeviceCount(&deviceCount);
 
-  assert(gpu_count > 0);
-  assert(gpu_count <= deviceCount);
+  tbblas_assert(gpu_count > 0);
+  tbblas_assert(gpu_count <= deviceCount);
 
 
   for (int tid = 0; tid < gpu_count; ++tid) {

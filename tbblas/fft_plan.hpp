@@ -16,7 +16,6 @@
 
 #include <cufft.h>
 
-#include <cassert>
 #include <sstream>
 #include <stdexcept>
 

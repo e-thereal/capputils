@@ -8,6 +8,7 @@
 #include "context_manager.hpp"
 
 #include <boost/thread/locks.hpp>
+#include <tbblas/assert.hpp>
 
 #include <iostream>
 
@@ -15,11 +16,15 @@ namespace tbblas {
 
 context_manager::context_manager() {
   default_context.stream = 0;
+#ifdef TBBLAS_HAVE_CUBLAS
   cublasCreate(&default_context.cublasHandle);
+#endif
 }
 
 context_manager::~context_manager() {
+#ifdef TBBLAS_HAVE_CUBLAS
   cublasDestroy(default_context.cublasHandle);
+#endif
 }
 
 context_manager& context_manager::get() {
@@ -57,11 +62,11 @@ void context_manager::add(boost::shared_ptr<tbblas::context> context) {
 void context_manager::remove(boost::shared_ptr<tbblas::context> context) {
   boost::lock_guard<boost::mutex> guard(mtx);
 
-  assert(contexts.find(boost::this_thread::get_id()) != contexts.end());
+  tbblas_assert(contexts.find(boost::this_thread::get_id()) != contexts.end());
 
   stack_t& s = contexts[boost::this_thread::get_id()];
 
-  assert (context.get() == s.top().get());
+  tbblas_assert (context.get() == s.top().get());
   s.pop();
 
   if (s.empty()) {

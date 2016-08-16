@@ -10,7 +10,7 @@
 
 #include <tbblas/proxy.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <cassert>
+#include <tbblas/assert.hpp>
 
 namespace tbblas {
 
@@ -21,7 +21,7 @@ typename boost::enable_if<is_tensor<Tensor>,
   >::type
 >::type
 row(Tensor& tensor, int rowIdx) {
-  assert(0 <= rowIdx && rowIdx < tensor.size()[0]);
+  tbblas_assert(0 <= rowIdx && rowIdx < tensor.size()[0]);
   return tensor[seq(rowIdx, 0), seq(1, tensor.size()[1])];
 }
 
@@ -32,7 +32,7 @@ typename boost::enable_if<is_tensor<Tensor>,
   >::type
 >::type
 row(const Tensor& tensor, int rowIdx) {
-  assert(0 <= rowIdx && rowIdx < tensor.size()[0]);
+  tbblas_assert(0 <= rowIdx && rowIdx < tensor.size()[0]);
   return tensor[seq(rowIdx, 0), seq(1, tensor.size()[1])];
 }
 

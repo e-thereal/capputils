@@ -9,6 +9,8 @@
 #define TBBLAS_REAL_HPP_
 
 #include <tbblas/type_traits.hpp>
+#include <tbblas/assert.hpp>
+
 #include <thrust/functional.h>
 #include <thrust/iterator/transform_iterator.h>
 #include <thrust/iterator/zip_iterator.h>
@@ -123,7 +125,7 @@ struct real_expression {
   operator=(const Expression& expr) const {
     const dim_t& size = expr.size();
     for (unsigned i = 0; i < dimCount; ++i) {
-      assert(size[i] == this->size()[i]);
+      tbblas_assert(size[i] == this->size()[i]);
     }
     tbblas::detail::for_each(
         typename tbblas::detail::select_system<cuda_enabled && Expression::cuda_enabled>(),

@@ -182,7 +182,10 @@ operator<<(std::ostream& os, const Expression& expr) {
 //  print(proxy, 5, os);
 //  return os;
 //}
-
+#if defined(_MSC_VER)
+#define tbblas_print(...) std::cout << #__VA_ARGS__" = " << (__VA_ARGS__) << std::endl
+#else
 #define tbblas_print(args...) std::cout << #args" = " << (args) << std::endl
+#endif
 
 #endif /* TBBLAS_IO_HPP_ */

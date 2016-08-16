@@ -38,7 +38,7 @@ Parameter: 42
 
 /*** Begin: DataModel.h ***/
 
-#include <capputils/ReflectableClass.h>
+#include <capputils/reflection/ReflectableClass.h>
 
 class DataModel : public capputils::reflection::ReflectableClass {
   InitReflectableClass(DataModel)
@@ -56,16 +56,17 @@ public:
 
 /*** Begin: DataModel.cpp ***/
 
-#include <capputils/DescriptionAttribute.h>
-#include <capputils/FlagAttribute.h>
+#include <capputils/attributes/DescriptionAttribute.h>
+#include <capputils/attributes/ParameterAttribute.h>
+#include <capputils/attributes/FlagAttribute.h>
 
 BeginPropertyDefinitions(DataModel)
   using namespace capputils::attributes;
 
-  DefineProperty(InputName, Description("Name of the input file."))
-  DefineProperty(OutputName, Description("Name of the output file."))
-  DefineProperty(Parameter, Description("Parameter of type int."))
-  DefineProperty(Help, Description("Shows this help."), Flag())
+  DefineProperty(InputName, Parameter("in", "i"), Description("Name of the input file."))
+  DefineProperty(OutputName, Parameter("out", "o"), Description("Name of the output file."))
+  DefineProperty(Parameter, Parameter("param", "p"), Description("Parameter of type int."))
+  DefineProperty(Help, Parameter("help", "h"), Description("Shows this help."), Flag())
   
 EndPropertyDefinitions
 
@@ -85,7 +86,7 @@ int main(int argc, char* argv[])
 
   ArgumentsParser::Parse(model, argc, argv);
   if (model.getHelp()) {
-    ArgumentsParser::PrintDefaultUsage("Demo1", model);
+    ArgumentsParser::PrintDefaultUsage("Demo1", model, true);
     return 0;
   }
 

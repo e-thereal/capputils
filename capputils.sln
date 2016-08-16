@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxml", "tinyxml\tinyxml.vcxproj", "{A571956C-9097-4B72-B3CA-9627786AAECD}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XmlizerTest", "XmlizerTest\XmlizerTest.vcxproj", "{149BC980-D31F-4B6D-9BE9-E28B18172BA2}"
@@ -20,11 +22,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Demo1", "examples\Demo1\Dem
 		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C} = {B47B19A5-8F5D-467D-B0D5-B5D7115D013C}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tbblas", "tbblas\tbblas.vcxproj", "{AD36BFDA-AA9E-427C-A4FC-16BCC0B1D2A2}"
+EndProject
 Global
-	GlobalSection(SubversionScc) = preSolution
-		Svn-Managed = True
-		Manager = AnkhSVN - Subversion Support for Visual Studio
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
@@ -45,21 +45,35 @@ Global
 		{149BC980-D31F-4B6D-9BE9-E28B18172BA2}.Debug|x64.ActiveCfg = Debug|Win32
 		{149BC980-D31F-4B6D-9BE9-E28B18172BA2}.Release|Win32.ActiveCfg = Release|Win32
 		{149BC980-D31F-4B6D-9BE9-E28B18172BA2}.Release|Win32.Build.0 = Release|Win32
-		{149BC980-D31F-4B6D-9BE9-E28B18172BA2}.Release|x64.ActiveCfg = Release|Win32
+		{149BC980-D31F-4B6D-9BE9-E28B18172BA2}.Release|x64.ActiveCfg = Release|x64
+		{149BC980-D31F-4B6D-9BE9-E28B18172BA2}.Release|x64.Build.0 = Release|x64
 		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C}.Debug|Win32.ActiveCfg = Debug|Win32
 		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C}.Debug|Win32.Build.0 = Debug|Win32
 		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C}.Debug|x64.ActiveCfg = Debug|Win32
 		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C}.Release|Win32.ActiveCfg = Release|Win32
 		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C}.Release|Win32.Build.0 = Release|Win32
-		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C}.Release|x64.ActiveCfg = Release|Win32
+		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C}.Release|x64.ActiveCfg = Release|x64
+		{B47B19A5-8F5D-467D-B0D5-B5D7115D013C}.Release|x64.Build.0 = Release|x64
 		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Debug|Win32.ActiveCfg = Debug|Win32
 		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Debug|Win32.Build.0 = Debug|Win32
 		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Debug|x64.ActiveCfg = Debug|Win32
 		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Release|Win32.ActiveCfg = Release|Win32
 		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Release|Win32.Build.0 = Release|Win32
-		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Release|x64.ActiveCfg = Release|Win32
+		{6827D781-FA94-476C-AD63-0921EF3A83CD}.Release|x64.ActiveCfg = Release|x64
+		{AD36BFDA-AA9E-427C-A4FC-16BCC0B1D2A2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AD36BFDA-AA9E-427C-A4FC-16BCC0B1D2A2}.Debug|Win32.Build.0 = Debug|Win32
+		{AD36BFDA-AA9E-427C-A4FC-16BCC0B1D2A2}.Debug|x64.ActiveCfg = Debug|x64
+		{AD36BFDA-AA9E-427C-A4FC-16BCC0B1D2A2}.Debug|x64.Build.0 = Debug|x64
+		{AD36BFDA-AA9E-427C-A4FC-16BCC0B1D2A2}.Release|Win32.ActiveCfg = Release|Win32
+		{AD36BFDA-AA9E-427C-A4FC-16BCC0B1D2A2}.Release|Win32.Build.0 = Release|Win32
+		{AD36BFDA-AA9E-427C-A4FC-16BCC0B1D2A2}.Release|x64.ActiveCfg = Release|x64
+		{AD36BFDA-AA9E-427C-A4FC-16BCC0B1D2A2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 EndGlobal

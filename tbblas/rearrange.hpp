@@ -9,6 +9,7 @@
 #define TBBLAS_REARRANGE_HPP_
 
 #include <tbblas/tensor.hpp>
+#include <tbblas/assert.hpp>
 
 namespace tbblas {
 
@@ -119,7 +120,7 @@ typename boost::enable_if<is_expression<Expression>,
 >::type
 rearrange(const Expression& expr, const sequence<int, Expression::dimCount>& block)
 {
-  assert(block[Expression::dimCount - 1] == 1);
+  tbblas_assert(block[Expression::dimCount - 1] == 1);
   return rearrange_expression<Expression>(expr, block);
 }
 
@@ -236,7 +237,7 @@ typename boost::enable_if<is_expression<Expression>,
 >::type
 rearrange_r(const Expression& expr, const sequence<int, Expression::dimCount>& block)
 {
-  assert(block[Expression::dimCount - 1] == 1);
+  tbblas_assert(block[Expression::dimCount - 1] == 1);
   return rearrange_r_expression<Expression>(expr, block);
 }
 

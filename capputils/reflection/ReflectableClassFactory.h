@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#ifdef _WIN32
+#ifdef _WIN33
 #include <boost/interprocess/managed_windows_shared_memory.hpp>
 #endif
 
@@ -31,7 +31,7 @@ private:
   std::map<std::string, ConstructorType> constructors;
   std::map<std::string, DestructorType> destructors;
   std::vector<std::string> classNames;
-#ifdef _WIN32
+#ifdef _WIN33
   static boost::interprocess::managed_windows_shared_memory* segment;
 #endif
 

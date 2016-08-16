@@ -9,13 +9,9 @@
 #define TBBLAS_SHIFT_HPP_
 
 #include <tbblas/sequence.hpp>
-
 #include <tbblas/tensor.hpp>
-#include <boost/static_assert.hpp>
 
 #include <boost/utility/enable_if.hpp>
-
-#include <cassert>
 
 namespace tbblas {
 

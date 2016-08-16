@@ -188,9 +188,17 @@ public:
     return false;
   }
 
-  operator typename boost::enable_if_c<size <= 4, dim3>::type() const {
+  template<
+    typename U = T,
+    typename = typename boost::enable_if_c<size <= 4>::type
+  >
+  operator dim3() const {
     return dim_type_trait<T, size>::convert(*this);
   }
+
+  /*operator typename boost::enable_if_c<size <= 4, dim3>::type() const {
+    return dim_type_trait<T, size>::convert(*this);
+  }*/
 
   __host__ __device__
   value_t sum() const {
@@ -293,6 +301,41 @@ __host__ __device__
 sequence<T, 4u> seq(T x1, T x2, T x3, T x4) {
   T seq[] = {x1, x2, x3, x4};
   return sequence<T, 4u>(seq);
+}
+
+template<class T>
+__host__ __device__
+sequence<T, 5u> seq(T x1, T x2, T x3, T x4, T x5) {
+  T seq[] = {x1, x2, x3, x4, x5};
+  return sequence<T, 5u>(seq);
+}
+
+template<class T>
+__host__ __device__
+sequence<T, 6u> seq(T x1, T x2, T x3, T x4, T x5, T x6) {
+  T seq[] = {x1, x2, x3, x4, x5, x6};
+  return sequence<T, 6u>(seq);
+}
+
+template<class T>
+__host__ __device__
+sequence<T, 7u> seq(T x1, T x2, T x3, T x4, T x5, T x6, T x7) {
+  T seq[] = {x1, x2, x3, x4, x5, x6, x7};
+  return sequence<T, 7u>(seq);
+}
+
+template<class T>
+__host__ __device__
+sequence<T, 8u> seq(T x1, T x2, T x3, T x4, T x5, T x6, T x7, T x8) {
+  T seq[] = {x1, x2, x3, x4, x5, x6, x7, x8};
+  return sequence<T, 8u>(seq);
+}
+
+template<class T>
+__host__ __device__
+sequence<T, 9u> seq(T x1, T x2, T x3, T x4, T x5, T x6, T x7, T x8, T x9) {
+  T seq[] = {x1, x2, x3, x4, x5, x6, x7, x8, x9};
+  return sequence<T, 9u>(seq);
 }
 
 /*** Useful functions ***/

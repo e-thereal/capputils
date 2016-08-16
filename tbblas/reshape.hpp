@@ -9,6 +9,7 @@
 #define TBBLAS_RESHAPE_HPP_
 
 #include <tbblas/proxy.hpp>
+#include <tbblas/assert.hpp>
 
 namespace tbblas {
 
@@ -74,7 +75,7 @@ reshape(const Expression& expr, const sequence<int, dims>& size)
   int count = 1;
   for (int i = 0; i < dims; ++i)
     count *= size[i];
-  assert(expr.count() == count);
+  tbblas_assert(expr.count() == count);
   return reshape_expression<Expression, dims>(expr, size);
 }
 
@@ -84,7 +85,7 @@ typename boost::enable_if<is_expression<Expression>,
 >::type
 reshape(const Expression& expr, int width)
 {
-  assert(expr.count() == width);
+  tbblas_assert(expr.count() == width);
   return reshape(expr, seq(width));
 }
 
@@ -94,7 +95,7 @@ typename boost::enable_if<is_expression<Expression>,
 >::type
 reshape(const Expression& expr, int width, int height)
 {
-  assert(expr.count() == width * height);
+  tbblas_assert(expr.count() == width * height);
   return reshape(expr, seq(width, height));
 }
 
@@ -104,7 +105,7 @@ typename boost::enable_if<is_expression<Expression>,
 >::type
 reshape(const Expression& expr, int width, int height, int depth)
 {
-  assert(expr.count() == width * height * depth);
+  tbblas_assert(expr.count() == width * height * depth);
   return reshape(expr, seq(width, height, depth));
 }
 
@@ -114,7 +115,7 @@ typename boost::enable_if<is_expression<Expression>,
 >::type
 reshape(const Expression& expr, int width, int height, int depth, int channels)
 {
-  assert(expr.count() == width * height * depth * channels);
+  tbblas_assert(expr.count() == width * height * depth * channels);
   return reshape(expr, seq(width, height, depth, channels));
 }
 

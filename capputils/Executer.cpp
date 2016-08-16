@@ -17,7 +17,7 @@
 
 namespace capputils {
 
-Executer::Executer(int verbose) : verbose(verbose) {
+Executer::Executer(bool verbose) : verbose(verbose) {
 }
 
 Executer::~Executer() {

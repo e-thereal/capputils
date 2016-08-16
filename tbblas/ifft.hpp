@@ -12,12 +12,12 @@
 #include <tbblas/complex.hpp>
 #include <tbblas/fft_plan.hpp>
 #include <tbblas/context.hpp>
+#include <tbblas/assert.hpp>
 
 #include <boost/utility/enable_if.hpp>
 
 #include <cufft.h>
 
-#include <cassert>
 #include <sstream>
 #include <stdexcept>
 
@@ -100,7 +100,7 @@ struct ifft_operation
           ) != CUFFT_SUCCESS)
       {
         std::cout << result << std::endl;
-        assert(0);
+        tbblas_assert(0);
       }
     }
 #endif

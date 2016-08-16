@@ -13,7 +13,9 @@ namespace tbblas {
 
 change_stream::change_stream(cudaStream_t stream) : _context(new tbblas::context()) {
   _context->stream = stream;
+#ifdef TBBLAS_HAVE_CUBLAS
   _context->cublasHandle = context::get().cublasHandle;
+#endif
   context_manager::get().add(_context);
 }
 

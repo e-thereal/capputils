@@ -19,7 +19,7 @@ private:
   bool verbose;
 
 public:
-  Executer(int verbose = false);
+  Executer(bool verbose = false);
   virtual ~Executer();
 
   std::ostream& getCommand();

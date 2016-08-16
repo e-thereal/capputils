@@ -13,7 +13,7 @@
 #include <capputils/attributes/OutputAttribute.h>
 #include <capputils/attributes/TimeStampAttribute.h>
 
-#include <boost/filesystem.hpp>
+
 #include <cmath>
 #include <iostream>
 

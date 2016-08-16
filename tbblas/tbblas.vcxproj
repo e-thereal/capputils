@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -18,6 +18,78 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="arithmetic.hpp" />
+    <ClInclude Include="assert.hpp" />
+    <ClInclude Include="binary_expression.hpp" />
+    <ClInclude Include="change_stream.hpp" />
+    <ClInclude Include="column.hpp" />
+    <ClInclude Include="comparisons.hpp" />
+    <ClInclude Include="complex.hpp" />
+    <ClInclude Include="context.hpp" />
+    <ClInclude Include="context_manager.hpp" />
+    <ClInclude Include="conv.hpp" />
+    <ClInclude Include="detail\copy.hpp" />
+    <ClInclude Include="detail\for_each.hpp" />
+    <ClInclude Include="detail\inner_product.hpp" />
+    <ClInclude Include="detail\reduce.hpp" />
+    <ClInclude Include="detail\reduce_by_key.hpp" />
+    <ClInclude Include="detail\system.hpp" />
+    <ClInclude Include="detail\transform_reduce.hpp" />
+    <ClInclude Include="dot.hpp" />
+    <ClInclude Include="entropy.hpp" />
+    <ClInclude Include="expand.hpp" />
+    <ClInclude Include="fft.hpp" />
+    <ClInclude Include="fft_plan.hpp" />
+    <ClInclude Include="fill.hpp" />
+    <ClInclude Include="filter.hpp" />
+    <ClInclude Include="filter2.hpp" />
+    <ClInclude Include="flip.hpp" />
+    <ClInclude Include="gaussian.hpp" />
+    <ClInclude Include="identity.hpp" />
+    <ClInclude Include="ifft.hpp" />
+    <ClInclude Include="img.hpp" />
+    <ClInclude Include="indices.hpp" />
+    <ClInclude Include="io.hpp" />
+    <ClInclude Include="linalg.hpp" />
+    <ClInclude Include="mask.hpp" />
+    <ClInclude Include="math.hpp" />
+    <ClInclude Include="max.hpp" />
+    <ClInclude Include="min.hpp" />
+    <ClInclude Include="new_context.hpp" />
+    <ClInclude Include="ones.hpp" />
+    <ClInclude Include="prod.hpp" />
+    <ClInclude Include="proxy.hpp" />
+    <ClInclude Include="random.hpp" />
+    <ClInclude Include="real.hpp" />
+    <ClInclude Include="rearrange.hpp" />
+    <ClInclude Include="reorder.hpp" />
+    <ClInclude Include="repeat.hpp" />
+    <ClInclude Include="reshape.hpp" />
+    <ClInclude Include="row.hpp" />
+    <ClInclude Include="sequence.hpp" />
+    <ClInclude Include="sequence_iterator.hpp" />
+    <ClInclude Include="serialize.hpp" />
+    <ClInclude Include="shift.hpp" />
+    <ClInclude Include="sum.hpp" />
+    <ClInclude Include="swap.hpp" />
+    <ClInclude Include="tbblas.hpp" />
+    <ClInclude Include="tensor.hpp" />
+    <ClInclude Include="trans.hpp" />
+    <ClInclude Include="type_traits.hpp" />
+    <ClInclude Include="unary_expression.hpp" />
+    <ClInclude Include="util.hpp" />
+    <ClInclude Include="zeros.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="change_stream.cpp" />
+    <ClCompile Include="context.cpp" />
+    <ClCompile Include="context_manager.cpp" />
+    <ClCompile Include="math.cpp" />
+    <ClCompile Include="new_context.cpp" />
+    <ClCompile Include="prod.cpp" />
+    <ClCompile Include="util.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AD36BFDA-AA9E-427C-A4FC-16BCC0B1D2A2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -28,27 +100,31 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 4.2.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 7.5.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -141,7 +217,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;TBBLAS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(NVSDKCOMPUTE_ROOT)/C/common/inc;$(BOOST_INC_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(NVSDKCOMPUTE_ROOT)/C/common/inc;$(BOOST_INCLUDE_PATH);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -150,65 +226,13 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <CudaCompile>
-      <Include>$(BOOST_INC_PATH);$(NVSDKCOMPUTE_ROOT)/C/common/inc;$(SolutionDir)</Include>
+      <Include>$(BOOST_INCLUDE_PATH);$(NVSDKCOMPUTE_ROOT)/C/common/inc;$(SolutionDir)</Include>
       <CodeGeneration>compute_20,sm_20</CodeGeneration>
       <Defines>TBBLAS_EXPORTS</Defines>
     </CudaCompile>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="device_matrix.cpp" />
-    <ClCompile Include="device_vector.cpp" />
-    <ClCompile Include="math.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="device_matrix_gpu.cu" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="arithmetic.hpp" />
-    <ClInclude Include="binary_expression.hpp" />
-    <ClInclude Include="column.hpp" />
-    <ClInclude Include="comparisons.hpp" />
-    <ClInclude Include="complex.hpp" />
-    <ClInclude Include="conv.hpp" />
-    <ClInclude Include="device_matrix.hpp" />
-    <ClInclude Include="device_vector.hpp" />
-    <ClInclude Include="dot.hpp" />
-    <ClInclude Include="entropy.hpp" />
-    <ClInclude Include="expand.hpp" />
-    <ClInclude Include="fft.hpp" />
-    <ClInclude Include="fft_plan.hpp" />
-    <ClInclude Include="fill.hpp" />
-    <ClInclude Include="flip.hpp" />
-    <ClInclude Include="gaussian.hpp" />
-    <ClInclude Include="ifft.hpp" />
-    <ClInclude Include="img.hpp" />
-    <ClInclude Include="io.hpp" />
-    <ClInclude Include="linalg.hpp" />
-    <ClInclude Include="mask.hpp" />
-    <ClInclude Include="math.hpp" />
-    <ClInclude Include="max.hpp" />
-    <ClInclude Include="min.hpp" />
-    <ClInclude Include="ones.hpp" />
-    <ClInclude Include="prod.hpp" />
-    <ClInclude Include="proxy.hpp" />
-    <ClInclude Include="random.hpp" />
-    <ClInclude Include="real.hpp" />
-    <ClInclude Include="repeat.hpp" />
-    <ClInclude Include="reshape.hpp" />
-    <ClInclude Include="row.hpp" />
-    <ClInclude Include="sequence.hpp" />
-    <ClInclude Include="serialize.hpp" />
-    <ClInclude Include="shift.hpp" />
-    <ClInclude Include="sum.hpp" />
-    <ClInclude Include="tbblas.hpp" />
-    <ClInclude Include="tensor.hpp" />
-    <ClInclude Include="trans.hpp" />
-    <ClInclude Include="type_traits.hpp" />
-    <ClInclude Include="unary_expression.hpp" />
-    <ClInclude Include="zeros.hpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 4.2.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 7.5.targets" />
   </ImportGroup>
 </Project>

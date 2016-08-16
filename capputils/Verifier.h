@@ -10,6 +10,8 @@
 
 #include <capputils/reflection/ReflectableClass.h>
 
+#include <boost/filesystem.hpp>	// Putting boost header here so that boost libs are automatically linked in VisualStudio
+
 #include <ostream>
 #include <iostream>
 

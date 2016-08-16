@@ -14,6 +14,7 @@
 #include <tbblas/shift.hpp>
 #include <tbblas/repeat.hpp>
 #include <tbblas/zeros.hpp>
+#include <tbblas/assert.hpp>
 
 namespace tbblas {
 
@@ -45,10 +46,10 @@ public:
   filter_operation(const Expression1& input, const Expression2& kernel, const dim_t& size, unsigned dimension)
    : input(input), kernel(kernel), _size(size), dimension(dimension)
   {
-    assert(max(input.size(), kernel.size()) == input.size());
+    tbblas_assert(max(input.size(), kernel.size()) == input.size());
 
     for (unsigned i = dimension; i < dimCount; ++i)
-      assert(kernel.size()[i] == input.size()[i]);
+      tbblas_assert(kernel.size()[i] == input.size()[i]);
   }
 
   void apply(tensor_t& output) const {
@@ -120,7 +121,7 @@ typename boost::enable_if<is_expression<Expression1>,
   >::type
 >::type
 filter(const Expression1& input, const Expression2& kernel, unsigned dimension) {
-  assert(dimension <= 3);
+  tbblas_assert(dimension <= 3);
   return filter_operation<Expression1, Expression2>(input, kernel, input.size(), dimension);
 }
 
@@ -151,7 +152,7 @@ typename boost::enable_if<is_expression<Expression1>,
   >::type
 >::type
 filter(const Expression1& input, const Expression2& kernel, const typename Expression1::dim_t& size, unsigned dimension) {
-  assert(dimension <= 3);
+  tbblas_assert(dimension <= 3);
   return filter_operation<Expression1, Expression2>(input, kernel, size, dimension);
 }
 

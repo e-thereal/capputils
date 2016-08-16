@@ -261,7 +261,7 @@ template<class T>
 class Converter<T, true, typename boost::enable_if<boost::is_arithmetic<T> >::type> {
 public:
   static T fromString(const std::string& value) {
-    return util::eval_expression(value);
+    return (T)util::eval_expression(value);
   }
 
   static std::string toString(const T& value) {

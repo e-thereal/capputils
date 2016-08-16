@@ -17,7 +17,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
 
-#include <cassert>
+#include <tbblas/assert.hpp>
 
 namespace tbblas {
 
@@ -49,8 +49,8 @@ struct binary_expression {
   binary_expression(const T1& expr1, const T2& expr2, const Operation& op)
    : expr1(expr1), expr2(expr2), op(op)
   {
-    assert(expr1.size() == expr2.size());
-    assert(expr1.fullsize() == expr2.fullsize());
+    tbblas_assert(expr1.size() == expr2.size());
+    tbblas_assert(expr1.fullsize() == expr2.fullsize());
   }
 
   inline const_iterator begin() const {

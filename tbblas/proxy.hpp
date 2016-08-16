@@ -12,15 +12,12 @@
 
 #include <tbblas/tensor.hpp>
 #include <tbblas/fill.hpp>
-
-#include <boost/static_assert.hpp>
+#include <tbblas/assert.hpp>
 
 #include <tbblas/detail/copy.hpp>
 #include <tbblas/detail/system.hpp>
 
 #include <tbblas/io.hpp>
-
-#include <cassert>
 
 namespace tbblas {
 
@@ -46,7 +43,7 @@ struct proxy {
 
     dim_t _size;
     dim_t _pitch, _opitch;
-    size_t _first;
+    difference_type _first;
     flipped_t _flipped;
     dim_t _stride;
     bool trivial, only_different_size;
@@ -154,7 +151,7 @@ struct proxy {
    : _data(tensor.shared_data()), _start(start), _size(size), _fullsize(size), _pitch(tensor.size()), _stride(tbblas::seq<dimCount>(1)), _flipped(tbblas::seq<dimCount>(false))
   {
     for (unsigned i = 0; i < dimCount; ++i) {
-      assert(_start[i] + _size[i] <= _pitch[i]);
+      tbblas_assert(_start[i] + _size[i] <= _pitch[i]);
       _order[i] = i;
     }
   }
@@ -163,7 +160,7 @@ struct proxy {
    : _data(tensor.shared_data()), _start(start), _size((size + stride - 1) / stride), _fullsize((size + stride - 1) / stride), _pitch(tensor.size()), _stride(stride), _flipped(tbblas::seq<dimCount>(false))
   {
     for (unsigned i = 0; i < dimCount; ++i) {
-      assert(_start[i] + _size[i] * _stride[i] - _stride[i] < _pitch[i]);
+      tbblas_assert(_start[i] + _size[i] * _stride[i] - _stride[i] < _pitch[i]);
       _order[i] = i;
     }
   }
@@ -237,7 +234,7 @@ struct proxy {
   }
 
   proxy_t& operator=(const proxy_t& p) {
-    assert(p.size() == _size);
+    tbblas_assert(p.size() == _size);
     tbblas::detail::copy(typename tbblas::detail::select_system<cuda_enabled>::system(), p.begin(), p.end(), begin());
     return *this;
   }
@@ -251,7 +248,7 @@ struct proxy {
   operator=(const Expression& expr) {
     const dim_t& size = expr.size();
     for (unsigned i = 0; i < dimCount; ++i) {
-      assert(size[i] == _size[i]);
+      tbblas_assert(size[i] == _size[i]);
     }
     tbblas::detail::copy(typename tbblas::detail::select_system<cuda_enabled && Expression::cuda_enabled>::system(), expr.begin(), expr.end(), begin());
     return *this;

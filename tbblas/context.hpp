@@ -26,7 +26,9 @@ class change_stream;
 
 struct context {
   cudaStream_t stream;
+#ifdef TBBLAS_HAVE_CUBLAS
   cublasHandle_t cublasHandle;
+#endif
 
   friend class context_manager;
   friend class new_context;

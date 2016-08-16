@@ -13,6 +13,7 @@
 #include <tbblas/shift.hpp>
 #include <tbblas/repeat.hpp>
 #include <tbblas/zeros.hpp>
+#include <tbblas/assert.hpp>
 
 #include <tbblas/context.hpp>
 
@@ -150,7 +151,7 @@ public:
   filter3d_operation(const Tensor& input, const Tensor& kernel, unsigned batches)
    : input(input), kernel(kernel), _size(input.size()), _batches(batches)
   {
-    assert(max(input.size(), kernel.size()) == input.size());
+    tbblas_assert(max(input.size(), kernel.size()) == input.size());
 
 //    for (unsigned i = dimension; i < dimCount; ++i)
 //      assert(kernel.size()[i] == input.size()[i]);
@@ -169,9 +170,9 @@ public:
       blockDim[2] = 4;
     }
 
-    assert(kernel.size()[0] % 2 == 1);
-    assert(kernel.size()[1] % 2 == 1);
-    assert(kernel.size()[2] % 2 == 1);
+    tbblas_assert(kernel.size()[0] % 2 == 1);
+    tbblas_assert(kernel.size()[1] % 2 == 1);
+    tbblas_assert(kernel.size()[2] % 2 == 1);
 
     const int haloSizeX = kernel.size()[0] / 2;
     const int haloSizeY = kernel.size()[1] / 2;
@@ -236,7 +237,7 @@ typename boost::enable_if<is_tensor<Tensor>,
   >::type
 >::type
 filter3d(const Tensor& input, const Tensor& kernel, T) {
-  assert(input.size()[3] == kernel.size()[3]);
+  tbblas_assert(input.size()[3] == kernel.size()[3]);
   return filter3d_operation<Tensor, T>(input, kernel, input.size()[3]);
 }
 
