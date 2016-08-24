@@ -39,7 +39,7 @@ proxy<tensor<T, dim, device> > flip(const proxy<tensor<T, dim, device> >& p, siz
 
   proxy<tensor<T, dim, device> > proxy = p;
   sequence<bool, dim> flipped = proxy.flipped();
-  flipped[idx] = !flipped[idx];
+  flipped[(int)idx] = !flipped[(int)idx];
   proxy.set_flipped(flipped);
   return proxy;
 }
@@ -50,7 +50,7 @@ proxy<tensor<T, dim, device> > flip(tensor<T, dim, device>& t, size_t idx) {
 
   proxy<tensor<T, dim, device> > proxy(t);
   sequence<bool, dim> flipped = proxy.flipped();
-  flipped[idx] = !flipped[idx];
+  flipped[(int)idx] = !flipped[(int)idx];
   proxy.set_flipped(flipped);
   return proxy;
 }
