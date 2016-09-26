@@ -12,6 +12,8 @@
 #include <tbblas/proxy.hpp>
 #include <tbblas/type_traits.hpp>
 #include <tbblas/assert.hpp>
+#include <tbblas/zeros.hpp>
+#include <tbblas/sequence_iterator.hpp>
 
 namespace tbblas {
 
@@ -85,7 +87,7 @@ typename boost::enable_if<is_tensor<Tensor>,
       juxtapose_operation<Tensor>
     >::type
 >::type
-juxtapose(const Tensor& input, int inDim, int outDim1, int outDim2)
+juxtapose(const Tensor& input, int inDim, int outDim1 = 0, int outDim2 = 1)
 {
   return juxtapose_operation<Tensor>(input, inDim, outDim1, outDim2);
 }
