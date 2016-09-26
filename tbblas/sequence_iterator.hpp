@@ -43,7 +43,7 @@ public:
   __host__ __device__
   sequence_iterator<T> operator++() {
     ++_current[0];
-    for (size_t i = 0; i < dimCount - 1; ++i) {
+    for (int i = 0; i < (int)dimCount - 1; ++i) {
       if (_current[i] >= _start[i] + _size[i]) {
         _current[i] = _start[i];
         ++_current[i + 1];
@@ -60,7 +60,7 @@ public:
     sequence_iterator<T> old = *this;
 
     ++_current[0];
-    for (size_t i = 0; i < dimCount - 1; ++i) {
+    for (int i = 0; i < (int)dimCount - 1; ++i) {
       if (_current[i] >= _start[i] + _size[i]) {
         _current[i] = _start[i];
         ++_current[i + 1];
@@ -79,7 +79,7 @@ public:
 
   __host__ __device__
   bool valid() const {
-    for (size_t i = 0; i < dimCount; ++i) {
+    for (int i = 0; i < (int)dimCount; ++i) {
       if (_current[i] >= _start[i] + _size[i])
         return false;
     }
