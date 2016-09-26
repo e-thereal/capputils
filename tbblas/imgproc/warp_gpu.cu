@@ -6,6 +6,7 @@
  */
 
 #include <tbblas/imgproc/warp.hpp>
+#include <tbblas/context.hpp>
 
 namespace tbblas {
 
@@ -75,7 +76,7 @@ void warp(tensor<float, 3, true>& input, const sequence<float, 3>& voxel_size, t
   dim3 blockDim(BlockWidth, BlockHeight);
 
   for (uint k = 0; k < output.size()[2]; ++k) {
-    warp3DKernel<<<gridDim, blockDim>>>(output.data().data().get(), output.size(), deformation.data().data().get(), voxel_size, k);
+    warp3DKernel<<<gridDim, blockDim, 0, context::get().stream>>>(output.data().data().get(), output.size(), deformation.data().data().get(), voxel_size, k);
   }
 
   cudaUnbindTexture(warp_tex);
@@ -127,7 +128,7 @@ void warp(tensor<float, 4, true>& input, const sequence<float, 3>& voxel_size, t
     dim3 blockDim(BlockWidth, BlockHeight);
 
     for (uint k = 0; k < output.size()[2]; ++k) {
-      warp3DKernel<<<gridDim, blockDim>>>(output.data().data().get() + offset, seq(output.size()[0], output.size()[1], output.size()[2]), deformation.data().data().get(), voxel_size, k);
+      warp3DKernel<<<gridDim, blockDim, 0, context::get().stream>>>(output.data().data().get() + offset, seq(output.size()[0], output.size()[1], output.size()[2]), deformation.data().data().get(), voxel_size, k);
     }
 
     cudaUnbindTexture(warp_tex);

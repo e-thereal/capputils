@@ -15,7 +15,9 @@ public:
         message = "Assertion failed: " + reason + " at " + file + ", line " + std::to_string(line);
     }
 
-    virtual const char* what() const {
+    virtual ~assert_exception() throw() { }
+
+    virtual const char* what() const throw() {
         return message.c_str();
     }
 };
@@ -23,4 +25,3 @@ public:
 }
 
 #define tbblas_assert(_Expression) (void)( (!!(_Expression)) || (throw tbblas::assert_exception(#_Expression, __FILE__, __LINE__), 0) )
-

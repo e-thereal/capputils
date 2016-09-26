@@ -6,6 +6,7 @@
  */
 
 #include <tbblas/imgproc/transform.hpp>
+#include <tbblas/context.hpp>
 
 namespace tbblas {
 
@@ -65,7 +66,7 @@ void transform(tensor<float, 3, true>& input, const fmatrix4& matrix, tensor<flo
   dim3 blockDim(BlockWidth, BlockHeight);
 
   for (uint k = 0; k < output.size()[2]; ++k) {
-    transform3DKernel<<<gridDim, blockDim>>>(output.data().data().get(), output.size(), matrix, k);
+    transform3DKernel<<<gridDim, blockDim, 0, context::get().stream>>>(output.data().data().get(), output.size(), matrix, k);
   }
 
   cudaUnbindTexture(tex);
@@ -83,7 +84,7 @@ __global__ void transform4DKernel(float *d_result, tensor<float, 4>::dim_t dimen
 //  d_result[(k * dimension[1] + j) * dimension[0] + i] = tex3D(tex, get_x(v), get_y(v), get_z(v));
 
   float4 v = transMatrix * make_float4(i, j, k, 1);
-  d_result[(k * dimension[1] + j) * dimension[0] + i] = tex3D(tex, get_x(v) + 0.5, get_y(v) + 0.5, get_z(v) + 0.5 + c * dimension[2]);
+  d_result[((c * dimension[2] + k) * dimension[1] + j) * dimension[0] + i] = tex3D(tex, get_x(v) + 0.5, get_y(v) + 0.5, get_z(v) + 0.5 + c * dimension[2]);
 }
 
 template<>
@@ -117,15 +118,13 @@ void transform(tensor<float, 4, true>& input, const fmatrix4& matrix, tensor<flo
   cudaBindTextureToArray(tex, d_cudaArray, texDesc);
 
   // Start kernel
-//  dim3 gridDim((output.size()[0] / skip.x+BlockWidth-1)/BlockWidth,
-//      (dimension.y/skip.y+BlockHeight-1)/BlockHeight);
-  dim3 gridDim((output.size()[0] + BlockWidth - 1) / BlockWidth,
-      (output.size()[1] + BlockHeight - 1) / BlockHeight);
+  dim3 gridDim((output.size()[0] + BlockWidth  - 1) / BlockWidth,
+               (output.size()[1] + BlockHeight - 1) / BlockHeight);
   dim3 blockDim(BlockWidth, BlockHeight);
 
   for (uint c = 0; c < output.size()[3]; ++c) {
     for (uint k = 0; k < output.size()[2]; ++k) {
-      transform4DKernel<<<gridDim, blockDim>>>(output.data().data().get(), output.size(), matrix, k, c);
+      transform4DKernel<<<gridDim, blockDim, 0, context::get().stream>>>(thrust::raw_pointer_cast(output.data().data()), output.size(), matrix, k, c);
     }
   }
 

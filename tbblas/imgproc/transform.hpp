@@ -97,7 +97,7 @@ transform(Tensor& tensor, const fmatrix4& mat, typename Tensor::dim_t outSize = 
   if (outSize == seq<4>(-1))
     outSize = tensor.size();
 
-  assert(tensor.size()[3] == outSize[3]);
+  tbblas_assert(tensor.size()[3] == outSize[3]);
   return transform_operation<Tensor>(tensor, mat, outSize);
 }
 

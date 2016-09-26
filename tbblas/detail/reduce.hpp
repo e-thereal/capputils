@@ -61,6 +61,46 @@ template<typename InputIterator1,
       keys_first, keys_last, values_first, keys_output, values_output);
 }
 
+template<typename InputIterator1,
+         typename InputIterator2,
+         typename OutputIterator1,
+         typename OutputIterator2,
+         typename BinaryPredicate,
+         typename BinaryFunction>
+  thrust::pair<OutputIterator1,OutputIterator2>
+  reduce_by_key(generic_system,
+                InputIterator1 keys_first,
+                InputIterator1 keys_last,
+                InputIterator2 values_first,
+                OutputIterator1 keys_output,
+                OutputIterator2 values_output,
+                BinaryPredicate binary_pred,
+                BinaryFunction binary_op)
+{
+  return thrust::reduce_by_key(keys_first, keys_last, values_first, keys_output, values_output, binary_pred, binary_op);
+}
+
+template<typename InputIterator1,
+         typename InputIterator2,
+         typename OutputIterator1,
+         typename OutputIterator2,
+         typename BinaryPredicate,
+         typename BinaryFunction>
+  thrust::pair<OutputIterator1,OutputIterator2>
+  reduce_by_key(device_system,
+                InputIterator1 keys_first,
+                InputIterator1 keys_last,
+                InputIterator2 values_first,
+                OutputIterator1 keys_output,
+                OutputIterator2 values_output,
+                BinaryPredicate binary_pred,
+                BinaryFunction binary_op)
+{
+  return thrust::reduce_by_key(
+      thrust::cuda::par.on(tbblas::context::get().stream),
+      keys_first, keys_last, values_first, keys_output, values_output, binary_pred, binary_op);
+}
+
 }
 
 }
